@@ -1,0 +1,18 @@
+diff --git a/node_modules/expo-document-picker/android/build.gradle b/node_modules/expo-document-picker/android/build.gradle
+index e5c03e3..735709b 100644
+--- a/node_modules/expo-document-picker/android/build.gradle
++++ b/node_modules/expo-document-picker/android/build.gradle
+@@ -6,7 +6,12 @@ apply plugin: 'kotlin-android'
+ 
+ group = 'host.exp.exponent'
+ version = '13.0.3'
+-useCoreDependencies()
++
++dependencies {
++  implementation project(':expo-modules-core')
++  implementation 'androidx.documentfile:documentfile:1.0.1'
++  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${rootProject.ext.kotlinVersion}"
++}
+ 
+ android {
+   compileSdkVersion rootProject.ext.compileSdkVersion

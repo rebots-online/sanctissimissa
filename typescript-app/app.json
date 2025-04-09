@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "Sanctissi Missa",
+    "slug": "sanctissi-missa",
+    "version": "1.0.0",
+    "owner": "robinsaiworld",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "world.robinsai.sanctissimissa"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "world.robinsai.sanctissimissa"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "0ca3900d-c4e7-4790-b535-169405b0bc34"
+      }
+    },
+    "plugins": [
+      "expo-sqlite"
+    ]
+  }
+}

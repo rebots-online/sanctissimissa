@@ -1,0 +1,9 @@
+[submodule "reference"]
+	path = reference
+	url = https://github.com/DivinumOfficium/divinum-officium.git
+	branch = master
+
+[submodule "typescript-app"]
+	path = typescript-app
+	url = https://github.com/rebots-online/sanctissi-missa-typescript.git
+	branch = master
