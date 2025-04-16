@@ -95,8 +95,8 @@ echo -e "${GREEN}Native code generation complete.${NC}"
 echo "Starting EAS build with development-standalone profile..."
 echo "This will create a standalone APK with embedded bundle."
 echo "This may take some time. Please wait..."
-# Ensure you have committed the latest changes before running this!
-# It uses the development-standalone profile and clears cache.
+# Ensure you are on the correct commit before running this!
+# Uses development-standalone profile and clears cache.
 eas build -p android --profile development-standalone --clear-cache
 
 if [ $? -ne 0 ]; then
