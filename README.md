@@ -1,6 +1,7 @@
 # Sanctissi-Missa - Modern Architecture
 
-w
+(C)2025 Robin L. M. Cheung, MBA
+
 # Sanctissi Missa Architecture
 
 ## Repository Structure
@@ -17,7 +18,7 @@ sanctissi-missa/
 ├── typescript-app/           # Modern TypeScript Implementation
 └── docs/                    # Project Documentation
 ```
-
+I think it's 
 ### Design Decisions
 
 #### 1. Parent Repository Pattern
