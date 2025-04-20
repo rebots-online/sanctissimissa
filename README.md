@@ -18,7 +18,6 @@ sanctissi-missa/
 ├── typescript-app/           # Modern TypeScript Implementation
 └── docs/                    # Project Documentation
 ```
-I think it's 
 ### Design Decisions
 
 #### 1. Parent Repository Pattern
