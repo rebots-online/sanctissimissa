@@ -1,34 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import './App.css'
+import CalendarPage from './pages/CalendarPage'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <Router>
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-gray-800 text-white p-4">
+          <div className="container mx-auto flex justify-between items-center">
+            <h1 className="text-xl font-bold">SanctissiMissa</h1>
+            <nav>
+              <ul className="flex space-x-4">
+                <li>
+                  <Link to="/" className="hover:text-gray-300">Home</Link>
+                </li>
+                <li>
+                  <Link to="/calendar" className="hover:text-gray-300">Calendar</Link>
+                </li>
+                <li>
+                  <Link to="/mass" className="hover:text-gray-300">Mass</Link>
+                </li>
+                <li>
+                  <Link to="/office" className="hover:text-gray-300">Divine Office</Link>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </header>
+
+        <main className="container mx-auto py-6">
+          <Routes>
+            <Route path="/" element={<CalendarPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
+            {/* Add more routes as we develop more pages */}
+          </Routes>
+        </main>
+
+        <footer className="bg-gray-800 text-white p-4 mt-auto">
+          <div className="container mx-auto text-center">
+            <p>SanctissiMissa &copy; 2025 Robin L. M. Cheung, MBA</p>
+          </div>
+        </footer>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </Router>
   )
 }
 
