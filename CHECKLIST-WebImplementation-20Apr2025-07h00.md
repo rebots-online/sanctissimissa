@@ -1,6 +1,7 @@
 # SanctissiMissa Web Implementation Checklist
 
 ## Project Setup
+
 - [✅] Initialize React + TypeScript project with Vite
 - [✅] Configure Tailwind CSS
 - [✅] Set up project structure (components, services, models)
@@ -8,6 +9,7 @@
 - [✅] Create project documentation (ARCHITECTURE.md, ROADMAP.md, IDEOLOGY.md)
 
 ## Core Features Implementation
+
 - [✅] Create basic layout with navigation
 - [✅] Implement liturgical calendar page
 - [✅] Create calendar models and interfaces
@@ -23,6 +25,7 @@
 - [ ] Implement audio recording for journal entries
 
 ## UI/UX Enhancements
+
 - [ ] Improve responsive design for mobile devices
 - [ ] Add dark mode support
 - [ ] Implement language switching (Latin/English)
@@ -30,6 +33,7 @@
 - [ ] Add accessibility features
 
 ## Testing & Optimization
+
 - [ ] Write unit tests for core functionality
 - [ ] Perform cross-browser testing
 - [ ] Optimize performance
@@ -37,17 +41,20 @@
 - [ ] Test on various screen sizes
 
 ## Documentation
+
 - [ ] Create user documentation
 - [ ] Document API and data structures
 - [ ] Create developer documentation
 
 ## Deployment
+
 - [ ] Set up CI/CD pipeline
 - [ ] Configure hosting
 - [ ] Deploy web application
 - [ ] Monitor performance and errors
 
 ## Future Enhancements
+
 - [ ] Add Altar Server's resource with conceptual explanations
 - [ ] Implement user accounts and sync
 - [ ] Add community features
