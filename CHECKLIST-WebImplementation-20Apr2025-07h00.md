@@ -15,9 +15,10 @@
 - [✅] Create calendar models and interfaces
 - [✅] Implement Easter date calculation
 - [✅] Create liturgical day display component
-- [/] Set up IndexedDB database for liturgical texts
-- [/] Create detailed implementation guides
-- [ ] Implement data import service for liturgical texts
+- [✅] Set up IndexedDB database for liturgical texts
+- [✅] Create detailed implementation guides
+- [✅] Implement calendar import service
+- [/] Implement data import service for liturgical texts
 - [ ] Create Mass texts display component
 - [ ] Create Divine Office texts display component
 - [ ] Implement prayer texts component (Rosary, Divine Mercy, etc.)

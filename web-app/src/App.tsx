@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import './App.css'
 import CalendarPage from './pages/CalendarPage'
+import DatabaseTest from './components/database/DatabaseTest'
 
 function App() {
   return (
@@ -23,6 +24,9 @@ function App() {
                 <li>
                   <Link to="/office" className="hover:text-gray-300">Divine Office</Link>
                 </li>
+                <li>
+                  <Link to="/database-test" className="hover:text-gray-300">DB Test</Link>
+                </li>
               </ul>
             </nav>
           </div>
@@ -32,6 +36,7 @@ function App() {
           <Routes>
             <Route path="/" element={<CalendarPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/database-test" element={<DatabaseTest />} />
             {/* Add more routes as we develop more pages */}
           </Routes>
         </main>
