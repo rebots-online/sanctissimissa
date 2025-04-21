@@ -124,7 +124,7 @@ export async function initDatabase(): Promise<IDBPDatabase<SanctissiMissaDB>> {
   if (db) return db;
   
   db = await openDB<SanctissiMissaDB>(DB_NAME, DB_VERSION, {
-    upgrade(db, oldVersion, newVersion, transaction) {
+    upgrade(db, oldVersion) {
       // Create object stores if they don't exist
       if (oldVersion < 1) {
         // Liturgical days store

@@ -1,0 +1,54 @@
+[
+  {
+    "id": "proper_tempora_easter_sunday",
+    "date": "2025-04-21T03:20:09.155Z",
+    "part": "proper",
+    "category": "tempora",
+    "day": "Pasc0-0",
+    "title": {
+      "latin": "Dominica Resurrectionis",
+      "english": "Easter Sunday"
+    },
+    "introit": {
+      "latin": "Resurrexi, et adhuc tecum sum, allelúja: posuísti super me manum tuam, allelúja: mirábilis facta est sciéntia tua, allelúja, allelúja.",
+      "english": "I arose, and am still with Thee, alleluia; Thou hast laid Thy hand upon me, alleluia; Thy knowledge is become wonderful, alleluia, alleluia.",
+      "reference": "Ps 138:18; 138:5-6"
+    },
+    "collect": {
+      "latin": "Deus, qui hodiérna die per Unigénitum tuum æternitátis nobis áditum, devícta morte, reserásti: vota nostra, quæ præveniéndo aspíras, étiam adjuvándo proséquere.",
+      "english": "O God, who, on this day, through Thine only-begotten Son, hast conquered death, and thrown open to us the gate of everlasting life, give effect by thine aid to our desires, which Thou dost anticipate and inspire"
+    },
+    "epistle": {
+      "latin": "Fratres: Expurgáte vetus ferméntum, ut sitis nova conspérsio, sicut estis ázymi. Etenim Pascha nostrum immolátus est Christus. Itaque epulémur: non in ferménto véteri, neque in ferménto malítiæ et nequítiæ: sed in ázymis sinceritátis et veritátis.",
+      "english": "Brethren, purge out the old leaven, that you may be a new paste, as you are unleavened: for Christ our Pasch is sacrificed. Therefore let us feast, not with the old leaven, nor with the leaven of malice and wickedness, but with the unleavened bread of sincerity and truth.",
+      "reference": "1 Cor 5:7-8"
+    },
+    "gradual": {
+      "latin": "Allelúja, allelúja. Hæc dies, quam fecit Dóminus: exsultémus et lætémur in ea.",
+      "english": "Alleluia, alleluia. This is the day which the Lord hath made: let us rejoice and be glad in it."
+    },
+    "gospel": {
+      "latin": "In illo témpore: María Magdaléne et María Jacóbi et Salóme emérunt arómata, ut veniéntes úngerent Jesum. Et valde mane una sabbatórum, véniunt ad monuméntum, orto jam sole. Et dicébant ad ínvicem: Quis revólvet nobis lápidem ab óstio monuménti? Et respiciéntes vidérunt revolútum lápidem. Erat quippe magnus valde. Et introëúntes in monuméntum vidérunt júvenem sedéntem in dextris, coopértum stola cándida, et obstupuérunt. Qui dicit illis: Nolíte expavéscere: Jesum quǽritis Nazarénum, crucifíxum: surréxit, non est hic, ecce locus, ubi posuérunt eum. Sed ite, dícite discípulis ejus et Petro, quia præcédit vos in Galilǽam: ibi eum vidébitis, sicut dixit vobis.",
+      "english": "At that time, Mary Magdalen, and Mary the mother of James, and Salome bought sweet spices, that coming they might anoint Jesus. And very early in the morning, the first day of the week, they came to the sepulchre, the sun being now risen. And they said one to another: Who shall roll us back the stone from the door of the sepulchre? And looking, they saw the stone rolled back. For it was very great. And entering into the sepulchre, they saw a young man sitting on the right side, clothed with a white robe, and they were astonished. Who saith to them, Be not affrighted; ye seek Jesus of Nazareth, who was crucified: He is risen, He is not here; behold the place where they laid Him. But go, tell His disciples, and Peter, that He goeth before you into Galilee; there you shall see Him, as He told you.",
+      "reference": "Marc 16:1-7"
+    },
+    "offertory": {
+      "latin": "Terra trémuit, et quiévit, dum resúrgeret in judício Deus, allelúja.",
+      "english": "The earth trembled and was still when God arose in judgment, alleluia.",
+      "reference": "Ps. 75:9-10"
+    },
+    "secret": {
+      "latin": "Súscipe, quǽsumus, Dómine, preces pópuli tui cum oblatiónibus hostiárum: ut, Paschálibus initiáta mystériis, ad æternitátis nobis medélam, te operánte, profíciant.",
+      "english": "We beseech Thee, O Lord, accept the prayers of Thy people together with the Sacrifice they offer, that what has been begun by the Paschal Mysteries, by Thy working may profit us unto eternal healing."
+    },
+    "communion": {
+      "latin": "Pascha nostrum immolátus est Christus, allelúja: itaque epulémur in ázymis sinceritátis et veritátis, allelúja, allelúja, allelúja.",
+      "english": "Christ our Pasch is immolated, alleluia: therefore let us feast with the unleavened bread of sincerity and truth, alleluia, alleluia, alleluia.",
+      "reference": "1 Cor 5:7-8"
+    },
+    "postcommunion": {
+      "latin": "Spíritum nobis, Dómine, tuæ caritátis infúnde: ut, quos sacraméntis paschálibus satiásti, tua fácias pietáte concordes.",
+      "english": "Pour forth upon us, O Lord, the spirit of Thy love, that, by Thy loving kindness, Thou mayest make to be of one mind those whom Thou hast satisfied with the Paschal Sacraments."
+    }
+  }
+]

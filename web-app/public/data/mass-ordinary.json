@@ -1,0 +1,35 @@
+{
+  "id": "ordinary_default",
+  "date": "2025-04-21T03:20:09.156Z",
+  "part": "ordinary",
+  "kyrie": {
+    "latin": "",
+    "english": "",
+    "reference": ""
+  },
+  "gloria": {
+    "latin": "",
+    "english": "",
+    "reference": ""
+  },
+  "credo": {
+    "latin": "",
+    "english": "",
+    "reference": ""
+  },
+  "sanctus": {
+    "latin": "",
+    "english": "",
+    "reference": ""
+  },
+  "agnus": {
+    "latin": "",
+    "english": "",
+    "reference": ""
+  },
+  "ite": {
+    "latin": "",
+    "english": "",
+    "reference": ""
+  }
+}

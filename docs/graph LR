@@ -1,0 +1,21 @@
+graph LR
+    subgraph "Data Import Process"
+        A[Flat Text Files] --> B[TextFileParser]
+        B --> C[Structured Data]
+        C --> D[SQLite Import]
+        D --> E[Database]
+        
+        F[File Format Validation] --> B
+        G[Error Handling] --> B
+        
+        H[Mass Text Files] --> A
+        I[Office Text Files] --> A
+        
+        J[LiturgicalTexts.importMassFile] --> K[Parse & Insert Mass Texts]
+        L[LiturgicalTexts.importOfficeFile] --> M[Parse & Insert Office Texts]
+        
+        N[Batch Import] --> J
+        N --> L
+        
+        O[Data Verification] --> P[Validate Imported Data]
+    end

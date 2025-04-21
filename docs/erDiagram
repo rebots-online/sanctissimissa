@@ -1,0 +1,33 @@
+erDiagram
+    LITURGICAL_DAY {
+        string date
+        string season
+        string celebration
+        string dayName
+        int rank
+        string color
+        boolean allowsVigil
+        array commemorations
+    }
+    
+    MASS_TEXTS {
+        int id
+        string season
+        string celebration
+        string part
+        string latin
+        string english
+    }
+    
+    OFFICE_TEXTS {
+        int id
+        string season
+        string celebration
+        string hour
+        string part
+        string latin
+        string english
+    }
+    
+    LITURGICAL_DAY ||--o{ MASS_TEXTS : has
+    LITURGICAL_DAY ||--o{ OFFICE_TEXTS : has

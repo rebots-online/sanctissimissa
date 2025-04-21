@@ -1,6 +1,6 @@
 import { getDatabase } from '../database/db';
 import { getLiturgicalDay } from '../calendar/liturgicalCalendar';
-import type { LiturgicalDay as DayRecord } from '../../models/calendar';
+import type { LiturgicalDay } from '../../models/calendar';
 
 /**
  * Generate and import every liturgical day between startYear and endYear (inclusive).
@@ -18,7 +18,11 @@ export async function importLiturgicalCalendar(
   for (let year = startYear; year <= endYear; year++) {
     let cursor = new Date(year, 0, 1);
     while (cursor.getFullYear() === year) {
-      const entry: DayRecord = getLiturgicalDay(cursor);
+      const liturgical = getLiturgicalDay(cursor);
+      const entry = {
+        ...liturgical,
+        season: liturgical.season.name,
+      } as const;
       await db.put('liturgical_days', entry);
       cursor.setDate(cursor.getDate() + 1);
     }

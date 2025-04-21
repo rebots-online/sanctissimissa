@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SanctissiMissa Database Import</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.5;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #1a202c;
+    }
+    .status {
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    .success {
+      background-color: #c6f6d5;
+      color: #2f855a;
+    }
+    .error {
+      background-color: #fed7d7;
+      color: #c53030;
+    }
+    .loading {
+      background-color: #e9f5fe;
+      color: #2b6cb0;
+    }
+    .log {
+      background-color: #f7fafc;
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+      border-radius: 5px;
+      height: 300px;
+      overflow-y: auto;
+      margin-top: 20px;
+      font-family: monospace;
+    }
+    button {
+      background-color: #4299e1;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #3182ce;
+    }
+    button:disabled {
+      background-color: #a0aec0;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h1>SanctissiMissa Database Import</h1>
+  <p>This page will import liturgical texts directly into the IndexedDB database.</p>
+  
+  <div class="button-group" style="display: flex; gap: 10px; margin-bottom: 15px;">
+    <button id="importButton">Start Import</button>
+    <button id="clearButton" style="background-color: #e53e3e;">Clear Database</button>
+    <button id="homeButton" style="background-color: #4c51bf;">Go to App</button>
+  </div>
+  
+  <div id="status" class="status"></div>
+  
+  <div class="log" id="log"></div>
+  
+  <script>
+    // Initialize variables
+    const logElement = document.getElementById('log');
+    const statusElement = document.getElementById('status');
+    const importButton = document.getElementById('importButton');
+    
+    // Data sources
+    const DATA_SOURCES = {
+      MASS_PROPERS: '/sanctissimissa-reference/web/www/missa/English',
+      MASS_ORDINARY: '/sanctissimissa-reference/web/www/missa/Ordo',
+      OFFICE_TEXTS: '/sanctissimissa-reference/web/www/horas/English',
+      CALENDAR: '/sanctissimissa-reference/web/www/Tabulae'
+    };
+    
+    // Log function
+    function log(message) {
+      const line = document.createElement('div');
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logElement.appendChild(line);
+      logElement.scrollTop = logElement.scrollHeight;
+      console.log(message);
+    }
+    
+    // Set status
+    function setStatus(message, type) {
+      statusElement.textContent = message;
+      statusElement.className = `status ${type}`;
+    }
+    
+    // IndexedDB functions
+    async function openDatabase() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open('sanctissimissa', 1);
+        
+        request.onupgradeneeded = (event) => {
+          const db = event.target.result;
+          
+          // Create stores if they don't exist
+          if (!db.objectStoreNames.contains('liturgical_days')) {
+            db.createObjectStore('liturgical_days', { keyPath: 'date' });
+          }
+          
+          if (!db.objectStoreNames.contains('mass_texts')) {
+            db.createObjectStore('mass_texts', { keyPath: 'id' });
+          }
+          
+          if (!db.objectStoreNames.contains('office_texts')) {
+            db.createObjectStore('office_texts', { keyPath: 'id' });
+          }
+          
+          if (!db.objectStoreNames.contains('prayers')) {
+            db.createObjectStore('prayers', { keyPath: 'id' });
+          }
+          
+          if (!db.objectStoreNames.contains('journal_entries')) {
+            const journalStore = db.createObjectStore('journal_entries', { keyPath: 'id' });
+            journalStore.createIndex('by_date', 'date');
+            journalStore.createIndex('by_reference', ['textReference.type', 'textReference.id']);
+            journalStore.createIndex('by_tag', 'tags');
+          }
+        };
+        
+        request.onsuccess = (event) => {
+          resolve(event.target.result);
+        };
+        
+        request.onerror = (event) => {
+          reject(new Error(`Database error: ${event.target.error}`));
+        };
+      });
+    }
+    
+    // Import liturgical days
+    async function importLiturgicalDays(db) {
+      log('Importing liturgical days...');
+      
+      try {
+        // Fetch liturgical days from JSON file
+        const response = await fetch('/data/liturgical-days.json');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch liturgical days: ${response.statusText}`);
+        }
+        
+        const liturgicalDays = await response.json();
+        log(`Found ${liturgicalDays.length} liturgical days to import`);
+        
+        // Save to database
+        const transaction = db.transaction(['liturgical_days'], 'readwrite');
+        const store = transaction.objectStore('liturgical_days');
+        
+        let imported = 0;
+        
+        for (const day of liturgicalDays) {
+          // Make sure the date is used as the key
+          const liturgicalDay = {
+            ...day,
+            // Add any missing fields required by the schema
+            date: day.date,
+            season: day.season || 'Ordinary',
+            celebration: day.celebration || '',
+            rank: day.rank || 4,
+            color: day.color || 'green',
+            commemorations: day.commemorations || [],
+            isHolyDay: day.isHolyDay || false,
+            isFeastDay: day.isFeastDay || false,
+            // Add title fields for compatibility with the service
+            title_latin: day.title?.latin || day.celebration || '',
+            title_english: day.title?.english || day.celebration || '',
+            description_latin: day.description?.latin || '',
+            description_english: day.description?.english || '',
+            week: day.week || '1',
+            day: day.day || ''
+          };
+          
+          await new Promise((resolve, reject) => {
+            const request = store.put(liturgicalDay);
+            
+            request.onsuccess = () => {
+              imported++;
+              if (imported % 50 === 0) {
+                log(`Imported ${imported} liturgical days so far...`);
+              }
+              resolve();
+            };
+            
+            request.onerror = (event) => {
+              reject(new Error(`Error importing liturgical day: ${event.target.error}`));
+            };
+          });
+        }
+        
+        log(`Successfully imported ${imported} liturgical days`);
+        return imported;
+      } catch (error) {
+        log(`Error importing liturgical days: ${error.message}`);
+        throw error;
+      }
+    }
+    
+    // Import Mass texts
+    async function importMassTexts(db) {
+      log('Importing Mass texts...');
+      
+      try {
+        // Fetch Mass propers from JSON file
+        const propersResponse = await fetch('/data/mass-propers.json');
+        if (!propersResponse.ok) {
+          throw new Error(`Failed to fetch Mass propers: ${propersResponse.statusText}`);
+        }
+        
+        const massPropers = await propersResponse.json();
+        log(`Found ${massPropers.length} Mass propers to import`);
+        
+        // Fetch Mass ordinary from JSON file
+        const ordinaryResponse = await fetch('/data/mass-ordinary.json');
+        if (!ordinaryResponse.ok) {
+          throw new Error(`Failed to fetch Mass ordinary: ${ordinaryResponse.statusText}`);
+        }
+        
+        const massOrdinary = await ordinaryResponse.json();
+        log('Found Mass ordinary to import');
+        
+        // Save to database
+        const transaction = db.transaction(['mass_texts'], 'readwrite');
+        const store = transaction.objectStore('mass_texts');
+        
+        // Import Mass propers
+        let importedPropers = 0;
+        
+        for (const proper of massPropers) {
+          // Format the proper for IndexedDB schema
+          const formattedProper = {
+            id: proper.id,
+            date: proper.date,
+            part: proper.part,
+            // Add all the proper parts as separate fields
+            title: proper.title,
+            introit: proper.introit,
+            collect: proper.collect,
+            epistle: proper.epistle,
+            gradual: proper.gradual,
+            gospel: proper.gospel,
+            offertory: proper.offertory,
+            secret: proper.secret,
+            communion: proper.communion,
+            postcommunion: proper.postcommunion,
+            // Add sequence if it exists
+            sequence: proper.sequence,
+            // Add category and day if they exist
+            category: proper.category,
+            day: proper.day
+          };
+          
+          await new Promise((resolve, reject) => {
+            const request = store.put(formattedProper);
+            
+            request.onsuccess = () => {
+              importedPropers++;
+              if (importedPropers % 20 === 0) {
+                log(`Imported ${importedPropers} Mass propers so far...`);
+              }
+              resolve();
+            };
+            
+            request.onerror = (event) => {
+              reject(new Error(`Error importing Mass proper: ${event.target.error}`));
+            };
+          });
+        }
+        
+        log(`Successfully imported ${importedPropers} Mass propers`);
+        
+        // Format the ordinary for IndexedDB schema
+        const formattedOrdinary = {
+          id: massOrdinary.id,
+          date: massOrdinary.date,
+          part: massOrdinary.part,
+          // Add all the ordinary parts
+          kyrie: massOrdinary.kyrie,
+          gloria: massOrdinary.gloria,
+          credo: massOrdinary.credo,
+          sanctus: massOrdinary.sanctus,
+          agnus: massOrdinary.agnus,
+          ite: massOrdinary.ite
+        };
+        
+        // Import Mass ordinary
+        await new Promise((resolve, reject) => {
+          const request = store.put(formattedOrdinary);
+          
+          request.onsuccess = () => {
+            log('Mass ordinary imported successfully');
+            resolve();
+          };
+          
+          request.onerror = (event) => {
+            reject(new Error(`Error importing Mass ordinary: ${event.target.error}`));
+          };
+        });
+        
+        // Add default settings
+        const defaultSettings = {
+          id: 'settings',
+          date: new Date().toISOString(),
+          part: 'settings',
+          language: 'latin',
+          showRubrics: true,
+          showTranslations: true,
+          fontSize: 'medium'
+        };
+        
+        await new Promise((resolve, reject) => {
+          const request = store.put(defaultSettings);
+          
+          request.onsuccess = () => {
+            log('Default settings imported successfully');
+            resolve();
+          };
+          
+          request.onerror = (event) => {
+            reject(new Error(`Error importing default settings: ${event.target.error}`));
+          };
+        });
+        
+        return { propers: importedPropers, ordinary: 1, settings: 1 };
+      } catch (error) {
+        log(`Error importing Mass texts: ${error.message}`);
+        throw error;
+      }
+    }
+    
+    // Import Office texts
+    async function importOfficeTexts(db) {
+      log('Importing Office texts...');
+      
+      try {
+        // Fetch Office texts from JSON file
+        const response = await fetch('/data/office-texts.json');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch Office texts: ${response.statusText}`);
+        }
+        
+        const officeTexts = await response.json();
+        log(`Found ${officeTexts.length} Office hours to import`);
+        
+        // Save to database
+        const transaction = db.transaction(['office_texts'], 'readwrite');
+        const store = transaction.objectStore('office_texts');
+        
+        let imported = 0;
+        
+        for (const hour of officeTexts) {
+          // Format the office hour for IndexedDB schema
+          const formattedHour = {
+            id: hour.id,
+            date: hour.date,
+            hour: hour.hour,
+            // Add all the hour parts
+            title: hour.title || { latin: '', english: '' },
+            category: hour.category || '',
+            day: hour.day || '',
+            // Add specific parts
+            hymn: hour.hymn || { latin: '', english: '' },
+            chapter: hour.chapter || { latin: '', english: '' },
+            prayer: hour.prayer || { latin: '', english: '' },
+            // Add arrays of parts
+            psalms: hour.psalms || [],
+            readings: hour.readings || [],
+            antiphons: hour.antiphons || [],
+            responsories: hour.responsories || [],
+            benedictions: hour.benedictions || [],
+            // Add part field required by schema
+            part: hour.hour || 'unknown'
+          };
+          
+          await new Promise((resolve, reject) => {
+            const request = store.put(formattedHour);
+            
+            request.onsuccess = () => {
+              imported++;
+              if (imported % 20 === 0) {
+                log(`Imported ${imported} Office hours so far...`);
+              }
+              resolve();
+            };
+            
+            request.onerror = (event) => {
+              reject(new Error(`Error importing Office hour: ${event.target.error}`));
+            };
+          });
+        }
+        
+        log(`Successfully imported ${imported} Office hours`);
+        return imported;
+      } catch (error) {
+        log(`Error importing Office texts: ${error.message}`);
+        throw error;
+      }
+    }
+    
+    // Main import function
+    async function importData() {
+      try {
+        importButton.disabled = true;
+        setStatus('Importing data...', 'loading');
+        
+        // Open database
+        log('Opening database...');
+        const db = await openDatabase();
+        log('Database opened successfully');
+        
+        // Import liturgical days
+        await importLiturgicalDays(db);
+        
+        // Import Mass texts
+        await importMassTexts(db);
+        
+        // Import Office texts
+        await importOfficeTexts(db);
+        
+        // Success
+        setStatus('Import completed successfully!', 'success');
+        log('Database population complete!');
+        
+      } catch (error) {
+        console.error('Import error:', error);
+        log(`Error: ${error.message}`);
+        setStatus(`Import failed: ${error.message}`, 'error');
+      } finally {
+        importButton.disabled = false;
+      }
+    }
+    
+    // Clear database button event listener
+    const clearButton = document.getElementById('clearButton');
+    clearButton.addEventListener('click', async () => {
+      if (confirm('Are you sure you want to clear the database? This will delete all imported liturgical data.')) {
+        try {
+          // Set status to loading
+          setStatus('Clearing database...', 'loading');
+          log('Opening database...');
+          
+          // Delete the database completely
+          const request = indexedDB.deleteDatabase('sanctissimissa');
+          
+          request.onsuccess = () => {
+            log('Database deleted successfully');
+            setStatus('Database cleared successfully. You can now import fresh data.', 'success');
+          };
+          
+          request.onerror = (event) => {
+            log(`ERROR: Could not delete database: ${event.target.error}`);
+            setStatus(`Error: ${event.target.error}`, 'error');
+          };
+          
+          request.onblocked = () => {
+            log('WARNING: Database deletion was blocked. Please close any other tabs using this app.');
+            setStatus('Database deletion blocked. Please close other tabs using this app.', 'error');
+          };
+        } catch (error) {
+          console.error('Database deletion error:', error);
+          setStatus(`Error: ${error.message}`, 'error');
+          log(`ERROR: ${error.message}`);
+        }
+      }
+    });
+    
+    // Go to app button event listener
+    const homeButton = document.getElementById('homeButton');
+    homeButton.addEventListener('click', () => {
+      // Redirect to the main app with bypass parameter
+      window.location.href = '/?bypass_import=true';
+    });
+
+    // Import button event listener
+    importButton.addEventListener('click', async () => {
+      // Disable button during import
+      importButton.disabled = true;
+      
+      try {
+        // Set status to loading
+        setStatus('Importing data...', 'loading');
+        
+        // Open database
+        const db = await openDatabase();
+        
+        // Import liturgical days
+        await importLiturgicalDays(db);
+        
+        // Import mass texts
+        await importMassTexts(db);
+        
+        // Import office texts
+        await importOfficeTexts(db);
+        
+        // Set success status
+        setStatus('Import completed successfully!', 'success');
+        log('Database population complete!');
+      } catch (error) {
+        console.error('Import error:', error);
+        setStatus(`Error: ${error.message}`, 'error');
+        log(`ERROR: ${error.message}`);
+      } finally {
+        // Re-enable button
+        importButton.disabled = false;
+      }
+    });
+    
+    // Add event listener to import button
+    importButton.addEventListener('click', importData);
+  </script>
+</body>
+</html>

@@ -11,7 +11,6 @@ import {
   LiturgicalSeason, 
   LiturgicalColor, 
   LiturgicalRank,
-  LiturgicalCycle,
   Season
 } from '../../models/calendar';
 
@@ -241,7 +240,7 @@ export function getLiturgicalDay(date: Date): LiturgicalDay {
   let color = season.color;
   let isHolyDay = false;
   let isFeastDay = false;
-  let commemorations: string[] = [];
+  const commemorations: string[] = [];
   
   // Determine the celebration based on the liturgical season and date
   switch (season.id) {
@@ -307,7 +306,9 @@ export function getLiturgicalDay(date: Date): LiturgicalDay {
         rank = LiturgicalRank.FIRST_CLASS;
       } else if (date.getDay() === 0) {
         // Sundays of Lent
-        const sundayNumber = Math.floor((date.getTime() - season.startCalculation(year).getTime()) / (7 * 24 * 60 * 60 * 1000)) + 1;
+        const firstSundayOfLent = new Date(season.startDate);
+        const diffMs = date.getTime() - firstSundayOfLent.getTime();
+        const sundayNumber = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000)) + 1;
         celebration = `${sundayNumber} Sunday of Lent`;
         rank = LiturgicalRank.FIRST_CLASS;
       } else {

@@ -18,11 +18,11 @@
 - [✅] Set up IndexedDB database for liturgical texts
 - [✅] Create detailed implementation guides
 - [✅] Implement calendar import service
-- [/] Implement data import service for liturgical texts
-- [ ] Create Mass texts display component
-- [ ] Create Divine Office texts display component
-- [ ] Implement prayer texts component (Rosary, Divine Mercy, etc.)
-- [ ] Add user journal/notes functionality
+- [✅] Implement data import service for liturgical texts
+- [x] Create Mass texts display component
+- [x] Create Divine Office texts display component
+- [x] Implement prayer texts component (Rosary, Divine Mercy, etc.)
+- [x] Add user journal/notes functionality
 - [ ] Implement audio recording for journal entries
 
 ## UI/UX Enhancements

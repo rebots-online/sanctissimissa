@@ -1,6 +1,7 @@
 import { getDatabase } from '../database/db';
 import { LiturgicalDay } from '../../models/calendar';
 import { importLiturgicalCalendar } from './calendarImport';
+import { importMassTexts, importOfficeTexts } from './massTextsImport';
 
 /**
  * Import liturgical days data
@@ -11,7 +12,12 @@ import { importLiturgicalCalendar } from './calendarImport';
 export async function importLiturgicalDays(data: LiturgicalDay[]): Promise<void> {
   const db = await getDatabase();
   for (const liturgicalDay of data) {
-    await db.put('liturgical_days', liturgicalDay);
+    // Flatten season to string for IndexedDB store schema
+    const liturgicalDayRecord = {
+      ...liturgicalDay,
+      season: liturgicalDay.season.name,
+    } as const;
+    await db.put('liturgical_days', liturgicalDayRecord);
   }
 }
 
@@ -44,19 +50,32 @@ export async function importDataFromJson<T>(url: string, importFunction: (data: 
  */
 export async function importAllData(): Promise<void> {
   try {
+    console.log('Starting import of all liturgical data...');
+    
     // 1️⃣ Pre-populate the full EF calendar for current year:
+    console.log('Importing liturgical calendar...');
     await importLiturgicalCalendar(new Date().getFullYear(), new Date().getFullYear());
     
     // 2️⃣ Override JSON (optional) for special cases:
+    console.log('Importing liturgical day overrides...');
     await importDataFromJson<LiturgicalDay>(
       '/data/liturgical-days-overrides.json',
       importLiturgicalDays
     );
     
-    // Import other data as needed
-    // TODO: Add imports for mass texts, office texts, prayers, etc.
+    // 3️⃣ Import all Mass texts:
+    console.log('Importing all Mass texts...');
+    await importMassTexts();
     
-    console.log('All data imported successfully');
+    // 4️⃣ Import all Office texts:
+    console.log('Importing all Office texts...');
+    await importOfficeTexts();
+    
+    // 5️⃣ Import additional resources if needed
+    // TODO: Add imports for prayers, etc.
+    
+    console.log('All liturgical data imported successfully');
+    return;
   } catch (error) {
     console.error('Error importing all data:', error);
     throw error;

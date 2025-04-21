@@ -28,34 +28,39 @@ This roadmap outlines the planned development phases for the SanctissiMissa appl
 ## Phase 2: Liturgical Texts Implementation
 
 ### Mass Texts
-- [ ] Create Mass text models and interfaces
-- [ ] Implement Mass text retrieval service
-- [ ] Design Mass text display components
-- [ ] Create Mass page with proper and ordinary texts
-- [ ] Add rubrics and explanations
+- [x] Create Mass text models and interfaces
+- [x] Implement Mass text retrieval service
+- [x] Design Mass text display components
+- [x] Create Mass page with proper and ordinary texts
+- [x] Add rubrics and explanations
 
 ### Divine Office
-- [ ] Create Divine Office models and interfaces
-- [ ] Implement hour selection (Matins, Lauds, etc.)
-- [ ] Design Office text display components
-- [ ] Create Office page with psalms, readings, etc.
-- [ ] Add proper antiphons and prayers
+- [x] Create Divine Office models and interfaces
+- [x] Implement hour selection (Matins, Lauds, etc.)
+- [x] Design Office text display components
+- [x] Create Office page with psalms, readings, etc.
+- [x] Add proper antiphons and prayers
 
 ### Prayer Texts
-- [ ] Create prayer models and interfaces
-- [ ] Implement prayer category organization
-- [ ] Add Rosary prayers and mysteries
-- [ ] Add Divine Mercy Chaplet
-- [ ] Add other traditional prayers
+- [x] Create prayer models and interfaces
+- [x] Implement prayer category organization
+- [x] Add Rosary prayers and mysteries
+- [x] Add Divine Mercy Chaplet
+- [x] Add other traditional prayers
 
 ## Phase 3: User Features
 
 ### User Journal
-- [ ] Create journal entry model and interface
-- [ ] Implement journal entry creation and editing
-- [ ] Add audio recording functionality
+- [x] Create journal entry model and interface
+- [x] Implement journal entry creation and editing
+- [x] Add audio recording functionality
+- [x] Implement context menu for note creation
+- [ ] Display notes at their saved positions on the canvas
+- [ ] Implement editing and deletion of existing notes
 - [ ] Create journal entry listing and filtering
 - [ ] Add tagging and categorization
+- [ ] Add search functionality for notes
+- [ ] Implement note sharing and export
 
 ### Settings and Preferences
 - [ ] Create user settings model
@@ -73,12 +78,20 @@ This roadmap outlines the planned development phases for the SanctissiMissa appl
 
 ## Phase 4: Enhanced Features
 
+### Print & Export Features (High Priority)
+- [ ] Add "Print" and "Export to PDF" button for current day's Mass and Breviary Office (single-day export)
+- [ ] Implement print-optimized stylesheets for PDF/print output
+- [ ] Create batch export tool to pre-render and export a set of Masses, Propers, and Breviary Offices for a date range (multi-day export)
+- [ ] Add UI for selecting date/time ranges and export type
+- [ ] Ensure both single and batch exports are accessible from the web interface
+
 ### Altar Server Resource
 - [ ] Create conceptual explanations for liturgical actions
 - [ ] Design interactive rubrics guide
 - [ ] Add visual aids and diagrams
 - [ ] Implement step-by-step instructions
 - [ ] Add search and reference functionality
+- [ ] Add a few more Devotions;
 
 ### Community Features
 - [ ] Design user account system

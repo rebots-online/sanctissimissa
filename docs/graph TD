@@ -1,0 +1,48 @@
+graph TD
+    subgraph "Liturgical Texts Structure"
+        A[Liturgical Day] --> B[Mass Texts]
+        A --> C[Office Texts]
+        
+        B --> B1[Introit]
+        B --> B2[Collect]
+        B --> B3[Epistle]
+        B --> B4[Gradual]
+        B --> B5[Alleluia/Tract]
+        B --> B6[Gospel]
+        B --> B7[Offertory]
+        B --> B8[Secret]
+        B --> B9[Communion]
+        B --> B10[Postcommunion]
+        
+        C --> C1[Matins]
+        C --> C2[Lauds]
+        C --> C3[Prime]
+        C --> C4[Terce]
+        C --> C5[Sext]
+        C --> C6[None]
+        C --> C7[Vespers]
+        C --> C8[Compline]
+        
+        C1 --> D1[Invitatory]
+        C1 --> D2[Hymn]
+        C1 --> D3[Nocturns]
+        
+        C2 --> E1[Psalms]
+        C2 --> E2[Antiphons]
+        C2 --> E3[Chapter]
+        C2 --> E4[Hymn]
+        C2 --> E5[Benedictus]
+        C2 --> E6[Collect]
+        
+        C7 --> F1[Psalms]
+        C7 --> F2[Antiphons]
+        C7 --> F3[Chapter]
+        C7 --> F4[Hymn]
+        C7 --> F5[Magnificat]
+        C7 --> F6[Collect]
+        
+        G[Proper of Time] --> A
+        H[Proper of Saints] --> A
+        I[Common of Saints] --> A
+        J[Votive Masses] --> A
+    end

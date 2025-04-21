@@ -1,0 +1,330 @@
+[
+  {
+    "id": "tempora_pasc0-0_matutinum",
+    "date": "2025-04-21T03:20:09.162Z",
+    "category": "tempora",
+    "day": "Pasc0-0",
+    "hour": "matutinum",
+    "title": {
+      "latin": "Matutinum",
+      "english": "Matins"
+    },
+    "hymn": {
+      "latin": "Placeholder Latin hymn for Easter Sunday Matins",
+      "english": "Placeholder English hymn for Easter Sunday Matins"
+    },
+    "psalms": [
+      {
+        "number": "1",
+        "title": {
+          "latin": "Psalmus 1",
+          "english": "Psalm 1"
+        },
+        "text": {
+          "latin": "Beatus vir, qui non abiit in consilio impiorum...",
+          "english": "Blessed is the man who walks not in the counsel of the wicked..."
+        }
+      }
+    ],
+    "readings": [
+      {
+        "number": "1",
+        "text": {
+          "latin": "Placeholder Latin reading for Easter Sunday Matins",
+          "english": "Placeholder English reading for Easter Sunday Matins"
+        }
+      }
+    ],
+    "prayer": {
+      "latin": "Deus, qui hodiérna die per Unigénitum tuum æternitátis nobis áditum, devícta morte, reserásti: vota nostra, quæ præveniéndo aspíras, étiam adjuvándo proséquere.",
+      "english": "O God, who, on this day, through Thine only-begotten Son, hast conquered death, and thrown open to us the gate of everlasting life, give effect by thine aid to our desires, which Thou dost anticipate and inspire"
+    }
+  },
+  {
+    "id": "tempora_pasc0-0_laudes",
+    "date": "2025-04-21T03:20:09.162Z",
+    "category": "tempora",
+    "day": "Pasc0-0",
+    "hour": "laudes",
+    "title": {
+      "latin": "Laudes",
+      "english": "Lauds"
+    },
+    "hymn": {
+      "latin": "Placeholder Latin hymn for Easter Sunday Lauds",
+      "english": "Placeholder English hymn for Easter Sunday Lauds"
+    },
+    "psalms": [
+      {
+        "number": "1",
+        "title": {
+          "latin": "Psalmus 1",
+          "english": "Psalm 1"
+        },
+        "text": {
+          "latin": "Beatus vir, qui non abiit in consilio impiorum...",
+          "english": "Blessed is the man who walks not in the counsel of the wicked..."
+        }
+      }
+    ],
+    "readings": [
+      {
+        "number": "1",
+        "text": {
+          "latin": "Placeholder Latin reading for Easter Sunday Lauds",
+          "english": "Placeholder English reading for Easter Sunday Lauds"
+        }
+      }
+    ],
+    "prayer": {
+      "latin": "Deus, qui hodiérna die per Unigénitum tuum æternitátis nobis áditum, devícta morte, reserásti: vota nostra, quæ præveniéndo aspíras, étiam adjuvándo proséquere.",
+      "english": "O God, who, on this day, through Thine only-begotten Son, hast conquered death, and thrown open to us the gate of everlasting life, give effect by thine aid to our desires, which Thou dost anticipate and inspire"
+    }
+  },
+  {
+    "id": "tempora_pasc0-0_prima",
+    "date": "2025-04-21T03:20:09.162Z",
+    "category": "tempora",
+    "day": "Pasc0-0",
+    "hour": "prima",
+    "title": {
+      "latin": "Prima",
+      "english": "Prime"
+    },
+    "hymn": {
+      "latin": "Placeholder Latin hymn for Easter Sunday Prime",
+      "english": "Placeholder English hymn for Easter Sunday Prime"
+    },
+    "psalms": [
+      {
+        "number": "1",
+        "title": {
+          "latin": "Psalmus 1",
+          "english": "Psalm 1"
+        },
+        "text": {
+          "latin": "Beatus vir, qui non abiit in consilio impiorum...",
+          "english": "Blessed is the man who walks not in the counsel of the wicked..."
+        }
+      }
+    ],
+    "readings": [
+      {
+        "number": "1",
+        "text": {
+          "latin": "Placeholder Latin reading for Easter Sunday Prime",
+          "english": "Placeholder English reading for Easter Sunday Prime"
+        }
+      }
+    ],
+    "prayer": {
+      "latin": "Deus, qui hodiérna die per Unigénitum tuum æternitátis nobis áditum, devícta morte, reserásti: vota nostra, quæ præveniéndo aspíras, étiam adjuvándo proséquere.",
+      "english": "O God, who, on this day, through Thine only-begotten Son, hast conquered death, and thrown open to us the gate of everlasting life, give effect by thine aid to our desires, which Thou dost anticipate and inspire"
+    }
+  },
+  {
+    "id": "tempora_pasc0-0_tertia",
+    "date": "2025-04-21T03:20:09.162Z",
+    "category": "tempora",
+    "day": "Pasc0-0",
+    "hour": "tertia",
+    "title": {
+      "latin": "Tertia",
+      "english": "Terce"
+    },
+    "hymn": {
+      "latin": "Placeholder Latin hymn for Easter Sunday Terce",
+      "english": "Placeholder English hymn for Easter Sunday Terce"
+    },
+    "psalms": [
+      {
+        "number": "1",
+        "title": {
+          "latin": "Psalmus 1",
+          "english": "Psalm 1"
+        },
+        "text": {
+          "latin": "Beatus vir, qui non abiit in consilio impiorum...",
+          "english": "Blessed is the man who walks not in the counsel of the wicked..."
+        }
+      }
+    ],
+    "readings": [
+      {
+        "number": "1",
+        "text": {
+          "latin": "Placeholder Latin reading for Easter Sunday Terce",
+          "english": "Placeholder English reading for Easter Sunday Terce"
+        }
+      }
+    ],
+    "prayer": {
+      "latin": "Deus, qui hodiérna die per Unigénitum tuum æternitátis nobis áditum, devícta morte, reserásti: vota nostra, quæ præveniéndo aspíras, étiam adjuvándo proséquere.",
+      "english": "O God, who, on this day, through Thine only-begotten Son, hast conquered death, and thrown open to us the gate of everlasting life, give effect by thine aid to our desires, which Thou dost anticipate and inspire"
+    }
+  },
+  {
+    "id": "tempora_pasc0-0_sexta",
+    "date": "2025-04-21T03:20:09.162Z",
+    "category": "tempora",
+    "day": "Pasc0-0",
+    "hour": "sexta",
+    "title": {
+      "latin": "Sexta",
+      "english": "Sext"
+    },
+    "hymn": {
+      "latin": "Placeholder Latin hymn for Easter Sunday Sext",
+      "english": "Placeholder English hymn for Easter Sunday Sext"
+    },
+    "psalms": [
+      {
+        "number": "1",
+        "title": {
+          "latin": "Psalmus 1",
+          "english": "Psalm 1"
+        },
+        "text": {
+          "latin": "Beatus vir, qui non abiit in consilio impiorum...",
+          "english": "Blessed is the man who walks not in the counsel of the wicked..."
+        }
+      }
+    ],
+    "readings": [
+      {
+        "number": "1",
+        "text": {
+          "latin": "Placeholder Latin reading for Easter Sunday Sext",
+          "english": "Placeholder English reading for Easter Sunday Sext"
+        }
+      }
+    ],
+    "prayer": {
+      "latin": "Deus, qui hodiérna die per Unigénitum tuum æternitátis nobis áditum, devícta morte, reserásti: vota nostra, quæ præveniéndo aspíras, étiam adjuvándo proséquere.",
+      "english": "O God, who, on this day, through Thine only-begotten Son, hast conquered death, and thrown open to us the gate of everlasting life, give effect by thine aid to our desires, which Thou dost anticipate and inspire"
+    }
+  },
+  {
+    "id": "tempora_pasc0-0_nona",
+    "date": "2025-04-21T03:20:09.162Z",
+    "category": "tempora",
+    "day": "Pasc0-0",
+    "hour": "nona",
+    "title": {
+      "latin": "Nona",
+      "english": "None"
+    },
+    "hymn": {
+      "latin": "Placeholder Latin hymn for Easter Sunday None",
+      "english": "Placeholder English hymn for Easter Sunday None"
+    },
+    "psalms": [
+      {
+        "number": "1",
+        "title": {
+          "latin": "Psalmus 1",
+          "english": "Psalm 1"
+        },
+        "text": {
+          "latin": "Beatus vir, qui non abiit in consilio impiorum...",
+          "english": "Blessed is the man who walks not in the counsel of the wicked..."
+        }
+      }
+    ],
+    "readings": [
+      {
+        "number": "1",
+        "text": {
+          "latin": "Placeholder Latin reading for Easter Sunday None",
+          "english": "Placeholder English reading for Easter Sunday None"
+        }
+      }
+    ],
+    "prayer": {
+      "latin": "Deus, qui hodiérna die per Unigénitum tuum æternitátis nobis áditum, devícta morte, reserásti: vota nostra, quæ præveniéndo aspíras, étiam adjuvándo proséquere.",
+      "english": "O God, who, on this day, through Thine only-begotten Son, hast conquered death, and thrown open to us the gate of everlasting life, give effect by thine aid to our desires, which Thou dost anticipate and inspire"
+    }
+  },
+  {
+    "id": "tempora_pasc0-0_vespera",
+    "date": "2025-04-21T03:20:09.162Z",
+    "category": "tempora",
+    "day": "Pasc0-0",
+    "hour": "vespera",
+    "title": {
+      "latin": "Vespera",
+      "english": "Vespers"
+    },
+    "hymn": {
+      "latin": "Placeholder Latin hymn for Easter Sunday Vespers",
+      "english": "Placeholder English hymn for Easter Sunday Vespers"
+    },
+    "psalms": [
+      {
+        "number": "1",
+        "title": {
+          "latin": "Psalmus 1",
+          "english": "Psalm 1"
+        },
+        "text": {
+          "latin": "Beatus vir, qui non abiit in consilio impiorum...",
+          "english": "Blessed is the man who walks not in the counsel of the wicked..."
+        }
+      }
+    ],
+    "readings": [
+      {
+        "number": "1",
+        "text": {
+          "latin": "Placeholder Latin reading for Easter Sunday Vespers",
+          "english": "Placeholder English reading for Easter Sunday Vespers"
+        }
+      }
+    ],
+    "prayer": {
+      "latin": "Deus, qui hodiérna die per Unigénitum tuum æternitátis nobis áditum, devícta morte, reserásti: vota nostra, quæ præveniéndo aspíras, étiam adjuvándo proséquere.",
+      "english": "O God, who, on this day, through Thine only-begotten Son, hast conquered death, and thrown open to us the gate of everlasting life, give effect by thine aid to our desires, which Thou dost anticipate and inspire"
+    }
+  },
+  {
+    "id": "tempora_pasc0-0_completorium",
+    "date": "2025-04-21T03:20:09.162Z",
+    "category": "tempora",
+    "day": "Pasc0-0",
+    "hour": "completorium",
+    "title": {
+      "latin": "Completorium",
+      "english": "Compline"
+    },
+    "hymn": {
+      "latin": "Placeholder Latin hymn for Easter Sunday Compline",
+      "english": "Placeholder English hymn for Easter Sunday Compline"
+    },
+    "psalms": [
+      {
+        "number": "1",
+        "title": {
+          "latin": "Psalmus 1",
+          "english": "Psalm 1"
+        },
+        "text": {
+          "latin": "Beatus vir, qui non abiit in consilio impiorum...",
+          "english": "Blessed is the man who walks not in the counsel of the wicked..."
+        }
+      }
+    ],
+    "readings": [
+      {
+        "number": "1",
+        "text": {
+          "latin": "Placeholder Latin reading for Easter Sunday Compline",
+          "english": "Placeholder English reading for Easter Sunday Compline"
+        }
+      }
+    ],
+    "prayer": {
+      "latin": "Deus, qui hodiérna die per Unigénitum tuum æternitátis nobis áditum, devícta morte, reserásti: vota nostra, quæ præveniéndo aspíras, étiam adjuvándo proséquere.",
+      "english": "O God, who, on this day, through Thine only-begotten Son, hast conquered death, and thrown open to us the gate of everlasting life, give effect by thine aid to our desires, which Thou dost anticipate and inspire"
+    }
+  }
+]
