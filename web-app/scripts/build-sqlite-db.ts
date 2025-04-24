@@ -402,6 +402,58 @@ function createSchema(db: any): void {
 }
 
 /**
+ * Calculate Easter Sunday date for a given year
+ *
+ * @param year Year to calculate Easter for
+ * @returns Date object for Easter Sunday
+ */
+function calculateEaster(year: number): Date {
+  // Algorithm from Butcher's Ecclesiastical Calendar
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+
+  return new Date(year, month - 1, day);
+}
+
+/**
+ * Format a date as YYYY-MM-DD
+ *
+ * @param date Date to format
+ * @returns Formatted date string
+ */
+function formatDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Add days to a date
+ *
+ * @param date Base date
+ * @param days Number of days to add
+ * @returns New date
+ */
+function addDays(date: Date, days: number): Date {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
+
+/**
  * Import liturgical calendar data
  *
  * @param db SQLite database
@@ -409,37 +461,348 @@ function createSchema(db: any): void {
 function importLiturgicalCalendar(db: any): void {
   console.log('Importing liturgical calendar...');
 
-  // For simplicity, we'll create a sample liturgical day for Easter Sunday 2025
-  const easterSunday = {
-    date: '2025-04-20',
-    season: 'easter',
-    celebration: 'Easter Sunday',
-    rank: 1,
-    color: 'white',
-    is_holy_day: 1,
-    is_feast_day: 1,
-    mass_proper: 'easter_sunday',
-    commemorations: '[]'
-  };
+  // Calculate Easter Sunday for 2025
+  const easterSunday2025 = calculateEaster(2025);
+  const easterDate2025 = formatDate(easterSunday2025);
 
-  // Insert the liturgical day
-  db.exec(`
-    INSERT INTO liturgical_days (
-      date, season, celebration, rank, color, is_holy_day, is_feast_day, mass_proper, commemorations
-    ) VALUES (
-      '${easterSunday.date}',
-      '${easterSunday.season}',
-      '${easterSunday.celebration}',
-      ${easterSunday.rank},
-      '${easterSunday.color}',
-      ${easterSunday.is_holy_day},
-      ${easterSunday.is_feast_day},
-      '${easterSunday.mass_proper}',
-      '${easterSunday.commemorations}'
-    )
-  `);
+  // Define liturgical days
+  const liturgicalDays = [
+    // Easter Sunday
+    {
+      date: easterDate2025,
+      season: 'easter',
+      celebration: 'Easter Sunday',
+      rank: 1,
+      color: 'white',
+      is_holy_day: 1,
+      is_feast_day: 1,
+      mass_proper: 'proper_easter_sunday',
+      commemorations: '[]'
+    },
 
-  console.log('Liturgical calendar imported successfully');
+    // Easter Week (Octave of Easter)
+    {
+      date: formatDate(addDays(easterSunday2025, 1)),
+      season: 'easter',
+      celebration: 'Easter Monday',
+      rank: 1,
+      color: 'white',
+      is_holy_day: 1,
+      is_feast_day: 1,
+      mass_proper: 'proper_easter_monday',
+      commemorations: '[]'
+    },
+    {
+      date: formatDate(addDays(easterSunday2025, 2)),
+      season: 'easter',
+      celebration: 'Easter Tuesday',
+      rank: 1,
+      color: 'white',
+      is_holy_day: 1,
+      is_feast_day: 1,
+      mass_proper: 'proper_easter_tuesday',
+      commemorations: '[]'
+    },
+    {
+      date: formatDate(addDays(easterSunday2025, 3)),
+      season: 'easter',
+      celebration: 'Easter Wednesday',
+      rank: 1,
+      color: 'white',
+      is_holy_day: 1,
+      is_feast_day: 1,
+      mass_proper: 'proper_easter_wednesday',
+      commemorations: '[]'
+    },
+    {
+      date: formatDate(addDays(easterSunday2025, 4)),
+      season: 'easter',
+      celebration: 'Easter Thursday',
+      rank: 1,
+      color: 'white',
+      is_holy_day: 1,
+      is_feast_day: 1,
+      mass_proper: 'proper_easter_thursday',
+      commemorations: '[]'
+    },
+    {
+      date: formatDate(addDays(easterSunday2025, 5)),
+      season: 'easter',
+      celebration: 'Easter Friday',
+      rank: 1,
+      color: 'white',
+      is_holy_day: 1,
+      is_feast_day: 1,
+      mass_proper: 'proper_easter_friday',
+      commemorations: '[]'
+    },
+    {
+      date: formatDate(addDays(easterSunday2025, 6)),
+      season: 'easter',
+      celebration: 'Easter Saturday',
+      rank: 1,
+      color: 'white',
+      is_holy_day: 1,
+      is_feast_day: 1,
+      mass_proper: 'proper_easter_saturday',
+      commemorations: '[]'
+    },
+
+    // Low Sunday (Dominica in Albis)
+    {
+      date: formatDate(addDays(easterSunday2025, 7)),
+      season: 'easter',
+      celebration: 'Low Sunday',
+      rank: 2,
+      color: 'white',
+      is_holy_day: 0,
+      is_feast_day: 1,
+      mass_proper: 'proper_low_sunday',
+      commemorations: '[]'
+    },
+
+    // Second Sunday after Easter
+    {
+      date: formatDate(addDays(easterSunday2025, 14)),
+      season: 'easter',
+      celebration: 'Second Sunday after Easter',
+      rank: 2,
+      color: 'white',
+      is_holy_day: 0,
+      is_feast_day: 1,
+      mass_proper: 'proper_easter_2nd_sunday',
+      commemorations: '[]'
+    },
+
+    // Third Sunday after Easter
+    {
+      date: formatDate(addDays(easterSunday2025, 21)),
+      season: 'easter',
+      celebration: 'Third Sunday after Easter',
+      rank: 2,
+      color: 'white',
+      is_holy_day: 0,
+      is_feast_day: 1,
+      mass_proper: 'proper_easter_3rd_sunday',
+      commemorations: '[]'
+    },
+
+    // Fourth Sunday after Easter
+    {
+      date: formatDate(addDays(easterSunday2025, 28)),
+      season: 'easter',
+      celebration: 'Fourth Sunday after Easter',
+      rank: 2,
+      color: 'white',
+      is_holy_day: 0,
+      is_feast_day: 1,
+      mass_proper: 'proper_easter_4th_sunday',
+      commemorations: '[]'
+    },
+
+    // Fifth Sunday after Easter
+    {
+      date: formatDate(addDays(easterSunday2025, 35)),
+      season: 'easter',
+      celebration: 'Fifth Sunday after Easter',
+      rank: 2,
+      color: 'white',
+      is_holy_day: 0,
+      is_feast_day: 1,
+      mass_proper: 'proper_easter_5th_sunday',
+      commemorations: '[]'
+    },
+
+    // Ascension Thursday
+    {
+      date: formatDate(addDays(easterSunday2025, 39)),
+      season: 'easter',
+      celebration: 'Ascension of Our Lord',
+      rank: 1,
+      color: 'white',
+      is_holy_day: 1,
+      is_feast_day: 1,
+      mass_proper: 'proper_ascension',
+      commemorations: '[]'
+    },
+
+    // Sunday after Ascension
+    {
+      date: formatDate(addDays(easterSunday2025, 42)),
+      season: 'easter',
+      celebration: 'Sunday after Ascension',
+      rank: 2,
+      color: 'white',
+      is_holy_day: 0,
+      is_feast_day: 1,
+      mass_proper: 'proper_sunday_after_ascension',
+      commemorations: '[]'
+    },
+
+    // Pentecost Sunday
+    {
+      date: formatDate(addDays(easterSunday2025, 49)),
+      season: 'pentecost',
+      celebration: 'Pentecost Sunday',
+      rank: 1,
+      color: 'red',
+      is_holy_day: 1,
+      is_feast_day: 1,
+      mass_proper: 'proper_pentecost',
+      commemorations: '[]'
+    },
+
+    // Trinity Sunday
+    {
+      date: formatDate(addDays(easterSunday2025, 56)),
+      season: 'time_after_pentecost',
+      celebration: 'Trinity Sunday',
+      rank: 1,
+      color: 'white',
+      is_holy_day: 0,
+      is_feast_day: 1,
+      mass_proper: 'proper_trinity_sunday',
+      commemorations: '[]'
+    },
+
+    // Corpus Christi
+    {
+      date: formatDate(addDays(easterSunday2025, 60)),
+      season: 'time_after_pentecost',
+      celebration: 'Corpus Christi',
+      rank: 1,
+      color: 'white',
+      is_holy_day: 1,
+      is_feast_day: 1,
+      mass_proper: 'proper_corpus_christi',
+      commemorations: '[]'
+    },
+
+    // Sacred Heart of Jesus
+    {
+      date: formatDate(addDays(easterSunday2025, 68)),
+      season: 'time_after_pentecost',
+      celebration: 'Sacred Heart of Jesus',
+      rank: 1,
+      color: 'white',
+      is_holy_day: 0,
+      is_feast_day: 1,
+      mass_proper: 'proper_sacred_heart',
+      commemorations: '[]'
+    },
+
+    // Christmas
+    {
+      date: '2025-12-25',
+      season: 'christmas',
+      celebration: 'Nativity of Our Lord',
+      rank: 1,
+      color: 'white',
+      is_holy_day: 1,
+      is_feast_day: 1,
+      mass_proper: 'proper_christmas',
+      commemorations: '[]'
+    },
+
+    // Epiphany
+    {
+      date: '2025-01-06',
+      season: 'epiphany',
+      celebration: 'Epiphany of Our Lord',
+      rank: 1,
+      color: 'white',
+      is_holy_day: 1,
+      is_feast_day: 1,
+      mass_proper: 'proper_epiphany',
+      commemorations: '[]'
+    },
+
+    // Ash Wednesday
+    {
+      date: formatDate(addDays(easterSunday2025, -46)),
+      season: 'lent',
+      celebration: 'Ash Wednesday',
+      rank: 1,
+      color: 'purple',
+      is_holy_day: 0,
+      is_feast_day: 0,
+      mass_proper: 'proper_ash_wednesday',
+      commemorations: '[]'
+    },
+
+    // Palm Sunday
+    {
+      date: formatDate(addDays(easterSunday2025, -7)),
+      season: 'holy_week',
+      celebration: 'Palm Sunday',
+      rank: 1,
+      color: 'purple',
+      is_holy_day: 0,
+      is_feast_day: 1,
+      mass_proper: 'proper_palm_sunday',
+      commemorations: '[]'
+    },
+
+    // Holy Thursday
+    {
+      date: formatDate(addDays(easterSunday2025, -3)),
+      season: 'holy_week',
+      celebration: 'Holy Thursday',
+      rank: 1,
+      color: 'white',
+      is_holy_day: 1,
+      is_feast_day: 1,
+      mass_proper: 'proper_holy_thursday',
+      commemorations: '[]'
+    },
+
+    // Good Friday
+    {
+      date: formatDate(addDays(easterSunday2025, -2)),
+      season: 'holy_week',
+      celebration: 'Good Friday',
+      rank: 1,
+      color: 'black',
+      is_holy_day: 1,
+      is_feast_day: 0,
+      mass_proper: 'proper_good_friday',
+      commemorations: '[]'
+    },
+
+    // Holy Saturday
+    {
+      date: formatDate(addDays(easterSunday2025, -1)),
+      season: 'holy_week',
+      celebration: 'Holy Saturday',
+      rank: 1,
+      color: 'purple',
+      is_holy_day: 1,
+      is_feast_day: 0,
+      mass_proper: 'proper_holy_saturday',
+      commemorations: '[]'
+    }
+  ];
+
+  // Insert all liturgical days
+  for (const day of liturgicalDays) {
+    db.exec(`
+      INSERT INTO liturgical_days (
+        date, season, celebration, rank, color, is_holy_day, is_feast_day, mass_proper, commemorations
+      ) VALUES (
+        '${day.date}',
+        '${day.season}',
+        '${day.celebration}',
+        ${day.rank},
+        '${day.color}',
+        ${day.is_holy_day},
+        ${day.is_feast_day},
+        '${day.mass_proper}',
+        '${day.commemorations}'
+      )
+    `);
+  }
+
+  console.log(`Imported ${liturgicalDays.length} liturgical days successfully`);
 }
 
 /**

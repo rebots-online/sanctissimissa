@@ -49,10 +49,10 @@ This checklist tracks the progress of the SanctissiMissa web application develop
   - [x] Create basic SQLite database structure
   - [x] Implement data import from reference files
   - [x] Create standalone demo to verify functionality
-  - [ ] Add comprehensive liturgical calendar data
+  - [x] Add comprehensive liturgical calendar data
+  - [x] Implement proper liturgical calendar calculations
   - [ ] Add complete Mass texts for major feasts
   - [ ] Add complete Office texts for major feasts
-  - [ ] Implement proper liturgical calendar calculations
 
 - [ ] Build Mass rendering engine
   - [ ] Design component architecture for Mass texts
