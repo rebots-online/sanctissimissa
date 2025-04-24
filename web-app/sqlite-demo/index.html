@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SanctissiMissa SQLite Demo</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto p-4">
+    <header class="bg-gray-800 text-white p-4 rounded-lg mb-6">
+      <h1 class="text-2xl font-bold">SanctissiMissa SQLite Demo</h1>
+      <p class="text-gray-300">A simple demonstration of SQLite functionality</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div class="bg-white p-4 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-4">Database Status</h2>
+        <div id="status" class="p-4 bg-gray-100 rounded">
+          <p>Initializing database...</p>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-4">Actions</h2>
+        <div class="space-y-2">
+          <button id="btnLiturgicalDays" class="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50" disabled>
+            View Liturgical Days
+          </button>
+          <button id="btnMassTexts" class="px-4 py-2 bg-green-500 text-white rounded disabled:opacity-50" disabled>
+            View Mass Texts
+          </button>
+          <button id="btnOfficeTexts" class="px-4 py-2 bg-purple-500 text-white rounded disabled:opacity-50" disabled>
+            View Office Texts
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div class="bg-white p-4 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-4">Today's Liturgical Day</h2>
+        <div id="todayLiturgical" class="p-4 bg-gray-100 rounded">
+          <p>Loading data...</p>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-4">Easter Sunday 2025</h2>
+        <div id="easterSunday" class="p-4 bg-gray-100 rounded">
+          <p>Loading data...</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-lg shadow">
+      <h2 class="text-xl font-bold mb-4">Results</h2>
+      <div id="results" class="p-4 bg-gray-100 rounded overflow-auto max-h-96">
+        <p>Click a button to view data.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global variables
+    let SQL;
+    let db;
+    let isInitialized = false;
+
+    // Initialize SQL.js
+    async function initSqlite() {
+      try {
+        // Update status
+        document.getElementById('status').innerHTML = '<p class="text-blue-500">Loading SQL.js...</p>';
+
+        // Initialize SQL.js
+        SQL = await initSqlJs({
+          locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+        });
+
+        document.getElementById('status').innerHTML += '<p class="text-green-500">SQL.js loaded successfully!</p>';
+
+        // Load the database file
+        document.getElementById('status').innerHTML += '<p class="text-blue-500">Loading database file...</p>';
+
+        const response = await fetch('./sanctissimissa.sqlite');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch database: ${response.statusText}`);
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        const uInt8Array = new Uint8Array(arrayBuffer);
+
+        // Create a database from the file
+        db = new SQL.Database(uInt8Array);
+        isInitialized = true;
+
+        document.getElementById('status').innerHTML += '<p class="text-green-500">Database loaded successfully!</p>';
+
+        // Enable buttons
+        document.getElementById('btnLiturgicalDays').disabled = false;
+        document.getElementById('btnMassTexts').disabled = false;
+        document.getElementById('btnOfficeTexts').disabled = false;
+
+        // Load liturgical data
+        loadTodayLiturgical();
+        loadEasterSunday();
+      } catch (error) {
+        document.getElementById('status').innerHTML += `<p class="text-red-500">Error: ${error.message}</p>`;
+        console.error('Error initializing SQLite:', error);
+      }
+    }
+
+    // Load Easter Sunday data
+    function loadEasterSunday() {
+      try {
+        // Query the database for Easter Sunday
+        const result = db.exec("SELECT * FROM liturgical_days WHERE date = '2025-04-20'");
+
+        if (result.length > 0 && result[0].values.length > 0) {
+          const easterSunday = {};
+
+          // Map column names to values
+          for (let i = 0; i < result[0].columns.length; i++) {
+            easterSunday[result[0].columns[i]] = result[0].values[0][i];
+          }
+
+          // Display the data
+          document.getElementById('easterSunday').innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p><strong>Date:</strong> ${easterSunday.date}</p>
+                <p><strong>Celebration:</strong> ${easterSunday.celebration}</p>
+                <p><strong>Season:</strong> ${easterSunday.season}</p>
+                <p><strong>Color:</strong> ${easterSunday.color}</p>
+              </div>
+              <div>
+                <p><strong>Rank:</strong> ${easterSunday.rank}</p>
+                <p><strong>Holy Day:</strong> ${easterSunday.is_holy_day ? 'Yes' : 'No'}</p>
+                <p><strong>Feast Day:</strong> ${easterSunday.is_feast_day ? 'Yes' : 'No'}</p>
+                <p><strong>Mass Proper:</strong> ${easterSunday.mass_proper}</p>
+              </div>
+            </div>
+          `;
+        } else {
+          document.getElementById('easterSunday').innerHTML = '<p class="text-red-500">Easter Sunday data not found.</p>';
+        }
+      } catch (error) {
+        document.getElementById('easterSunday').innerHTML = `<p class="text-red-500">Error loading Easter Sunday data: ${error.message}</p>`;
+        console.error('Error loading Easter Sunday data:', error);
+      }
+    }
+
+    // View liturgical days
+    document.getElementById('btnLiturgicalDays').addEventListener('click', function() {
+      try {
+        const result = db.exec("SELECT * FROM liturgical_days ORDER BY date LIMIT 10");
+
+        if (result.length > 0) {
+          let html = '<table class="min-w-full bg-white">';
+
+          // Table header
+          html += '<thead><tr>';
+          for (const column of result[0].columns) {
+            html += `<th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">${column}</th>`;
+          }
+          html += '</tr></thead>';
+
+          // Table body
+          html += '<tbody>';
+          for (const row of result[0].values) {
+            html += '<tr>';
+            for (const cell of row) {
+              html += `<td class="py-2 px-4 border-b border-gray-200">${cell}</td>`;
+            }
+            html += '</tr>';
+          }
+          html += '</tbody></table>';
+
+          document.getElementById('results').innerHTML = html;
+        } else {
+          document.getElementById('results').innerHTML = '<p class="text-red-500">No liturgical days found.</p>';
+        }
+      } catch (error) {
+        document.getElementById('results').innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+        console.error('Error querying liturgical days:', error);
+      }
+    });
+
+    // View mass texts
+    document.getElementById('btnMassTexts').addEventListener('click', function() {
+      try {
+        const result = db.exec("SELECT id, part, title_latin, title_english FROM mass_texts");
+
+        if (result.length > 0) {
+          let html = '<table class="min-w-full bg-white">';
+
+          // Table header
+          html += '<thead><tr>';
+          for (const column of result[0].columns) {
+            html += `<th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">${column}</th>`;
+          }
+          html += '</tr></thead>';
+
+          // Table body
+          html += '<tbody>';
+          for (const row of result[0].values) {
+            html += '<tr>';
+            for (const cell of row) {
+              html += `<td class="py-2 px-4 border-b border-gray-200">${cell}</td>`;
+            }
+            html += '</tr>';
+          }
+          html += '</tbody></table>';
+
+          document.getElementById('results').innerHTML = html;
+        } else {
+          document.getElementById('results').innerHTML = '<p class="text-red-500">No mass texts found.</p>';
+        }
+      } catch (error) {
+        document.getElementById('results').innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+        console.error('Error querying mass texts:', error);
+      }
+    });
+
+    // View office texts
+    document.getElementById('btnOfficeTexts').addEventListener('click', function() {
+      try {
+        const result = db.exec("SELECT id, hour, title_latin, title_english FROM office_texts");
+
+        if (result.length > 0) {
+          let html = '<table class="min-w-full bg-white">';
+
+          // Table header
+          html += '<thead><tr>';
+          for (const column of result[0].columns) {
+            html += `<th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">${column}</th>`;
+          }
+          html += '</tr></thead>';
+
+          // Table body
+          html += '<tbody>';
+          for (const row of result[0].values) {
+            html += '<tr>';
+            for (const cell of row) {
+              html += `<td class="py-2 px-4 border-b border-gray-200">${cell}</td>`;
+            }
+            html += '</tr>';
+          }
+          html += '</tbody></table>';
+
+          document.getElementById('results').innerHTML = html;
+        } else {
+          document.getElementById('results').innerHTML = '<p class="text-red-500">No office texts found.</p>';
+        }
+      } catch (error) {
+        document.getElementById('results').innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+        console.error('Error querying office texts:', error);
+      }
+    });
+
+    // Load today's liturgical day
+    function loadTodayLiturgical() {
+      try {
+        // Get today's date in YYYY-MM-DD format
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const dateString = `${year}-${month}-${day}`;
+
+        // Query the database for today's date
+        const result = db.exec(`SELECT * FROM liturgical_days WHERE date = '${dateString}'`);
+
+        if (result.length > 0 && result[0].values.length > 0) {
+          const liturgicalDay = {};
+
+          // Map column names to values
+          for (let i = 0; i < result[0].columns.length; i++) {
+            liturgicalDay[result[0].columns[i]] = result[0].values[0][i];
+          }
+
+          // Get the mass proper
+          let massProperInfo = '';
+          if (liturgicalDay.mass_proper) {
+            const massResult = db.exec(`SELECT title_latin, title_english FROM mass_texts WHERE id = '${liturgicalDay.mass_proper}'`);
+            if (massResult.length > 0 && massResult[0].values.length > 0) {
+              massProperInfo = `${massResult[0].values[0][0]} / ${massResult[0].values[0][1]}`;
+            }
+          }
+
+          // Traditional liturgical colors
+          const colorMap = {
+            'white': 'White/Gold (Albus/Aureus)',
+            'red': 'Red (Ruber)',
+            'green': 'Green (Viridis)',
+            'purple': 'Purple/Violet (Violaceus)',
+            'black': 'Black (Niger)',
+            'rose': 'Rose (Rosaceus)'
+          };
+
+          // Display the data
+          document.getElementById('todayLiturgical').innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p><strong>Date:</strong> ${liturgicalDay.date}</p>
+                <p><strong>Celebration:</strong> ${liturgicalDay.celebration}</p>
+                <p><strong>Season:</strong> ${liturgicalDay.season}</p>
+                <p><strong>Color:</strong> ${colorMap[liturgicalDay.color] || liturgicalDay.color}</p>
+              </div>
+              <div>
+                <p><strong>Rank:</strong> ${liturgicalDay.rank}</p>
+                <p><strong>Holy Day:</strong> ${liturgicalDay.is_holy_day ? 'Yes' : 'No'}</p>
+                <p><strong>Feast Day:</strong> ${liturgicalDay.is_feast_day ? 'Yes' : 'No'}</p>
+                <p><strong>Mass Proper:</strong> ${massProperInfo || liturgicalDay.mass_proper || 'N/A'}</p>
+              </div>
+            </div>
+          `;
+        } else {
+          // If no entry for today, show a message
+          document.getElementById('todayLiturgical').innerHTML = `
+            <p class="text-amber-600">No specific liturgical day found for today (${dateString}).</p>
+            <p class="mt-2">This demo contains a limited set of liturgical days, primarily focused on Easter 2025.</p>
+            <p class="mt-2">In a complete implementation, the traditional calendar would include:</p>
+            <ul class="list-disc pl-5 mt-2">
+              <li>Temporal cycle (Sundays and weekdays)</li>
+              <li>Sanctoral cycle (Saints' feasts)</li>
+              <li>Moveable feasts</li>
+              <li>Proper ranking and precedence rules</li>
+            </ul>
+          `;
+        }
+      } catch (error) {
+        document.getElementById('todayLiturgical').innerHTML = `<p class="text-red-500">Error loading today's liturgical data: ${error.message}</p>`;
+        console.error('Error loading today\'s liturgical data:', error);
+      }
+    }
+
+    // Initialize the application
+    initSqlite();
+  </script>
+</body>
+</html>

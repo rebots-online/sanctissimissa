@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQLite Test</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>SQLite Test</h1>
+  
+  <div>
+    <button id="testCreateDb">Create Test Database</button>
+    <button id="testLoadDb">Load Database File</button>
+  </div>
+  
+  <h2>Results:</h2>
+  <div id="results">
+    <p>Click a button to test SQLite functionality.</p>
+  </div>
+  
+  <script>
+    // Initialize SQL.js
+    let SQL;
+    let db;
+    
+    // Initialize SQL.js
+    initSqlJs({
+      locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+    }).then(function(sql) {
+      SQL = sql;
+      document.getElementById('results').innerHTML += '<p class="success">SQL.js initialized successfully!</p>';
+    }).catch(function(err) {
+      document.getElementById('results').innerHTML += `<p class="error">Error initializing SQL.js: ${err.message}</p>`;
+    });
+    
+    // Test creating a database
+    document.getElementById('testCreateDb').addEventListener('click', function() {
+      try {
+        // Create a database
+        db = new SQL.Database();
+        
+        // Create a table
+        db.exec(`
+          CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT, value INTEGER);
+          INSERT INTO test VALUES (1, 'Item 1', 100);
+          INSERT INTO test VALUES (2, 'Item 2', 200);
+          INSERT INTO test VALUES (3, 'Item 3', 300);
+        `);
+        
+        // Query the database
+        const result = db.exec("SELECT * FROM test");
+        
+        // Display the results
+        document.getElementById('results').innerHTML += '<p class="success">Database created successfully!</p>';
+        document.getElementById('results').innerHTML += '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+      } catch (err) {
+        document.getElementById('results').innerHTML += `<p class="error">Error creating database: ${err.message}</p>`;
+      }
+    });
+    
+    // Test loading a database file
+    document.getElementById('testLoadDb').addEventListener('click', async function() {
+      try {
+        // Fetch the database file
+        document.getElementById('results').innerHTML += '<p>Fetching database file...</p>';
+        
+        const response = await fetch('./sanctissimissa.sqlite');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch database: ${response.statusText}`);
+        }
+        
+        document.getElementById('results').innerHTML += '<p class="success">Database file fetched successfully!</p>';
+        
+        // Convert the response to an array buffer
+        const arrayBuffer = await response.arrayBuffer();
+        const uInt8Array = new Uint8Array(arrayBuffer);
+        
+        // Create a database from the file
+        db = new SQL.Database(uInt8Array);
+        
+        document.getElementById('results').innerHTML += '<p class="success">Database loaded successfully!</p>';
+        
+        // Query the database
+        try {
+          const liturgicalDays = db.exec("SELECT * FROM liturgical_days LIMIT 5");
+          document.getElementById('results').innerHTML += '<h3>Liturgical Days:</h3>';
+          document.getElementById('results').innerHTML += '<pre>' + JSON.stringify(liturgicalDays, null, 2) + '</pre>';
+        } catch (err) {
+          document.getElementById('results').innerHTML += `<p class="error">Error querying liturgical_days: ${err.message}</p>`;
+        }
+        
+        try {
+          const massTexts = db.exec("SELECT id, part, title_latin, title_english FROM mass_texts LIMIT 5");
+          document.getElementById('results').innerHTML += '<h3>Mass Texts:</h3>';
+          document.getElementById('results').innerHTML += '<pre>' + JSON.stringify(massTexts, null, 2) + '</pre>';
+        } catch (err) {
+          document.getElementById('results').innerHTML += `<p class="error">Error querying mass_texts: ${err.message}</p>`;
+        }
+      } catch (err) {
+        document.getElementById('results').innerHTML += `<p class="error">Error loading database: ${err.message}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 import React, { useState, useRef, MouseEvent } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import './App.css'
 import CalendarPage from './pages/CalendarPage'
 import HomePage from './pages/HomePage'
@@ -7,10 +7,10 @@ import DatabaseTest from './components/database/DatabaseTest'
 import AudioRecorderModal from './components/modals/AudioRecorderModal';
 import TextNoteModal from './components/modals/TextNoteModal';
 import MassPage from './pages/MassPage';
-import DivineofficePage from './pages/DivineofficePage';
+import DivineofficePage from './pages/DivineOfficePage';
 import PrayersPage from './pages/PrayersPage';
 import JournalPage from './pages/JournalPage';
-import { getDatabase } from './services/database/db';
+import { saveJournalEntry } from './services/database/sqlite';
 import { JournalEntry } from './components/JournalNotes';
 
 // --- Placeholder Context Menu Component ---
@@ -75,7 +75,7 @@ function App() {
     // Start a new timer
     longPressTimerRef.current = setTimeout(() => {
       // Prevent default context menu
-      e.preventDefault(); 
+      e.preventDefault();
       setContextMenuPosition({ x: e.clientX, y: e.clientY });
       setContextMenuVisible(true);
       longPressTimerRef.current = null; // Clear ref after firing
@@ -101,7 +101,7 @@ function App() {
   // Show our custom context menu on right-click
   const handleContextMenu = (e: MouseEvent<HTMLElement>) => {
       e.preventDefault(); // Prevent the native context menu
-      
+
       // Show our custom context menu at the click position
       setContextMenuPosition({ x: e.clientX, y: e.clientY });
       setContextMenuVisible(true);
@@ -133,7 +133,6 @@ function App() {
   const handleSaveAudioNote = async (title: string, audioBlob: Blob) => {
     console.log('Attempting to save audio note:', title);
     try {
-        const db = await getDatabase();
         const id = Date.now().toString();
         const date = new Date().toISOString();
         const entryToSave: JournalEntry = {
@@ -148,7 +147,7 @@ function App() {
             updatedAt: Date.now(),
             // content is implicitly undefined for audio type
         };
-        await db.put('journal_entries', entryToSave);
+        saveJournalEntry(entryToSave);
         console.log('Audio note saved successfully:', entryToSave);
         setIsAudioModalOpen(false); // Close modal on success
     } catch (err) {
@@ -161,7 +160,6 @@ function App() {
   const handleSaveTextNote = async (title: string, content: string) => {
     console.log('Attempting to save text note:', title);
     try {
-        const db = await getDatabase();
         const id = Date.now().toString();
         const date = new Date().toISOString();
         const entryToSave: JournalEntry = {
@@ -175,7 +173,7 @@ function App() {
             createdAt: Date.now(),
             updatedAt: Date.now(),
         };
-        await db.put('journal_entries', entryToSave);
+        saveJournalEntry(entryToSave);
         console.log('Text note saved successfully:', entryToSave);
         setIsTextModalOpen(false); // Close modal on success
     } catch (err) {
@@ -222,8 +220,8 @@ function App() {
         </header>
 
         {/* Attach long-press handlers here */}
-        <main 
-          className="container mx-auto py-6 flex-grow" 
+        <main
+          className="container mx-auto py-6 flex-grow"
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
@@ -234,16 +232,16 @@ function App() {
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/database-test" element={<DatabaseTest />} />
             <Route path="/journal" element={<JournalPage />} />
-            
+
             {/* Mass routes */}
             <Route path="/mass" element={<MassPage />} />
             <Route path="/mass/:date" element={<MassPage />} />
-            
+
             {/* Divine Office routes */}
             <Route path="/office" element={<DivineofficePage />} />
             <Route path="/office/:date" element={<DivineofficePage />} />
             <Route path="/office/:date/:hour" element={<DivineofficePage />} />
-            
+
             {/* Prayers routes */}
             <Route path="/prayers" element={<PrayersPage />} />
             <Route path="/prayers/:category" element={<PrayersPage />} />
@@ -260,15 +258,15 @@ function App() {
 
       {/* Render Context Menu Conditionally */}
       {contextMenuVisible && (
-        <NoteContextMenu 
-          position={contextMenuPosition} 
-          onClose={handleCloseContextMenu} 
-          onOptionSelect={handleContextMenuOption} 
+        <NoteContextMenu
+          position={contextMenuPosition}
+          onClose={handleCloseContextMenu}
+          onOptionSelect={handleContextMenuOption}
         />
       )}
 
       {/* Render Audio Recorder Modal Conditionally */}
-      <AudioRecorderModal 
+      <AudioRecorderModal
         isOpen={isAudioModalOpen}
         onClose={handleCloseAudioModal}
         onSave={handleSaveAudioNote}
