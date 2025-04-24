@@ -37,10 +37,36 @@ This checklist tracks the progress of the SanctissiMissa web application develop
   - [x] Remove IndexedDB implementation
   - [x] Test application with SQLite database
   - [x] Create standalone SQLite demo as a reference implementation
+  - [x] Create new branch for SQLite implementation
 
 - [x] Optimize application startup
   - [x] Remove runtime data import process
   - [x] Implement loading indicator during SQLite database initialization
+
+### Current Priorities
+
+- [ ] Complete and verify SQLite database implementation
+  - [x] Create basic SQLite database structure
+  - [x] Implement data import from reference files
+  - [x] Create standalone demo to verify functionality
+  - [ ] Add comprehensive liturgical calendar data
+  - [ ] Add complete Mass texts for major feasts
+  - [ ] Add complete Office texts for major feasts
+  - [ ] Implement proper liturgical calendar calculations
+
+- [ ] Build Mass rendering engine
+  - [ ] Design component architecture for Mass texts
+  - [ ] Implement proper rendering of Latin and English texts
+  - [ ] Add support for rubrics and formatting
+  - [ ] Implement proper handling of propers and ordinary
+  - [ ] Add navigation between parts of the Mass
+
+- [ ] Build Divine Office rendering engine
+  - [ ] Design component architecture for Office texts
+  - [ ] Implement proper rendering of psalms and readings
+  - [ ] Add support for antiphons and responses
+  - [ ] Implement proper handling of hours
+  - [ ] Add navigation between parts of the Office
 
 - [ ] Rebuild main application with SQLite
   - [x] Create standalone SQLite demo as a reference implementation
