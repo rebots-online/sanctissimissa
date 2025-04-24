@@ -54,11 +54,12 @@ This checklist tracks the progress of the SanctissiMissa web application develop
   - [ ] Add complete Mass texts for major feasts
   - [ ] Add complete Office texts for major feasts
 
-- [ ] Build Mass rendering engine
-  - [ ] Design component architecture for Mass texts
-  - [ ] Implement proper rendering of Latin and English texts
+- [/] Build Mass rendering engine
+  - [x] Design component architecture for Mass texts
+  - [x] Implement proper rendering of Latin and English texts
+  - [x] Implement proper handling of propers and ordinary
+  - [x] Add language toggle functionality
   - [ ] Add support for rubrics and formatting
-  - [ ] Implement proper handling of propers and ordinary
   - [ ] Add navigation between parts of the Mass
 
 - [ ] Build Divine Office rendering engine
