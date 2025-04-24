@@ -260,20 +260,66 @@
       }
     });
 
+    // Calculate Easter Sunday date for a given year
+    function calculateEaster(year) {
+      // Algorithm from Butcher's Ecclesiastical Calendar
+      const a = year % 19;
+      const b = Math.floor(year / 100);
+      const c = year % 100;
+      const d = Math.floor(b / 4);
+      const e = b % 4;
+      const f = Math.floor((b + 8) / 25);
+      const g = Math.floor((b - f + 1) / 3);
+      const h = (19 * a + b - d - g + 15) % 30;
+      const i = Math.floor(c / 4);
+      const k = c % 4;
+      const l = (32 + 2 * e + 2 * i - h - k) % 7;
+      const m = Math.floor((a + 11 * h + 22 * l) / 451);
+      const month = Math.floor((h + l - 7 * m + 114) / 31);
+      const day = ((h + l - 7 * m + 114) % 31) + 1;
+
+      return new Date(year, month - 1, day);
+    }
+
     // Load today's liturgical day
     function loadTodayLiturgical() {
       try {
-        // Get today's date in YYYY-MM-DD format
+        // Get today's date
         const today = new Date();
         const year = today.getFullYear();
         const month = String(today.getMonth() + 1).padStart(2, '0');
         const day = String(today.getDate()).padStart(2, '0');
         const dateString = `${year}-${month}-${day}`;
 
+        // Calculate Easter Sunday for this year
+        const easterSunday = calculateEaster(year);
+
+        // Format Easter Sunday date as YYYY-MM-DD
+        const easterYear = easterSunday.getFullYear();
+        const easterMonth = String(easterSunday.getMonth() + 1).padStart(2, '0');
+        const easterDay = String(easterSunday.getDate()).padStart(2, '0');
+        const easterDateString = `${easterYear}-${easterMonth}-${easterDay}`;
+
+        // Calculate days since Easter
+        const todayTime = today.getTime();
+        const easterTime = easterSunday.getTime();
+        const daysSinceEaster = Math.floor((todayTime - easterTime) / (1000 * 60 * 60 * 24));
+
+        // Traditional liturgical colors
+        const colorMap = {
+          'white': 'White/Gold (Albus/Aureus)',
+          'red': 'Red (Ruber)',
+          'green': 'Green (Viridis)',
+          'purple': 'Purple/Violet (Violaceus)',
+          'black': 'Black (Niger)',
+          'rose': 'Rose (Rosaceus)'
+        };
+
         // Query the database for today's date
         const result = db.exec(`SELECT * FROM liturgical_days WHERE date = '${dateString}'`);
 
         if (result.length > 0 && result[0].values.length > 0) {
+          // We have an entry for today in the database
           const liturgicalDay = {};
 
           // Map column names to values
@@ -289,16 +335,6 @@
               massProperInfo = `${massResult[0].values[0][0]} / ${massResult[0].values[0][1]}`;
             }
           }
-
-          // Traditional liturgical colors
-          const colorMap = {
-            'white': 'White/Gold (Albus/Aureus)',
-            'red': 'Red (Ruber)',
-            'green': 'Green (Viridis)',
-            'purple': 'Purple/Violet (Violaceus)',
-            'black': 'Black (Niger)',
-            'rose': 'Rose (Rosaceus)'
-          };
 
           // Display the data
           document.getElementById('todayLiturgical').innerHTML = `
@@ -318,18 +354,86 @@
             </div>
           `;
         } else {
-          // If no entry for today, show a message
-          document.getElementById('todayLiturgical').innerHTML = `
-            <p class="text-amber-600">No specific liturgical day found for today (${dateString}).</p>
-            <p class="mt-2">This demo contains a limited set of liturgical days, primarily focused on Easter 2025.</p>
-            <p class="mt-2">In a complete implementation, the traditional calendar would include:</p>
-            <ul class="list-disc pl-5 mt-2">
-              <li>Temporal cycle (Sundays and weekdays)</li>
-              <li>Sanctoral cycle (Saints' feasts)</li>
-              <li>Moveable feasts</li>
-              <li>Proper ranking and precedence rules</li>
-            </ul>
-          `;
+          // No entry in database, calculate based on Easter
+          let liturgicalInfo = '';
+
+          if (daysSinceEaster === 0) {
+            liturgicalInfo = `
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p><strong>Date:</strong> ${dateString}</p>
+                  <p><strong>Celebration:</strong> Easter Sunday</p>
+                  <p><strong>Season:</strong> Easter</p>
+                  <p><strong>Color:</strong> ${colorMap['white']}</p>
+                </div>
+                <div>
+                  <p><strong>Rank:</strong> 1</p>
+                  <p><strong>Holy Day:</strong> Yes</p>
+                  <p><strong>Feast Day:</strong> Yes</p>
+                  <p><strong>Mass Proper:</strong> Dominica Resurrectionis / Easter Sunday</p>
+                </div>
+              </div>
+            `;
+          } else if (daysSinceEaster > 0 && daysSinceEaster <= 7) {
+            // Easter Week (Octave of Easter)
+            const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Low Sunday'];
+            const dayName = dayNames[daysSinceEaster - 1];
+
+            liturgicalInfo = `
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p><strong>Date:</strong> ${dateString}</p>
+                  <p><strong>Celebration:</strong> Easter ${dayName}</p>
+                  <p><strong>Season:</strong> Easter</p>
+                  <p><strong>Color:</strong> ${colorMap['white']}</p>
+                </div>
+                <div>
+                  <p><strong>Rank:</strong> ${daysSinceEaster === 7 ? '2' : '1'}</p>
+                  <p><strong>Holy Day:</strong> ${daysSinceEaster === 7 ? 'No' : 'Yes'}</p>
+                  <p><strong>Feast Day:</strong> Yes</p>
+                  <p><strong>Mass Proper:</strong> ${daysSinceEaster === 7 ? 'Dominica in Albis / Low Sunday' : `Feria ${daysSinceEaster} Paschae / Easter ${dayName}`}</p>
+                </div>
+              </div>
+            `;
+          } else if (daysSinceEaster > 7 && daysSinceEaster < 50) {
+            // Easter Season (up to Pentecost)
+            const weekNumber = Math.floor((daysSinceEaster - 1) / 7) + 1;
+            const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+            liturgicalInfo = `
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p><strong>Date:</strong> ${dateString}</p>
+                  <p><strong>Celebration:</strong> ${dayOfWeek === 0 ? `${weekNumber + 1}nd Sunday after Easter` : `${dayNames[dayOfWeek]} of the ${weekNumber + 1}nd week after Easter`}</p>
+                  <p><strong>Season:</strong> Easter</p>
+                  <p><strong>Color:</strong> ${colorMap['white']}</p>
+                </div>
+                <div>
+                  <p><strong>Rank:</strong> ${dayOfWeek === 0 ? '2' : '4'}</p>
+                  <p><strong>Holy Day:</strong> No</p>
+                  <p><strong>Feast Day:</strong> ${dayOfWeek === 0 ? 'Yes' : 'No'}</p>
+                  <p><strong>Mass Proper:</strong> ${dayOfWeek === 0 ? `Dominica ${weekNumber + 1} post Pascha / ${weekNumber + 1}nd Sunday after Easter` : 'Feria Temporis Paschalis / Ferial day in Eastertide'}</p>
+                </div>
+              </div>
+            `;
+          } else {
+            // Not Easter season, show a generic message
+            liturgicalInfo = `
+              <p class="text-amber-600">No specific liturgical day found for today (${dateString}).</p>
+              <p class="mt-2">Easter Sunday this year is on ${easterDateString}.</p>
+              <p class="mt-2">Days since Easter: ${daysSinceEaster}</p>
+              <p class="mt-2">In a complete implementation, the traditional calendar would include:</p>
+              <ul class="list-disc pl-5 mt-2">
+                <li>Temporal cycle (Sundays and weekdays)</li>
+                <li>Sanctoral cycle (Saints' feasts)</li>
+                <li>Moveable feasts</li>
+                <li>Proper ranking and precedence rules</li>
+              </ul>
+            `;
+          }
+
+          document.getElementById('todayLiturgical').innerHTML = liturgicalInfo;
         }
       } catch (error) {
         document.getElementById('todayLiturgical').innerHTML = `<p class="text-red-500">Error loading today's liturgical data: ${error.message}</p>`;
