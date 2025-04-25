@@ -10,6 +10,7 @@ import MassPage from './pages/MassPage';
 import DivineofficePage from './pages/DivineOfficePage';
 import PrayersPage from './pages/PrayersPage';
 import JournalPage from './pages/JournalPage';
+import TestPage from './pages/TestPage';
 import { saveJournalEntry } from './services/database/sqlite';
 import { JournalEntry } from './components/JournalNotes';
 
@@ -214,6 +215,9 @@ function App() {
                 <li>
                   <Link to="/database-test" className="hover:text-gray-300">DB Test</Link>
                 </li>
+                <li>
+                  <Link to="/test" className="hover:text-gray-300">Component Test</Link>
+                </li>
               </ul>
             </nav>
           </div>
@@ -246,6 +250,9 @@ function App() {
             <Route path="/prayers" element={<PrayersPage />} />
             <Route path="/prayers/:category" element={<PrayersPage />} />
             <Route path="/prayers/:category/:id" element={<PrayersPage />} />
+
+            {/* Test route */}
+            <Route path="/test" element={<TestPage />} />
           </Routes>
         </main>
 
