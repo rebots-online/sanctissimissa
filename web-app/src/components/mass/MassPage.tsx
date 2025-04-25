@@ -15,6 +15,7 @@ const MassPage: React.FC = () => {
   const [massOrdinary, setMassOrdinary] = useState<any>(null);
   const [showLatinOnly, setShowLatinOnly] = useState(false);
   const [showEnglishOnly, setShowEnglishOnly] = useState(false);
+  const [showRubrics, setShowRubrics] = useState(true);
 
   useEffect(() => {
     const loadMassData = () => {
@@ -24,11 +25,11 @@ const MassPage: React.FC = () => {
 
         // Get today's date if not provided
         const targetDate = date || formatDate(new Date());
-        
+
         // Get liturgical day
         const day = getLiturgicalDay(targetDate);
         setLiturgicalDay(day);
-        
+
         if (day && day.mass_proper) {
           // Get mass proper
           const proper = getMassText(day.mass_proper);
@@ -36,11 +37,11 @@ const MassPage: React.FC = () => {
         } else {
           setError(`No Mass proper found for ${targetDate}`);
         }
-        
+
         // Get mass ordinary
         const ordinary = getMassText('ordinary_default');
         setMassOrdinary(ordinary);
-        
+
         setLoading(false);
       } catch (err) {
         console.error('Error loading Mass data:', err);
@@ -48,7 +49,7 @@ const MassPage: React.FC = () => {
         setLoading(false);
       }
     };
-    
+
     loadMassData();
   }, [date]);
 
@@ -73,6 +74,11 @@ const MassPage: React.FC = () => {
     if (!showEnglishOnly) {
       setShowLatinOnly(false);
     }
+  };
+
+  // Toggle rubrics display
+  const toggleRubrics = () => {
+    setShowRubrics(!showRubrics);
   };
 
   if (loading) {
@@ -107,8 +113,8 @@ const MassPage: React.FC = () => {
               <span className="px-2 py-1 bg-green-100 rounded text-sm">Feast Day</span>
             )}
           </div>
-          
-          <div className="flex gap-4 mb-6">
+
+          <div className="flex flex-wrap gap-4 mb-6">
             <button
               onClick={toggleLatinOnly}
               className={`px-3 py-1 rounded ${
@@ -125,10 +131,18 @@ const MassPage: React.FC = () => {
             >
               English Only
             </button>
+            <button
+              onClick={toggleRubrics}
+              className={`px-3 py-1 rounded ${
+                showRubrics ? 'bg-blue-500 text-white' : 'bg-gray-200'
+              }`}
+            >
+              {showRubrics ? 'Hide Rubrics' : 'Show Rubrics'}
+            </button>
           </div>
         </div>
       )}
-      
+
       {massProper && (
         <div className="bg-white shadow-md rounded-lg p-6 mb-6">
           <MassText
@@ -186,10 +200,11 @@ const MassPage: React.FC = () => {
             }}
             showLatinOnly={showLatinOnly}
             showEnglishOnly={showEnglishOnly}
+            showRubrics={showRubrics}
           />
         </div>
       )}
-      
+
       {massOrdinary && (
         <div className="bg-white shadow-md rounded-lg p-6">
           <h2 className="text-2xl font-bold mb-6 text-center">Ordinary of the Mass</h2>
@@ -198,6 +213,7 @@ const MassPage: React.FC = () => {
             part="ordinary"
             showLatinOnly={showLatinOnly}
             showEnglishOnly={showEnglishOnly}
+            showRubrics={showRubrics}
           />
         </div>
       )}
