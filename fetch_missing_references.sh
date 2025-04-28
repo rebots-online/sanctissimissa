@@ -8,10 +8,15 @@ UPSTREAM="https://raw.githubusercontent.com/DivinumOfficium/divinum-officium/mas
 
 # List of files to fetch
 FILES=(
+  # Mass files
   "missa/Latin/Tempora/Pasc0-0.txt"
   "missa/English/Tempora/Pasc0-0.txt"
   "missa/Latin/Ordo/Ordo.txt"
   "missa/English/Ordo/Ordo.txt"
+
+  # Office files (horas)
+  "horas/Latin/Tempora/Pasc0-0.txt"
+  "horas/English/Tempora/Pasc0-0.txt"
 )
 
 for REL_PATH in "${FILES[@]}"; do

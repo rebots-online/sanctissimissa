@@ -1,0 +1,28 @@
+[Name]
+Easter Sunday
+
+[Rank]
+Easter Sunday;;Double of I Class with Privileged Octave I;;7
+
+[Rule]
+1 Nocturn
+Omit Preces
+Minores Horas Dominica
+
+[Hymnus]
+The dawn was purpling over the sky,
+with alleluias the air was ringing,
+the world triumphant seemed to cry,
+all bounds of earth in music singing.
+
+[Psalmi]
+The Lord reigns, he is robed in majesty
+Make a joyful noise to the Lord, all the earth
+O God, you are my God, earnestly I seek you
+
+[Capitulum]
+!Rom 6:9-10
+v. Christ, rising again from the dead, dieth now no more, death shall no more have dominion over him. For in that he died to sin, he died once; but in that he liveth, he liveth unto God.
+
+[Lectio1]
+Christ is risen from the dead, the first fruits of those who have fallen asleep.

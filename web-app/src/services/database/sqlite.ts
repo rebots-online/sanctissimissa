@@ -26,21 +26,52 @@ export async function initSqliteDatabase(): Promise<void> {
 
     // Load SQL.js
     console.log('Loading SQL.js...');
+    console.log('Current URL:', window.location.href);
+    console.log('Base URL:', window.location.origin);
+
+    // Load SQL.js with the WASM file
+    console.log('Trying to load WASM from sqljs-wasm.wasm');
     const SQL = await initSqlJs({
       // Specify the path to the wasm file
-      locateFile: file => `./node_modules/sql.js/dist/${file}`
+      locateFile: file => {
+        console.log('Requested file:', file);
+        return '/sqljs-wasm.wasm';
+      }
     });
     console.log('SQL.js loaded successfully');
 
     // Fetch the database file
     console.log('Fetching SQLite database file...');
     try {
-      const response = await fetch('./sanctissimissa.sqlite');
-      if (!response.ok) {
-        console.error(`Failed to fetch database: ${response.statusText}`);
-        throw new Error(`Failed to fetch database: ${response.statusText}`);
+      // Try different paths for the database file
+      const dbPaths = [
+        './sanctissimissa.sqlite',
+        '/sanctissimissa.sqlite',
+        'sanctissimissa.sqlite'
+      ];
+
+      let response = null;
+      let dbPath = '';
+
+      for (const path of dbPaths) {
+        console.log(`Trying to fetch database from: ${path}`);
+        try {
+          response = await fetch(path);
+          if (response.ok) {
+            dbPath = path;
+            break;
+          }
+        } catch (error) {
+          console.error(`Error fetching from ${path}:`, error);
+        }
       }
-      console.log('Database file fetched successfully');
+
+      if (!response || !response.ok) {
+        console.error(`Failed to fetch database from any path`);
+        throw new Error(`Failed to fetch database from any path`);
+      }
+
+      console.log(`Database file fetched successfully from ${dbPath}`);
 
       const arrayBuffer = await response.arrayBuffer();
       const uInt8Array = new Uint8Array(arrayBuffer);

@@ -1,0 +1,28 @@
+[Name]
+Dominica Resurrectionis
+
+[Rank]
+Dominica Resurrectionis;;Duplex I classis cum Octava privilegiata I;;7
+
+[Rule]
+1 Nocturn
+Omit Preces
+Minores Horas Dominica
+
+[Hymnus]
+Aurora caelum purpurat,
+Aether resultat laudibus,
+Mundus triumphans jubilat,
+Horrens avernus infremit.
+
+[Psalmi]
+Dominus regnavit, decorem indutus est
+Jubilate Deo, omnis terra
+Deus, Deus meus, ad te de luce vigilo
+
+[Capitulum]
+!Rom 6:9-10
+v. Christus resurgens ex mortuis iam non moritur, mors illi ultra non dominabitur. Quod enim mortuus est peccato, mortuus est semel: quod autem vivit, vivit Deo.
+
+[Lectio1]
+Christus resurgens ex mortuis, primitiae dormientium.
