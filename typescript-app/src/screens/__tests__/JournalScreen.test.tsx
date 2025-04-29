@@ -1,14 +1,17 @@
 import React from 'react';
-import { render, fireEvent, act } from '@testing-library/react-native';
-import { JournalScreen } from '../JournalScreen';
-import * as journalService from '../../services/journal';
 import {
+  render,
+  fireEvent,
+  act,
+  wait,
   createMockNavigation,
   createMockRoute,
   createNavigationEvent,
   triggerNavigationEvent,
-  type NavigationEventType
-} from '../../test-utils/navigation';
+  type MockFunction
+} from '../../test-utils/test-library';
+import { JournalScreen } from '../JournalScreen';
+import * as journalService from '../../services/journal';
 import type { JournalEntry } from '../../types/journal';
 
 // Mock journal service
@@ -43,10 +46,13 @@ const mockEntries: JournalEntry[] = [
 describe('JournalScreen Component', () => {
   const mockNavigation = createMockNavigation();
   const mockRoute = createMockRoute();
+  const getAllEntriesMock = journalService.getAllJournalEntries as MockFunction;
+  const saveEntryMock = journalService.saveJournalEntry as MockFunction;
+  const deleteEntryMock = journalService.deleteJournalEntry as MockFunction;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (journalService.getAllJournalEntries as jest.Mock).mockResolvedValue(mockEntries);
+    getAllEntriesMock.mockResolvedValue(mockEntries);
   });
 
   it('renders loading state initially', () => {
@@ -63,7 +69,7 @@ describe('JournalScreen Component', () => {
     );
 
     await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await wait();
     });
 
     expect(queryByTestId('loading-indicator')).toBeNull();
@@ -77,19 +83,20 @@ describe('JournalScreen Component', () => {
     );
 
     await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await wait();
     });
 
     // Clear first load
-    (journalService.getAllJournalEntries as jest.Mock).mockClear();
+    getAllEntriesMock.mockClear();
 
     // Trigger focus event
     await act(async () => {
       triggerNavigationEvent(mockNavigation, createNavigationEvent('focus'));
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await wait();
     });
 
-    expect(journalService.getAllJournalEntries).toHaveBeenCalledTimes(1);
+    // Verify service was called
+    expect(getAllEntriesMock).toHaveBeenCalledTimes(1);
   });
 
   it('creates new entry when add button is pressed', async () => {
@@ -99,10 +106,10 @@ describe('JournalScreen Component', () => {
 
     await act(async () => {
       fireEvent.press(getByTestId('add-entry-button'));
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await wait();
     });
 
-    expect(journalService.saveJournalEntry).toHaveBeenCalled();
+    expect(saveEntryMock).toHaveBeenCalled();
   });
 
   it('deletes entry when delete is triggered', async () => {
@@ -111,29 +118,28 @@ describe('JournalScreen Component', () => {
     );
 
     await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await wait();
     });
 
     const deleteButtons = getAllByTestId('delete-entry-button');
     await act(async () => {
       fireEvent.press(deleteButtons[0]);
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await wait();
     });
 
-    expect(journalService.deleteJournalEntry).toHaveBeenCalledWith('entry-1');
+    expect(deleteEntryMock).toHaveBeenCalledWith('entry-1');
   });
 
   it('handles errors when loading entries', async () => {
-    (journalService.getAllJournalEntries as jest.Mock).mockRejectedValue(
-      new Error('Failed to load entries')
-    );
+    const error = new Error('Failed to load entries');
+    getAllEntriesMock.mockRejectedValue(error);
 
     const { getByTestId } = render(
       <JournalScreen navigation={mockNavigation} route={mockRoute} />
     );
 
     await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await wait();
     });
 
     expect(getByTestId('error-message')).toBeTruthy();
