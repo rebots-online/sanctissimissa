@@ -1,97 +1,200 @@
-interface GlossaryEntry {
-  definition: string;
-  pronunciation?: string;
-  category: 'liturgical' | 'theological' | 'rubrical' | 'general';
-  usage?: string[];
-}
+/**
+ * Glossary Service
+ * 
+ * This service provides access to glossary entries and categories through
+ * the mobile database adapter. It includes search functionality and
+ * category management.
+ */
 
-interface GlossaryDatabase {
-  [key: string]: GlossaryEntry;
-}
+import { getDatabaseAdapter } from './database';
+import { GlossaryEntry, GlossaryCategory, CategoryNode, GlossarySearchResult, GlossaryStats } from '../types/glossary';
 
-// Initial glossary data - this would typically be loaded from a database
-const glossaryData: GlossaryDatabase = {
-  'dominus': {
-    definition: 'The Lord',
-    pronunciation: 'DOH-mee-nus',
-    category: 'theological',
-    usage: ['Dominus vobiscum', 'Dominus illuminatio mea'],
-  },
-  'vobiscum': {
-    definition: 'with you',
-    pronunciation: 'voh-BEES-kum',
-    category: 'liturgical',
-    usage: ['Dominus vobiscum', 'Pax vobiscum'],
-  },
-  'oremus': {
-    definition: 'Let us pray',
-    pronunciation: 'oh-REH-mus',
-    category: 'liturgical',
-  },
-  'alleluia': {
-    definition: 'Praise the Lord (from Hebrew "hallelu Yah")',
-    pronunciation: 'ah-leh-LOO-yah',
-    category: 'liturgical',
-  },
-  'sequentia': {
-    definition: 'The continuation (used to introduce Gospel readings)',
-    pronunciation: 'seh-KWEN-tsee-ah',
-    category: 'liturgical',
-  },
-  'rubrica': {
-    definition: 'Instructions or directions for the ceremony (printed in red)',
-    pronunciation: 'ROO-bree-kah',
-    category: 'rubrical',
-  },
+/**
+ * Get all glossary entries
+ * @returns Promise resolving to array of glossary entries
+ */
+export const getAllEntries = async (): Promise<GlossaryEntry[]> => {
+  try {
+    const db = await getDatabaseAdapter();
+    const result = await db.query<GlossaryEntry>(
+      'SELECT * FROM glossary_entries ORDER BY term'
+    );
+    return result.rows;
+  } catch (error) {
+    console.error('Error getting glossary entries:', error);
+    throw error;
+  }
 };
 
-export class Glossary {
-  private static instance: Glossary;
-  private data: GlossaryDatabase;
-
-  private constructor() {
-    this.data = glossaryData;
+/**
+ * Get glossary entries by category
+ * @param category Category name
+ * @returns Promise resolving to array of glossary entries
+ */
+export const getEntriesByCategory = async (category: string): Promise<GlossaryEntry[]> => {
+  try {
+    const db = await getDatabaseAdapter();
+    return await db.findBy('glossary_entries', 'category', category);
+  } catch (error) {
+    console.error('Error getting entries by category:', error);
+    throw error;
   }
+};
 
-  static getInstance(): Glossary {
-    if (!Glossary.instance) {
-      Glossary.instance = new Glossary();
+/**
+ * Search glossary entries
+ * @param query Search query
+ * @param options Search options
+ * @returns Promise resolving to array of search results
+ */
+export const searchEntries = async (
+  query: string,
+  options: { 
+    includeLatinTerms?: boolean;
+    categories?: string[];
+    limit?: number;
+  } = {}
+): Promise<GlossarySearchResult[]> => {
+  try {
+    const db = await getDatabaseAdapter();
+    const searchFields = ['term', 'definition'];
+    if (options.includeLatinTerms) {
+      searchFields.push('term_latin', 'definition_latin');
     }
-    return Glossary.instance;
-  }
 
-  getDefinition(term: string): string | undefined {
-    const entry = this.data[term.toLowerCase()];
-    return entry?.definition;
-  }
+    const whereConditions = searchFields.map(field => `${field} LIKE ?`);
+    const searchPattern = `%${query}%`;
+    const params = Array(searchFields.length).fill(searchPattern);
 
-  getPronunciation(term: string): string | undefined {
-    const entry = this.data[term.toLowerCase()];
-    return entry?.pronunciation;
-  }
+    if (options.categories?.length) {
+      whereConditions.push(`category IN (${options.categories.map(() => '?').join(', ')})`);
+      params.push(...options.categories);
+    }
 
-  getEntry(term: string): GlossaryEntry | undefined {
-    return this.data[term.toLowerCase()];
-  }
+    const sql = `
+      SELECT *, 
+      (${searchFields.map(field => `(CASE WHEN ${field} LIKE ? THEN 1 ELSE 0 END)`).join(' + ')}) as relevance
+      FROM glossary_entries
+      WHERE ${whereConditions.join(' OR ')}
+      ORDER BY relevance DESC, term
+      ${options.limit ? `LIMIT ${options.limit}` : ''}
+    `;
 
-  searchTerms(query: string): string[] {
-    const normalizedQuery = query.toLowerCase();
-    return Object.keys(this.data).filter(term => 
-      term.toLowerCase().includes(normalizedQuery) ||
-      this.data[term].definition.toLowerCase().includes(normalizedQuery)
+    const result = await db.query<GlossaryEntry & { relevance: number }>(sql, params);
+
+    return result.rows.map(row => {
+      const { relevance, ...entry } = row;
+      const matchedFields = searchFields.filter(field => 
+        row[field]?.toLowerCase().includes(query.toLowerCase())
+      );
+
+      return {
+        entry,
+        relevance,
+        matchedFields
+      };
+    });
+  } catch (error) {
+    console.error('Error searching entries:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get all glossary categories
+ * @returns Promise resolving to array of categories
+ */
+export const getAllCategories = async (): Promise<GlossaryCategory[]> => {
+  try {
+    const db = await getDatabaseAdapter();
+    const result = await db.query<GlossaryCategory>(
+      'SELECT * FROM glossary_categories ORDER BY "order", name'
     );
+    return result.rows;
+  } catch (error) {
+    console.error('Error getting glossary categories:', error);
+    throw error;
   }
+};
 
-  getTermsByCategory(category: GlossaryEntry['category']): string[] {
-    return Object.entries(this.data)
-      .filter(([_, entry]) => entry.category === category)
-      .map(([term, _]) => term);
+/**
+ * Build category hierarchy tree
+ * @returns Promise resolving to category tree
+ */
+export const getCategoryTree = async (): Promise<CategoryNode[]> => {
+  try {
+    const categories = await getAllCategories();
+    const tree: CategoryNode[] = [];
+    const map: Record<string, CategoryNode> = {};
+
+    // First pass: Create nodes
+    categories.forEach(category => {
+      map[category.id] = { ...category, children: [] };
+    });
+
+    // Second pass: Build tree
+    categories.forEach(category => {
+      const node = map[category.id];
+      if (category.parentCategory) {
+        const parent = map[category.parentCategory];
+        if (parent) {
+          parent.children.push(node);
+        } else {
+          tree.push(node);
+        }
+      } else {
+        tree.push(node);
+      }
+    });
+
+    return tree;
+  } catch (error) {
+    console.error('Error building category tree:', error);
+    throw error;
   }
+};
 
-  getAllTerms(): string[] {
-    return Object.keys(this.data);
+/**
+ * Get glossary statistics
+ * @returns Promise resolving to glossary statistics
+ */
+export const getGlossaryStats = async (): Promise<GlossaryStats> => {
+  try {
+    const db = await getDatabaseAdapter();
+    
+    // Get total entries
+    const entriesResult = await db.query<{ count: number }>(
+      'SELECT COUNT(*) as count FROM glossary_entries'
+    );
+    
+    // Get total categories
+    const categoriesResult = await db.query<{ count: number }>(
+      'SELECT COUNT(*) as count FROM glossary_categories'
+    );
+    
+    // Get entries per category
+    const categoryCountsResult = await db.query<{ category: string; count: number }>(
+      'SELECT category, COUNT(*) as count FROM glossary_entries GROUP BY category'
+    );
+    
+    // Get last updated timestamp
+    const lastUpdatedResult = await db.query<{ max_updated: number }>(
+      'SELECT MAX(updated_at) as max_updated FROM glossary_entries'
+    );
+    
+    const categoryCounts: Record<string, number> = {};
+    categoryCountsResult.rows.forEach(row => {
+      categoryCounts[row.category] = row.count;
+    });
+    
+    return {
+      totalEntries: entriesResult.rows[0].count,
+      totalCategories: categoriesResult.rows[0].count,
+      lastUpdated: lastUpdatedResult.rows[0].max_updated,
+      categoryCounts
+    };
+  } catch (error) {
+    console.error('Error getting glossary stats:', error);
+    throw error;
   }
-}
-
-// Export singleton instance
-export const glossary = Glossary.getInstance();
+};

@@ -1,18 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Switch } from 'react-native';
-import { RootStackScreenProps, TabScreenProps } from '../navigation/types';
-import { useAppTheme } from '../hooks/useAppTheme';
-import { dataManager } from '../services/dataManager';
-import { MassProper } from '../services/texts';
-import { LiturgicalDay } from '../services/calendar';
-import AccordionSection from '../components/AccordionSection';
-import { format } from 'date-fns';
+/**
+ * Mass Screen
+ * 
+ * Displays the texts for the Mass of the day with support for
+ * foldable displays and different viewing modes.
+ */
 
-type StackProps = RootStackScreenProps<'Mass'>;
-type TabProps = TabScreenProps<'Mass'>;
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  ScrollView,
+  ActivityIndicator,
+  Switch,
+  StyleSheet,
+  Text,
+  ViewStyle
+} from 'react-native';
+import { RootStackScreenProps, TabScreenProps } from '../navigation/types';
+import { useFoldableDevice } from '../hooks/useFoldableDevice';
+import { useAppTheme } from '../hooks/useAppTheme';
+import MassTextSection from '../components/MassTextSection';
+import { format } from 'date-fns';
+import { getLiturgicalDay, getMassText } from '../services/liturgical';
+import { LiturgicalDay, MassText } from '../shared/database/types';
 
 interface MassSection {
-  id: keyof MassProper;
+  id: string;
   title: string;
   optional?: boolean;
 }
@@ -31,15 +43,17 @@ const MASS_SECTIONS: MassSection[] = [
   { id: 'postcommunion', title: 'POST COMMUNION' },
 ];
 
-// Component that handles both stack and tab navigation props
-const MassScreenContent: React.FC<{
+type Props = {
   date?: string;
-}> = ({ date }) => {
+};
+
+const MassScreenContent: React.FC<Props> = ({ date }) => {
   const theme = useAppTheme();
   const [loading, setLoading] = useState(true);
-  const [proper, setProper] = useState<MassProper | null>(null);
+  const [proper, setProper] = useState<MassText | null>(null);
   const [dayInfo, setDayInfo] = useState<LiturgicalDay | null>(null);
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [showLatinOnly, setShowLatinOnly] = useState(false);
+  const [showEnglishOnly, setShowEnglishOnly] = useState(false);
   const [isVigil, setIsVigil] = useState(false);
 
   useEffect(() => {
@@ -49,12 +63,21 @@ const MassScreenContent: React.FC<{
   const loadContent = async () => {
     try {
       setLoading(true);
-      const [massProper, info] = await Promise.all([
-        dataManager.getMassProper(date),
-        dataManager.getDayInfo(date)
-      ]);
-      setProper(massProper);
-      setDayInfo(info);
+      const targetDate = date || formatDate(new Date());
+      
+      // Get liturgical day info
+      const day = await getLiturgicalDay(targetDate);
+      if (day) {
+        setDayInfo(day);
+        
+        if (day.massProper) {
+          // Get mass text
+          const massText = await getMassText(day.massProper);
+          if (massText) {
+            setProper(massText);
+          }
+        }
+      }
     } catch (error) {
       console.error('Failed to load Mass content:', error);
     } finally {
@@ -62,13 +85,22 @@ const MassScreenContent: React.FC<{
     }
   };
 
-  const toggleSection = (sectionName: string) => {
-    setExpandedSection(expandedSection === sectionName ? null : sectionName);
+  const formatDate = (date: Date): string => {
+    return format(date, 'yyyy-MM-dd');
   };
 
-  const formatDate = (dateStr?: string) => {
-    const dateObj = dateStr ? new Date(dateStr) : new Date();
-    return format(dateObj, 'EEEE, MMMM d, yyyy');
+  const toggleLatinOnly = () => {
+    setShowLatinOnly(!showLatinOnly);
+    if (!showLatinOnly) {
+      setShowEnglishOnly(false);
+    }
+  };
+
+  const toggleEnglishOnly = () => {
+    setShowEnglishOnly(!showEnglishOnly);
+    if (!showEnglishOnly) {
+      setShowLatinOnly(false);
+    }
   };
 
   if (loading) {
@@ -96,38 +128,54 @@ const MassScreenContent: React.FC<{
           {dayInfo.celebration}
         </Text>
         <Text style={[styles.season, { color: theme.colors.textSecondary }]}>
-          {dayInfo.season.replace('_', ' ').toUpperCase()}
+          {dayInfo.season}
         </Text>
         <Text style={[styles.date, { color: theme.colors.textSecondary }]}>
-          {formatDate(date)}
+          {format(new Date(dayInfo.date), 'EEEE, MMMM d, yyyy')}
         </Text>
-        {dayInfo.allowsVigil && (
-          <View style={styles.vigilToggle}>
-            <Text style={[styles.vigilText, { color: theme.colors.textSecondary }]}>
-              Vigil Mass
+        
+        <View style={styles.controls}>
+          <View style={styles.controlItem}>
+            <Text style={[styles.controlLabel, { color: theme.colors.textSecondary }]}>
+              Latin Only
             </Text>
             <Switch
-              value={isVigil}
-              onValueChange={setIsVigil}
+              value={showLatinOnly}
+              onValueChange={toggleLatinOnly}
               trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
               thumbColor={theme.colors.background}
             />
           </View>
-        )}
+          
+          <View style={styles.controlItem}>
+            <Text style={[styles.controlLabel, { color: theme.colors.textSecondary }]}>
+              English Only
+            </Text>
+            <Switch
+              value={showEnglishOnly}
+              onValueChange={toggleEnglishOnly}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+              thumbColor={theme.colors.background}
+            />
+          </View>
+        </View>
       </View>
 
       {MASS_SECTIONS.map(section => {
-        const content = proper[section.id];
-        if (!content && section.optional) return null;
-        
+        // Skip optional sections if not present
+        if (section.optional && !proper[section.id]) {
+          return null;
+        }
+
         return (
-          <AccordionSection
+          <MassTextSection
             key={section.id}
             title={section.title}
-            latin={content?.latin || ''}
-            english={content?.english || ''}
-            isExpanded={expandedSection === section.id}
-            onPress={() => toggleSection(section.id)}
+            latin={showEnglishOnly ? undefined : proper[`${section.id}Latin`]}
+            english={showLatinOnly ? undefined : proper[`${section.id}English`]}
+            reference={proper[`${section.id}Reference`]}
+            showLatinOnly={showLatinOnly}
+            showEnglishOnly={showEnglishOnly}
           />
         );
       })}
@@ -136,61 +184,62 @@ const MassScreenContent: React.FC<{
 };
 
 // Stack navigation version
-export const MassScreen: React.FC<StackProps> = ({ route }) => {
+export const MassScreen: React.FC<RootStackScreenProps<'Mass'>> = ({ route }) => {
   return <MassScreenContent {...route.params} />;
 };
 
 // Tab navigation version
-export const TabMassScreen: React.FC<TabProps> = () => {
+export const TabMassScreen: React.FC<TabScreenProps<'Mass'>> = () => {
   return <MassScreenContent />;
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
+  } as ViewStyle,
   centered: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
+  } as ViewStyle,
   header: {
     padding: 16,
-    alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
-  },
+  } as ViewStyle,
   celebration: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 8,
-  },
+  } as ViewStyle,
   season: {
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 4,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
+  } as ViewStyle,
   date: {
     fontSize: 14,
     textAlign: 'center',
     fontStyle: 'italic',
-    marginBottom: 12,
-  },
-  vigilToggle: {
+    marginBottom: 16,
+  } as ViewStyle,
+  controls: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 16,
+  } as ViewStyle,
+  controlItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 8,
-  },
-  vigilText: {
+    gap: 8,
+  } as ViewStyle,
+  controlLabel: {
     fontSize: 14,
-    marginRight: 8,
-  },
+  } as ViewStyle,
   error: {
     fontSize: 16,
     textAlign: 'center',
-  },
+  } as ViewStyle,
 });
 
 export default MassScreen;

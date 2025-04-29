@@ -1,36 +1,56 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
+/**
+ * Navigation Types
+ * 
+ * Type definitions for navigation parameters and routes
+ */
 
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { CompositeScreenProps } from '@react-navigation/native';
+
+/**
+ * Root Stack Parameter List
+ */
 export type RootStackParamList = {
-  Main: NavigatorScreenParams<BottomTabParamList>;
-  Office: {
-    date?: string;
-    type?: string;
-  };
-  Mass: {
-    date?: string;
-  };
+  Main: undefined;
+  Mass: { date?: string };
+  Office: { date?: string; hour?: string };
+  Prayer: { category?: string };
+  Journal: { id?: string };
+  Glossary: undefined;
   Settings: undefined;
-  DeviceDebug: undefined; // Added for Z-Fold testing & debugging
 };
 
+/**
+ * Bottom Tab Parameter List
+ */
 export type BottomTabParamList = {
-  Home: undefined;
-  Office: undefined;
+  Today: undefined;
   Mass: undefined;
+  Office: undefined;
+  Prayer: undefined;
+  Journal: undefined;
+  More: undefined;
 };
 
-export type RootStackScreenProps<T extends keyof RootStackParamList> = NativeStackScreenProps<
-  RootStackParamList,
-  T
->;
+/**
+ * Root Stack Screen Props
+ */
+export type RootStackScreenProps<T extends keyof RootStackParamList> = 
+  NativeStackScreenProps<RootStackParamList, T>;
 
-export type TabScreenProps<T extends keyof BottomTabParamList> = CompositeScreenProps<
-  BottomTabScreenProps<BottomTabParamList, T>,
-  RootStackScreenProps<keyof RootStackParamList>
->;
+/**
+ * Tab Screen Props
+ */
+export type TabScreenProps<T extends keyof BottomTabParamList> = 
+  CompositeScreenProps<
+    BottomTabScreenProps<BottomTabParamList, T>,
+    RootStackScreenProps<keyof RootStackParamList>
+  >;
 
+/**
+ * Navigation Props Type Guard
+ */
 declare global {
   namespace ReactNavigation {
     interface RootParamList extends RootStackParamList {}
