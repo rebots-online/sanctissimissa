@@ -1,6 +1,12 @@
-const fs = require('fs');
-const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
+import fs from 'fs';
+import path from 'path';
+import pkg from 'sqlite3';
+const { verbose } = pkg;
+const sqlite3 = verbose();
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const SOURCE_DB_PATH = path.join(__dirname, '../public/sanctissimissa.sqlite');
 const DEST_DB_PATH = path.join(__dirname, '../dist/sanctissimissa.sqlite');

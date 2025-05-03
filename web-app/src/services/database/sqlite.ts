@@ -6,7 +6,8 @@
  * Enhanced for offline use with data persistence between sessions.
  */
 
-import initSqlJs, { Database } from 'sql.js';
+import initSqlJs from 'sql.js';
+import type { Database } from 'sql.js';
 import { openDB, IDBPDatabase } from 'idb';
 
 // Global database instance
@@ -77,6 +78,11 @@ async function saveDatabaseToIndexedDB(): Promise<void> {
  */
 async function loadDatabaseFromIndexedDB(SQL: any): Promise<boolean> {
   try {
+    if (!SQL || typeof SQL.Database !== 'function') {
+      console.error('Invalid SQL.js instance provided. SQL.Database is not a constructor.');
+      return false;
+    }
+
     // Open IndexedDB
     const idb = await openIndexedDB();
 
@@ -84,10 +90,15 @@ async function loadDatabaseFromIndexedDB(SQL: any): Promise<boolean> {
     const data = await idb.get(STORE_NAME, DB_KEY);
 
     if (data) {
-      // Create a database from the data
-      db = new SQL.Database(data);
-      console.log('Database loaded from IndexedDB successfully');
-      return true;
+      try {
+        // Create a database from the data
+        db = new SQL.Database(data);
+        console.log('Database loaded from IndexedDB successfully');
+        return true;
+      } catch (dbError) {
+        console.error('Error creating database from IndexedDB data:', dbError);
+        return false;
+      }
     }
 
     console.log('No database found in IndexedDB');
@@ -115,13 +126,45 @@ export async function initSqliteDatabase(): Promise<void> {
     console.log('Loading SQL.js...');
 
     // Load SQL.js with the WASM file
-    const SQL = await initSqlJs({
-      // Specify the path to the wasm file
-      locateFile: file => {
-        console.log('Requested file:', file);
-        return '/sqljs-wasm.wasm';
+    let SQL;
+    try {
+      console.log('Trying to load SQL.js with WASM...');
+
+      // First try with the default locateFile function
+      try {
+        SQL = await initSqlJs();
+        console.log('SQL.js loaded with default configuration');
+      } catch (defaultError) {
+        console.error('Failed to load SQL.js with default configuration:', defaultError);
+
+        // Try with explicit path to sqljs-wasm.wasm
+        try {
+          console.log('Trying to load WASM from /sqljs-wasm.wasm');
+          SQL = await initSqlJs({
+            locateFile: file => {
+              console.log('Requested file:', file);
+              return '/sqljs-wasm.wasm';
+            }
+          });
+          console.log('SQL.js loaded with /sqljs-wasm.wasm');
+        } catch (sqlJsWasmError) {
+          console.error('Failed to load /sqljs-wasm.wasm:', sqlJsWasmError);
+
+          // Try with explicit path to sql-wasm.wasm
+          console.log('Trying to load WASM from /sql-wasm.wasm');
+          SQL = await initSqlJs({
+            locateFile: file => {
+              console.log('Requested file (alternative):', file);
+              return '/sql-wasm.wasm';
+            }
+          });
+          console.log('SQL.js loaded with /sql-wasm.wasm');
+        }
       }
-    });
+    } catch (error) {
+      console.error('All attempts to load SQL.js failed:', error);
+      throw new Error('Failed to initialize SQL.js: ' + error.message);
+    }
     console.log('SQL.js loaded successfully');
 
     // Try to load the database from IndexedDB first
@@ -171,6 +214,9 @@ export async function initSqliteDatabase(): Promise<void> {
       const uInt8Array = new Uint8Array(arrayBuffer);
 
       // Create a database from the file
+      if (!SQL || typeof SQL.Database !== 'function') {
+        throw new Error('Invalid SQL.js instance. SQL.Database is not a constructor.');
+      }
       db = new SQL.Database(uInt8Array);
 
       // Save the database to IndexedDB for offline use
@@ -183,6 +229,9 @@ export async function initSqliteDatabase(): Promise<void> {
 
       // Create an empty database as fallback
       console.log('Creating empty database as fallback...');
+      if (!SQL || typeof SQL.Database !== 'function') {
+        throw new Error('Invalid SQL.js instance. SQL.Database is not a constructor.');
+      }
       db = new SQL.Database();
 
       // Create the schema

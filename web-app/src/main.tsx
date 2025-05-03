@@ -1,11 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import App from './App';
 import theme from './theme';
-import { DatabaseProvider } from './shared/database';
 import './index.css';
 import { registerSW } from 'virtual:pwa-register';
 
@@ -13,14 +11,10 @@ async function initializeApp() {
   try {
     ReactDOM.createRoot(document.getElementById('root')!).render(
       <React.StrictMode>
-        <BrowserRouter>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <DatabaseProvider>
-              <App />
-            </DatabaseProvider>
-          </ThemeProvider>
-        </BrowserRouter>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <App />
+        </ThemeProvider>
       </React.StrictMode>
     );
   } catch (error) {
@@ -161,7 +155,7 @@ const updateSW = registerSW({
   },
 
   // Register error handling
-  onRegisterError(error) {
+  onRegisterError(error: any) {
     console.error('Service worker registration error:', error);
   }
 });

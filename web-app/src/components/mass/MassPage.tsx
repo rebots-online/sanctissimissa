@@ -4,17 +4,22 @@ import ResponsiveLiturgicalText from '../liturgical/ResponsiveLiturgicalText';
 import { getLiturgicalDay, getMassText } from '../../services/database/liturgicalService';
 import { LiturgicalDay, MassText } from '../../types/liturgical';
 
+interface MassPageProps {
+  ordinary?: boolean;
+  extraordinary?: boolean;
+}
+
 /**
  * Component for rendering the Mass page with responsive design
  */
-const MassPage: React.FC = () => {
+const MassPage: React.FC<MassPageProps> = ({ ordinary = false, extraordinary = false }) => {
   const { date } = useParams<{ date?: string }>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [liturgicalDay, setLiturgicalDay] = useState<LiturgicalDay | null>(null);
   const [massProper, setMassProper] = useState<MassText | null>(null);
   const [massOrdinary, setMassOrdinary] = useState<MassText | null>(null);
-  const [showLatinOnly, setShowLatinOnly] = useState(false);
+  const [showLatinOnly, setShowLatinOnly] = useState(extraordinary);
   const [showEnglishOnly, setShowEnglishOnly] = useState(false);
   const [showRubrics, setShowRubrics] = useState(true);
 
@@ -23,6 +28,18 @@ const MassPage: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
+
+        // If viewing ordinary only, just load the ordinary
+        if (ordinary) {
+          const ordinaryText = await getMassText('ordinary_default');
+          if (ordinaryText) {
+            setMassOrdinary(ordinaryText as unknown as MassText);
+          } else {
+            setError('Failed to load Ordinary of the Mass');
+          }
+          setLoading(false);
+          return;
+        }
 
         // Get today's date if not provided
         const targetDate = date || formatDate(new Date());
@@ -33,7 +50,7 @@ const MassPage: React.FC = () => {
           // Cast to our type
           const liturgicalDayData = day as unknown as LiturgicalDay;
           setLiturgicalDay(liturgicalDayData);
-          
+
           if (liturgicalDayData.massProper && typeof liturgicalDayData.massProper === 'string') {
             // Get mass proper
             const proper = await getMassText(liturgicalDayData.massProper);
@@ -46,11 +63,13 @@ const MassPage: React.FC = () => {
           }
         }
 
-        // Get mass ordinary
-        const ordinary = await getMassText('ordinary_default');
-        if (ordinary) {
-          // Cast to our type
-          setMassOrdinary(ordinary as unknown as MassText);
+        // Get mass ordinary if not viewing extraordinary form only
+        if (!extraordinary) {
+          const ordinaryText = await getMassText('ordinary_default');
+          if (ordinaryText) {
+            // Cast to our type
+            setMassOrdinary(ordinaryText as unknown as MassText);
+          }
         }
 
         setLoading(false);
@@ -62,7 +81,7 @@ const MassPage: React.FC = () => {
     };
 
     loadMassData();
-  }, [date]);
+  }, [date, ordinary, extraordinary]);
 
   // Format date as YYYY-MM-DD
   const formatDate = (date: Date): string => {
@@ -111,7 +130,79 @@ const MassPage: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {liturgicalDay && (
+      {ordinary && (
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2 text-center">Ordinary of the Mass</h1>
+          <p className="text-center text-gray-600 mb-4">
+            The unchanging parts of the Mass that are the same for every celebration.
+          </p>
+
+          <div className="flex flex-wrap justify-center gap-2 mb-6">
+            <button
+              onClick={toggleLatinOnly}
+              className={`px-3 py-1 rounded text-sm ${
+                showLatinOnly ? 'bg-blue-500 text-white' : 'bg-gray-200'
+              }`}
+            >
+              Latin Only
+            </button>
+            <button
+              onClick={toggleEnglishOnly}
+              className={`px-3 py-1 rounded text-sm ${
+                showEnglishOnly ? 'bg-blue-500 text-white' : 'bg-gray-200'
+              }`}
+            >
+              English Only
+            </button>
+            <button
+              onClick={toggleRubrics}
+              className={`px-3 py-1 rounded text-sm ${
+                showRubrics ? 'bg-blue-500 text-white' : 'bg-gray-200'
+              }`}
+            >
+              {showRubrics ? 'Hide Rubrics' : 'Show Rubrics'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {extraordinary && (
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2 text-center">Extraordinary Form</h1>
+          <p className="text-center text-gray-600 mb-4">
+            The Traditional Latin Mass according to the 1962 Missal.
+          </p>
+
+          <div className="flex flex-wrap justify-center gap-2 mb-6">
+            <button
+              onClick={toggleLatinOnly}
+              className={`px-3 py-1 rounded text-sm ${
+                showLatinOnly ? 'bg-blue-500 text-white' : 'bg-gray-200'
+              }`}
+            >
+              Latin Only
+            </button>
+            <button
+              onClick={toggleEnglishOnly}
+              className={`px-3 py-1 rounded text-sm ${
+                showEnglishOnly ? 'bg-blue-500 text-white' : 'bg-gray-200'
+              }`}
+            >
+              English Only
+            </button>
+            <button
+              onClick={toggleRubrics}
+              className={`px-3 py-1 rounded text-sm ${
+                showRubrics ? 'bg-blue-500 text-white' : 'bg-gray-200'
+              }`}
+            >
+              {showRubrics ? 'Hide Rubrics' : 'Show Rubrics'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {liturgicalDay && !ordinary && !extraordinary && (
         <div className="mb-6">
           <h1 className="text-2xl md:text-3xl font-bold mb-2 text-center">{liturgicalDay.celebration}</h1>
           <div className="flex flex-wrap justify-center gap-2 mb-4">
@@ -157,7 +248,7 @@ const MassPage: React.FC = () => {
       {massProper && (
         <div className="bg-white shadow-md rounded-lg p-4 md:p-6 mb-6">
           <h2 className="text-xl md:text-2xl font-bold mb-6 text-center">Proper of the Mass</h2>
-          
+
           {/* Introit */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-2">Introit</h3>
@@ -172,7 +263,7 @@ const MassPage: React.FC = () => {
               showRubrics={showRubrics}
             />
           </div>
-          
+
           {/* Collect */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-2">Collect</h3>
@@ -186,7 +277,7 @@ const MassPage: React.FC = () => {
               showRubrics={showRubrics}
             />
           </div>
-          
+
           {/* Epistle */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-2">Epistle</h3>
@@ -201,7 +292,7 @@ const MassPage: React.FC = () => {
               showRubrics={showRubrics}
             />
           </div>
-          
+
           {/* Gradual */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-2">Gradual</h3>
@@ -215,7 +306,7 @@ const MassPage: React.FC = () => {
               showRubrics={showRubrics}
             />
           </div>
-          
+
           {/* Sequence (if present) */}
           {(massProper.sequenceLatin || massProper.sequenceEnglish) && (
             <div className="mb-8">
@@ -232,7 +323,7 @@ const MassPage: React.FC = () => {
               />
             </div>
           )}
-          
+
           {/* Gospel */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-2">Gospel</h3>
@@ -247,7 +338,7 @@ const MassPage: React.FC = () => {
               showRubrics={showRubrics}
             />
           </div>
-          
+
           {/* Offertory */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-2">Offertory</h3>
@@ -262,7 +353,7 @@ const MassPage: React.FC = () => {
               showRubrics={showRubrics}
             />
           </div>
-          
+
           {/* Secret */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-2">Secret</h3>
@@ -276,7 +367,7 @@ const MassPage: React.FC = () => {
               showRubrics={showRubrics}
             />
           </div>
-          
+
           {/* Communion */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-2">Communion</h3>
@@ -291,7 +382,7 @@ const MassPage: React.FC = () => {
               showRubrics={showRubrics}
             />
           </div>
-          
+
           {/* Postcommunion */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-2">Postcommunion</h3>
