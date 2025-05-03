@@ -3,13 +3,100 @@
  *
  * This service provides access to the SQLite database using sql.js.
  * It handles database initialization, querying, and error handling.
+ * Enhanced for offline use with data persistence between sessions.
  */
 
 import initSqlJs, { Database } from 'sql.js';
+import { openDB, IDBPDatabase } from 'idb';
 
 // Global database instance
 let db: Database | null = null;
 let isInitialized = false;
+let idbDatabase: IDBPDatabase | null = null;
+
+// Constants
+const DB_NAME = 'sanctissimissa-db';
+const DB_VERSION = 1;
+const STORE_NAME = 'sqlite-data';
+const DB_KEY = 'sqlite-db';
+
+/**
+ * Open the IndexedDB database
+ *
+ * @returns Promise that resolves to the IndexedDB database
+ */
+async function openIndexedDB(): Promise<IDBPDatabase> {
+  if (idbDatabase) {
+    return idbDatabase;
+  }
+
+  idbDatabase = await openDB(DB_NAME, DB_VERSION, {
+    upgrade(db) {
+      // Create the object store if it doesn't exist
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    }
+  });
+
+  return idbDatabase;
+}
+
+/**
+ * Save the SQLite database to IndexedDB
+ */
+async function saveDatabaseToIndexedDB(): Promise<void> {
+  if (!db) {
+    console.error('Cannot save database: SQLite database not initialized');
+    return;
+  }
+
+  try {
+    // Export the database to a Uint8Array
+    const data = db.export();
+
+    // Open IndexedDB
+    const idb = await openIndexedDB();
+
+    // Save the data to IndexedDB
+    const tx = idb.transaction(STORE_NAME, 'readwrite');
+    await tx.store.put(data, DB_KEY);
+    await tx.done;
+
+    console.log('Database saved to IndexedDB successfully');
+  } catch (error) {
+    console.error('Error saving database to IndexedDB:', error);
+  }
+}
+
+/**
+ * Load the SQLite database from IndexedDB
+ *
+ * @param SQL SQL.js instance
+ * @returns Promise that resolves to true if database was loaded, false otherwise
+ */
+async function loadDatabaseFromIndexedDB(SQL: any): Promise<boolean> {
+  try {
+    // Open IndexedDB
+    const idb = await openIndexedDB();
+
+    // Get the data from IndexedDB
+    const data = await idb.get(STORE_NAME, DB_KEY);
+
+    if (data) {
+      // Create a database from the data
+      db = new SQL.Database(data);
+      console.log('Database loaded from IndexedDB successfully');
+      return true;
+    }
+
+    console.log('No database found in IndexedDB');
+    return false;
+  } catch (error) {
+    console.error('Error loading database from IndexedDB:', error);
+    return false;
+  }
+}
 
 /**
  * Initialize the SQLite database
@@ -26,11 +113,8 @@ export async function initSqliteDatabase(): Promise<void> {
 
     // Load SQL.js
     console.log('Loading SQL.js...');
-    console.log('Current URL:', window.location.href);
-    console.log('Base URL:', window.location.origin);
 
     // Load SQL.js with the WASM file
-    console.log('Trying to load WASM from sqljs-wasm.wasm');
     const SQL = await initSqlJs({
       // Specify the path to the wasm file
       locateFile: file => {
@@ -40,8 +124,18 @@ export async function initSqliteDatabase(): Promise<void> {
     });
     console.log('SQL.js loaded successfully');
 
-    // Fetch the database file
-    console.log('Fetching SQLite database file...');
+    // Try to load the database from IndexedDB first
+    const loadedFromIndexedDB = await loadDatabaseFromIndexedDB(SQL);
+
+    if (loadedFromIndexedDB) {
+      isInitialized = true;
+      console.log('Database loaded from IndexedDB successfully');
+      return;
+    }
+
+    // If not found in IndexedDB, fetch from network
+    console.log('Database not found in IndexedDB, fetching from network...');
+
     try {
       // Try different paths for the database file
       const dbPaths = [
@@ -78,9 +172,12 @@ export async function initSqliteDatabase(): Promise<void> {
 
       // Create a database from the file
       db = new SQL.Database(uInt8Array);
-      isInitialized = true;
 
-      console.log('SQLite database initialized successfully');
+      // Save the database to IndexedDB for offline use
+      await saveDatabaseToIndexedDB();
+
+      isInitialized = true;
+      console.log('SQLite database initialized and saved to IndexedDB');
     } catch (fetchError) {
       console.error('Error fetching database file:', fetchError);
 
@@ -234,8 +331,11 @@ export async function initSqliteDatabase(): Promise<void> {
         );
       `);
 
+      // Save the empty database to IndexedDB
+      await saveDatabaseToIndexedDB();
+
       isInitialized = true;
-      console.log('Empty database created and initialized with sample data');
+      console.log('Empty database created, initialized with sample data, and saved to IndexedDB');
     }
   } catch (error) {
     console.error('Error initializing SQLite database:', error);
@@ -454,7 +554,7 @@ export function getJournalEntry(id: string): any | null {
  *
  * @param entry Journal entry to save
  */
-export function saveJournalEntry(entry: any): void {
+export async function saveJournalEntry(entry: any): Promise<void> {
   // Check if the entry already exists
   const existingEntry = querySingle(
     'SELECT id FROM journal_entries WHERE id = ?',
@@ -508,6 +608,14 @@ export function saveJournalEntry(entry: any): void {
         entry.position?.y
       ]
     );
+  }
+
+  // Save the updated database to IndexedDB
+  try {
+    await saveDatabaseToIndexedDB();
+    console.log('Database saved to IndexedDB after journal entry update');
+  } catch (error) {
+    console.error('Error saving database to IndexedDB after journal entry update:', error);
   }
 }
 

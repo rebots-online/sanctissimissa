@@ -10,7 +10,7 @@ const theme = createTheme({
       main: '#19857b', // Example secondary color
     },
     error: {
-      main: '#red', // Standard error color
+      main: '#f44336', // Standard error color
     },
     background: {
       default: '#fff', // Default background color
