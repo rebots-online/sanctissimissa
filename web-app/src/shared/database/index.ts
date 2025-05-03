@@ -9,3 +9,4 @@ export * from './types';
 export * from './utils';
 export * from './adapter';
 export * from './utils/validators';
+export * from './context';
