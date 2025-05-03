@@ -9,6 +9,7 @@
 import initSqlJs from 'sql.js';
 import type { Database } from 'sql.js';
 import { openDB, IDBPDatabase } from 'idb';
+import wasmUrl from 'sql.js/dist/sql-wasm.wasm?url';
 
 // Global database instance
 let db: Database | null = null;
@@ -128,42 +129,30 @@ export async function initSqliteDatabase(): Promise<void> {
     // Load SQL.js with the WASM file
     let SQL;
     try {
-      console.log('Trying to load SQL.js with WASM...');
+      console.log('Loading SQL.js with WASM...');
+      console.log('WASM URL:', wasmUrl);
 
-      // First try with the default locateFile function
-      try {
-        SQL = await initSqlJs();
-        console.log('SQL.js loaded with default configuration');
-      } catch (defaultError) {
-        console.error('Failed to load SQL.js with default configuration:', defaultError);
-
-        // Try with explicit path to sqljs-wasm.wasm
-        try {
-          console.log('Trying to load WASM from /sqljs-wasm.wasm');
-          SQL = await initSqlJs({
-            locateFile: file => {
-              console.log('Requested file:', file);
-              return '/sqljs-wasm.wasm';
-            }
-          });
-          console.log('SQL.js loaded with /sqljs-wasm.wasm');
-        } catch (sqlJsWasmError) {
-          console.error('Failed to load /sqljs-wasm.wasm:', sqlJsWasmError);
-
-          // Try with explicit path to sql-wasm.wasm
-          console.log('Trying to load WASM from /sql-wasm.wasm');
-          SQL = await initSqlJs({
-            locateFile: file => {
-              console.log('Requested file (alternative):', file);
-              return '/sql-wasm.wasm';
-            }
-          });
-          console.log('SQL.js loaded with /sql-wasm.wasm');
+      // Use the explicit WASM URL via Vite/CRA import
+      SQL = await initSqlJs({
+        // Use the imported WASM URL
+        locateFile: (filename) => {
+          console.log(`SQL.js requested file: ${filename}`);
+          return wasmUrl;
         }
+      });
+
+      // Verify that SQL.Database is a constructor
+      if (typeof SQL.Database !== 'function') {
+        throw new Error(`SQL.Database is not a constructor. Type: ${typeof SQL.Database}`);
       }
+
+      // Log SQL object to verify it's properly initialized
+      console.log('SQL object:', Object.keys(SQL));
+
+      console.log('SQL.js loaded successfully with /sql-wasm.wasm');
     } catch (error) {
-      console.error('All attempts to load SQL.js failed:', error);
-      throw new Error('Failed to initialize SQL.js: ' + error.message);
+      console.error('Failed to load SQL.js:', error);
+      throw new Error('Failed to initialize SQL.js: ' + (error instanceof Error ? error.message : String(error)));
     }
     console.log('SQL.js loaded successfully');
 
@@ -400,6 +389,7 @@ export async function initSqliteDatabase(): Promise<void> {
  */
 export function getSqliteDatabase(): Database {
   if (!db) {
+    console.error('SQLite database not initialized. Current state:', { isInitialized, db });
     throw new Error('SQLite database not initialized');
   }
 

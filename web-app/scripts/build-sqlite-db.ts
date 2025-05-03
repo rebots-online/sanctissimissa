@@ -465,6 +465,22 @@ function importLiturgicalCalendar(db: any): void {
   const easterSunday2025 = calculateEaster(2025);
   const easterDate2025 = formatDate(easterSunday2025);
 
+  // Get all Mass text files from the reference directory
+  const massTemporaPath = path.join(REFERENCE_PATH, 'missa/Latin/Tempora');
+  const massSanctiPath = path.join(REFERENCE_PATH, 'missa/Latin/Sancti');
+
+  // Get all Tempora files (liturgical seasons)
+  const temporaFiles = fs.existsSync(massTemporaPath)
+    ? fs.readdirSync(massTemporaPath).filter(file => file.endsWith('.txt'))
+    : [];
+
+  // Get all Sancti files (saints' days)
+  const sanctiFiles = fs.existsSync(massSanctiPath)
+    ? fs.readdirSync(massSanctiPath).filter(file => file.endsWith('.txt'))
+    : [];
+
+  console.log(`Found ${temporaFiles.length} Tempora files and ${sanctiFiles.length} Sancti files`);
+
   // Define liturgical days
   const liturgicalDays = [
     // Easter Sunday
@@ -476,7 +492,7 @@ function importLiturgicalCalendar(db: any): void {
       color: 'white',
       is_holy_day: 1,
       is_feast_day: 1,
-      mass_proper: 'proper_easter_sunday',
+      mass_proper: 'Pasc0-0',
       commemorations: '[]'
     },
 
@@ -489,7 +505,7 @@ function importLiturgicalCalendar(db: any): void {
       color: 'white',
       is_holy_day: 1,
       is_feast_day: 1,
-      mass_proper: 'proper_easter_monday',
+      mass_proper: 'Pasc0-1',
       commemorations: '[]'
     },
     {
@@ -500,7 +516,7 @@ function importLiturgicalCalendar(db: any): void {
       color: 'white',
       is_holy_day: 1,
       is_feast_day: 1,
-      mass_proper: 'proper_easter_tuesday',
+      mass_proper: 'Pasc0-2',
       commemorations: '[]'
     },
     {
@@ -1147,8 +1163,15 @@ async function buildSqliteDb(): Promise<void> {
   try {
     console.log('Building SQLite database...');
 
-    // Initialize SQL.js
-    const SQL = await initSqlJs();
+    // Initialize SQL.js with explicit WASM path
+    const SQL = await initSqlJs({
+      // Explicitly tell SQL.js where to find the wasm file
+      locateFile: (filename) => {
+        console.log(`SQL.js requested file: ${filename}`);
+        // Use the node_modules path for the WASM file
+        return path.join(__dirname, '../node_modules/sql.js/dist/sql-wasm.wasm');
+      }
+    });
 
     // Create a new database
     const db = new SQL.Database();

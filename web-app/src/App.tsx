@@ -8,8 +8,10 @@ import JournalPage from './pages/JournalPage';
 import MassPage from './components/mass/MassPage';
 import CalendarPage from './pages/CalendarPage';
 import NotFoundPage from './pages/NotFoundPage';
+import SqlTestPage from './pages/SqlTestPage';
+import OfficeTestPage from './pages/OfficeTestPage';
+import DebugPage from './pages/DebugPage';
 import { useDatabase } from './shared/database';
-import SqlJsTest from './components/database/SqlJsTest';
 
 /**
  * Main application component with routing configuration
@@ -21,17 +23,6 @@ import SqlJsTest from './components/database/SqlJsTest';
  * - Default route handling
  */
 const App: React.FC = () => {
-  // For testing SQL.js directly
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
-      <h1 className="text-2xl font-bold mb-6">SQL.js Test Page</h1>
-      <div className="w-full max-w-2xl">
-        <SqlJsTest />
-      </div>
-    </div>
-  );
-
-  /* Original code with database provider
   const { isLoading, error, isInitialized } = useDatabase();
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
 
@@ -78,9 +69,8 @@ const App: React.FC = () => {
       </div>
     );
   }
-  */
 
-  /* Main application with routing - commented out for testing
+  // Main application with routing
   return (
     <Router>
       <ResponsiveLayout>
@@ -114,13 +104,16 @@ const App: React.FC = () => {
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/calendar/:year/:month" element={<CalendarPage />} />
 
+          {/* Test routes */}
+          <Route path="/test/office" element={<OfficeTestPage />} />
+          <Route path="/test/sql" element={<SqlTestPage />} />
+
           {/* 404 Not Found */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </ResponsiveLayout>
     </Router>
   );
-  */
 };
 
 export default App;

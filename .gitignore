@@ -54,3 +54,6 @@ Thumbs.db
 
 # Temp files
 *.tmp
+
+# Reference files - exclude the entire reference directory
+sanctissimissa-reference/

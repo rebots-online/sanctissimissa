@@ -9,20 +9,22 @@ const SqlJsTest: React.FC = () => {
     const testSqlJs = async () => {
       try {
         setStatus('Initializing SQL.js...');
-        
-        // Try to initialize SQL.js with default settings
-        const SQL = await initSqlJs();
+
+        // Try to initialize SQL.js with explicit path to WASM file
+        const SQL = await initSqlJs({
+          locateFile: file => `/sql-wasm.wasm`
+        });
         setStatus('SQL.js initialized successfully');
-        
+
         // Test if SQL.Database is a constructor
         if (typeof SQL.Database === 'function') {
           setStatus('SQL.Database is a constructor');
-          
+
           // Try to create a new database
           try {
             const db = new SQL.Database();
             setStatus('Successfully created a new database');
-            
+
             // Try to execute a simple query
             try {
               db.exec('CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT)');

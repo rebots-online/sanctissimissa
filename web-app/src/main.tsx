@@ -4,6 +4,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import App from './App';
 import theme from './theme';
+import { DatabaseProvider } from './shared/database';
 import './index.css';
 import { registerSW } from 'virtual:pwa-register';
 
@@ -13,7 +14,9 @@ async function initializeApp() {
       <React.StrictMode>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <App />
+          <DatabaseProvider>
+            <App />
+          </DatabaseProvider>
         </ThemeProvider>
       </React.StrictMode>
     );

@@ -5,12 +5,14 @@ interface DatabaseContextType {
   isInitialized: boolean;
   isLoading: boolean;
   error: Error | null;
+  db: any | null;
 }
 
 const DatabaseContext = createContext<DatabaseContextType>({
   isInitialized: false,
   isLoading: true,
-  error: null
+  error: null,
+  db: null
 });
 
 export const useDatabase = () => useContext(DatabaseContext);
@@ -23,27 +25,46 @@ export const DatabaseProvider: React.FC<DatabaseProviderProps> = ({ children }) 
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [db, setDb] = useState<any>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     const initialize = async () => {
       try {
-        setIsLoading(true);
+        if (isMounted) setIsLoading(true);
+
+        // Initialize the database
+        console.log('Starting database initialization...');
         await initSqliteDatabase();
-        setIsInitialized(true);
-        setError(null);
+
+        if (isMounted) {
+          console.log('Database initialization complete');
+          setIsInitialized(true);
+          setError(null);
+        }
       } catch (err) {
         console.error('Failed to initialize database:', err);
-        setError(err instanceof Error ? err : new Error(String(err)));
+        if (isMounted) {
+          setError(err instanceof Error ? err : new Error(String(err)));
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     initialize();
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
-    <DatabaseContext.Provider value={{ isInitialized, isLoading, error }}>
+    <DatabaseContext.Provider value={{ isInitialized, isLoading, error, db }}>
       {children}
     </DatabaseContext.Provider>
   );
