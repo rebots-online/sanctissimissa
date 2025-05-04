@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ResponsiveLiturgicalText from '../liturgical/ResponsiveLiturgicalText';
-import { getLiturgicalDay, getMassText } from '../../services/database/liturgicalService';
+// Import from the direct liturgical service instead
+import { getLiturgicalDay, getMassText } from '../../services/database/directLiturgicalService';
 import { LiturgicalDay, MassText } from '../../types/liturgical';
 
 interface MassPageProps {

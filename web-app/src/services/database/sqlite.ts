@@ -9,7 +9,6 @@
 import initSqlJs from 'sql.js';
 import type { Database } from 'sql.js';
 import { openDB, IDBPDatabase } from 'idb';
-import wasmUrl from 'sql.js/dist/sql-wasm.wasm?url';
 
 // Global database instance
 let db: Database | null = null;
@@ -130,14 +129,14 @@ export async function initSqliteDatabase(): Promise<void> {
     let SQL;
     try {
       console.log('Loading SQL.js with WASM...');
-      console.log('WASM URL:', wasmUrl);
+      console.log('WASM URL: /sql-wasm.wasm');
 
-      // Use the explicit WASM URL via Vite/CRA import
+      // Use a direct path to the WASM file in the public directory
       SQL = await initSqlJs({
-        // Use the imported WASM URL
+        // Use a direct path to the WASM file
         locateFile: (filename) => {
           console.log(`SQL.js requested file: ${filename}`);
-          return wasmUrl;
+          return '/sql-wasm.wasm';
         }
       });
 

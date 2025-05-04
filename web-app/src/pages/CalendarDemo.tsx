@@ -17,9 +17,9 @@ import {
   CardContent,
   Divider
 } from '@mui/material';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { format } from 'date-fns';
+import CustomDatePicker from '../components/date/CustomDatePicker';
+import { CustomDateAdapter } from '../components/date/CustomDateAdapter';
 import { getLiturgicalDay } from '../services/calendar/enhanced/liturgicalDayService';
 import { renderLiturgicalDay, OutputFormat, RenderingOptions } from '../services/rendering/liturgicalDayRenderer';
 import { LiturgicalColor, LiturgicalRank } from '../models/calendar';
@@ -113,14 +113,12 @@ const CalendarDemo: React.FC = () => {
       <Paper sx={{ p: 3, mb: 4 }}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
-                label="Select Date"
-                value={selectedDate}
-                onChange={(newDate) => newDate && setSelectedDate(newDate)}
-                renderInput={(params) => <TextField {...params} fullWidth />}
-              />
-            </LocalizationProvider>
+            <CustomDatePicker
+              label="Select Date"
+              value={selectedDate}
+              onChange={(newDate) => setSelectedDate(newDate)}
+              className="w-full"
+            />
           </Grid>
 
           <Grid item xs={12} md={6}>
@@ -196,7 +194,7 @@ const CalendarDemo: React.FC = () => {
                   return (
                     <>
                       <Typography variant="body1" gutterBottom>
-                        <strong>Date:</strong> {format(liturgicalDay.displayDate || selectedDate, 'EEEE, MMMM d, yyyy')}
+                        <strong>Date:</strong> {CustomDateAdapter.formatDate(liturgicalDay.displayDate || selectedDate, 'EEEE, MMMM d, yyyy')}
                       </Typography>
                       <Typography variant="body1" gutterBottom>
                         <strong>Celebration:</strong> {liturgicalDay.celebration}

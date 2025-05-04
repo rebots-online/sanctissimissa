@@ -4,7 +4,7 @@
  * This service provides functions for rendering liturgical days in various formats.
  */
 
-import { format } from 'date-fns';
+import { CustomDateAdapter } from '../../components/date/CustomDateAdapter';
 import { LiturgicalDay } from '../calendar/enhanced/liturgicalDayService';
 import { LiturgicalRank } from '../../models/calendar';
 
@@ -87,7 +87,7 @@ function renderAsText(day: LiturgicalDay, options: RenderingOptions): string {
 
   // Format the date
   const date = day.displayDate || new Date(day.date);
-  lines.push(format(date, 'EEEE, MMMM d, yyyy'));
+  lines.push(CustomDateAdapter.formatDate(date, 'EEEE, MMMM d, yyyy'));
   lines.push('');
 
   // Add celebration information
@@ -141,7 +141,7 @@ function renderAsHtml(day: LiturgicalDay, options: RenderingOptions): string {
 
   // Format the date
   const date = day.displayDate || new Date(day.date);
-  html += `<div class="date">${format(date, 'EEEE, MMMM d, yyyy')}</div>`;
+  html += `<div class="date">${CustomDateAdapter.formatDate(date, 'EEEE, MMMM d, yyyy')}</div>`;
 
   // Add celebration information
   html += `<h2 class="celebration" style="color: ${getColorHex(day.color)}">${day.celebration}</h2>`;
@@ -200,7 +200,7 @@ function renderAsMarkdown(day: LiturgicalDay, options: RenderingOptions): string
 
   // Format the date
   const date = day.displayDate || new Date(day.date);
-  lines.push(`## ${format(date, 'EEEE, MMMM d, yyyy')}`);
+  lines.push(`## ${CustomDateAdapter.formatDate(date, 'EEEE, MMMM d, yyyy')}`);
   lines.push('');
 
   // Add celebration information

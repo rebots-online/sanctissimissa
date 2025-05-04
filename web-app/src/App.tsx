@@ -109,6 +109,9 @@ const App: React.FC = () => {
           {/* Test routes */}
           <Route path="/test/office" element={<OfficeTestPage />} />
           <Route path="/test/sql" element={<SqlTestPage />} />
+          <Route path="/test/sqljs" element={<React.Suspense fallback={<div>Loading...</div>}>
+            {React.createElement(React.lazy(() => import('./components/SqlTest')))}
+          </React.Suspense>} />
 
           {/* 404 Not Found */}
           <Route path="*" element={<NotFoundPage />} />
