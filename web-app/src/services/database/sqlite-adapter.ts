@@ -1,9 +1,10 @@
 import { Database, QueryExecResult } from 'sql.js';
 import { DbValue } from '../../shared/database/utils';
+import { initializeSql, createDatabase } from './sqlInitializer';
 
 /**
  * SQLite adapter for client-side database operations
- * 
+ *
  * Features:
  * - Asynchronous database operations
  * - Typed query results
@@ -39,16 +40,16 @@ export class SQLiteAdapter {
 
     this.initPromise = new Promise<void>(async (resolve, reject) => {
       try {
-        // Load SQL.js
-        const SQL = await import('sql.js');
-        
+        // Initialize SQL.js using our Promise-based initializer
+        await initializeSql();
+
         // Fetch the database file
         const response = await fetch(`/${this.dbName}`);
         const arrayBuffer = await response.arrayBuffer();
         const uInt8Array = new Uint8Array(arrayBuffer);
-        
-        // Create the database
-        this.db = new SQL.Database(uInt8Array);
+
+        // Create the database using our createDatabase function
+        this.db = await createDatabase(uInt8Array);
         this.isInitialized = true;
         resolve();
       } catch (error) {
@@ -119,12 +120,12 @@ export class SQLiteAdapter {
       // Execute the query
       const statement = this.db.prepare(query);
       statement.bind(params);
-      
+
       // Run the query and get the number of rows affected
       statement.step();
       const rowsAffected = this.db.getRowsModified();
       statement.free();
-      
+
       return rowsAffected;
     } catch (error) {
       console.error('Error executing non-query:', error);

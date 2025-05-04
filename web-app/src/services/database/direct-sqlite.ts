@@ -5,9 +5,9 @@
  * using sql.js. It handles database initialization, querying, and error handling.
  */
 
-// Import sql.js directly
-import initSqlJs from 'sql.js';
+// Import from our sqlInitializer
 import type { Database } from 'sql.js';
+import { initializeSql, createDatabase } from './sqlInitializer';
 
 // Global database instance
 let db: Database | null = null;
@@ -24,15 +24,13 @@ export async function initSqliteDatabase(): Promise<void> {
   }
 
   try {
-    console.log('Initializing SQLite database...');
+    console.log('Initializing direct SQLite database...');
 
-    // Load SQL.js with direct path to WASM file
-    const SQL = await initSqlJs({
-      locateFile: file => `/sql-wasm.wasm`
-    });
+    // Initialize SQL.js using our Promise-based initializer
+    await initializeSql();
 
     // Create an empty database
-    db = new SQL.Database();
+    db = await createDatabase();
 
     // Create the schema
     db.exec(`
