@@ -199,7 +199,7 @@ function renderAsMarkdown(day: LiturgicalDay, options: RenderingOptions): string
   }
 
   // Format the date
-  const date = new Date(day.date);
+  const date = day.displayDate || new Date(day.date);
   lines.push(`## ${format(date, 'EEEE, MMMM d, yyyy')}`);
   lines.push('');
 
