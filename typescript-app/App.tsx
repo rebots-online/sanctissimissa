@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider } from 'react-redux';
@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from './src/screens/HomeScreen';
 import { OfficeScreen, TabOfficeScreen } from './src/screens/OfficeScreen';
 import { MassScreen, TabMassScreen } from './src/screens/MassScreen';
+import CalendarDemoScreen from './src/screens/CalendarDemoScreen';
 import DeviceDebugScreen from './src/screens/DeviceDebugScreen';
 import { RootStackParamList, BottomTabParamList } from './src/navigation/types';
 import { dataManager } from './src/services/dataManager';
@@ -22,20 +23,27 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function TabNavigator() {
   const theme = useAppTheme();
-  
+  const navigation = useNavigation();
+
+  const handleCalendarPress = () => {
+    navigation.navigate('CalendarDemo');
+  };
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap = 'home';
-          
+
           if (route.name === 'Home') {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Office') {
             iconName = focused ? 'book' : 'book-outline';
           } else if (route.name === 'Mass') {
             iconName = focused ? 'heart' : 'heart-outline';
+          } else if (route.name === 'Calendar') {
+            iconName = focused ? 'calendar' : 'calendar-outline';
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -48,25 +56,40 @@ function TabNavigator() {
         },
       })}
     >
-      <Tab.Screen 
-        name="Home" 
+      <Tab.Screen
+        name="Home"
         component={HomeScreen}
         options={{
           title: 'Home',
         }}
       />
-      <Tab.Screen 
+      <Tab.Screen
         name="Office"
         component={TabOfficeScreen}
         options={{
           title: 'Divine Office',
         }}
       />
-      <Tab.Screen 
-        name="Mass" 
+      <Tab.Screen
+        name="Mass"
         component={TabMassScreen}
         options={{
           title: 'Holy Mass',
+        }}
+      />
+      <Tab.Screen
+        name="Calendar"
+        component={HomeScreen}
+        listeners={{
+          tabPress: (e) => {
+            // Prevent default action
+            e.preventDefault();
+            // Navigate to CalendarDemo screen
+            navigation.navigate('CalendarDemo');
+          },
+        }}
+        options={{
+          title: 'Calendar',
         }}
       />
     </Tab.Navigator>
@@ -122,18 +145,18 @@ function AppContent() {
           },
         }}
       >
-        <Stack.Screen 
-          name="Main" 
+        <Stack.Screen
+          name="Main"
           component={TabNavigator}
-          options={{ 
+          options={{
             headerShown: false,
             title: 'Sanctissi-Missa'
           }}
         />
-        <Stack.Screen 
-          name="Office" 
+        <Stack.Screen
+          name="Office"
           component={OfficeScreen}
-          options={({ route }) => ({ 
+          options={({ route }) => ({
             title: route.params?.type || 'Divine Office',
           })}
         />
@@ -149,6 +172,13 @@ function AppContent() {
           component={DeviceDebugScreen}
           options={{
             title: 'Device Debug',
+          }}
+        />
+        <Stack.Screen
+          name="CalendarDemo"
+          component={CalendarDemoScreen}
+          options={{
+            title: 'Liturgical Calendar',
           }}
         />
       </Stack.Navigator>

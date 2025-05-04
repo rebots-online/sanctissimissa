@@ -273,6 +273,18 @@ function fetchTextContent(path: string): string {
   }
 }
 
+/**
+ * Escape a string for SQL
+ *
+ * @param str String to escape
+ * @returns Escaped string
+ */
+function escapeSql(str: string | undefined): string {
+  if (!str) return '';
+  // Replace single quotes with two single quotes (SQL standard)
+  return str.replace(/'/g, "''");
+}
+
 // Path to reference files
 const REFERENCE_PATH = path.join(__dirname, '../../sanctissimissa-reference/web/www');
 // Output path for the SQLite database
@@ -822,118 +834,31 @@ function importLiturgicalCalendar(db: any): void {
 }
 
 /**
- * Import Easter Sunday Mass texts
+ * Import all Mass texts
  *
  * @param db SQLite database
  */
-function importEasterSundayMass(db: any): void {
-  console.log('Importing Easter Sunday Mass texts...');
+function importAllMassTexts(db: any): void {
+  console.log('Importing all Mass texts...');
 
   try {
-    // Paths to Mass text files
-    const latinPath = path.join(REFERENCE_PATH, 'missa/Latin/Tempora/Pasc0-0.txt');
-    const englishPath = path.join(REFERENCE_PATH, 'missa/English/Tempora/Pasc0-0.txt');
+    // Get all Mass text files from the reference directory
+    const massTemporaPath = path.join(REFERENCE_PATH, 'missa/Latin/Tempora');
+    const massSanctiPath = path.join(REFERENCE_PATH, 'missa/Latin/Sancti');
 
-    // Check if the files exist
-    if (!fs.existsSync(latinPath) || !fs.existsSync(englishPath)) {
-      console.warn('Mass text files not found, using mock data');
+    // Get all Tempora files (liturgical seasons)
+    const temporaFiles = fs.existsSync(massTemporaPath)
+      ? fs.readdirSync(massTemporaPath).filter(file => file.endsWith('.txt'))
+      : [];
 
-      // Insert mock data
-      db.exec(`
-        INSERT INTO mass_texts (
-          id, part, title_latin, title_english,
-          introit_latin, introit_english, introit_reference,
-          collect_latin, collect_english,
-          epistle_latin, epistle_english, epistle_reference,
-          gradual_latin, gradual_english,
-          gospel_latin, gospel_english, gospel_reference,
-          offertory_latin, offertory_english,
-          secret_latin, secret_english,
-          communion_latin, communion_english,
-          postcommunion_latin, postcommunion_english
-        ) VALUES (
-          'easter_sunday', 'proper', 'Dominica Resurrectionis', 'Easter Sunday',
-          'Resurrexi, et adhuc tecum sum, alleluia', 'I have risen, and I am with you still, alleluia.', 'Ps 138:18,5-6',
-          'Deus, qui hodierna die per Unigenitum tuum aeternitatis nobis aditum devicta morte reserasti', 'O God, who on this day, through your Only Begotten Son, have conquered death and unlocked for us the path to eternity',
-          'Fratres: Expurgate vetus fermentum', 'Brethren: Purge out the old leaven', '1 Cor 5:7-8',
-          'Haec dies, quam fecit Dominus: exsultemus et laetemur in ea', 'This is the day the Lord has made; let us rejoice and be glad in it.',
-          'In illo tempore: Maria Magdalene, et Maria Jacobi, et Salome emerunt aromata', 'At that time: Mary Magdalene, and Mary the mother of James, and Salome, bought sweet spices', 'Mark 16:1-7',
-          'Terra tremuit, et quievit, dum resurgeret in judicio Deus', 'The earth trembled and was still when God arose in judgment',
-          'Suscipe, quaesumus, Domine, preces populi tui cum oblationibus hostiarum', 'Accept, we pray, O Lord, the prayers of your people with the sacrificial offerings',
-          'Pascha nostrum immolatus est Christus, alleluia', 'Christ our Passover has been sacrificed, alleluia',
-          'Spiritum nobis, Domine, tuae caritatis infunde', 'Pour out on us, O Lord, the Spirit of your love'
-        )
-      `);
+    // Get all Sancti files (saints' days)
+    const sanctiFiles = fs.existsSync(massSanctiPath)
+      ? fs.readdirSync(massSanctiPath).filter(file => file.endsWith('.txt'))
+      : [];
 
-      // Also insert the ordinary
-      db.exec(`
-        INSERT INTO mass_texts (
-          id, part, title_latin, title_english,
-          introit_latin, introit_english,
-          collect_latin, collect_english,
-          epistle_latin, epistle_english,
-          gradual_latin, gradual_english,
-          gospel_latin, gospel_english,
-          offertory_latin, offertory_english,
-          secret_latin, secret_english,
-          communion_latin, communion_english,
-          postcommunion_latin, postcommunion_english
-        ) VALUES (
-          'ordinary_default', 'ordinary', 'Ordo Missae', 'Order of Mass',
-          '', '',
-          '', '',
-          '', '',
-          '', '',
-          '', '',
-          '', '',
-          '', '',
-          '', '',
-          '', ''
-        )
-      `);
+    console.log(`Found ${temporaFiles.length} Tempora files and ${sanctiFiles.length} Sancti files for Mass texts`);
 
-      return;
-    }
-
-    // Read the files
-    const latinText = fetchTextContent(latinPath);
-    const englishText = fetchTextContent(englishPath);
-
-    // Parse the texts
-    const latinParts = parseMassText(latinText, 'latin');
-    const englishParts = parseMassText(englishText, 'english');
-
-    // Insert the proper
-    db.exec(`
-      INSERT INTO mass_texts (
-        id, part, title_latin, title_english,
-        introit_latin, introit_english, introit_reference,
-        collect_latin, collect_english,
-        epistle_latin, epistle_english, epistle_reference,
-        gradual_latin, gradual_english,
-        sequence_latin, sequence_english, sequence_rubric,
-        gospel_latin, gospel_english, gospel_reference,
-        offertory_latin, offertory_english, offertory_reference,
-        secret_latin, secret_english,
-        communion_latin, communion_english, communion_reference,
-        postcommunion_latin, postcommunion_english
-      ) VALUES (
-        'proper_easter_sunday', 'proper',
-        '${latinParts.title || ''}', '${englishParts.title || ''}',
-        '${latinParts.introit?.text || ''}', '${englishParts.introit?.text || ''}', '${latinParts.introit?.reference || englishParts.introit?.reference || ''}',
-        '${latinParts.collect?.text || ''}', '${englishParts.collect?.text || ''}',
-        '${latinParts.epistle?.text || ''}', '${englishParts.epistle?.text || ''}', '${latinParts.epistle?.reference || englishParts.epistle?.reference || ''}',
-        '${latinParts.gradual?.text || ''}', '${englishParts.gradual?.text || ''}',
-        '${latinParts.sequence?.text || ''}', '${englishParts.sequence?.text || ''}', '${latinParts.sequence?.rubric || englishParts.sequence?.rubric || ''}',
-        '${latinParts.gospel?.text || ''}', '${englishParts.gospel?.text || ''}', '${latinParts.gospel?.reference || englishParts.gospel?.reference || ''}',
-        '${latinParts.offertory?.text || ''}', '${englishParts.offertory?.text || ''}', '${latinParts.offertory?.reference || englishParts.offertory?.reference || ''}',
-        '${latinParts.secret?.text || ''}', '${englishParts.secret?.text || ''}',
-        '${latinParts.communion?.text || ''}', '${englishParts.communion?.text || ''}', '${latinParts.communion?.reference || englishParts.communion?.reference || ''}',
-        '${latinParts.postcommunion?.text || ''}', '${englishParts.postcommunion?.text || ''}'
-      )
-    `);
-
-    // Also import the ordinary
+    // Import the Ordo (Ordinary of the Mass)
     const latinOrdoPath = path.join(REFERENCE_PATH, 'missa/Latin/Ordo/Ordo.txt');
     const englishOrdoPath = path.join(REFERENCE_PATH, 'missa/English/Ordo/Ordo.txt');
 
@@ -958,20 +883,21 @@ function importEasterSundayMass(db: any): void {
           postcommunion_latin, postcommunion_english
         ) VALUES (
           'ordinary_default', 'ordinary', 'Ordo Missae', 'Order of Mass',
-          '${latinOrdoParts.kyrie?.text || ''}', '${englishOrdoParts.kyrie?.text || ''}',
-          '${latinOrdoParts.gloria?.text || ''}', '${englishOrdoParts.gloria?.text || ''}',
-          '${latinOrdoParts.credo?.text || ''}', '${englishOrdoParts.credo?.text || ''}',
+          '${escapeSql(latinOrdoParts.kyrie?.text)}', '${escapeSql(englishOrdoParts.kyrie?.text)}',
+          '${escapeSql(latinOrdoParts.gloria?.text)}', '${escapeSql(englishOrdoParts.gloria?.text)}',
+          '${escapeSql(latinOrdoParts.credo?.text)}', '${escapeSql(englishOrdoParts.credo?.text)}',
           '', '',
           '', '',
           '', '',
-          '${latinOrdoParts.sanctus?.text || ''}', '${englishOrdoParts.sanctus?.text || ''}',
-          '${latinOrdoParts.agnus?.text || ''}', '${englishOrdoParts.agnus?.text || ''}',
-          '${latinOrdoParts.ite?.text || ''}', '${englishOrdoParts.ite?.text || ''}'
+          '${escapeSql(latinOrdoParts.sanctus?.text)}', '${escapeSql(englishOrdoParts.sanctus?.text)}',
+          '${escapeSql(latinOrdoParts.agnus?.text)}', '${escapeSql(englishOrdoParts.agnus?.text)}',
+          '${escapeSql(latinOrdoParts.ite?.text)}', '${escapeSql(englishOrdoParts.ite?.text)}'
         )
       `);
     } else {
-      console.warn('Ordinary text files not found, using mock data');
+      console.warn('Ordo files not found, using mock data');
 
+      // Insert mock data for the ordinary
       db.exec(`
         INSERT INTO mass_texts (
           id, part, title_latin, title_english,
@@ -987,21 +913,129 @@ function importEasterSundayMass(db: any): void {
         ) VALUES (
           'ordinary_default', 'ordinary', 'Ordo Missae', 'Order of Mass',
           'Kyrie eleison. Christe eleison. Kyrie eleison.', 'Lord, have mercy. Christ, have mercy. Lord, have mercy.',
-          'Gloria in excelsis Deo...', 'Glory to God in the highest...',
-          'Credo in unum Deum...', 'I believe in one God...',
+          'Gloria in excelsis Deo.', 'Glory to God in the highest.',
+          'Credo in unum Deum.', 'I believe in one God.',
           '', '',
           '', '',
           '', '',
-          'Sanctus, Sanctus, Sanctus...', 'Holy, Holy, Holy...',
-          'Agnus Dei, qui tollis peccata mundi...', 'Lamb of God, who takes away the sins of the world...',
+          'Sanctus, Sanctus, Sanctus.', 'Holy, Holy, Holy.',
+          'Agnus Dei, qui tollis peccata mundi.', 'Lamb of God, who takes away the sins of the world.',
           'Ite, missa est.', 'Go, the Mass is ended.'
         )
       `);
     }
 
-    console.log('Easter Sunday Mass texts imported successfully');
+    // Import all Tempora files
+    let importedCount = 0;
+
+    for (const file of temporaFiles) {
+      const fileBase = file.replace('.txt', '');
+      const latinPath = path.join(massTemporaPath, file);
+      const englishPath = path.join(REFERENCE_PATH, `missa/English/Tempora/${file}`);
+
+      // Skip if English file doesn't exist
+      if (!fs.existsSync(englishPath)) {
+        console.warn(`English file for ${fileBase} not found, skipping`);
+        continue;
+      }
+
+      // Read the files
+      const latinText = fetchTextContent(latinPath);
+      const englishText = fetchTextContent(englishPath);
+
+      // Parse the texts
+      const latinParts = parseMassText(latinText, 'latin');
+      const englishParts = parseMassText(englishText, 'english');
+
+      // Insert the proper
+      db.exec(`
+        INSERT INTO mass_texts (
+          id, part, title_latin, title_english,
+          introit_latin, introit_english, introit_reference,
+          collect_latin, collect_english,
+          epistle_latin, epistle_english, epistle_reference,
+          gradual_latin, gradual_english,
+          sequence_latin, sequence_english, sequence_rubric,
+          gospel_latin, gospel_english, gospel_reference,
+          offertory_latin, offertory_english, offertory_reference,
+          secret_latin, secret_english,
+          communion_latin, communion_english, communion_reference,
+          postcommunion_latin, postcommunion_english
+        ) VALUES (
+          '${fileBase}', 'proper',
+          '${escapeSql(latinParts.title)}', '${escapeSql(englishParts.title)}',
+          '${escapeSql(latinParts.introit?.text)}', '${escapeSql(englishParts.introit?.text)}', '${escapeSql(latinParts.introit?.reference || englishParts.introit?.reference)}',
+          '${escapeSql(latinParts.collect?.text)}', '${escapeSql(englishParts.collect?.text)}',
+          '${escapeSql(latinParts.epistle?.text)}', '${escapeSql(englishParts.epistle?.text)}', '${escapeSql(latinParts.epistle?.reference || englishParts.epistle?.reference)}',
+          '${escapeSql(latinParts.gradual?.text)}', '${escapeSql(englishParts.gradual?.text)}',
+          '${escapeSql(latinParts.sequence?.text)}', '${escapeSql(englishParts.sequence?.text)}', '${escapeSql(latinParts.sequence?.rubric || englishParts.sequence?.rubric)}',
+          '${escapeSql(latinParts.gospel?.text)}', '${escapeSql(englishParts.gospel?.text)}', '${escapeSql(latinParts.gospel?.reference || englishParts.gospel?.reference)}',
+          '${escapeSql(latinParts.offertory?.text)}', '${escapeSql(englishParts.offertory?.text)}', '${escapeSql(latinParts.offertory?.reference || englishParts.offertory?.reference)}',
+          '${escapeSql(latinParts.secret?.text)}', '${escapeSql(englishParts.secret?.text)}',
+          '${escapeSql(latinParts.communion?.text)}', '${escapeSql(englishParts.communion?.text)}', '${escapeSql(latinParts.communion?.reference || englishParts.communion?.reference)}',
+          '${escapeSql(latinParts.postcommunion?.text)}', '${escapeSql(englishParts.postcommunion?.text)}'
+        )
+      `);
+
+      importedCount++;
+    }
+
+    // Import all Sancti files
+    for (const file of sanctiFiles) {
+      const fileBase = file.replace('.txt', '');
+      const latinPath = path.join(massSanctiPath, file);
+      const englishPath = path.join(REFERENCE_PATH, `missa/English/Sancti/${file}`);
+
+      // Skip if English file doesn't exist
+      if (!fs.existsSync(englishPath)) {
+        console.warn(`English file for ${fileBase} not found, skipping`);
+        continue;
+      }
+
+      // Read the files
+      const latinText = fetchTextContent(latinPath);
+      const englishText = fetchTextContent(englishPath);
+
+      // Parse the texts
+      const latinParts = parseMassText(latinText, 'latin');
+      const englishParts = parseMassText(englishText, 'english');
+
+      // Insert the proper
+      db.exec(`
+        INSERT INTO mass_texts (
+          id, part, title_latin, title_english,
+          introit_latin, introit_english, introit_reference,
+          collect_latin, collect_english,
+          epistle_latin, epistle_english, epistle_reference,
+          gradual_latin, gradual_english,
+          sequence_latin, sequence_english, sequence_rubric,
+          gospel_latin, gospel_english, gospel_reference,
+          offertory_latin, offertory_english, offertory_reference,
+          secret_latin, secret_english,
+          communion_latin, communion_english, communion_reference,
+          postcommunion_latin, postcommunion_english
+        ) VALUES (
+          '${fileBase}', 'sancti',
+          '${escapeSql(latinParts.title)}', '${escapeSql(englishParts.title)}',
+          '${escapeSql(latinParts.introit?.text)}', '${escapeSql(englishParts.introit?.text)}', '${escapeSql(latinParts.introit?.reference || englishParts.introit?.reference)}',
+          '${escapeSql(latinParts.collect?.text)}', '${escapeSql(englishParts.collect?.text)}',
+          '${escapeSql(latinParts.epistle?.text)}', '${escapeSql(englishParts.epistle?.text)}', '${escapeSql(latinParts.epistle?.reference || englishParts.epistle?.reference)}',
+          '${escapeSql(latinParts.gradual?.text)}', '${escapeSql(englishParts.gradual?.text)}',
+          '${escapeSql(latinParts.sequence?.text)}', '${escapeSql(englishParts.sequence?.text)}', '${escapeSql(latinParts.sequence?.rubric || englishParts.sequence?.rubric)}',
+          '${escapeSql(latinParts.gospel?.text)}', '${escapeSql(englishParts.gospel?.text)}', '${escapeSql(latinParts.gospel?.reference || englishParts.gospel?.reference)}',
+          '${escapeSql(latinParts.offertory?.text)}', '${escapeSql(englishParts.offertory?.text)}', '${escapeSql(latinParts.offertory?.reference || englishParts.offertory?.reference)}',
+          '${escapeSql(latinParts.secret?.text)}', '${escapeSql(englishParts.secret?.text)}',
+          '${escapeSql(latinParts.communion?.text)}', '${escapeSql(englishParts.communion?.text)}', '${escapeSql(latinParts.communion?.reference || englishParts.communion?.reference)}',
+          '${escapeSql(latinParts.postcommunion?.text)}', '${escapeSql(englishParts.postcommunion?.text)}'
+        )
+      `);
+
+      importedCount++;
+    }
+
+    console.log(`Imported ${importedCount} Mass texts successfully`);
   } catch (error) {
-    console.error('Error importing Easter Sunday Mass texts:', error);
+    console.error('Error importing Mass texts:', error);
     throw error;
   }
 }
@@ -1181,7 +1215,7 @@ async function buildSqliteDb(): Promise<void> {
 
     // Import liturgical data
     importLiturgicalCalendar(db);
-    importEasterSundayMass(db);
+    importAllMassTexts(db);
     importEasterSundayOffice(db);
 
     // Save the database to a file

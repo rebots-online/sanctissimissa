@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Liturgical Calendar Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .liturgical-day {
+      margin-bottom: 2rem;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+    }
+    .parish-info {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+    .date {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .celebration {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .details {
+      margin-bottom: 1rem;
+    }
+    .description {
+      font-style: italic;
+      margin-bottom: 1rem;
+    }
+    .commemorations {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 p-4">
+  <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-3xl font-bold mb-6 text-center">Enhanced Liturgical Calendar Demo</h1>
+    
+    <div class="mb-6">
+      <label for="date-picker" class="block text-sm font-medium text-gray-700 mb-2">Select a date:</label>
+      <input type="date" id="date-picker" class="w-full p-2 border rounded-md" value="2025-04-20">
+    </div>
+    
+    <div class="mb-6">
+      <label for="format-select" class="block text-sm font-medium text-gray-700 mb-2">Output format:</label>
+      <select id="format-select" class="w-full p-2 border rounded-md">
+        <option value="html">HTML</option>
+        <option value="text">Text</option>
+        <option value="markdown">Markdown</option>
+        <option value="json">JSON</option>
+      </select>
+    </div>
+    
+    <div class="mb-6">
+      <div class="flex items-center mb-2">
+        <input type="checkbox" id="show-commemorations" class="mr-2" checked>
+        <label for="show-commemorations" class="text-sm font-medium text-gray-700">Show commemorations</label>
+      </div>
+      
+      <div class="flex items-center mb-2">
+        <input type="checkbox" id="include-description" class="mr-2" checked>
+        <label for="include-description" class="text-sm font-medium text-gray-700">Include descriptions</label>
+      </div>
+      
+      <div class="flex items-center">
+        <input type="checkbox" id="include-parish-info" class="mr-2">
+        <label for="include-parish-info" class="text-sm font-medium text-gray-700">Include parish information</label>
+      </div>
+    </div>
+    
+    <div class="mb-6">
+      <button id="generate-btn" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">Generate Calendar</button>
+    </div>
+    
+    <div id="output-container" class="border rounded-md p-4 bg-gray-50">
+      <div id="output"></div>
+    </div>
+  </div>
+  
+  <script type="module">
+    // Import the required modules
+    import { calculateEaster } from '../src/services/calendar/enhanced/easterCalculator.js';
+    import { getLiturgicalSeason } from '../src/services/calendar/enhanced/seasonCalculator.js';
+    import { getTemporalCelebration } from '../src/services/calendar/enhanced/temporalCycleService.js';
+    import { getSanctoralCelebration } from '../src/services/calendar/enhanced/sanctoralCycleService.js';
+    import { getLiturgicalDay } from '../src/services/calendar/enhanced/liturgicalDayService.js';
+    import { renderLiturgicalDay, OutputFormat } from '../src/services/rendering/liturgicalDayRenderer.js';
+    
+    // DOM elements
+    const datePicker = document.getElementById('date-picker');
+    const formatSelect = document.getElementById('format-select');
+    const showCommemorations = document.getElementById('show-commemorations');
+    const includeDescription = document.getElementById('include-description');
+    const includeParishInfo = document.getElementById('include-parish-info');
+    const generateBtn = document.getElementById('generate-btn');
+    const output = document.getElementById('output');
+    
+    // Sample parish information
+    const parishInfo = {
+      name: 'St. Mary\'s Catholic Church',
+      address: '123 Main St, Anytown, USA 12345',
+      phone: '(555) 123-4567',
+      email: 'info@stmarys.example.com',
+      website: 'www.stmarys.example.com',
+      pastor: 'Rev. John Smith'
+    };
+    
+    // Generate the calendar
+    function generateCalendar() {
+      // Get the selected date
+      const dateString = datePicker.value;
+      const date = new Date(dateString);
+      
+      // Get the selected format
+      const format = formatSelect.value;
+      
+      // Get the options
+      const options = {
+        format: format,
+        showCommemorations: showCommemorations.checked,
+        includeDescription: includeDescription.checked,
+        parishInfo: includeParishInfo.checked ? parishInfo : undefined
+      };
+      
+      try {
+        // Get the liturgical day
+        const liturgicalDay = getLiturgicalDay(date);
+        
+        // Render the liturgical day
+        const rendered = renderLiturgicalDay(liturgicalDay, options);
+        
+        // Display the output
+        if (format === 'html') {
+          output.innerHTML = rendered;
+        } else if (format === 'json') {
+          output.innerHTML = `<pre>${rendered}</pre>`;
+        } else {
+          output.innerHTML = `<pre>${rendered}</pre>`;
+        }
+      } catch (error) {
+        output.innerHTML = `<div class="text-red-600">Error: ${error.message}</div>`;
+        console.error(error);
+      }
+    }
+    
+    // Add event listener to the generate button
+    generateBtn.addEventListener('click', generateCalendar);
+    
+    // Generate the calendar on page load
+    generateCalendar();
+  </script>
+</body>
+</html>

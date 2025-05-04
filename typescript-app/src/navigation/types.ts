@@ -1,6 +1,6 @@
 /**
  * Navigation Types
- * 
+ *
  * Type definitions for navigation parameters and routes
  */
 
@@ -19,30 +19,30 @@ export type RootStackParamList = {
   Journal: { id?: string };
   Glossary: undefined;
   Settings: undefined;
+  CalendarDemo: undefined;
+  DeviceDebug: undefined;
 };
 
 /**
  * Bottom Tab Parameter List
  */
 export type BottomTabParamList = {
-  Today: undefined;
+  Home: undefined;
   Mass: undefined;
   Office: undefined;
-  Prayer: undefined;
-  Journal: undefined;
-  More: undefined;
+  Calendar: undefined;
 };
 
 /**
  * Root Stack Screen Props
  */
-export type RootStackScreenProps<T extends keyof RootStackParamList> = 
+export type RootStackScreenProps<T extends keyof RootStackParamList> =
   NativeStackScreenProps<RootStackParamList, T>;
 
 /**
  * Tab Screen Props
  */
-export type TabScreenProps<T extends keyof BottomTabParamList> = 
+export type TabScreenProps<T extends keyof BottomTabParamList> =
   CompositeScreenProps<
     BottomTabScreenProps<BottomTabParamList, T>,
     RootStackScreenProps<keyof RootStackParamList>

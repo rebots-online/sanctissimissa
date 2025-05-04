@@ -7,6 +7,7 @@ import PrayersPage from './pages/PrayersPage';
 import JournalPage from './pages/JournalPage';
 import MassPage from './components/mass/MassPage';
 import CalendarPage from './pages/CalendarPage';
+import CalendarDemo from './pages/CalendarDemo';
 import NotFoundPage from './pages/NotFoundPage';
 import SqlTestPage from './pages/SqlTestPage';
 import OfficeTestPage from './pages/OfficeTestPage';
@@ -103,6 +104,7 @@ const App: React.FC = () => {
           {/* Calendar routes */}
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/calendar/:year/:month" element={<CalendarPage />} />
+          <Route path="/calendar/demo" element={<CalendarDemo />} />
 
           {/* Test routes */}
           <Route path="/test/office" element={<OfficeTestPage />} />
