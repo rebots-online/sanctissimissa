@@ -6,9 +6,9 @@
  * Enhanced for offline use with data persistence between sessions.
  */
 
-import initSqlJs from 'sql.js';
 import type { Database } from 'sql.js';
 import { openDB, IDBPDatabase } from 'idb';
+import { initializeSql, createDatabase } from './sqlInitializer';
 
 // Global database instance
 let db: Database | null = null;
@@ -73,16 +73,10 @@ async function saveDatabaseToIndexedDB(): Promise<void> {
 /**
  * Load the SQLite database from IndexedDB
  *
- * @param SQL SQL.js instance
  * @returns Promise that resolves to true if database was loaded, false otherwise
  */
-async function loadDatabaseFromIndexedDB(SQL: any): Promise<boolean> {
+async function loadDatabaseFromIndexedDB(): Promise<boolean> {
   try {
-    if (!SQL || typeof SQL.Database !== 'function') {
-      console.error('Invalid SQL.js instance provided. SQL.Database is not a constructor.');
-      return false;
-    }
-
     // Open IndexedDB
     const idb = await openIndexedDB();
 
@@ -91,8 +85,8 @@ async function loadDatabaseFromIndexedDB(SQL: any): Promise<boolean> {
 
     if (data) {
       try {
-        // Create a database from the data
-        db = new SQL.Database(data);
+        // Create a database from the data using our initializer
+        db = await createDatabase(data);
         console.log('Database loaded from IndexedDB successfully');
         return true;
       } catch (dbError) {
@@ -122,41 +116,12 @@ export async function initSqliteDatabase(): Promise<void> {
   try {
     console.log('Initializing SQLite database...');
 
-    // Load SQL.js
-    console.log('Loading SQL.js...');
-
-    // Load SQL.js with the WASM file
-    let SQL;
-    try {
-      console.log('Loading SQL.js with WASM...');
-      console.log('WASM URL: /sql-wasm.wasm');
-
-      // Use a direct path to the WASM file in the public directory
-      SQL = await initSqlJs({
-        // Use a direct path to the WASM file
-        locateFile: (filename) => {
-          console.log(`SQL.js requested file: ${filename}`);
-          return '/sql-wasm.wasm';
-        }
-      });
-
-      // Verify that SQL.Database is a constructor
-      if (typeof SQL.Database !== 'function') {
-        throw new Error(`SQL.Database is not a constructor. Type: ${typeof SQL.Database}`);
-      }
-
-      // Log SQL object to verify it's properly initialized
-      console.log('SQL object:', Object.keys(SQL));
-
-      console.log('SQL.js loaded successfully with /sql-wasm.wasm');
-    } catch (error) {
-      console.error('Failed to load SQL.js:', error);
-      throw new Error('Failed to initialize SQL.js: ' + (error instanceof Error ? error.message : String(error)));
-    }
-    console.log('SQL.js loaded successfully');
+    // Initialize SQL.js using our Promise-based initializer
+    await initializeSql();
+    console.log('SQL.js initialized successfully');
 
     // Try to load the database from IndexedDB first
-    const loadedFromIndexedDB = await loadDatabaseFromIndexedDB(SQL);
+    const loadedFromIndexedDB = await loadDatabaseFromIndexedDB();
 
     if (loadedFromIndexedDB) {
       isInitialized = true;
@@ -201,11 +166,8 @@ export async function initSqliteDatabase(): Promise<void> {
       const arrayBuffer = await response.arrayBuffer();
       const uInt8Array = new Uint8Array(arrayBuffer);
 
-      // Create a database from the file
-      if (!SQL || typeof SQL.Database !== 'function') {
-        throw new Error('Invalid SQL.js instance. SQL.Database is not a constructor.');
-      }
-      db = new SQL.Database(uInt8Array);
+      // Create a database from the file using our initializer
+      db = await createDatabase(uInt8Array);
 
       // Save the database to IndexedDB for offline use
       await saveDatabaseToIndexedDB();
@@ -217,10 +179,7 @@ export async function initSqliteDatabase(): Promise<void> {
 
       // Create an empty database as fallback
       console.log('Creating empty database as fallback...');
-      if (!SQL || typeof SQL.Database !== 'function') {
-        throw new Error('Invalid SQL.js instance. SQL.Database is not a constructor.');
-      }
-      db = new SQL.Database();
+      db = await createDatabase();
 
       // Create the schema
       db.exec(`
