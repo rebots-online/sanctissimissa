@@ -11,6 +11,8 @@ import CalendarDemo from './pages/CalendarDemo';
 import NotFoundPage from './pages/NotFoundPage';
 import SqlTestPage from './pages/SqlTestPage';
 import OfficeTestPage from './pages/OfficeTestPage';
+import OfficeLibTest from './pages/OfficeLibTest';
+import TestPage from './pages/TestPage';
 import DebugPage from './pages/DebugPage';
 import { useDatabase } from './shared/database';
 
@@ -108,6 +110,8 @@ const App: React.FC = () => {
 
           {/* Test routes */}
           <Route path="/test/office" element={<OfficeTestPage />} />
+          <Route path="/test/office-lib" element={<OfficeLibTest />} />
+          <Route path="/test/simple" element={<TestPage />} />
           <Route path="/test/sql" element={<SqlTestPage />} />
           <Route path="/test/sqljs" element={<React.Suspense fallback={<div>Loading...</div>}>
             {React.createElement(React.lazy(() => import('./components/SqlTest')))}
