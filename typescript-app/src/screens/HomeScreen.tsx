@@ -65,11 +65,14 @@ const HomeScreen: React.FC<Props> = () => {
   const getGridItemWidth = () => {
     // Use numeric values instead of percentages for better TypeScript compatibility
     if (deviceInfo.isFoldable && deviceInfo.isUnfolded) {
-      // 4-column grid on unfolded devices with better spacing
-      return width * 0.22;
+      // 5-column grid on unfolded devices with better spacing
+      return width * 0.18;
+    } else if (width > 600) {
+      // 3-column grid on larger devices
+      return width * 0.30;
     } else {
-      // 2-column grid on folded or regular devices
-      return width * 0.46;
+      // 3-column grid with smaller items on regular devices
+      return width * 0.30;
     }
   };
 
@@ -85,22 +88,26 @@ const HomeScreen: React.FC<Props> = () => {
     gridItem: {
       width: getGridItemWidth(),
       aspectRatio: deviceInfo.isUnfolded ? 1.2 : 1,
-      margin: deviceInfo.isUnfolded ? 8 : 4,
+      margin: deviceInfo.isUnfolded ? 6 : 3,
+      padding: deviceInfo.isUnfolded ? 12 : 8,
     },
     container: {
-      paddingHorizontal: deviceInfo.isUnfolded ? 24 : 16,
+      paddingHorizontal: deviceInfo.isUnfolded ? 24 : 12,
     },
     grid: {
-      justifyContent: deviceInfo.isUnfolded ? 'space-around' as const : 'space-between' as const,
-      marginHorizontal: deviceInfo.isUnfolded ? -8 : 0,
+      justifyContent: 'space-around' as const,
+      marginHorizontal: deviceInfo.isUnfolded ? -6 : -3,
     },
     fontSize: {
       date: 14 * getFontSizeMultiplier(),
       celebration: 24 * getFontSizeMultiplier(),
       season: 16 * getFontSizeMultiplier(),
       sectionTitle: 18 * getFontSizeMultiplier(),
-      gridItemText: 16 * getFontSizeMultiplier(),
-      massButtonText: 18 * getFontSizeMultiplier(),
+      gridItemText: 14 * getFontSizeMultiplier(), // Reduced font size
+      massButtonText: 16 * getFontSizeMultiplier(), // Reduced font size
+    },
+    massButton: {
+      padding: deviceInfo.isUnfolded ? 24 : 16, // Reduced padding
     }
   };
 
@@ -110,28 +117,28 @@ const HomeScreen: React.FC<Props> = () => {
       contentContainerStyle={adaptiveStyles.container}
     >
       <View style={[styles.header, deviceInfo.isUnfolded && { paddingVertical: 24 }]}>
-        <Text style={[styles.date, { 
+        <Text style={[styles.date, {
           color: theme.colors.textSecondary,
           fontSize: adaptiveStyles.fontSize.date
         }]}>
           {formatDate()}
         </Text>
-        <Text style={[styles.celebration, { 
+        <Text style={[styles.celebration, {
           color: theme.colors.text,
-          fontSize: adaptiveStyles.fontSize.celebration  
+          fontSize: adaptiveStyles.fontSize.celebration
         }]}>
           {dayInfo.celebration || 'Feria'}
         </Text>
-        <Text style={[styles.season, { 
+        <Text style={[styles.season, {
           color: theme.colors.textSecondary,
-          fontSize: adaptiveStyles.fontSize.season 
+          fontSize: adaptiveStyles.fontSize.season
         }]}>
           {dayInfo.season.replace('_', ' ').toUpperCase()}
         </Text>
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { 
+        <Text style={[styles.sectionTitle, {
           color: theme.colors.text,
           fontSize: adaptiveStyles.fontSize.sectionTitle
         }]}>
@@ -142,20 +149,20 @@ const HomeScreen: React.FC<Props> = () => {
             <TouchableOpacity
               key={hour}
               style={[
-                styles.gridItem, 
+                styles.gridItem,
                 adaptiveStyles.gridItem,
                 { backgroundColor: theme.colors.surface }
               ]}
               onPress={() => navigateToOffice(hour)}
             >
-              <Ionicons 
-                name="book-outline" 
-                size={24} 
-                color={theme.colors.primary} 
+              <Ionicons
+                name="book-outline"
+                size={24}
+                color={theme.colors.primary}
               />
-              <Text style={[styles.gridItemText, { 
+              <Text style={[styles.gridItemText, {
                 color: theme.colors.text,
-                fontSize: adaptiveStyles.fontSize.gridItemText 
+                fontSize: adaptiveStyles.fontSize.gridItemText
               }]}>
                 {hour}
               </Text>
@@ -165,7 +172,7 @@ const HomeScreen: React.FC<Props> = () => {
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { 
+        <Text style={[styles.sectionTitle, {
           color: theme.colors.text,
           fontSize: adaptiveStyles.fontSize.sectionTitle
         }]}>
@@ -173,22 +180,22 @@ const HomeScreen: React.FC<Props> = () => {
         </Text>
         <TouchableOpacity
           style={[
-            styles.massButton, 
-            { 
+            styles.massButton,
+            {
               backgroundColor: theme.colors.surface,
-              padding: deviceInfo.isUnfolded ? 32 : 24
+              padding: adaptiveStyles.massButton.padding
             }
           ]}
           onPress={navigateToMass}
         >
-          <Ionicons 
-            name="heart-outline" 
-            size={24} 
-            color={theme.colors.primary} 
+          <Ionicons
+            name="heart-outline"
+            size={24}
+            color={theme.colors.primary}
           />
-          <Text style={[styles.massButtonText, { 
+          <Text style={[styles.massButtonText, {
             color: theme.colors.text,
-            fontSize: adaptiveStyles.fontSize.massButtonText 
+            fontSize: adaptiveStyles.fontSize.massButtonText
           }]}>
             Mass of the Day
           </Text>
@@ -266,29 +273,29 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   gridItem: {
-    width: '48%',
+    width: '30%', // Changed from 48% to 30% for 3-column layout
     aspectRatio: 1,
-    marginBottom: 16,
+    marginBottom: 12, // Reduced from 16
     borderRadius: 8,
-    padding: 16,
+    padding: 12, // Reduced from 16
     alignItems: 'center',
     justifyContent: 'center',
   },
   gridItemText: {
-    marginTop: 8,
-    fontSize: 16,
+    marginTop: 6, // Reduced from 8
+    fontSize: 14, // Reduced from 16
     textAlign: 'center',
   },
   massButton: {
-    padding: 24,
+    padding: 16, // Reduced from 24
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
   },
   massButtonText: {
-    fontSize: 18,
-    marginLeft: 12,
+    fontSize: 16, // Reduced from 18
+    marginLeft: 10, // Reduced from 12
   },
   debugButton: {
     padding: 12,
