@@ -99,6 +99,18 @@ if (existsSync(nsisDir)) {
   }
 }
 
+const msiDir = resolve(ROOT, 'src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi');
+if (existsSync(msiDir)) {
+  const msiMatches = readdirSync(msiDir).filter((f) => f.endsWith('.msi') && f.includes(VERSION));
+  if (msiMatches.length === 1) {
+    sources.push({
+      id: 'windows-msi', platform: 'windows', kind: 'msi',
+      source: join(msiDir, msiMatches[0]),
+      filename: `${PREFIX}-windows-x64.msi`,
+    });
+  }
+}
+
 for (const artifact of sources) {
   if (!existsSync(artifact.source)) throw new Error(`${artifact.id}: missing ${artifact.source}`);
 }

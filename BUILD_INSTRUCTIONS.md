@@ -61,10 +61,32 @@ export ANDROID_SDK_ROOT="$ANDROID_HOME"
 export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"
 ```
 
-### Windows x64 cross-build
+### Windows x64 cross-build (Linux-hosted)
 
 Install `cargo-xwin`. The current Linux-hosted recipe emits a standalone PE
 `.exe`; it does not emit NSIS, MSI, or MSIX packages.
+
+### Windows x64 native MSI build (Windows-hosted)
+
+On a Windows host with Node.js ≥ 22.6, Rust stable (target
+`x86_64-pc-windows-msvc`), and the Tauri CLI (installed via `npm install`),
+run:
+
+```bash
+npm run build:windows:msi
+```
+
+This builds the web frontend (`build:vite`) then invokes
+`tauri build --target x86_64-pc-windows-msvc --bundles msi`. Tauri
+auto-downloads WiX Toolset 3.14 on first run. The MSI is emitted at
+`src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/`.
+
+**WSL filesystem caveat:** Tauri's MSI bundler (WiX `light.exe`) cannot
+create CAB files on `\\wsl$\` network paths. If the repo lives in WSL,
+copy the project to a local Windows drive (e.g. via `cp -a` from WSL to
+`/mnt/c/...`) and build from there. The `tauri.conf.json` bundle targets
+remain `["deb", "appimage", "nsis"]` so Linux builds are unaffected; MSI
+is opt-in via the `--bundles msi` CLI flag only.
 
 ## Production signing
 
@@ -239,9 +261,14 @@ Every successful release contains:
 7. `standroidsmissal-v<version>-android-universal-release.aab`
 8. `standroidsmissal-v<version>-android-native-debug-symbols.zip`
 
+When built on a Windows host (see "Windows x64 native MSI build" above), the
+release also contains:
+
+9. `standroidsmissal-v<version>-windows-x64.msi`
+
 JSON/XML manifests, release notes, and runtime-verification evidence accompany
-the set. MSI/MSIX/NSIS and Snap packages are currently absent and must not be
-claimed as release outputs.
+the set. MSIX and Snap packages are currently absent and must not be claimed
+as release outputs.
 
 ## Verification gates
 
@@ -283,8 +310,9 @@ LFS objects to Forgejo. GitHub receives commits and LFS pointers only.
 ## Store packaging gaps
 
 - Google Play: production AAB is available.
-- Microsoft Store: tile/listing assets exist, but MSI/MSIX Store packaging does
-  not yet exist.
+- Microsoft Store: tile/listing assets exist. MSI packaging is available via
+  `npm run build:windows:msi` on a Windows host; MSIX Store packaging does not
+  yet exist.
 - Ubuntu/Snap Store: listing assets exist, but a `.snap` does not yet exist.
 
 ## Web deployment
