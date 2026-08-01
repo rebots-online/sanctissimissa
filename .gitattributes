@@ -20,3 +20,7 @@ dist/*.exe filter=lfs diff=lfs merge=lfs -text
 dist/**/*.zip filter=lfs diff=lfs merge=lfs -text
 dist/*.zip filter=lfs diff=lfs merge=lfs -text
 dist/**/*.mp4 filter=lfs diff=lfs merge=lfs -text
+dist/**/*.msi filter=lfs diff=lfs merge=lfs -text
+dist/*.msi filter=lfs diff=lfs merge=lfs -text
+dist/**/*.msix filter=lfs diff=lfs merge=lfs -text
+dist/*.msix filter=lfs diff=lfs merge=lfs -text
