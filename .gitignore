@@ -21,3 +21,7 @@ release.lock
 build-logs/
 standroidsmissal-release-state.json
 tests/.tmp/
+# MSIX build artifacts (winapp CLI)
+devcert.pfx
+msix-stage/
+standroidsmissal-*.msix

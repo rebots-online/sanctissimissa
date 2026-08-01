@@ -111,6 +111,17 @@ if (existsSync(msiDir)) {
   }
 }
 
+// MSIX is built by `npm run build:windows:msix` (winapp CLI, not Tauri's
+// bundler) and emitted at the repo root as standroidsmissal-v<ver>-windows-x64.msix.
+const msixPath = resolve(ROOT, `${PREFIX}-windows-x64.msix`);
+if (existsSync(msixPath)) {
+  sources.push({
+    id: 'windows-msix', platform: 'windows', kind: 'msix',
+    source: msixPath,
+    filename: `${PREFIX}-windows-x64.msix`,
+  });
+}
+
 for (const artifact of sources) {
   if (!existsSync(artifact.source)) throw new Error(`${artifact.id}: missing ${artifact.source}`);
 }

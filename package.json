@@ -20,6 +20,7 @@
     "build:android": "npm run stamp && tauri android build --apk --aab",
     "build:windows:unstamped": "bash scripts/build-windows.sh",
     "build:windows:msi": "npm run build:vite && tauri build --target x86_64-pc-windows-msvc --bundles msi",
+    "build:windows:msix": "bash scripts/build-windows-msix.sh",
     "build:release": "bash scripts/build-release.sh",
     "build:all": "npm run build:release",
     "preview": "vite preview",

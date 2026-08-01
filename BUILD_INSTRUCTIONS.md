@@ -88,6 +88,47 @@ copy the project to a local Windows drive (e.g. via `cp -a` from WSL to
 remain `["deb", "appimage", "nsis"]` so Linux builds are unaffected; MSI
 is opt-in via the `--bundles msi` CLI flag only.
 
+### Windows x64 MSIX build for Microsoft Store (Windows-hosted)
+
+Tauri 2 does not natively produce MSIX packages. Instead, the MSIX is
+built by Microsoft's `winapp` CLI wrapping the compiled Tauri exe. The
+Microsoft Store re-signs MSIX packages on submission, so no purchased
+code signing certificate is needed — a self-signed dev cert suffices.
+
+**One-time setup:**
+
+```powershell
+# Install winapp CLI
+winget install microsoft.winappcli --source winget
+
+# Initialize manifest and assets (run once in the repo root)
+winapp init . --setup-sdks none --use-defaults
+
+# Generate a dev cert (publisher must match Package.appxmanifest)
+winapp cert generate --publisher "CN=Robin Cheung"
+```
+
+This creates `Package.appxmanifest` (committed to the repo) and
+`devcert.pfx` (gitignored). The manifest's `Identity` uses
+`mba.robin.standroidsmissal` / `CN=Robin Cheung` / version
+`<MAJOR.MINOR.BUILD>.0`.
+
+**Build:**
+
+```bash
+npm run build:windows:msix
+```
+
+This runs `scripts/build-windows-msix.sh`, which builds the web frontend,
+compiles the Rust exe (`tauri build --no-bundle`), stages the exe +
+`dist-web/` into `msix-stage/`, and packages it via `winapp package`.
+The MSIX is emitted at the repo root as
+`standroidsmissal-v<version>-windows-x64.msix`.
+
+**Store submission:** Upload the `.msix` directly via Partner Center
+under an MSIX/PWA product. Microsoft re-signs it during certification —
+no certificate purchase required.
+
 ## Production signing
 
 The production keystore remains under Admin-Manual credential custody. The
@@ -261,14 +302,15 @@ Every successful release contains:
 7. `standroidsmissal-v<version>-android-universal-release.aab`
 8. `standroidsmissal-v<version>-android-native-debug-symbols.zip`
 
-When built on a Windows host (see "Windows x64 native MSI build" above), the
-release also contains:
+When built on a Windows host (see "Windows x64 native MSI build" and
+"Windows x64 MSIX build for Microsoft Store" above), the release also contains:
 
 9. `standroidsmissal-v<version>-windows-x64.msi`
+10. `standroidsmissal-v<version>-windows-x64.msix`
 
 JSON/XML manifests, release notes, and runtime-verification evidence accompany
-the set. MSIX and Snap packages are currently absent and must not be claimed
-as release outputs.
+the set. Snap packages are currently absent and must not be claimed as release
+outputs.
 
 ## Verification gates
 
@@ -310,9 +352,10 @@ LFS objects to Forgejo. GitHub receives commits and LFS pointers only.
 ## Store packaging gaps
 
 - Google Play: production AAB is available.
-- Microsoft Store: tile/listing assets exist. MSI packaging is available via
-  `npm run build:windows:msi` on a Windows host; MSIX Store packaging does not
-  yet exist.
+- Microsoft Store: tile/listing assets exist. MSIX packaging is available via
+  `npm run build:windows:msix` on a Windows host (winapp CLI); the Store
+  re-signs on submission so no certificate purchase is required. MSI packaging
+  is also available via `npm run build:windows:msi` for non-Store distribution.
 - Ubuntu/Snap Store: listing assets exist, but a `.snap` does not yet exist.
 
 ## Web deployment
