@@ -37,7 +37,9 @@ interface SpawnResult {
 }
 
 // Canonical stage order for verification
-const CANONICAL_STAGE_ORDER = ['test', 'web', 'linux', 'windows', 'android-debug', 'android-release', 'symbols', 'collect'];
+// The Windows installer stages sit immediately after the standalone PE: the
+// MSI and MSIX are part of the release, not produced out of band (BUGS #7).
+const CANONICAL_STAGE_ORDER = ['test', 'web', 'linux', 'windows', 'windows-msi', 'windows-msix', 'android-debug', 'android-release', 'symbols', 'collect'];
 
 // Helper: create a temporary directory and return cleanup function
 function createTempDir() {
@@ -155,8 +157,8 @@ describe('Unit tests: STAGE_ORDER', () => {
     assert.deepStrictEqual(STAGE_ORDER, CANONICAL_STAGE_ORDER);
   });
 
-  it('should have 8 stages total', () => {
-    assert.strictEqual(STAGE_ORDER.length, 8);
+  it('should have 10 stages total', () => {
+    assert.strictEqual(STAGE_ORDER.length, 10);
   });
 });
 
@@ -284,7 +286,7 @@ describe('Unit tests: main with injected deps', () => {
     assert.ok(!commandsRun.includes('stamp'));
 
     // Should run only remaining stages
-    const expectedStages = ['linux', 'windows', 'android-debug', 'android-release', 'symbols', 'collect'];
+    const expectedStages = ['linux', 'windows', 'windows-msi', 'windows-msix', 'android-debug', 'android-release', 'symbols', 'collect'];
     assert.deepStrictEqual(commandsRun, expectedStages);
 
     // Lock should be archived
@@ -598,7 +600,7 @@ describe('Integration tests: Real CLI spawning', () => {
       assert.ok(!loggedCommands.includes('stamp'));
 
       // Should have only remaining stages
-      const expectedStages = ['linux', 'windows', 'android-debug', 'android-release', 'symbols', 'collect'];
+      const expectedStages = ['linux', 'windows', 'windows-msi', 'windows-msix', 'android-debug', 'android-release', 'symbols', 'collect'];
       assert.deepStrictEqual(loggedCommands, expectedStages);
     });
 
@@ -710,7 +712,7 @@ describe('Integration tests: Real CLI spawning', () => {
 
       // After both spawns: log should show stamp once, each stage once, in order
       const loggedCommands = readRunCommandLog(tempDir).trim().split('\n').filter(l => l);
-      assert.deepStrictEqual(loggedCommands, ['stamp', 'test', 'web', 'linux', 'windows', 'android-debug', 'android-release', 'symbols', 'collect']);
+      assert.deepStrictEqual(loggedCommands, ['stamp', 'test', 'web', 'linux', 'windows', 'windows-msi', 'windows-msix', 'android-debug', 'android-release', 'symbols', 'collect']);
 
       // Stamp appears exactly once
       assert.strictEqual(loggedCommands.filter(c => c === 'stamp').length, 1);

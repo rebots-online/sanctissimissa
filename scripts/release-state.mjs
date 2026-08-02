@@ -183,7 +183,14 @@ function lockMatchesCurrent(lock, root) {
 /**
  * Canonical stage order
  */
-export const STAGE_ORDER = ['test', 'web', 'linux', 'windows', 'android-debug', 'android-release', 'symbols', 'collect'];
+export const STAGE_ORDER = [
+  'test', 'web', 'linux',
+  'windows', 'windows-msi', 'windows-msix',
+  'android-debug', 'android-release', 'symbols', 'collect',
+];
+
+/** The WiX and winapp toolchains do not cross-build; those stages need Windows. */
+const IS_WINDOWS_HOST = process.platform === 'win32';
 
 /**
  * Interrupt receipt filename
@@ -380,6 +387,26 @@ async function runCommand(name, deps, root) {
       console.log('🔧 Stage: windows');
       execSync('npm run build:windows:unstamped', inherited);
     },
+    // The MSI and MSIX were never part of this pipeline: the `windows` stage
+    // builds `--no-bundle`, so it emits the standalone PE and nothing else.
+    // Whatever shipped as an installer at v1.25 was produced out of band and
+    // staged without being installed — which is the defect being corrected.
+    'windows-msi': () => {
+      console.log('🔧 Stage: windows-msi');
+      if (!IS_WINDOWS_HOST) {
+        console.log('   ⏭  skipped — the WiX bundler requires a Windows host.');
+        return;
+      }
+      execSync('./node_modules/.bin/tauri build --target x86_64-pc-windows-msvc --bundles msi --ci', inherited);
+    },
+    'windows-msix': () => {
+      console.log('🔧 Stage: windows-msix');
+      if (!IS_WINDOWS_HOST) {
+        console.log('   ⏭  skipped — the winapp CLI requires a Windows host.');
+        return;
+      }
+      execSync('bash scripts/build-windows-msix.sh', inherited);
+    },
     'android-debug': () => {
       console.log('🔧 Stage: android-debug');
       execSync('./node_modules/.bin/tauri android build --debug --apk --ci', inherited);
@@ -448,6 +475,8 @@ Release stages (run automatically):
   web                Build web/PWA
   linux              Build Linux deb and AppImage
   windows            Build Windows x64 standalone PE
+  windows-msi        Build the MSI installer (Windows host only)
+  windows-msix       Build the MSIX package (Windows host only)
   android-debug      Build Android debug APK
   android-release    Build Android release APK and AAB
   symbols            Package Android native debug symbols

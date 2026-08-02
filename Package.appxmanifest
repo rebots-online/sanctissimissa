@@ -14,7 +14,7 @@
   <Identity
     Name="mba.robin.standroidsmissal"
     Publisher="CN=Robin Cheung"
-    Version="1.24.37311.0" />
+    Version="1.26.0.0" />
 
   <Properties>
     <DisplayName>St. Android's Missal</DisplayName>
@@ -41,9 +41,8 @@
         DisplayName="St. Android's Missal"
         Description="Traditional Latin Mass and Divine Office rendered as a navigable subway map."
         BackgroundColor="transparent"
-        Square150x150Logo="Assets\MedTile.png"
-        Square44x44Logo="Assets\AppList.png">
-        <uap:DefaultTile Wide310x150Logo="Assets\WideTile.png" />
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
       </uap:VisualElements>
     </Application>
   </Applications>

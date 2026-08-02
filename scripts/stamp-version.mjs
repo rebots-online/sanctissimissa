@@ -101,6 +101,32 @@ const cargo = readFileSync(p('src-tauri/Cargo.toml'), 'utf8')
   .replace(/^version\s*=\s*"[^"]*"/m, `version = "${VERSION}"`);
 writeFileSync(p('src-tauri/Cargo.toml'), cargo);
 
+/**
+ * MSIX package identity.
+ *
+ * Appx `Identity/@Version` is `Major.Minor.Build.Revision`, every part must be
+ * <= 65535, and the Microsoft Store additionally requires the revision part to
+ * be 0. Our display BUILD is `epoch-minutes % 100000`, so roughly a third of
+ * all builds mint a number above 65535 — those would produce a package Windows
+ * rejects outright, intermittently and for no reason visible at the call site.
+ *
+ * So the package version carries MAJOR.MINOR only, exactly as `versionCode`
+ * does for Play and for the same reason: BUILD is display-only, and the store
+ * needs a value that increases monotonically per release. MINOR bumps on every
+ * release, which is precisely that.
+ *
+ * Nothing stamped this file before, so it sat two releases behind at
+ * 1.24.37311.0 — a version that is also structurally invalid for MSIX.
+ */
+const APPX_VERSION = `${MAJOR}.${MINOR}.0.0`;
+const appxPath = p('Package.appxmanifest');
+if (existsSync(appxPath)) {
+  const appx = readFileSync(appxPath, 'utf8')
+    .replace(/(<Identity[^>]*?\sVersion=")[^"]*(")/s, `$1${APPX_VERSION}$2`);
+  writeFileSync(appxPath, appx);
+  console.log(`  ✓ Package.appxmanifest → ${APPX_VERSION}`);
+}
+
 for (const f of [
   'version.txt',
   'version.json',

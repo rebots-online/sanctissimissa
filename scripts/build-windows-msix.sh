@@ -22,12 +22,33 @@ echo ""
 echo "=== Building Rust (no bundle, exe only) ==="
 npx tauri build --target x86_64-pc-windows-msvc --no-bundle
 
+if [ ! -f devcert.pfx ]; then
+  echo "ERROR: devcert.pfx is missing (gitignored, provisioned per machine)." >&2
+  echo "  Generate once:  winapp cert generate --publisher \"CN=Robin Cheung\"" >&2
+  exit 1
+fi
+
 echo ""
 echo "=== Staging for MSIX ==="
 rm -rf msix-stage
-mkdir -p msix-stage
+mkdir -p msix-stage/Assets
 cp "$EXE" msix-stage/
 cp -r dist-web msix-stage/dist-web
+
+# The manifest names Assets\*.png. Staging never copied them, so every package
+# built to date referenced logos that were not inside it — which is a package
+# Windows refuses to install, not a package that installs and looks wrong.
+for logo in StoreLogo Square44x44Logo Square150x150Logo Square310x310Logo Square71x71Logo; do
+  cp "src-tauri/icons/${logo}.png" "msix-stage/Assets/${logo}.png"
+done
+
+# Fail loudly here rather than at Add-AppxPackage time: every asset the
+# manifest references must exist in the stage.
+missing=0
+while read -r asset; do
+  [ -f "msix-stage/${asset}" ] || { echo "MISSING ASSET: ${asset}" >&2; missing=1; }
+done < <(grep -o 'Assets\\[A-Za-z0-9]*\.png' Package.appxmanifest | tr '\\' '/' | sort -u)
+[ "$missing" -eq 0 ] || { echo "ERROR: manifest references assets absent from the stage." >&2; exit 1; }
 
 echo ""
 echo "=== Packaging MSIX ==="
