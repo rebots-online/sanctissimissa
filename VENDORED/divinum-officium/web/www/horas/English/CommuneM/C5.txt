@@ -1,5 +1,0 @@
-[Lectio9]
-@Commune/C5:Lectio7:s/ But, .*//s
-
-[Lectio10]
-@Commune/C5:Lectio7:s/.* (?=But,)//s

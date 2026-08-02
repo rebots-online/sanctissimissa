@@ -1,8 +1,0 @@
-[Lectio2]
-@Tempora/Adv2-6::1 s/4-7/6-8/
-@Tempora/Adv2-6:Lectio2:4-5
-@Tempora/Adv2-6:Lectio3:2
-
-[Lectio3]
-@Tempora/Adv2-6::1 s/8-/9-/
-@Tempora/Adv2-6::3-6

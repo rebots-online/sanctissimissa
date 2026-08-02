@@ -1,9 +1,0 @@
-[Officium]
-Św. Małgorzaty, Królowej Szkockiej
-
-[Oratio]
-Boże, Któryś błogosławioną Małgorzatę królowę dla jej przedziwnej ku ubogim miłości uczynił godną uwielbienia: spraw, niechaj za jej przykładem i przyczyną miłość Twoja w sercach naszych nieustannie wzrasta.
-$Per Dominum
-
-[Invit]
-@Commune/C7::s/N\./Małgorzacie/

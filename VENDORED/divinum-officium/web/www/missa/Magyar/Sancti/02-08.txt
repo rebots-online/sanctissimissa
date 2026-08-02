@@ -1,9 +1,0 @@
-[Officium]
-Máthai Szent János hitvalló
-
-[Name]
-János
-
-[Oratio]
-Isten, ki Szent János által a szaracénok foglyainak kiváltására a szentséges Szentháromság rendjét méltóztattál a mennyből megalapítani; engedd kérünk, hogy érdemei által segítségeddel a test és lélek szolgaságából megszabadulhassunk.
-$Per Dominum

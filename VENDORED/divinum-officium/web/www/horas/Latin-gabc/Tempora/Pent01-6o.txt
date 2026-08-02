@@ -1,4 +1,0 @@
-[Lectio2]
-@Tempora/Pent01-6::s/-12/-14/
-13 Prædíxi enim ei quod iudicatúrus essem domum eius in ætérnum propter iniquitátem, eo quod nóverat indígne ágere fílios suos, et non corripúerit eos.
-14 Idcírco iurávi dómui Heli quod non expiétur iníquitas domus eius víctimis et munéribus usque in ætérnum.

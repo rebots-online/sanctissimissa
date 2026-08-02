@@ -1,6 +1,0 @@
-[Officium]
-Św. Atanazego Wyznawcy i Doktora Kościoła
-
-[Name]
-Atanazego
-Ant=Atanazy

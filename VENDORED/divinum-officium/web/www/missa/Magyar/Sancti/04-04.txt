@@ -1,7 +1,0 @@
-[Rule]
-vide C4a;
-Gloria
-CredoDa
-
-[Name]
-Isidore

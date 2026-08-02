@@ -1,2 +1,0 @@
-[Ant Laudes] (rubrica cisterciensis)
-@:Ant Vespera 3:s/;;.*//g

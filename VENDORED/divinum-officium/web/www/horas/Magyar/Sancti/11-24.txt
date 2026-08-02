@@ -1,7 +1,0 @@
-[Officium]
-Keresztes Szent János hitvalló és egyháztanító
-(sed rubrica tridentina)
-Keresztes Szent János hitvalló
-
-[Name]
-János

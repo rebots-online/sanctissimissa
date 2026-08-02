@@ -1,9 +1,0 @@
-[Officium]
-S. Cyrilli Episc. Alexandrini Confessoris Ecclesiæ Doctoris
-
-[Name]
-Cyrillus
-
-[Oratio]
-God, Gij hebt uw heilige belijder en bisschop Cyrillus een onoverwinnelijk verdediger gemaakt van het goddelijk moederschap van de allerzaligste Maagd Maria. Wil ons, die oprecht geloven, dat zij de Moeder van God is, op zijn voorspraak door haar moederlijke bescherming redden.
-$Per eumdem

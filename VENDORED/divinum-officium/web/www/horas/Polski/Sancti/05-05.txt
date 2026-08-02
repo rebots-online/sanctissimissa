@@ -1,9 +1,0 @@
-[Officium]
-Św. Piusa V Papieża i Wyznawcy
-
-[Name]
-Piusa
-
-[Oratio]
-Boże, któryś dla poniżenia nieprzyjaciół Kościoła Twojego i odnowienia kultu Bożego raczył wybrać błogosławionego Piusa na najwyższego pasterza, spraw, prosimy, byśmy opieką jego wsparci, służyli Ci z gorliwością, a zwyciężywszy zasadzki nieprzyjaciół zbawienia, osiągnęli radość w pokoju wiecznym.
-$Per Dominum

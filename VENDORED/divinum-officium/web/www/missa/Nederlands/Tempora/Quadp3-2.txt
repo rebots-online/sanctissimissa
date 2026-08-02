@@ -1,5 +1,0 @@
-[Officium]
-Feria III infra Hebdomadam Quinquagesimæ
-
-[Graduale]
-@Tempora/Quadp3-0:GradualeF

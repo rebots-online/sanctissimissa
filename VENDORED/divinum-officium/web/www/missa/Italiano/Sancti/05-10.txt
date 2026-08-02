@@ -1,9 +1,0 @@
-[Officium]
-S. Antonini Episcopi et Confessoris
-
-[Name]
-Antonino
-
-[Oratio]
-Ci soccorrano, o Signore, i meriti del santo confessore e vescovo Antonino; affinché, come ti proclamiamo ammirabile in lui , così ci gloriamo della tua misericordia verso di noi.
-$Per Dominum

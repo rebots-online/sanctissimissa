@@ -1,5 +1,0 @@
-[Lectio9]
-@Tempora/Pent12-0:Lectio7:s/Isaías.*//s
-
-[Lectio12]
-@Tempora/Pent12-0:Lectio9:s/.* Legisperítus,/Legisperítus,/s

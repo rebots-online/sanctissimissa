@@ -1,9 +1,0 @@
-[Officium]
-Św. Pawła pierwszego pustelnika i Wyznawcy
-
-[Name]
-Pawła
-
-[Oratio]
-Boże, który nas dorocznem świętem Błogosławionego Pawła Wyznawcy uweselasz, spraw łaskawie, abyśmy naśladowali cnoty tego, którego narodziny dla nieba obchodzimy.
-$Per Dominum

@@ -1,9 +1,0 @@
-[Officium]
-Św. Cyryla Aleksandryjskiego Biskupa Wyznawcy i Doktora Kościoła
-
-[Name]
-Cyrylu
-
-[Oratio]
-Boże, któryś świętego Cyryla, Biskupa i Wyznawcę Twego, uczynił niezłomnym obrońcą Boskiego Macierzyństwa Najśw. Marji Panny, spraw za jego przyczyną, abyśmy wierząc, że jest Ona prawdziwie Matką Boga, przez Jej Macierzyńską opiekę zbawienia dostąpili.
-$Per eumdem

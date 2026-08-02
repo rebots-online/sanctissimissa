@@ -1,5 +1,0 @@
-[Lectio9]
-@Tempora/Pent20-0:Lectio7:s/Quare .*//s
-
-[Lectio12]
-@Tempora/Pent20-0:Lectio9:s/.* Salútem /Salútem /s

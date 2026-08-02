@@ -1,3 +1,0 @@
-[Rule]
-ex sancti/06-24
-Suffr=Maria3;Ecclesiæ,Papa;;

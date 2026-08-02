@@ -1,9 +1,0 @@
-@Tempora/Epi1-0
-
-[Rule]
-12 lectiones
-Doxology=Epi
-
-[Commemoratio]
-@Tempora/Epi1-0a:Oratio
-(sed die Baptismatis)

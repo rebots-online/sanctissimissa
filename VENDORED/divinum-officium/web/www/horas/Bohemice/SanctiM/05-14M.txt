@@ -1,8 +1,0 @@
-[Officium]
-sv. Pachomia, Opata
-
-[Officium] (rubrica cisterciensis)
-sv. Pachomia, Opata (1965)
-
-[Name]
-Pachomia

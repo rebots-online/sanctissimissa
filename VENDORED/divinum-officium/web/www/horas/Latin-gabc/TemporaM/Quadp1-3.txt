@@ -1,2 +1,0 @@
-[Lectio3]
-@Tempora/Quadp1-3::s/\n(17 )/ ¶\n$1/

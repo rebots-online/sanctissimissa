@@ -1,9 +1,0 @@
-[Officium]
-Św. Paulina Biskupa i Wyznawcy
-
-[Oratio]
-Boże, któryś opuszczającym wszystko w tem życiu, stokrotną nagrodę i żywot wieczny obiecał, spraw łaskawie, abyśmy, idąc wiernie śladami świętego biskupa Paulina, gardzili tem co ziemskie, a jedynie niebieskich rzeczy pożądali.
-$Qui vivis
-
-[Ant 2]
-Dobrzeć, sługo dobry * i wierny, gdyżeś nad małem był wiernym, nad wielem cię postanowię, wnidź do wesela Pana twego.

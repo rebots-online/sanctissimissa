@@ -1,5 +1,0 @@
-[Officium]
-In Conversione S. Pauli Apostoli
-
-[Communio]
-@Commune/C5-1

@@ -1,9 +1,0 @@
-[Officium]
-S. Andreae Corsini Episcopi et Confessoris
-
-[Name]
-Andrea
-
-[Oratio]
-O Dio, che nella tua Chiesa sempre susciti nuovi esempi di virtù, concedi al popolo tuo di seguire le vestigia del beato Andrea confessore tuo e vescovo, così da conseguirne anche il premio.
-$Per Dominum

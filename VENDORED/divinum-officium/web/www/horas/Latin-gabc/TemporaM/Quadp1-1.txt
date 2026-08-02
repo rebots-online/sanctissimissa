@@ -1,2 +1,0 @@
-[Lectio1]
-@Tempora/Quadp1-1::s/\n(29 )/ ¶\n$1/

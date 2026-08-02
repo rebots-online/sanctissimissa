@@ -1,3 +1,0 @@
-[Rule]
-OPapaM=Anicetus;
-vide C4D;

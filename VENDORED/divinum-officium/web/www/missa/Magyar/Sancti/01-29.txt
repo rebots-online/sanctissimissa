@@ -1,9 +1,0 @@
-[Officium]
-Szalézi Szent Ferenc püspök, hitvalló és egyháztanító
-
-[Name]
-Ferenc
-
-[Oratio]
-Isten, te azt akartad, hogy a lelkek üdvösségére Szent Ferenc hitvallód és püspököd midnenkinek mindenévé legyen, engedd kegyesen, hogy szereteted édességétől elárasztva az ő irányító tanításai szerint és közbenjáró érdemei által az örök örömöket elnyerhessük.
-$Per Dominum

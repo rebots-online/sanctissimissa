@@ -1,9 +1,0 @@
-[Officium]
-Corsini Szent András püspök és hitvalló
-
-[Name]
-András
-
-[Oratio]
-Isten, ki Egyházadban állandóan az erények új példáját támasztod, add, hogy néped Szent András hitvallód és püspököd nyomdokait úgy kövesse, hogy jutalmát is elismerje.
-$Per Dominum

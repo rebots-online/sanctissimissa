@@ -1,9 +1,0 @@
-[Officium]
-S. Augustini Episcopi et Confessoris et Ecclesiæ Doctoris
-
-[Name]
-Augustinus
-
-[Oratio]
-Luister, almachtige God, naar ons smeken, en doe hen, die Gij bezielt met vertrouwen op uw goedheid, op voorspraak van uw heilige belijder en bisschop Augustinus genadig de uitwerking van uw nooit versagende barmhartigheid ondervinden.
-$Per Dominum

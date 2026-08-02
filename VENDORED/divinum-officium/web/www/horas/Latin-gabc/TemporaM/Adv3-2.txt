@@ -1,2 +1,0 @@
-[Lectio3]
-@Tempora/Adv3-2::s/\n27 / ¶\n27 /

@@ -1,9 +1,0 @@
-[Officium]
-S. Felicis Valois Confessoris
-
-[Name]
-Felice
-
-[Oratio]
-O Dio, che in modo soprannaturale ti degnasti di chiamare il beato Felice confessore tuo dall'eremo all'opera del riscatto degli schiavi, fa', te ne preghiamo, che a sua intercessione, per tua grazia liberati dai peccati, possiamo giungere alla patria celeste.
-$Per Dominum

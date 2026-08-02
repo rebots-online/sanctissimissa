@@ -1,9 +1,0 @@
-[Officium]
-Św. Cyryla Biskupa Jerozolimskego Wyznawcy i Doktora Kościoła
-
-[Name]
-Cyrylu
-
-[Oratio]
-Daj nam, prosimy Cię, wszechmogący Boże, za wstawiennictwem błogosławionego Cyryla Biskupa, Ciebie Jedynego prawdziwego Boga i któregoś posłał, Jezusa Chrystusa, tak poznać, abyśmy zasłużyli być policzeni na wieki między owce, które głosu Jego słuchają.
-$Per eumdem

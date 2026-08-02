@@ -1,9 +1,0 @@
-[Officium]
-S. Ubaldi Episcopi Confessoris
-
-[Name]
-Ubaldo
-
-[Oratio]
-O Signore, donaci placato, il tuo aiuto: e, per intercessione del beato vescovo e confessore Ubaldo, stendi su noi la tua destra misericordiosa contro tutte le insidie di Satana.
-$Per Dominum

@@ -1,9 +1,0 @@
-[Officium]
-S. Thomae de Villanova Episcopi et Confessoris
-
-[Name]
-Tommaso
-
-[Oratio]
-O Dio, tu rendesti grande per la sua carità verso i poveri il beato Tommaso vescovo; su quanti t'invocano benigno effondi, te ne preghiamo, per la sua intercessione, i tesori della tua misericordia.
-$Per Dominum

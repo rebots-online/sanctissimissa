@@ -1,6 +1,0 @@
-[Officium]
-Św. Piotra Nolasco Wyznawcy
-
-[Oratio]
-Boże, któryś przykładem Twej miłości natchnął świętego Piotra do założenia nowej rodziny w Kościele dla wykupywania wiernych z niewoli, daj nam za jego przyczyną, byśmy z niewoli grzechu wyzwoleni, mogli się radować wieczną wolnością w niebieskiej ojczyźnie.
-$Qui vivis

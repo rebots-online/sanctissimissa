@@ -1,9 +1,0 @@
-[Officium]
-Św. Grzegorza Barbarigo, Biskupa i Wyznawcy
-
-[Name]
-Grzegorz
-
-[Oratio]
-Boże, z Twojej woli święty Grzegorz, Twój Wyznawca i Biskup, jaśniał pasterską gorliwością i miłosierdziem wobec biednych; spraw łaskawie, abyśmy czcząc jego zasługi, naśladowali przykład miłości.
-$Per Dominum

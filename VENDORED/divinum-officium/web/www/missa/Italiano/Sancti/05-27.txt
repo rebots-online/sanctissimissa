@@ -1,9 +1,0 @@
-[Officium]
-S. Bedae Venerabilis Confessoris et Ecclesiae Doctoris
-
-[Name]
-Beda
-
-[Oratio]
-O Dio, che illumini la tua Chiesa con la dottrina del beato confessore e dottore Beda; da' propizio ai tuoi servi di essere guidati dalla sua sapienza e aiutati dai suoi meriti.
-$Per Dominum

@@ -1,6 +1,0 @@
-[Officium]
-Wigilja Wszystkich Świętych
-
-[Oratio]
-Panie Boże nasz, rozmnóż nad nami łaskę Twoją, i przez święte życie dozwól nam osiągnąć szczęśliwość tych, których chwalebną uroczystość dziś uprzedzamy.
-$Per Dominum

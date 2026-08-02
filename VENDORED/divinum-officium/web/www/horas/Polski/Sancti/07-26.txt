@@ -1,9 +1,0 @@
-[Officium]
-Św. Anny Matki N.M.P.
-
-[Oratio]
-Boże, który darem swej łaski błogosławioną Annę uczyniłeś godną być Rodzicielką Matki Jednorodzonego Syna Twego, dozwól abyśmy doznawali pomocy tej, której uroczystość obchodzimy.
-$Per eumdem
-
-[Invit]
-@Commune/C7::s/N\./Annie./

@@ -1,5 +1,0 @@
-[Officium]
-S. Turibius of Mogrovejo, bishop
-
-[Rule]
-vide C4;

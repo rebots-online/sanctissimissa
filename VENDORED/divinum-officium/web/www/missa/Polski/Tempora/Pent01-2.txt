@@ -1,5 +1,0 @@
-[Officium]
-Wtorek I tygodnia po Oktawie Pięćdziesiątnicy
-
-[Oratio]
-@Tempora/Pent01-0a:Oratio

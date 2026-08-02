@@ -1,5 +1,0 @@
-[Officium]
-Hll. Fabian und Sebastian, Märtyrer
-
-[Oratio]
-@Commune/C2::s/deines heiligen Martyrers und Bischofs N\./deiner heiligen Märtyrer Fabian und Sebastian/

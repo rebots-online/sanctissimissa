@@ -1,5 +1,0 @@
-[Rank]
-Rocznica Poświęcenia Rzymskiej Bazyliki Najśw. Maryi Panny Śnieżnej;;Duplex majus;;4;;ex C11
-
-[Rank] (rubrica 196)
-Rocznica Poświęcenia Rzymskiej Bazyliki Najśw. Maryi Panny Śnieżnej;;Duplex;;3;;vide C11

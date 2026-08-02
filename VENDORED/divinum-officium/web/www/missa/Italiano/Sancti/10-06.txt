@@ -1,9 +1,0 @@
-[Officium]
-S. Brunonis Confessoris
-
-[Name]
-Bruno
-
-[Oratio]
-O Signore, ci soccorra l'intercessione del santo confessore Bruno; affinché, se peccando abbiamo gravemente offesa la tua maestà, per i meriti e le preghiere di lui, otteniamo il perdono delle nostre colpe.
-$Per Dominum

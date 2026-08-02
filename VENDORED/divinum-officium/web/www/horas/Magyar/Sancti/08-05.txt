@@ -1,5 +1,0 @@
-[Rank]
-Havas Boldogasszony;;Duplex majus;;4;;ex C11
-
-[Rank] (rubrica 196)
-Havas Boldogasszony;;Duplex;;3;;vide C11

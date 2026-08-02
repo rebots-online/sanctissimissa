@@ -1,9 +1,0 @@
-[Officium]
-Św. Zefiryna Papieża i Męczennika
-
-[Name]
-Zefiryna
-
-[Oratio] (nisi communi Summorum Pontificum)
-Spraw, prosimy Cię, wszechmogący Boże, abyśmy weseląc się z chwały błogosławionego Zefiryna, Biskupa Twego i Męczennika, korzystali z przykładów, które nam zostawił.
-$Per Dominum

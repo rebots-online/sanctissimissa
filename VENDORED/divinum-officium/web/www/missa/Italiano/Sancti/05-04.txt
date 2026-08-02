@@ -1,9 +1,0 @@
-[Officium]
-S. Monicae Viduae
-
-[Name]
-Monica
-
-[Oratio] (nisi rubrica cisterciensis)
-O Dio, consolatore degli afflitti e salvezza di quanti in te sperano; Tu, che benigno accogliesti le pie lacrime della beata Monica per la conversione del figlio suo Agostino, concedici, per la loro intercessione, di piangere i nostri peccati e di ottenere l'aiuto della tua grazia.
-$Per Dominum

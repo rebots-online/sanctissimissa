@@ -1,4 +1,0 @@
-[Rule]
-OPapaM=Zephirin;
-vide C4D;
-Gloria

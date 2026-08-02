@@ -1,6 +1,0 @@
-[Officium]
-Św. Izydora Biskupa Wyznawcy i Doktora Kościoła
-
-[Name]
-Izydora
-Ant=Izydorze

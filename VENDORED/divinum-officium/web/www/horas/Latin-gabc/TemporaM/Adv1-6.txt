@@ -1,2 +1,0 @@
-[Lectio3]
-@Tempora/Adv1-6::s/\n13 / ¶\n13 /

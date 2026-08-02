@@ -1,4 +1,0 @@
-@Sancti/07-05oct
-
-[Rank]
-;;Semiduplex;;2.1;;vide C1

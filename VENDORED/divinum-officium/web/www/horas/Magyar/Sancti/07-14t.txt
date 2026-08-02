@@ -1,5 +1,0 @@
-[Rank]
-Szent Bonaventúra püspök és hitvalló;;Duplex;;3;;vide C4
-
-[Rank] (rubrica 1570)
-Szent Bonaventúra püspök és hitvalló;;Semiduplex;;2;;vide C4

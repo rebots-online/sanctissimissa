@@ -1,9 +1,0 @@
-[Officium]
-Św. Romualda Opata
-
-[Name]
-Romualda
-
-[Oratio]
-Prosimy Cię, Panie, niechaj przyczyna błogosławionego Romualda Opata Twego, poleci nas Twej opiece, abyśmy, czego własną zasługą uzyskać nie możemy, za jego pomocą dostąpili.
-$Per Dominum

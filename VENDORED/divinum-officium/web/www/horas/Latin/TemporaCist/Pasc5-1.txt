@@ -1,7 +1,0 @@
-@Tempora/Pasc5-1
-
-[Benedictio]
-@TemporaCist/Pasc0-1
-
-[Ant 3]
-@TemporaCist/Pasc1-1

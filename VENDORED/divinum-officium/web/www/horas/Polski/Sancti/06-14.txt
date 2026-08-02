@@ -1,6 +1,0 @@
-[Officium]
-Św. Bazylego Wielkiego, Wyznawcy i Doktora Kościoła
-
-[Name]
-Bazylego
-Ant=Bazyli

@@ -1,9 +1,0 @@
-[Lectio9]
-@Tempora/Pasc7-1:Lectio1:s/ Ecco.*//s
-
-[Lectio10]
-@Tempora/Pasc7-1:Lectio1:s/.*(Ecco)/$1/s s/$/~/
-@Tempora/Pasc7-1:Lectio2:s/ Or.*//s
-
-[Lectio11]
-@Tempora/Pasc7-1:Lectio2:s/.*(Or)/$1/s s/$/~/

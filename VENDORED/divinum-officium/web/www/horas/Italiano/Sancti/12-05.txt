@@ -1,9 +1,0 @@
-[Officium]
-S. Sabbae Abbatis
-
-[Name]
-Sabba
-
-[Oratio]
-Signore, ci renda accetti l'intercessione del beato Sabba Abbate affinché, ciò che non possiamo coi nostri meriti, lo otteniamo per il suo patrocinio.
-$Per Dominum

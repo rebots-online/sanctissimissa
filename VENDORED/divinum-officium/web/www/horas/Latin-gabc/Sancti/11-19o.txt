@@ -1,6 +1,0 @@
-[Name]
-Pon(h)ti(h)á(h)ni(h)
-(sed communi Summorum Pontificum)
-Pon(h)ti(h)á(h)num(h)
-Secreta=Pon(h)ti(h)á(h)ni(h)
-Postcommunio=Pon(h)ti(h)á(h)no(h)

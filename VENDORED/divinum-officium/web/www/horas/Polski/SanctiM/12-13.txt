@@ -1,5 +1,0 @@
-[Lectio7]
-@Sancti/12-13:Lectio6:s/ Dla .*//
-
-[Lectio8]
-@Sancti/12-13:Lectio6:s/.*Dla /Dla /

@@ -1,6 +1,0 @@
-[Officium]
-Római Szent Franciska özvegy
-
-[Oratio]
-Isten, ki Szent Franciska szolgálódat kegyelmed egyéb ajándékain kívül az őrangyal bizalmas társaságával tüntetted ki: engedd, kérünk, hogy közbenjárásának segítségével méltók legyünk az angyalok társaságába jutni.
-$Per Dominum

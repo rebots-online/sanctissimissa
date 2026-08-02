@@ -1,3 +1,0 @@
-[Rule]
-Oratio Dominica
-Suffr=Sanctorum;Maria3,Ecclesiae,Papa;;

@@ -1,9 +1,0 @@
-[Officium]
-Św. Efrema Syryjczyka Wyznawcy i Doktora Kościoła
-
-[Name]
-Efremie
-
-[Oratio]
-Boże, któryś zechciał uświetnić Kościół swój zadziwiającą, wiedzą i zasługami chwalebnego życia błogosławionego Efrema, Wyznawcy Twego i Doktora: racz, błagamy Cię pokornie, za jego wstawieniem się, potęgą swoją bronić tegoż Kościoła przeciw błędom i zasadzkom nieprawości.
-$Per Dominum

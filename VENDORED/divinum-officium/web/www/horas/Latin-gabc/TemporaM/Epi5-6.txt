@@ -1,2 +1,0 @@
-[Lectio3]
-@Tempora/Epi5-6::s/\n(15 )/ ¶\n$1/

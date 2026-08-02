@@ -1,2 +1,0 @@
-[Lectio1]
-@Tempora/Pasc3-0:Lectio7:s/ I nie.*//

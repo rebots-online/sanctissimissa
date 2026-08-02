@@ -1,6 +1,0 @@
-[Officium]
-Szombat nagyböjt VI. hetében
-
-[Rule]
-Full text
-Prefatio=Pasch;

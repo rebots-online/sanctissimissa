@@ -1,7 +1,0 @@
-[Officium]
-S. Anacleti Papae et Martyris
-
-[Rule]
-OPapaM=Anacletus;
-vide C4D;
-Gloria

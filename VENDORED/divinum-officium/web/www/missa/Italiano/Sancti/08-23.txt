@@ -1,9 +1,0 @@
-[Officium]
-S. Philippi Benitii Confessoris
-
-[Name]
-Filippo
-
-[Oratio]
-O Dio, che nel tuo beato confessore Filippo ci hai offerto mirabile esempio di umiltà, concedi ai tuoi servi di disprezzare, come lui, le glorie del mondo e di ricercare sempre i beni celesti.
-$Per Dominum

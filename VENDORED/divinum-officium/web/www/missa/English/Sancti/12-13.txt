@@ -1,8 +1,0 @@
-[Officium]
-St. Lucy, Virgin and Martyr
-
-[Name]
-Lucy, thy Virgin and Martyr
-
-[Communio]
-@Commune/C7

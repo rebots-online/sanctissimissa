@@ -1,8 +1,0 @@
-[Responsory Vespera]
-R.br. {gabc:Tempora/Pascha/rb--spiritus_paraclitus_tonus_simplex_pro_diebus_infra_octavam--solesmes_1934}
-
-[Responsory1]
-@Tempora/Pasc7-0
-
-[Responsory2]
-@Tempora/Pasc7-0

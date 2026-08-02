@@ -1,2 +1,0 @@
-[Lectio1]
-@Tempora/Quadp1-5::s/\n(20 )/ ¶\n$1/

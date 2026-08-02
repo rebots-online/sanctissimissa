@@ -1,4 +1,0 @@
-@Sancti/05-29
-
-[Rank]
-;;Duplex;;3;;vide C6a

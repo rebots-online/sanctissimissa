@@ -1,6 +1,0 @@
-[Officium]
-sv. Kristýny, Panny a Mučednice
-
-[Name]
-Kristýna
-Secreta=Kristýny

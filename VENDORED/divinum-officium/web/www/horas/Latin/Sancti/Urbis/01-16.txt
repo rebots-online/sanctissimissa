@@ -1,4 +1,0 @@
-@Sancti/01-16
-
-[Rank]
-;;Duplex;;3;;vide C2b

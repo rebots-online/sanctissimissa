@@ -1,9 +1,0 @@
-[Officium]
-Św. Jana Damasceńskiego Wyznawcy
-
-[Name]
-Janie
-
-[Oratio]
-Wszechmogący, wiekuisty Boże, któryś napełnił błogosławionego Jana niebieską nauką i przedziwną mocą ducha ku obronie czci obrazów świętych, daj nam za jego wstawiennictwem i przykładem cnoty tych, których wizerunki czcimy, naśladować i doznawać ich opieki.
-$Per Dominum

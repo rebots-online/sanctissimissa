@@ -1,5 +1,0 @@
-[Officium]
-Feria VI infra Hebdomadam Septuagesimae
-
-[Graduale]
-@Tempora/Quadp1-0:GradualeF

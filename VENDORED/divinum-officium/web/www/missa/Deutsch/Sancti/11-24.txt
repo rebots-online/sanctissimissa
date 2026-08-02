@@ -1,7 +1,0 @@
-[Officium]
-Hl. Johannes vom Kreuz, Bekenner und Kirchenlehrer
-(sed rubrica tridentina)
-Hl. Johannes vom Kreuz, Bekenner
-
-[Name]
-Johannes

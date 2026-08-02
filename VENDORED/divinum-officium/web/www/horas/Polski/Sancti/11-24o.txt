@@ -1,6 +1,0 @@
-[Officium]
-Św. Chryzogona Męczennika
-
-[Oratio]
-Wysłuchaj, Panie, łaskawie modlitw naszych, i racz nas wyznających nieprawości swoje, wyzwolić od nich, za przyczyną błogosławionego Chryzogona, Męczennika Twego.
-$Per Dominum

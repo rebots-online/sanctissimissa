@@ -1,9 +1,0 @@
-[Oratio]
-{(c3) Tu(h)a(h) nos,(h) quǽ(h)su(h)mus,(h) Dó(h)mi(h)ne,(h) grá(h)ti(h)a(h) sem(h)per(h) et(h) præ(h)vé(h)ni(h)at(h) et(g) se(f)quá(h hr)tur:(h.) *(;) ac(h) bo(h)nis(h) o(h)pé(h)ri(h)bus(h) jú(h)gi(h)ter(h) præ(h)stet(h) es(h)se(h) in(h)tén(h dr)tos.(d.) (::)}
-$Per Dominum
-
-[Ant 2]
-Cum intráret Jesus * in domum cujúsdam príncipis pharisæórum sábbato manducáre panem, ecce homo quidam hydrópicus erat ante illum: ipse vero apprehénsum sanávit eum, ac dimísit.
-
-[Ant 3]
-Cum vocátus fúeris * ad núptias, recúmbe in novíssimo loco, ut dicat tibi qui te invitávit: Amíce, ascénde supérius. Et erit tibi glória coram simul discumbéntibus, allelúja.

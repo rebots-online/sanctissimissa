@@ -1,2 +1,0 @@
-[Lectio2]
-@Tempora/Adv1-2::s/\n2 / ¶\n2 /

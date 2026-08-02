@@ -1,2 +1,0 @@
-[Lectio3]
-@Tempora/Epi2-1::s/\n(12 )/ ¶\n$1/

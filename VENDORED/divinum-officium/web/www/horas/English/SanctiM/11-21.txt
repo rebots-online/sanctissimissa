@@ -1,5 +1,0 @@
-[Lectio5]
-@Sancti/11-21:Lectio4:s/ She.*//
-
-[Lectio6]
-@Sancti/11-21:Lectio4:s/.* (?=She)//s

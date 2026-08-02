@@ -1,7 +1,0 @@
-
-[Lectio2]
-@Sancti/02-01:Lectio4:s/Polykarpovi, .*/Polykarpovi./
-
-[Lectio3]
-@Sancti/02-01:Lectio5:s/Od Sýrie .*// s/$/~/
-@Sancti/02-01:Lectio6:s/Ostatky .*//

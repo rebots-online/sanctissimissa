@@ -1,7 +1,0 @@
-[Officium]
-Hl. Benno, Bischof und Bekenner
-(sed dioecesis Monacensis)
-Hl. Benno, Bischof und Bekenner, Patron Bayerns und Stadtpatron Münchens
-
-[Name]
-Benno

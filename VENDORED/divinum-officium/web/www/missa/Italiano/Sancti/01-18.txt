@@ -1,9 +1,0 @@
-[Officium]
-Cathedræ S. Petri Romæ
-
-[GradualeP]
-@Commune/Coronatio
-
-[Communio]
-!Matt 16:18
-Tu sei Pietro, e su questa pietra edificherò la mia Chiesa.

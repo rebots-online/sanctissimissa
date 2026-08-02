@@ -1,9 +1,0 @@
-[Officium]
-S. Tecla Vergine e Martire
-
-[Name]
-Tecla
-
-[Oratio]
-Concedi, te ne preghiamo, onnipotente Iddio, che, celebrando l'anniversario della beata Tecla, vergine e martire tua, godiamo di questa solennità, e approfittiamo dell'esempio di tanta fede.
-$Per Dominum

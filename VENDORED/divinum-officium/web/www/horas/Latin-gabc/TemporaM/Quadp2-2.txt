@@ -1,2 +1,0 @@
-[Lectio1]
-@Tempora/Quadp2-2::s/\n(3 )/ ¶\n$1/

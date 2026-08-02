@@ -1,9 +1,0 @@
-[Officium]
-S. Isidori Episcopi Confessoris et Ecclesiae Doctoris
-
-[Name]
-Isidoro
-
-[Oratio]
-O Dio, tu hai concesso al tuo popolo quale ministro di salvezza il beato Isidoro; colui che in terra ci è stato dottore, meritiamo di averlo intercessore in cielo.
-$Per Dominum

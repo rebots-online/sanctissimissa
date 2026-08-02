@@ -1,5 +1,0 @@
-[Officium]
-Szombat pünkösd ny. utáni II. héten
-
-[Rule]
-vide Tempora/Pent02-5;

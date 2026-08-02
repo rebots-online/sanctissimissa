@@ -1,5 +1,0 @@
-[Lectio10]
-@Tempora/Pent19-0:Lectio8:s/Qui fecit .*//s
-
-[Lectio12]
-@Tempora/Pent19-0:Lectio9:s/.* Ex duábus /Ex duábus /s

@@ -1,9 +1,0 @@
-[Officium]
-Św. Marka Papieża Wyznawcy
-
-[Name]
-Marka
-
-[Oratio] (nisi rubrica 196)
-Wysłuchaj, Panie, próśb naszych i za przyczyną błogosławionego Marka, Wyznawcy Twego i Biskupa, udziel nam miłościwie przebaczenia i pokoju.
-$Per Dominum

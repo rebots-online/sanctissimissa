@@ -1,2 +1,0 @@
-[Lectio3]
-@Tempora/Quadp2-6::s/\n(27 )/ ¶\n$1/

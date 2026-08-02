@@ -1,2 +1,0 @@
-[Lectio3]
-@Tempora/Epi4-1::s/\n(9 )/ ¶\n$1/

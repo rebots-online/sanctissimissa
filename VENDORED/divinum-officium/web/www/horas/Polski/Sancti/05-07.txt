@@ -1,9 +1,0 @@
-[Officium]
-Św. Stanisława Biskupa i Męczennika
-
-[Name]
-Stanisław
-
-[Oratio]
-Boże, dla chwały którego błogosławiony Biskup Stanisław od miecza nieprzyjaciół śmierć poniósł, prosimy Cię, by wszyscy, którzy wzywają jego pomocy, osiągnęli zbawienny skutek próśb swoich.
-$Per Dominum

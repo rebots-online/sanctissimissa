@@ -1,9 +1,0 @@
-[Officium]
-Św. Tomasza z Akwinu Wyznawcy i Doktora Kościoła
-
-[Name]
-Tomaszu
-
-[Oratio]
-Boże, który Kościół swój przedziwną nauką błogosławionego Tomasza, wyznawcy Twego oświecasz i świętemi czynami ubogacasz, daj nam, prosimy, abyśmy mieli zrozumienie tego, czego uczył i abyśmy naśladując go, pełnili to, co on czynił.
-$Per Dominum

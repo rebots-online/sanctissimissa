@@ -1,2 +1,0 @@
-[Oratio]
-@Sancti/12-26::s/natalícia/Inventiónem/

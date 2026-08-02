@@ -1,5 +1,0 @@
-[Responsory1]
-@TemporaM/Pasc4-0:Responsory4
-
-[Responsory3]
-@TemporaM/Pasc4-0:Responsory6

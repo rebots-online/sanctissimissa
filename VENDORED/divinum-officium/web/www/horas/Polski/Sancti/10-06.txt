@@ -1,6 +1,0 @@
-[Officium]
-Św. Brunona Wyznawcy
-
-[Oratio]
-Prosimy Cię, Panie, niechaj nas wspomaga wstawiennictwo świętego Brunona, Wyznawcy Twego, abyśmy obraziwszy Majestat Twój ciężkiemi grzechami, dla zasług i modlitw jego otrzymali przebaczenie win naszych.
-$Per Dominum

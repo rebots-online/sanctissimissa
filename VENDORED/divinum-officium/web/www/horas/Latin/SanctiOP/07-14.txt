@@ -1,4 +1,0 @@
-@Sancti/07-14
-
-[Evangelium]
-@Commune/C4a

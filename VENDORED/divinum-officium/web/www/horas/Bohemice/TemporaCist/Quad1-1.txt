@@ -1,7 +1,0 @@
-@Tempora/Quad1-1
-
-[Lectio1]
-@Tempora/Quad1-1::s/Aby si .*//
-
-[Lectio2]
-@Tempora/Quad1-1:Lectio1:s/.* (Aby si)/$1/s

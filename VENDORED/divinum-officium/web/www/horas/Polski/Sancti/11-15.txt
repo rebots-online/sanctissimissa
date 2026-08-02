@@ -1,9 +1,0 @@
-[Officium]
-Św. Alberta Wielkiego Biskupa Wyznawcy i Doktora Kościoła
-
-[Name]
-Albercie
-
-[Oratio]
-Boże, który błogosławionego Alberta, Biskupa Twego i Doktora uczyniłeś wielkim przez poddanie ludzkiej mądrości wierze świętej: daj nam tak wstępować w ślady jego nauki, abyśmy światła doskonałego używali we niebie.
-$Per Dominum

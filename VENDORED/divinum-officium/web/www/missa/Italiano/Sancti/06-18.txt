@@ -1,9 +1,0 @@
-[Officium]
-S. Ephraem Syri Confessoris et Ecclesiae Doctoris
-
-[Name]
-Efrem
-
-[Oratio]
-O Dio, che volesti illustrare la tua Chiesa con la meravigliosa erudizione e i chiari esempi di vita del beato Efrem tuo Confessore e Dottore, ti supplichiamo umilmente che, per sua intercessione, Tu con perenne virtù la difenda dalle insidie dell'errore e del male.
-$Per Dominum

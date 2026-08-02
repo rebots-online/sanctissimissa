@@ -1,6 +1,0 @@
-[Officium]
-Św. Anzelma Biskupa Wyznawcy i Doktora Kościoła
-
-[Name]
-Anzelma
-Ant=Anzelmie

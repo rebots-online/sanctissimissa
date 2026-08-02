@@ -1,5 +1,0 @@
-[Lectio9]
-@Tempora/Pent03-5:Lectio7: s/Hoc .*//
-
-[Lectio11]
-@Tempora/Pent03-5:Lectio8: s/.*(O mors)/$1/

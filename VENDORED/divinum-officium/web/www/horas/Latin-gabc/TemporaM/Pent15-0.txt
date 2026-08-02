@@ -1,5 +1,0 @@
-[Lectio10]
-@Tempora/Pent15-0:Lectio8:s/Dóminus .*//s
-
-[Lectio12]
-@Tempora/Pent15-0:Lectio9:s/.* Alius /Alius /s

@@ -1,5 +1,0 @@
-[Secreta]
-@Commune/C6-1::s/Panny a //i s/N\./N./
-
-[Postcommunio]
-@Commune/C6-1::s/Panny a //i s/N\./N./

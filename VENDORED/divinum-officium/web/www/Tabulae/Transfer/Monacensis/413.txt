@@ -1,4 +1,0 @@
-#= sunday letter: e, rule number: 23, Diœcesis Monacensis et Frisingensis 
-Tempora/Pasc2-6=Bavaria/05-SP;;DA
-Tempora/Pasc2-6=Bavaria/05-SPr;;1954 1960
-#=Finis Tabula translationis pro festis Dominica assignato et Vigilia

@@ -1,9 +1,0 @@
-[Officium]
-Św. Joanny Franciszki Fremiot de Chantal, Wdowy
-
-[Oratio]
-Wszechmogący, miłosierny Boże, który rozpaliwszy miłością swoją błogosławioną Joannę Franciszkę, obdarzyłeś ją cudowną siłą ducha, by mogła kroczyć drogą doskonałości we wszytkich okolicznościach życia, i któryś przez nią ozdobił Kościół swój święty nowem potomstwem duchowem, daj, abyśmy świadomi naszej słabości, uciekając się z ufnością do Twojej potęgi, przy pomocy łaski niebieskiej zwyciężyli wszelkie przeciwności.
-$Per Dominum
-
-[Invit]
-@Commune/C7::s/N\./Joannie Franciszce./

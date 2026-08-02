@@ -1,9 +1,0 @@
-[Oratio]
-{(c3) Dí(h)ri(h)gat(h) cor(h)da(h) nos(h)tra,(h) quǽ(h)su(h)mus,(h) Dó(h)mi(h)ne,(h) tu(h)æ(h) mi(h)se(h)ra(h)ti(h)ó(h)nis(h) o(g)pe(f)rá(h)ti(hr)o:(h.) *(;) qui(h)a(h) ti(h)bi(h) si(h)ne(h) te(h) pla(h)cé(h)re(h) non(h) pós(h)su(dr)mus.(d.) (::)}
-$Per Dominum
-
-[Ant 2]
-Dixit Dóminus * paralýtico: Confíde, fili, remittúntur tibi peccáta tua.
-
-[Ant 3]
-Tulit ergo * paralýticus lectum suum, in quo jacébat, magníficans Deum: et omnis plebs, ut vidit, dedit laudem Deo.

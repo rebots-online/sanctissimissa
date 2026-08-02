@@ -1,9 +1,0 @@
-[Officium]
-Św. Jana Chryzostoma Biskupa Wyznawcy Doktora Kościoła
-
-[Name]
-Janie Chryzostomie
-
-[Oratio]
-Prosimy Cię, Panie, abyś łaską niebieską napełnił Kościół Twój święty, który nauką i chwalebnemi zasługami świętego Jana Chryzostoma, Biskupa i Wyznawcy wsławić raczyłeś.
-$Per Dominum

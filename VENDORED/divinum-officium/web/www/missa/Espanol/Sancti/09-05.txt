@@ -1,7 +1,0 @@
-@Commune/C4
-
-[Officium]
-S. Laurentii Justiniani Episcopi et Confessoris
-
-[Name]
-Lorenzo

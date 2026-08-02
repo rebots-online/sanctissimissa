@@ -1,2 +1,0 @@
-[Lectio1]
-@Tempora/Epi5-1::s/\n(5 )/ ¶\n$1/

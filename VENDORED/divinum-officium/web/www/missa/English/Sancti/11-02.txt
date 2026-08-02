@@ -1,5 +1,0 @@
-[Rank]
-All Souls;;Duplex;;3;;ex C9
-
-[Rule]
-multiple3

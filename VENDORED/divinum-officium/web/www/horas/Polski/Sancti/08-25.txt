@@ -1,6 +1,0 @@
-[Officium]
-Św. Ludwika Wyznawcy
-
-[Oratio]
-Boże, któryś błogosławionego Ludwika, Wyznawcę Twego, z królestwa ziemskiego do niebieskiego przeprowadził, prosimy Cię, przez jego zasługi i wstawiennictwo, abyś nas uczynił współdziedzicami Króla królów, Syna Twego, Jezusa Chrystusa.
-$Qui tecum
