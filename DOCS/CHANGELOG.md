@@ -26,6 +26,7 @@ English of the Ordinary is no longer missing.
 - The navigation rail has a hamburger toggle, collapses cleanly to icons without stray text, and its date picker becomes a calendar button that opens over the page.
 - The About page now carries the real origin story of the project instead of placeholder text.
 - The Windows installers (.msi and .msix) are built by the release pipeline for the first time; previously neither was produced by a release run.
+- Fixed an offline-cache fault that would have kept returning web users on the previous corpus indefinitely — they would have received the new app with the old, partly-blank text.
 
 ### Known limitations
 
@@ -38,4 +39,5 @@ English of the Ordinary is no longer missing.
 - The corpus ingest pairs the Ordo by ordinal position rather than by heading name, because the headings are themselves translated.
 - `windows-msi` and `windows-msix` are release stages, skipped on non-Windows hosts.
 - MSIX `Identity/@Version` is `MAJOR.MINOR.0.0`; Appx parts must be ≤ 65535 and the Store requires revision 0, so the display BUILD number cannot appear there.
+- The service worker's corpus cache used `CacheFirst` under a cache name hardcoded to `v1.24.37311`. CacheFirst never revalidates and the name never changed, so `cleanupOutdatedCaches` could not evict it. Now `StaleWhileRevalidate` under a version-free name, revalidating against the ETag nginx already sets for `/missal.db`.
 - `tsconfig.tsbuildinfo` is untracked and `src-tauri/Cargo.lock` records the built version — both previously dirtied the tree mid-build and failed the gate for the following stage.

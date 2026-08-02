@@ -29,9 +29,23 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         runtimeCaching: [{
           urlPattern: /\/missal\.db$/,
-          handler: 'CacheFirst',
+          // The corpus URL is stable across releases, so the CACHE must be the
+          // thing that notices a new one. It previously used CacheFirst under a
+          // cache name hardcoded to v1.24.37311: CacheFirst never revalidates,
+          // the name never changed, so `cleanupOutdatedCaches` never evicted it
+          // — a returning user would have kept the v1.24 corpus forever, taking
+          // the new UI with the OLD text. That would have silently defeated the
+          // English-Ordinary fix, which lives in the corpus and not in the JS.
+          //
+          // StaleWhileRevalidate serves the cached copy immediately (so the app
+          // still opens instantly and works offline) and revalidates in the
+          // background against the ETag nginx already sets for this URL — a 304
+          // costs nothing, and a changed corpus lands on the next load. The
+          // cache name is deliberately version-free: stamping it per release
+          // would force every user to re-download 194 MB on every MINOR bump.
+          handler: 'StaleWhileRevalidate',
           options: {
-            cacheName: 'standroid-missal-corpus-v1.24.37311',
+            cacheName: 'standroid-missal-corpus',
             expiration: { maxEntries: 1 },
           },
         }],
