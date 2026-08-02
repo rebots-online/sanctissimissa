@@ -975,12 +975,16 @@ Markers: `[ ]` not started · `[/]` in progress · `[X]` implemented · ✅ veri
 - `[ ]` **#1b Origin story media** — photo + clickable animated-GIF YouTube preview. **Blocked:** awaiting the operator's edited GIF and still photo.
 - ✅ **#3 Rail** — hamburger at any width, mark above it, no text that cannot fit icon mode, calendar button + flyout, one breakpoint (1100) with 860/980/981 converged. Verified in the running app.
 - ✅ **#13 English Ordinary** — ingest pairs the Ordo by ordinal position, not translated heading name. Measured: sections with blank English 14/21 → 0/21.
-- `[X]` **#7 MSI/MSIX** — root-caused (the pipeline never built either; four further MSIX defects) and fixed: `windows-msi`/`windows-msix` stages, asset staging + assertion, manifest asset names, stamped `Identity/@Version` = `MAJOR.MINOR.0.0`. **Not ✅ — acceptance is installation, which requires the Windows host.**
+- `[X]` **#7 MSI/MSIX** — root-caused and fixed; **both now BUILD on the Windows host**: `.msi` 64.1 MB (the first this pipeline has ever produced) and `.msix` 71.8 MB signed, with the package opened and verified to contain all five `Assets/*.png` and `Identity/@Version = 1.26.0.0`. **Still not ✅:** acceptance is installation, and both are blocked on administrator elevation — MSI returns Error 1925 (`installMode: perMachine`), MSIX returns 0x800B0109 (dev-cert root untrusted). A UAC prompt was raised once and cancelled; the two elevated commands are in the build-state note.
+- ✅ **Web PWA deployed** — `https://standroid.robin.mba` serves 1.26.60862; every fix above re-verified in the live app, not just locally. Release `/var/www/standroid/releases/1.26.60862`, prior releases retained.
+- ✅ **Service-worker corpus cache** — `CacheFirst` under a cache name hardcoded to `v1.24.37311` would have kept returning users on the old corpus forever, i.e. the new UI with the still-blank English Ordinary. Now `StaleWhileRevalidate` under a version-free name. Found by deploying and reloading.
+- ✅ **Change notes are a build input** — `DOCS/CHANGELOG.md` is parsed into the release manifests (`change_notes`) and `RELEASE_NOTES-v<version>.md`, replacing a hardcoded paragraph every release since v0.5 had reprinted verbatim.
 - `[ ]` **#9 Subway map relevance** — the map must project the active reader's structure (Mass parts / Books→Chapters / the hour's shape). **Blocked on design:** all three frozen Stitch map screens are Mass-only and the design system's screen table itself says "SVG map of the Mass".
 - `[ ]` **#4 Bookstore · #5 omnisearch · #8 Liturgibot · #12 Journaling** — not started this wave.
 
 ### Verification evidence
 
 - `npm test` 283/283 · `npx tsc -b` clean after every task.
-- Screencast: `DOCS/BUGS/evidence/standroidsmissal-v1.26.60862-bugfix-demo-2026-08-02.gif` (29 frames).
+- Screencasts: `DOCS/BUGS/evidence/standroidsmissal-v1.26.60862-bugfix-demo-2026-08-02.gif` (29 frames, dev server) and `…-live-deploy-demo-2026-08-02.gif` (25 frames, against the deployed site).
+- Build state and the elevation blocker: `DOCS/standroidsmissal-v1.26.60862-build-state-note-2026-08-02.md`.
 - Corpus measurement: Ordo English coverage compared against the pre-ingest corpus preserved at `~/outbox/standroidsmissal-v1.26.60862-missal.db.pre-ordo-pairing-2026-08-02.bak`.
