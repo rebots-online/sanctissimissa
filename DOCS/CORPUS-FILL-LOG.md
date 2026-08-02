@@ -2445,6 +2445,9 @@ and recorded here with its citation.
 | Ordo/Ordo | Prelude | `&Vidiaquam` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Prelude | `&Vidiaquam` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Introitus | `&introitus` | kept-as-rubric-marker | — | — | — |
+| Ordo/Ordo | Introitus | `&introitus` | kept-as-rubric-marker | — | — | — |
+| Ordo/Ordo | Oratio | `&DominusVobiscum` | kept-as-rubric-marker | — | — | — |
+| Ordo/Ordo | Oratio | `&collect` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Oratio | `&DominusVobiscum` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Oratio | `&collect` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Lectio | `&lectio` | kept-as-rubric-marker | — | — | — |
@@ -2453,15 +2456,22 @@ and recorded here with its citation.
 | Ordo/Ordo | Evangelium 2 | `&evangelium` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Evangelium 3 | `&evangelium` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Offertorium | `&offertorium` | kept-as-rubric-marker | — | — | — |
+| Ordo/Ordo | Offertorium | `&offertorium` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Incensatio 2 | `&secreta` | kept-as-rubric-marker | — | — | — |
+| Ordo/Ordo | Incensatio 2 | `&secreta` | kept-as-rubric-marker | — | — | — |
+| Ordo/Ordo | Præfatio | `&prefatio` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Præfatio | `&prefatio` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Canon | `&communicantes` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Canon | `&hancigitur` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Canon | `&communicantes` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Canon | `&hancigitur` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Communio | `&communio` | kept-as-rubric-marker | — | — | — |
+| Ordo/Ordo | Communio | `&communio` | kept-as-rubric-marker | — | — | — |
+| Ordo/Ordo | Postcommunio | `&postcommunio` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Postcommunio | `&postcommunio` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Conclusio | `&itemissaest` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Conclusio | `&Ultimaev` | kept-as-rubric-marker | — | — | — |
+| Ordo/Ordo | Conclusio | `&itemissaest` | kept-as-rubric-marker | — | — | — |
+| Ordo/Ordo | Conclusio | `&Ultimaev` | kept-as-rubric-marker | — | — | — |
 
-Total: 2456 fill(s).
+Total: 2466 fill(s).

@@ -332,12 +332,48 @@ for (const src of SOURCES) {
     rankClass: null, rankNum: 0, color: null, vide: null, category: 'Ordo',
     sections: new Map(),
   };
-  for (const s of lat) {
-    const e = engByName.get(s.name);
+
+  /**
+   * Pair the Ordo by ORDINAL POSITION, not by heading name.
+   *
+   * The two files carry the same headings in the same order, but the headings
+   * are themselves translated: `# Offertorium` / `# Offertory`,
+   * `#Oratio` / `# Collect`, and so on. Only a minority of names coincide
+   * (`# Incipit`, `# Kyrie`, `# Evangelium`, `# Canon`), so a name join silently
+   * dropped the English of every section whose heading differs — which is why
+   * the English column of most of the Ordinary rendered blank while the
+   * translation sat in the corpus the whole time (BUGS #13).
+   *
+   * Ordinal pairing is only sound while the files agree on shape, so a count
+   * mismatch falls back to the name join rather than mis-pairing the Canon
+   * with the Communion.
+   */
+  const ordinalPairing = lat.length === eng.length && lat.length > 0;
+  if (!ordinalPairing && lat.length && eng.length) {
+    console.warn(
+      `[ordo] heading counts differ (Latin ${lat.length}, English ${eng.length}) — ` +
+      'falling back to name pairing; English will be missing where headings are translated.',
+    );
+  }
+
+  lat.forEach((s, i) => {
+    const e = ordinalPairing ? eng[i] : engByName.get(s.name);
     const lr = resolveLang('Latin', path, 'Ordo/Ordo', s.name, s.content, null, null);
     const er = e ? resolveLang('English', path, 'Ordo/Ordo', s.name, e.content, null, null) : { text: null, filled: false };
     entry.sections.set(s.name, { latin: lr.text || null, english: er.text || null, filled: lr.filled || er.filled, qualifier: null });
+  });
+
+  // English-only sections (the English file running longer, or names the Latin
+  // file lacks) still ingest rather than being silently discarded.
+  const pairedEnglish = new Set(
+    ordinalPairing ? eng.slice(0, lat.length).map((s) => s.name) : lat.map((s) => s.name),
+  );
+  for (const s of eng) {
+    if (pairedEnglish.has(s.name) || entry.sections.has(s.name)) continue;
+    const er = resolveLang('English', path, 'Ordo/Ordo', s.name, s.content, null, null);
+    entry.sections.set(s.name, { latin: null, english: er.text || null, filled: er.filled, qualifier: null });
   }
+
   corpus.set(path, entry);
 }
 
