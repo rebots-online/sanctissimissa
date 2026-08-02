@@ -1,0 +1,37 @@
+commentary parse report — 2026-07-14T06:29:54.714Z
+
+== haydock (Haydock) dir=VENDORED/haydock/ENG-B-Haydock1883-pd-PSFM
+records: 20965, skipped refs: 40, books covered: 73
+book list: Gen Ex Lev Num Deut Jos Judic Ruth 1Reg 2Reg 3Reg 4Reg 1Par 2Par 1Esdr 2Esdr Tob Judith Esth Job Ps Prov Eccle Cant Sap Eccli Is Jer Thren Bar Ezech Dan Os Joel Amos Abd Jon Mich Nah Hab Soph Agg Zach Mal 1Mach 2Mach Matt Marc Luc Joann Act Rom 1Cor 2Cor Gal Eph Phil Col 1Thess 2Thess 1Tim 2Tim Tit Philem Hebr Jac 1Petr 2Petr 1Joann 2Joann 3Joann Jud Apoc
+malformed records: 0
+duplicate node keys within source: 0
+text length min/median/max: 15/261/20407
+--- sample Gen 1:22-22
+Blessed them, or enabled them to produce others. --- Multiply: the immense numbers and variety of fishes and fowls is truly astonishing.
+--- sample Ps 136:8-8
+Daughter. Citizens. --- Miserable "plunderer," (Symmachus) or "ruined," (Aquila) or "which shalt be given up to plunder." (Theodoret) --- Cyrus reduced the city to a state of abjection, and it has since experienced other miseries, (Calmet) so that its situation is now unknown. (Haydock) --- Isaias (xiii.) foretold this destruction. (Worthington)
+
+== catena-aurea (Catena Aurea) dir=VENDORED/catena-aurea/catena-aurea-project/markdown_chapters
+records: 815, skipped refs: 1, books covered: 4
+book list: Matt Marc Luc Joann
+malformed records: 0
+duplicate node keys within source: 0
+text length min/median/max: 600/6624/24114
+--- sample Matt 1:20-20
+20. But while he thought on these things, behold, the angel of the Lord
+appeared unto him in a dream, saying, Joseph, thou son of David, fear not to
+take unto thee Mary thy wife: for that which is conceived in her is of the
+Holy Ghost. REMIGIUS. Because Joseph was minded, as has been said, to put
+Mary away privily, which if he had done, there would have been few who would
+not rather have thought her a harlot than a virgin, therefore this purpose of
+Joseph was changed by Divine revelation, whence it is said, While he thought
+on these things. GLOSS. (ap. Ans.) In this is to be noted the wise sou
+--- sample Luc 1:65-66
+65. And fear came on all that dwelt round about them: and all these sayings
+were noised abroad throughout all the hill country of Judæa. 66. And all they
+that heard them laid them up in their hearts, saying, What manner of child
+shall this be! And the hand of the Lord was with him. THEOPHYLACT. As at
+the silence of Zacharias the people marvelled, so likewise when he spoke.
+Hence it is said, And fear came upon all; that from these two circumstances
+all might believe there was something great in the child that was born. But
+all these things were ordained, to the end that he who was to bear witne

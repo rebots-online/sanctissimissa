@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<!-- saved from url=(0057)file:///home/robin/Downloads/missa_template_improved.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sancta Missa - {{liturgicalDate.feastTitle}}</title>
+    <!-- Tailwind CSS for styling and responsiveness -->
+    <script src="./Sancta Missa - {{liturgicalDate.feastTitle}}_files/saved_resource"></script>
+    <!-- Google Fonts for traditional, readable typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="./Sancta Missa - {{liturgicalDate.feastTitle}}_files/css2" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="./Sancta Missa - {{liturgicalDate.feastTitle}}_files/all.min.css">
+    
+    <style>
+        :root {
+            --liturgical-red: #b91c1c;
+            --liturgical-purple: #4c1d95;
+            --liturgical-gold: #d4af37;
+            --liturgical-green: #059669;
+            --liturgical-white: #ffffff;
+            --liturgical-rose: #ec4899;
+            --liturgical-black: #1f2937;
+        }
+
+        body {
+            font-family: 'EB Garamond', serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            line-height: 1.6;
+        }
+
+        .liturgical-text {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        /* Accordion Styling */
+        .accordion-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .accordion-section:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .accordion-header {
+            cursor: pointer;
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            user-select: none;
+        }
+
+        .accordion-header:hover {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        }
+
+        .accordion-header h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--liturgical-purple);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s ease;
+            color: var(--liturgical-red);
+        }
+
+        .accordion-section.open .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-section.open .accordion-content {
+            max-height: 5000px;
+        }
+
+        .accordion-body {
+            padding: 2rem;
+        }
+
+        /* Typography and Liturgical Styling */
+        .rubric {
+            color: var(--liturgical-red);
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .dialogue-priest {
+            font-weight: 600;
+            color: var(--liturgical-red);
+        }
+
+        .dialogue-server {
+            font-weight: 600;
+            color: var(--liturgical-purple);
+        }
+
+        .latin-text {
+            font-weight: 500;
+        }
+
+        .english-text {
+            color: #4b5563;
+        }
+
+        /* Interactive Elements */
+        .interactive-text {
+            position: relative;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .interactive-text:hover {
+            background-color: rgba(79, 70, 229, 0.1);
+        }
+
+        .translation-popup {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--liturgical-black);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            max-width: 300px;
+            z-index: 100;
+            margin-bottom: 0.5rem;
+            font-style: italic;
+            pointer-events: none;
+        }
+
+        .interactive-text:hover .translation-popup,
+        .interactive-text.show-popup .translation-popup {
+            display: block;
+        }
+
+        /* Side-by-side layout */
+        .side-by-side {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .interlinear-mode .side-by-side {
+            display: block;
+        }
+
+        .interlinear-mode .english-column {
+            display: none;
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: 350px;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .settings-panel.open {
+            transform: translateX(0);
+        }
+
+        .settings-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .settings-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .side-by-side {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .english-column {
+                display: none;
+            }
+            
+            .accordion-body {
+                padding: 1rem;
+            }
+            
+            .settings-panel {
+                width: 100%;
+            }
+        }
+
+        /* Liturgical Color Themes */
+        .color-red { --primary-color: var(--liturgical-red); }
+        .color-purple { --primary-color: var(--liturgical-purple); }
+        .color-green { --primary-color: var(--liturgical-green); }
+        .color-white { --primary-color: var(--liturgical-black); }
+        .color-rose { --primary-color: var(--liturgical-rose); }
+        .color-black { --primary-color: var(--liturgical-black); }
+
+        /* Propers Styling */
+        .propers-section {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid var(--liturgical-gold);
+        }
+
+        .ordinary-section {
+            background: white;
+        }
+
+        /* Print Styles */
+        @media print {
+            .settings-panel,
+            .settings-overlay,
+            .accordion-icon,
+            .interactive-text .translation-popup {
+                display: none !important;
+            }
+            
+            .accordion-content {
+                max-height: none !important;
+            }
+            
+            .accordion-section {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #e2e8f0;
+            }
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.absolute{position:absolute}.relative{position:relative}.right-6{right:1.5rem}.top-6{top:1.5rem}.mx-auto{margin-left:auto;margin-right:auto}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.mr-2{margin-right:0.5rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.mt-6{margin-top:1.5rem}.flex{display:flex}.w-full{width:100%}.max-w-6xl{max-width:72rem}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-4{gap:1rem}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border-b{border-bottom-width:1px}.bg-red-50{--tw-bg-opacity:1;background-color:rgb(254 242 242 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.p-4{padding:1rem}.p-8{padding:2rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-8{padding-top:2rem;padding-bottom:2rem}.pb-2{padding-bottom:0.5rem}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-semibold{font-weight:600}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-gray-900{--tw-text-opacity:1;color:rgb(17 24 39 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:text-gray-800:hover{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}</style></head>
+
+<body class="{{liturgicalDate.liturgicalColor}}">
+    <!-- Settings Overlay -->
+    <div class="settings-overlay" id="settingsOverlay"></div>
+    
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-gray-800">Settings</h3>
+            <button id="closeSettings" class="text-2xl text-gray-500 hover:text-gray-800">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="space-y-6">
+            <div>
+                <h4 class="font-semibold mb-3">Display Mode</h4>
+                <div class="space-y-2">
+                    <label class="flex items-center">
+                        <input type="radio" name="displayMode" value="side-by-side" class="mr-2" checked="">
+                        <span>Side-by-Side</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="displayMode" value="interlinear" class="mr-2">
+                        <span>Interlinear (Hover/Tap)</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="font-semibold mb-3">Font Size</h4>
+                <input type="range" id="fontSizeSlider" min="14" max="24" value="18" class="w-full">
+                <div class="text-sm text-gray-600 mt-1">
+                    <span id="fontSizeValue">18px</span>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="font-semibold mb-3">Audio Settings</h4>
+                <label class="flex items-center">
+                    <input type="checkbox" id="enableAudio" class="mr-2">
+                    <span>Enable Audio Pronunciation</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="text-center mb-8 bg-white p-8 rounded-xl shadow-lg relative">
+            <button id="openSettings" class="absolute top-6 right-6 text-gray-500 hover:text-gray-800 text-2xl transition-colors">
+                <i class="fas fa-cog"></i>
+            </button>
+            
+            <div class="mb-4">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">{{liturgicalDate.feastTitle}}</h1>
+                <p class="text-xl text-gray-600">{{liturgicalDate.dateLong}}</p>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-4 text-sm">
+                <span class="rubric px-3 py-1 bg-red-50 rounded-full">
+                    Class: {{liturgicalDate.rank}}
+                </span>
+                <span class="rubric px-3 py-1 bg-red-50 rounded-full">
+                    Color: {{liturgicalDate.liturgicalColor}}
+                </span>
+                {{#if liturgicalDate.commemorations}}
+                <span class="rubric px-3 py-1 bg-red-50 rounded-full">
+                    {{liturgicalDate.commemorations}}
+                </span>
+                {{/if}}
+            </div>
+        </header>
+
+        <!-- Accordion Sections -->
+        
+        <!-- 1. Preparation (Ordinary) -->
+        <div class="accordion-section ordinary-section open">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    I. The Preparation
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                </h2>
+            </div>
+            <div class="accordion-content">
+                <div class="accordion-body">
+                    <div class="side-by-side">
+                        <div class="latin-column">
+                            <h3 class="text-xl font-bold mb-4 text-gray-800 border-b pb-2">Prayers at the Foot of the Altar</h3>
+                            
+                            <div class="liturgical-text space-y-3">
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> In nómine Patris, et Fílii, ✠ et Spíritus Sancti. Amen.</span>
+                                    <span class="translation-popup">In the Name of the Father, and of the Son, ✠ and of the Holy Ghost. Amen.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text">Introíbo ad altáre Dei.</span>
+                                    <span class="translation-popup">I will go in to the altar of God.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Ad Deum qui lætíficat iuventútem meam.</span>
+                                    <span class="translation-popup">To God who giveth joy to my youth.</span>
+                                </p>
+
+                                <h4 class="font-bold mt-6 mb-3 text-lg">Psalmus 42</h4>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Iúdica me, Deus, et discérne causam meam de gente non sancta: ab hómine iníquo et dolóso érue me.</span>
+                                    <span class="translation-popup">Judge me, O God, and distinguish my cause from the nation that is not holy; deliver me from the unjust and deceitful man.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Quia tu es, Deus, fortitúdo mea: quare me repulísti, et quare tristis incédo, dum afflígit me inimícus?</span>
+                                    <span class="translation-popup">For Thou, O God, art my strength: why hast Thou cast me off? And why do I go sorrowful whilst the enemy afflicteth me?</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Emítte lucem tuam et veritátem tuam: ipsa me deduxérunt, et adduxérunt in montem sanctum tuum et in tabernácula tua.</span>
+                                    <span class="translation-popup">Send forth Thy light and Thy truth: they have conducted me and brought me unto Thy holy hill, and into Thy tabernacles.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Et introíbo ad altáre Dei: ad Deum, qui lætíficat iuventútem meam.</span>
+                                    <span class="translation-popup">And I will go in to the altar of God: to God who giveth joy to my youth.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Confitébor tibi in cíthara, Deus, Deus meus: quare tristis es, ánima mea, et quare contúrbas me?</span>
+                                    <span class="translation-popup">I will praise Thee on the harp, O God, my God: why art thou sad, O my soul? and why dost thou disquiet me?</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Spera in Deo, quóniam adhuc confitébor illi: salutáre vultus mei, et Deus meus.</span>
+                                    <span class="translation-popup">Hope in God, for I will still praise Him: the salvation of my countenance, and my God.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Glória Patri, et Fílio, et Spirítui Sancto.</span>
+                                    <span class="translation-popup">Glory be to the Father, and to the Son, and to the Holy Ghost.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Sicut erat in princípio, et nunc, et semper: et in sǽcula sæculórum. Amen.</span>
+                                    <span class="translation-popup">As it was in the beginning, is now, and ever shall be, world without end. Amen.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Introíbo ad altáre Dei.</span>
+                                    <span class="translation-popup">I will go in to the altar of God.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Ad Deum qui lætíficat iuventútem meam.</span>
+                                    <span class="translation-popup">To God who giveth joy to my youth.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Adiutórium nostrum ✠ in nómine Dómini.</span>
+                                    <span class="translation-popup">Our help ✠ is in the Name of the Lord.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Qui fecit cælum et terram.</span>
+                                    <span class="translation-popup">Who hath made heaven and earth.</span>
+                                </p>
+
+                                <h4 class="font-bold mt-6 mb-3 text-lg">Confiteor</h4>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Confíteor Deo omnipoténti, beátæ Maríæ semper Vírgini, beáto Michaéli Archángelo, beáto Joánni Baptístæ, sanctis Apóstolis Petro et Paulo, ómnibus Sanctis, et vobis, fratres: quia peccávi nimis cogitatióne, verbo et ópere: <span class="rubric">mea culpa, mea culpa, mea máxima culpa.</span> Ideo precor beátam Maríam semper Vírginem, beátum Michaélem Archángelum, beátum Joánnem Baptístam, sanctos Apóstolos Petrum et Paulum, omnes Sanctos, et vos, fratres, oráre pro me ad Dóminum Deum nostrum.</span>
+                                    <span class="translation-popup">I confess to almighty God, to blessed Mary ever Virgin, to blessed Michael the Archangel, to blessed John the Baptist, to the holy Apostles Peter and Paul, to all the Saints, and to you, brethren, that I have sinned exceedingly in thought, word, and deed: through my fault, through my fault, through my most grievous fault. Therefore I beseech blessed Mary ever Virgin, blessed Michael the Archangel, blessed John the Baptist, the holy Apostles Peter and Paul, all the Saints, and you, brethren, to pray to the Lord our God for me.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Misereátur tui omnípotens Deus, et, dimíssis peccátis tuis, perdúcat te ad vitam ætérnam.</span>
+                                    <span class="translation-popup">May almighty God have mercy upon thee, forgive thee thy sins, and bring thee to life everlasting.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Amen.</span>
+                                    <span class="translation-popup">Amen.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Confíteor Deo omnipoténti, beátæ Maríæ semper Vírgini, beáto Michaéli Archángelo, beáto Joánni Baptístæ, sanctis Apóstolis Petro et Paulo, ómnibus Sanctis, et tibi, pater: quia peccávi nimis cogitatióne, verbo et ópere: mea culpa, mea culpa, mea máxima culpa. Ideo precor beátam Maríam semper Vírginem, beátum Michaélem Archángelum, beátum Joánnem Baptístam, sanctos Apóstolos Petrum et Paulum, omnes Sanctos, et te, pater, oráre pro me ad Dóminum Deum nostrum.</span>
+                                    <span class="translation-popup">I confess to almighty God, to blessed Mary ever Virgin, to blessed Michael the Archangel, to blessed John the Baptist, to the holy Apostles Peter and Paul, to all the Saints, and to you, Father, that I have sinned exceedingly in thought, word, and deed: through my fault, through my fault, through my most grievous fault. Therefore I beseech blessed Mary ever Virgin, blessed Michael the Archangel, blessed John the Baptist, the holy Apostles Peter and Paul, all the Saints, and you, Father, to pray to the Lord our God for me.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Misereátur vestri omnípotens Deus, et, dimíssis peccátis vestris, perdúcat vos ad vitam ætérnam.</span>
+                                    <span class="translation-popup">May almighty God have mercy upon you, forgive you your sins, and bring you to life everlasting.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Amen.</span>
+                                    <span class="translation-popup">Amen.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Indulgéntiam, ✠ absolutiónem et remissiónem peccatórum nostrórum tríbuat nobis omnípotens et miséricors Dóminus.</span>
+                                    <span class="translation-popup">May the almighty and merciful Lord grant us pardon, ✠ absolution, and remission of our sins.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Amen.</span>
+                                    <span class="translation-popup">Amen.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Deus, tu convérsus vivificábis nos.</span>
+                                    <span class="translation-popup">O God, Thou wilt turn and bring us to life.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Et plebs tua lætábitur in te.</span>
+                                    <span class="translation-popup">And Thy people shall rejoice in Thee.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Osténde nobis, Dómine, misericórdiam tuam.</span>
+                                    <span class="translation-popup">Show us, O Lord, Thy mercy.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Et salutáre tuum da nobis.</span>
+                                    <span class="translation-popup">And grant us Thy salvation.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Dómine, exáudi oratiónem meam.</span>
+                                    <span class="translation-popup">O Lord, hear my prayer.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Et clamor meus ad te véniat.</span>
+                                    <span class="translation-popup">And let my cry come unto Thee.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Dóminus vobíscum.</span>
+                                    <span class="translation-popup">The Lord be with you.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Et cum spíritu tuo.</span>
+                                    <span class="translation-popup">And with thy spirit.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Orémus.</span>
+                                    <span class="translation-popup">Let us pray.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text">Aufer a nobis, quǽsumus, Dómine, iniquitátes nostras: ut ad Sancta sanctórum puris mereámur méntibus introíre. Per Christum, Dóminum nostrum. Amen.</span>
+                                    <span class="translation-popup">Take away from us our iniquities, we beseech Thee, O Lord, that we may be worthy to enter with pure minds into the Holy of Holies. Through Christ our Lord. Amen.</span>
+                                </p>
+                                
+                                <p class="interactive-text">
+                                    <span class="latin-text">Orámus te, Dómine, per mérita Sanctórum tuórum, quorum relíquiæ hic sunt, et ómnium Sanctórum: ut indulgére dignéris ómnia peccáta mea. Amen.</span>
+                                    <span class="translation-popup">We beseech Thee, O Lord, by the merits of Thy Saints, whose relics are here, and of all the Saints, that Thou wouldst vouchsafe to forgive me all my sins. Amen.</span>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="english-column">
+                            <h3 class="text-xl font-bold mb-4 text-gray-800 border-b pb-2">Prayers at the Foot of the Altar</h3>
+                            
+                            <div class="liturgical-text english-text space-y-3">
+                                <p><span class="dialogue-priest">P.</span> In the Name of the Father, and of the Son, ✠ and of the Holy Ghost. Amen.</p>
+                                <p>I will go in to the altar of God.</p>
+                                <p><span class="dialogue-server">S.</span> To God who giveth joy to my youth.</p>
+                                
+                                <h4 class="font-bold mt-6 mb-3 text-lg">Psalm 42</h4>
+                                <p><span class="dialogue-priest">P.</span> Judge me, O God, and distinguish my cause from the nation that is not holy; deliver me from the unjust and deceitful man.</p>
+                                <p><span class="dialogue-server">S.</span> For Thou, O God, art my strength: why hast Thou cast me off? And why do I go sorrowful whilst the enemy afflicteth me?</p>
+                                <p><span class="dialogue-priest">P.</span> Send forth Thy light and Thy truth: they have conducted me and brought me unto Thy holy hill, and into Thy tabernacles.</p>
+                                <p><span class="dialogue-server">S.</span> And I will go in to the altar of God: to God who giveth joy to my youth.</p>
+                                <p><span class="dialogue-priest">P.</span> I will praise Thee on the harp, O God, my God: why art thou sad, O my soul? and why dost thou disquiet me?</p>
+                                <p><span class="dialogue-server">S.</span> Hope in God, for I will still praise Him: the salvation of my countenance, and my God.</p>
+                                <p><span class="dialogue-priest">P.</span> Glory be to the Father, and to the Son, and to the Holy Ghost.</p>
+                                <p><span class="dialogue-server">S.</span> As it was in the beginning, is now, and ever shall be, world without end. Amen.</p>
+                                <p><span class="dialogue-priest">P.</span> I will go in to the altar of God.</p>
+                                <p><span class="dialogue-server">S.</span> To God who giveth joy to my youth.</p>
+                                <p><span class="dialogue-priest">P.</span> Our help ✠ is in the Name of the Lord.</p>
+                                <p><span class="dialogue-server">S.</span> Who hath made heaven and earth.</p>
+                                
+                                <h4 class="font-bold mt-6 mb-3 text-lg">The Confession</h4>
+                                <p><span class="dialogue-priest">P.</span> I confess to almighty God, to blessed Mary ever Virgin, to blessed Michael the Archangel, to blessed John the Baptist, to the holy Apostles Peter and Paul, to all the Saints, and to you, brethren, that I have sinned exceedingly in thought, word, and deed: <span class="rubric">through my fault, through my fault, through my most grievous fault.</span> Therefore I beseech blessed Mary ever Virgin, blessed Michael the Archangel, blessed John the Baptist, the holy Apostles Peter and Paul, all the Saints, and you, brethren, to pray to the Lord our God for me.</p>
+                                <p><span class="dialogue-server">S.</span> May almighty God have mercy upon thee, forgive thee thy sins, and bring thee to life everlasting.</p>
+                                <p><span class="dialogue-priest">P.</span> Amen.</p>
+                                <p><span class="dialogue-server">S.</span> I confess to almighty God, to blessed Mary ever Virgin, to blessed Michael the Archangel, to blessed John the Baptist, to the holy Apostles Peter and Paul, to all the Saints, and to you, Father, that I have sinned exceedingly in thought, word, and deed: through my fault, through my fault, through my most grievous fault. Therefore I beseech blessed Mary ever Virgin, blessed Michael the Archangel, blessed John the Baptist, the holy Apostles Peter and Paul, all the Saints, and you, Father, to pray to the Lord our God for me.</p>
+                                <p><span class="dialogue-priest">P.</span> May almighty God have mercy upon you, forgive you your sins, and bring you to life everlasting.</p>
+                                <p><span class="dialogue-server">S.</span> Amen.</p>
+                                <p><span class="dialogue-priest">P.</span> May the almighty and merciful Lord grant us pardon, ✠ absolution, and remission of our sins.</p>
+                                <p><span class="dialogue-server">S.</span> Amen.</p>
+                                <p><span class="dialogue-priest">P.</span> O God, Thou wilt turn and bring us to life.</p>
+                                <p><span class="dialogue-server">S.</span> And Thy people shall rejoice in Thee.</p>
+                                <p><span class="dialogue-priest">P.</span> Show us, O Lord, Thy mercy.</p>
+                                <p><span class="dialogue-server">S.</span> And grant us Thy salvation.</p>
+                                <p><span class="dialogue-priest">P.</span> O Lord, hear my prayer.</p>
+                                <p><span class="dialogue-server">S.</span> And let my cry come unto Thee.</p>
+                                <p><span class="dialogue-priest">P.</span> The Lord be with you.</p>
+                                <p><span class="dialogue-server">S.</span> And with thy spirit.</p>
+                                <p><span class="dialogue-priest">P.</span> Let us pray.</p>
+                                <p>Take away from us our iniquities, we beseech Thee, O Lord, that we may be worthy to enter with pure minds into the Holy of Holies. Through Christ our Lord. Amen.</p>
+                                <p>We beseech Thee, O Lord, by the merits of Thy Saints, whose relics are here, and of all the Saints, that Thou wouldst vouchsafe to forgive me all my sins. Amen.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Mass of the Catechumens -->
+        <div class="accordion-section ordinary-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    II. Mass of the Catechumens
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                </h2>
+            </div>
+            <div class="accordion-content">
+                <div class="accordion-body">
+                    <!-- Introit (Proper) -->
+                    <div class="propers-section p-4 rounded-lg mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Introit</h3>
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text">
+                                    <p class="interactive-text">
+                                        <span class="latin-text">{{propers.introit.antiphon.latin}}</span>
+                                        <span class="translation-popup">{{propers.introit.antiphon.english}}</span>
+                                    </p>
+                                    <p class="rubric text-sm mt-2">{{propers.introit.verse.reference}}</p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text">{{propers.introit.verse.latin}}</span>
+                                        <span class="translation-popup">{{propers.introit.verse.english}}</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text">Glória Patri, et Fílio, et Spirítui Sancto. Sicut erat in princípio, et nunc, et semper, et in sǽcula sæculórum. Amen.</span>
+                                        <span class="translation-popup">Glory be to the Father, and to the Son, and to the Holy Ghost. As it was in the beginning, is now, and ever shall be, world without end. Amen.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text">{{propers.introit.antiphon.latin}}</span>
+                                        <span class="translation-popup">{{propers.introit.antiphon.english}}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text">
+                                    <p>{{propers.introit.antiphon.english}}</p>
+                                    <p class="rubric text-sm mt-2">{{propers.introit.verse.reference}}</p>
+                                    <p>{{propers.introit.verse.english}}</p>
+                                    <p>Glory be to the Father, and to the Son, and to the Holy Ghost. As it was in the beginning, is now, and ever shall be, world without end. Amen.</p>
+                                    <p>{{propers.introit.antiphon.english}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kyrie (Ordinary) -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Kyrie</h3>
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text space-y-2">
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Kýrie, eléison.</span>
+                                        <span class="translation-popup">Lord, have mercy.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Kýrie, eléison.</span>
+                                        <span class="translation-popup">Lord, have mercy.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Kýrie, eléison.</span>
+                                        <span class="translation-popup">Lord, have mercy.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Christe, eléison.</span>
+                                        <span class="translation-popup">Christ, have mercy.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Christe, eléison.</span>
+                                        <span class="translation-popup">Christ, have mercy.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Christe, eléison.</span>
+                                        <span class="translation-popup">Christ, have mercy.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Kýrie, eléison.</span>
+                                        <span class="translation-popup">Lord, have mercy.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Kýrie, eléison.</span>
+                                        <span class="translation-popup">Lord, have mercy.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Kýrie, eléison.</span>
+                                        <span class="translation-popup">Lord, have mercy.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text space-y-2">
+                                    <p><span class="dialogue-server">S.</span> Lord, have mercy.</p>
+                                    <p><span class="dialogue-server">S.</span> Lord, have mercy.</p>
+                                    <p><span class="dialogue-server">S.</span> Lord, have mercy.</p>
+                                    <p><span class="dialogue-server">S.</span> Christ, have mercy.</p>
+                                    <p><span class="dialogue-server">S.</span> Christ, have mercy.</p>
+                                    <p><span class="dialogue-server">S.</span> Christ, have mercy.</p>
+                                    <p><span class="dialogue-server">S.</span> Lord, have mercy.</p>
+                                    <p><span class="dialogue-server">S.</span> Lord, have mercy.</p>
+                                    <p><span class="dialogue-server">S.</span> Lord, have mercy.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gloria (Ordinary) -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Gloria</h3>
+                        <p class="rubric text-sm mb-3">{{#unless liturgicalDate.omitGloria}}Said on all days except during Advent, Lent, and certain feasts{{/unless}}{{#if liturgicalDate.omitGloria}}Omitted during {{liturgicalDate.season}}{{/if}}</p>
+                        {{#unless liturgicalDate.omitGloria}}
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text space-y-2">
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-priest">P.</span> Glória in excélsis Deo.</span>
+                                        <span class="translation-popup">Glory to God in the highest.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Et in terra pax homínibus bonæ voluntátis. Laudámus te. Benedícimus te. Adorámus te. Glorificámus te. Grátias ágimus tibi propter magnam glóriam tuam. Dómine Deus, Rex cæléstis, Deus Pater omnípotens. Dómine Fili unigénite, Iesu Christe. Dómine Deus, Agnus Dei, Fílius Patris. Qui tollis peccáta mundi, miserére nobis. Qui tollis peccáta mundi, súscipe deprecatiónem nostram. Qui sedes ad déxteram Patris, miserére nobis. Quóniam tu solus Sanctus. Tu solus Dóminus. Tu solus Altíssimus, Iesu Christe. Cum Sancto Spíritu ✠ in glória Dei Patris. Amen.</span>
+                                        <span class="translation-popup">And on earth peace to men of good will. We praise Thee. We bless Thee. We adore Thee. We glorify Thee. We give Thee thanks for Thy great glory. O Lord God, heavenly King, God the Father almighty. O Lord Jesus Christ, the only-begotten Son. O Lord God, Lamb of God, Son of the Father. Who takest away the sins of the world, have mercy on us. Who takest away the sins of the world, receive our prayer. Who sittest at the right hand of the Father, have mercy on us. For Thou alone art holy. Thou alone art Lord. Thou alone art most high, O Jesus Christ. Together with the Holy Ghost ✠ in the glory of God the Father. Amen.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text space-y-2">
+                                    <p><span class="dialogue-priest">P.</span> Glory to God in the highest.</p>
+                                    <p><span class="dialogue-server">S.</span> And on earth peace to men of good will. We praise Thee. We bless Thee. We adore Thee. We glorify Thee. We give Thee thanks for Thy great glory. O Lord God, heavenly King, God the Father almighty. O Lord Jesus Christ, the only-begotten Son. O Lord God, Lamb of God, Son of the Father. Who takest away the sins of the world, have mercy on us. Who takest away the sins of the world, receive our prayer. Who sittest at the right hand of the Father, have mercy on us. For Thou alone art holy. Thou alone art Lord. Thou alone art most high, O Jesus Christ. Together with the Holy Ghost ✠ in the glory of God the Father. Amen.</p>
+                                </div>
+                            </div>
+                        </div>
+                        {{/unless}}
+                    </div>
+
+                    <!-- Collect (Proper) -->
+                    <div class="propers-section p-4 rounded-lg mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Collect</h3>
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text space-y-2">
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-priest">P.</span> Dóminus vobíscum.</span>
+                                        <span class="translation-popup">The Lord be with you.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Et cum spíritu tuo.</span>
+                                        <span class="translation-popup">And with thy spirit.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-priest">P.</span> Orémus.</span>
+                                        <span class="translation-popup">Let us pray.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text">{{propers.collect.latin}}</span>
+                                        <span class="translation-popup">{{propers.collect.english}}</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Amen.</span>
+                                        <span class="translation-popup">Amen.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text space-y-2">
+                                    <p><span class="dialogue-priest">P.</span> The Lord be with you.</p>
+                                    <p><span class="dialogue-server">S.</span> And with thy spirit.</p>
+                                    <p><span class="dialogue-priest">P.</span> Let us pray.</p>
+                                    <p>{{propers.collect.english}}</p>
+                                    <p><span class="dialogue-server">S.</span> Amen.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Epistle (Proper) -->
+                    <div class="propers-section p-4 rounded-lg mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Epistle</h3>
+                        <p class="rubric text-sm mb-3">{{propers.epistle.reference}}</p>
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text">
+                                    <p class="interactive-text">
+                                        <span class="latin-text">{{propers.epistle.latin}}</span>
+                                        <span class="translation-popup">{{propers.epistle.english}}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text">
+                                    <p>{{propers.epistle.english}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gradual (Proper) -->
+                    <div class="propers-section p-4 rounded-lg mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">{{#if propers.gradual}}Gradual{{/if}}{{#if propers.tract}}Tract{{/if}}{{#if propers.alleluia}}Alleluia{{/if}}</h3>
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text">
+                                    {{#if propers.gradual}}
+                                    <p class="interactive-text">
+                                        <span class="latin-text">{{propers.gradual.verse1.latin}}</span>
+                                        <span class="translation-popup">{{propers.gradual.verse1.english}}</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text">{{propers.gradual.verse2.latin}}</span>
+                                        <span class="translation-popup">{{propers.gradual.verse2.english}}</span>
+                                    </p>
+                                    {{/if}}
+                                    {{#if propers.alleluia}}
+                                    <p class="interactive-text">
+                                        <span class="latin-text">Allelúia, allelúia.</span>
+                                        <span class="translation-popup">Alleluia, alleluia.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text">{{propers.alleluia.verse.latin}}</span>
+                                        <span class="translation-popup">{{propers.alleluia.verse.english}}</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text">Allelúia.</span>
+                                        <span class="translation-popup">Alleluia.</span>
+                                    </p>
+                                    {{/if}}
+                                    {{#if propers.tract}}
+                                    {{#each propers.tract.verses}}
+                                    <p class="interactive-text">
+                                        <span class="latin-text">{{this.latin}}</span>
+                                        <span class="translation-popup">{{this.english}}</span>
+                                    </p>
+                                    {{/each}}
+                                    {{/if}}
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text">
+                                    {{#if propers.gradual}}
+                                    <p>{{propers.gradual.verse1.english}}</p>
+                                    <p>{{propers.gradual.verse2.english}}</p>
+                                    {{/if}}
+                                    {{#if propers.alleluia}}
+                                    <p>Alleluia, alleluia.</p>
+                                    <p>{{propers.alleluia.verse.english}}</p>
+                                    <p>Alleluia.</p>
+                                    {{/if}}
+                                    {{#if propers.tract}}
+                                    {{#each propers.tract.verses}}
+                                    <p>{{this.english}}</p>
+                                    {{/each}}
+                                    {{/if}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gospel (Proper) -->
+                    <div class="propers-section p-4 rounded-lg mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Gospel</h3>
+                        <p class="rubric text-sm mb-3">{{propers.gospel.reference}}</p>
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text space-y-2">
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-priest">P.</span> Dóminus vobíscum.</span>
+                                        <span class="translation-popup">The Lord be with you.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Et cum spíritu tuo.</span>
+                                        <span class="translation-popup">And with thy spirit.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-priest">P.</span> ✠ Sequéntia sancti Evangélii secúndum {{propers.gospel.evangelist}}.</span>
+                                        <span class="translation-popup">✠ The continuation of the holy Gospel according to {{propers.gospel.evangelist}}.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Glória tibi, Dómine.</span>
+                                        <span class="translation-popup">Glory be to Thee, O Lord.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text">{{propers.gospel.latin}}</span>
+                                        <span class="translation-popup">{{propers.gospel.english}}</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Laus tibi, Christe.</span>
+                                        <span class="translation-popup">Praise be to Thee, O Christ.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text space-y-2">
+                                    <p><span class="dialogue-priest">P.</span> The Lord be with you.</p>
+                                    <p><span class="dialogue-server">S.</span> And with thy spirit.</p>
+                                    <p><span class="dialogue-priest">P.</span> ✠ The continuation of the holy Gospel according to {{propers.gospel.evangelist}}.</p>
+                                    <p><span class="dialogue-server">S.</span> Glory be to Thee, O Lord.</p>
+                                    <p>{{propers.gospel.english}}</p>
+                                    <p><span class="dialogue-server">S.</span> Praise be to Thee, O Christ.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Credo (Ordinary) -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Credo</h3>
+                        <p class="rubric text-sm mb-3">{{#unless liturgicalDate.omitCredo}}Said on Sundays and major feasts{{/unless}}{{#if liturgicalDate.omitCredo}}Omitted on ferial days and lesser feasts{{/if}}</p>
+                        {{#unless liturgicalDate.omitCredo}}
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text space-y-2">
+                                    <p class="interactive-text">
+                                        <span class="latin-text">Credo in unum Deum, Patrem omnipoténtem, factórem cæli et terræ, visibílium ómnium et invisibílium. Et in unum Dóminum Iesum Christum, Fílium Dei unigénitum. Et ex Patre natum ante ómnia sǽcula. Deum de Deo, lumen de lúmine, Deum verum de Deo vero. Génitum, non factum, consubstantiálem Patri: per quem ómnia facta sunt. Qui propter nos hómines et propter nostram salútem descéndit de cælis. <span class="rubric">Et incarnátus est de Spíritu Sancto ex María Vírgine: Et homo factus est.</span> Crucifíxus étiam pro nobis: sub Póntio Piláto passus, et sepúltus est. Et resurréxit tértia die, secúndum Scriptúras. Et ascéndit in cælum: sedet ad déxteram Patris. Et íterum ventúrus est cum glória iudicáre vivos et mórtuos: cuius regni non erit finis. Et in Spíritum Sanctum, Dóminum et vivificántem: qui ex Patre Filióque procédit. Qui cum Patre et Fílio simul adorátur et conglorificátur: qui locútus est per Prophétas. Et unam sanctam cathólicam et apostólicam Ecclésiam. Confíteor unum baptísma in remissiónem peccatórum. Et expécto resurrectiónem mortuórum. ✠ Et vitam ventúri sǽculi. Amen.</span>
+                                        <span class="translation-popup">I believe in one God, the Father almighty, maker of heaven and earth, and of all things visible and invisible. And in one Lord Jesus Christ, the only-begotten Son of God. Born of the Father before all ages. God of God, light of light, true God of true God. Begotten, not made, consubstantial with the Father: by whom all things were made. Who for us men and for our salvation came down from heaven. And was incarnate by the Holy Ghost of the Virgin Mary: and was made man. He was crucified also for us, suffered under Pontius Pilate, and was buried. And the third day He rose again according to the Scriptures. And ascended into heaven, and sitteth at the right hand of the Father. And He shall come again with glory to judge the living and the dead: of whose kingdom there shall be no end. And in the Holy Ghost, the Lord and giver of life: who proceedeth from the Father and the Son. Who together with the Father and the Son is adored and glorified: who spoke by the prophets. And one holy, catholic, and apostolic Church. I confess one baptism for the remission of sins. And I look for the resurrection of the dead. ✠ And the life of the world to come. Amen.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text">
+                                    <p>I believe in one God, the Father almighty, maker of heaven and earth, and of all things visible and invisible. And in one Lord Jesus Christ, the only-begotten Son of God. Born of the Father before all ages. God of God, light of light, true God of true God. Begotten, not made, consubstantial with the Father: by whom all things were made. Who for us men and for our salvation came down from heaven. <span class="rubric">And was incarnate by the Holy Ghost of the Virgin Mary: and was made man.</span> He was crucified also for us, suffered under Pontius Pilate, and was buried. And the third day He rose again according to the Scriptures. And ascended into heaven, and sitteth at the right hand of the Father. And He shall come again with glory to judge the living and the dead: of whose kingdom there shall be no end. And in the Holy Ghost, the Lord and giver of life: who proceedeth from the Father and the Son. Who together with the Father and the Son is adored and glorified: who spoke by the prophets. And one holy, catholic, and apostolic Church. I confess one baptism for the remission of sins. And I look for the resurrection of the dead. ✠ And the life of the world to come. Amen.</p>
+                                </div>
+                            </div>
+                        </div>
+                        {{/unless}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Mass of the Faithful -->
+        <div class="accordion-section ordinary-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    III. Mass of the Faithful
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                </h2>
+            </div>
+            <div class="accordion-content">
+                <div class="accordion-body">
+                    <!-- Offertory (Proper) -->
+                    <div class="propers-section p-4 rounded-lg mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Offertory</h3>
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text space-y-2">
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-priest">P.</span> Dóminus vobíscum.</span>
+                                        <span class="translation-popup">The Lord be with you.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Et cum spíritu tuo.</span>
+                                        <span class="translation-popup">And with thy spirit.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-priest">P.</span> Orémus.</span>
+                                        <span class="translation-popup">Let us pray.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text">{{propers.offertory.latin}}</span>
+                                        <span class="translation-popup">{{propers.offertory.english}}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text space-y-2">
+                                    <p><span class="dialogue-priest">P.</span> The Lord be with you.</p>
+                                    <p><span class="dialogue-server">S.</span> And with thy spirit.</p>
+                                    <p><span class="dialogue-priest">P.</span> Let us pray.</p>
+                                    <p>{{propers.offertory.english}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Offertory Prayers (Ordinary) -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Offertory Prayers</h3>
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text space-y-3">
+                                    <p class="interactive-text">
+                                        <span class="latin-text">Súscipe, sancte Pater, omnípotens ætérne Deus, hanc immaculátam hóstiam, quam ego indígnus fámulus tuus óffero tibi Deo meo vivo et vero, pro innumerabílibus peccátis, et offensiónibus, et negligéntiis meis, et pro ómnibus circumstántibus, sed et pro ómnibus fidélibus christiánis vivis atque defúnctis: ut mihi, et illis profíciat ad salútem in vitam ætérnam. Amen.</span>
+                                        <span class="translation-popup">Accept, O holy Father, almighty and eternal God, this spotless host, which I, Thy unworthy servant, offer unto Thee, my living and true God, for my innumerable sins, offenses, and negligences, and for all here present: as also for all faithful Christians, both living and dead, that it may profit me and them for salvation unto life everlasting. Amen.</span>
+                                    </p>
+                                    
+                                    <p class="interactive-text">
+                                        <span class="latin-text">Deus, ✠ qui humánæ substántiæ dignitátem mirabíliter condidísti, et mirabílius reformásti: da nobis per huius aquæ et vini mystérium, eius divinitátis esse consórtes, qui humanitátis nostræ fíeri dignátus est párticeps, Iesus Christus, Fílius tuus, Dóminus noster: Qui tecum vivit et regnat in unitáte Spíritus Sancti Deus: per ómnia sǽcula sæculórum. Amen.</span>
+                                        <span class="translation-popup">O God, ✠ who, in creating human nature, didst wonderfully dignify it, and still more wonderfully restore it, grant that, by the mystery of this water and wine, we may be made partakers of His divine nature, who vouchsafed to be made partaker of our human nature, even Jesus Christ our Lord, Thy Son, who with Thee, liveth and reigneth in the unity of the Holy Ghost, God: world without end. Amen.</span>
+                                    </p>
+                                    
+                                    <p class="interactive-text">
+                                        <span class="latin-text">Offérimus tibi, Dómine, cálicem salutáris, tuam deprecántes cleméntiam: ut in conspéctu divínæ maiestátis tuæ, pro nostra et totíus mundi salúte, cum odóre suavitátis ascéndat. Amen.</span>
+                                        <span class="translation-popup">We offer unto Thee, O Lord, the chalice of salvation, beseeching Thy clemency, that it may ascend before Thy divine Majesty, as a sweet savor, for our salvation, and for that of the whole world. Amen.</span>
+                                    </p>
+                                    
+                                    <p class="interactive-text">
+                                        <span class="latin-text">In spíritu humilitátis et in ánimo contríto suscipiámur a te, Dómine: et sic fiat sacrifícium nostrum in conspéctu tuo hódie, ut pláceat tibi, Dómine Deus.</span>
+                                        <span class="translation-popup">Accept us, O Lord, in the spirit of humility and contrition of heart, and grant that the sacrifice which we offer this day in Thy sight may be pleasing to Thee, O Lord God.</span>
+                                    </p>
+                                    
+                                    <p class="interactive-text">
+                                        <span class="latin-text">Veni, sanctificátor omnípotens ætérne Deus: et béne ✠ dic hoc sacrifícium, tuo sancto nómini præparátum.</span>
+                                        <span class="translation-popup">Come, O almighty and eternal God, the Sanctifier, and bless ✠ this Sacrifice, prepared for the glory of Thy holy Name.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text space-y-3">
+                                    <p>Accept, O holy Father, almighty and eternal God, this spotless host, which I, Thy unworthy servant, offer unto Thee, my living and true God, for my innumerable sins, offenses, and negligences, and for all here present: as also for all faithful Christians, both living and dead, that it may profit me and them for salvation unto life everlasting. Amen.</p>
+                                    
+                                    <p>O God, ✠ who, in creating human nature, didst wonderfully dignify it, and still more wonderfully restore it, grant that, by the mystery of this water and wine, we may be made partakers of His divine nature, who vouchsafed to be made partaker of our human nature, even Jesus Christ our Lord, Thy Son, who with Thee, liveth and reigneth in the unity of the Holy Ghost, God: world without end. Amen.</p>
+                                    
+                                    <p>We offer unto Thee, O Lord, the chalice of salvation, beseeching Thy clemency, that it may ascend before Thy divine Majesty, as a sweet savor, for our salvation, and for that of the whole world. Amen.</p>
+                                    
+                                    <p>Accept us, O Lord, in the spirit of humility and contrition of heart, and grant that the sacrifice which we offer this day in Thy sight may be pleasing to Thee, O Lord God.</p>
+                                    
+                                    <p>Come, O almighty and eternal God, the Sanctifier, and bless ✠ this Sacrifice, prepared for the glory of Thy holy Name.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sanctus (Ordinary) -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Sanctus</h3>
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text">
+                                    <p class="interactive-text">
+                                        <span class="latin-text">Sanctus, Sanctus, Sanctus Dóminus Deus Sábaoth. Pleni sunt cæli et terra glória tua. Hosánna in excélsis. Benedíctus qui venit in nómine Dómini. Hosánna in excélsis.</span>
+                                        <span class="translation-popup">Holy, Holy, Holy Lord God of Hosts. Heaven and earth are full of Thy glory. Hosanna in the highest. Blessed is He that cometh in the Name of the Lord. Hosanna in the highest.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text">
+                                    <p>Holy, Holy, Holy Lord God of Hosts. Heaven and earth are full of Thy glory. Hosanna in the highest. Blessed is He that cometh in the Name of the Lord. Hosanna in the highest.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Canon (Ordinary) -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Canon of the Mass</h3>
+                        <p class="rubric text-sm mb-3">The Canon is said silently by the priest</p>
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text space-y-3">
+                                    <p class="interactive-text">
+                                        <span class="latin-text">Te ígitur, clementíssime Pater, per Iesum Christum, Fílium tuum, Dóminum nostrum, súpplices rogámus, ac pétimus, uti accépta hábeas et benedícas, hæc ✠ dona, hæc ✠ múnera, hæc ✠ sancta sacrifícia illibáta, in primis, quæ tibi offérimus pro Ecclésia tua sancta cathólica: quam pacificáre, custodíre, adunáre et régere dignéris toto orbe terrárum: una cum fámulo tuo Papa nostro N. et Antístite nostro N. et ómnibus orthodóxis, atque cathólicæ et apostólicæ fídei cultóribus.</span>
+                                        <span class="translation-popup">We therefore, humbly pray and beseech Thee, most merciful Father, through Jesus Christ, Thy Son, our Lord, that Thou wouldst vouchsafe to accept and bless these ✠ gifts, these ✠ presents, these ✠ holy unspotted Sacrifices, which in the first place we offer Thee for Thy holy Catholic Church to which vouchsafe to grant peace, as also to preserve, unite, and govern it throughout the world, together with Thy servant our Pope, and our Bishop, and all orthodox believers and professors of the Catholic and Apostolic Faith.</span>
+                                    </p>
+                                    
+                                    <p class="interactive-text">
+                                        <span class="latin-text">Qui prídie quam paterétur, accépit panem in sanctas ac venerábiles manus suas, et elevátis óculis in cælum ad te Deum, Patrem suum omnipoténtem, tibi grátias agens, benedíxit, fregit, dedítque discípulis suis, dicens: Accípite, et manducáte ex hoc omnes. HOC EST ENIM CORPUS MEUM.</span>
+                                        <span class="translation-popup">Who, the day before He suffered, took bread into His holy and venerable hands, and with His eyes lifted up towards heaven unto Thee, God, His almighty Father, giving thanks to Thee, He blessed it, broke it and gave it to His disciples, saying: Take and eat ye all of this, FOR THIS IS MY BODY.</span>
+                                    </p>
+                                    
+                                    <p class="interactive-text">
+                                        <span class="latin-text">Símili modo postquam cenátum est, accípiens et hunc præclárum Cálicem in sanctas ac venerábiles manus suas: item tibi grátias agens, benedíxit, dedítque discípulis suis, dicens: Accípite, et bíbite ex eo omnes. HIC EST ENIM CALIX SÁNGUINIS MEI, NOVI ET ÆTÉRNI TESTAMÉNTI: MYSTÉRIUM FÍDEI: QUI PRO VOBIS ET PRO MULTIS EFFUNDÉTUR IN REMISSIÓNEM PECCATÓRUM. Hæc quotiescúmque fecéritis, in mei memóriam faciétis.</span>
+                                        <span class="translation-popup">In like manner, after He had supped, taking also this excellent chalice into His holy and venerable hands and again giving thanks to Thee, He blessed it, and gave it to His disciples, saying: Take and drink ye all of this, FOR THIS IS THE CHALICE OF MY BLOOD, OF THE NEW AND ETERNAL TESTAMENT, THE MYSTERY OF FAITH, WHICH SHALL BE SHED FOR YOU AND FOR MANY UNTO THE REMISSION OF SINS. As often as ye do these things, ye shall do them in remembrance of Me.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text space-y-3">
+                                    <p>We therefore, humbly pray and beseech Thee, most merciful Father, through Jesus Christ, Thy Son, our Lord, that Thou wouldst vouchsafe to accept and bless these ✠ gifts, these ✠ presents, these ✠ holy unspotted Sacrifices, which in the first place we offer Thee for Thy holy Catholic Church to which vouchsafe to grant peace, as also to preserve, unite, and govern it throughout the world, together with Thy servant our Pope, and our Bishop, and all orthodox believers and professors of the Catholic and Apostolic Faith.</p>
+                                    
+                                    <p>Who, the day before He suffered, took bread into His holy and venerable hands, and with His eyes lifted up towards heaven unto Thee, God, His almighty Father, giving thanks to Thee, He blessed it, broke it and gave it to His disciples, saying: Take and eat ye all of this, <strong>FOR THIS IS MY BODY.</strong></p>
+                                    
+                                    <p>In like manner, after He had supped, taking also this excellent chalice into His holy and venerable hands and again giving thanks to Thee, He blessed it, and gave it to His disciples, saying: Take and drink ye all of this, <strong>FOR THIS IS THE CHALICE OF MY BLOOD, OF THE NEW AND ETERNAL TESTAMENT, THE MYSTERY OF FAITH, WHICH SHALL BE SHED FOR YOU AND FOR MANY UNTO THE REMISSION OF SINS.</strong> As often as ye do these things, ye shall do them in remembrance of Me.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pater Noster (Ordinary) -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Pater Noster</h3>
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text space-y-2">
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-priest">P.</span> Pater noster, qui es in cælis, sanctificétur nomen tuum: advéniat regnum tuum: fiat volúntas tua, sicut in cælo et in terra. Panem nostrum quotidiánum da nobis hódie: et dimítte nobis débita nostra, sicut et nos dimíttimus debitóribus nostris: et ne nos indúcas in tentatiónem:</span>
+                                        <span class="translation-popup">Our Father, who art in heaven, hallowed be Thy Name; Thy kingdom come; Thy will be done on earth as it is in heaven. Give us this day our daily bread; and forgive us our trespasses, as we forgive those who trespass against us; and lead us not into temptation:</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Sed líbera nos a malo.</span>
+                                        <span class="translation-popup">But deliver us from evil.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-priest">P.</span> Amen.</span>
+                                        <span class="translation-popup">Amen.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text space-y-2">
+                                    <p><span class="dialogue-priest">P.</span> Our Father, who art in heaven, hallowed be Thy Name; Thy kingdom come; Thy will be done on earth as it is in heaven. Give us this day our daily bread; and forgive us our trespasses, as we forgive those who trespass against us; and lead us not into temptation:</p>
+                                    <p><span class="dialogue-server">S.</span> But deliver us from evil.</p>
+                                    <p><span class="dialogue-priest">P.</span> Amen.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Agnus Dei (Ordinary) -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Agnus Dei</h3>
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text space-y-2">
+                                    <p class="interactive-text">
+                                        <span class="latin-text">Agnus Dei, qui tollis peccáta mundi: miserére nobis.</span>
+                                        <span class="translation-popup">Lamb of God, who takest away the sins of the world, have mercy on us.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text">Agnus Dei, qui tollis peccáta mundi: miserére nobis.</span>
+                                        <span class="translation-popup">Lamb of God, who takest away the sins of the world, have mercy on us.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text">Agnus Dei, qui tollis peccáta mundi: dona nobis pacem.</span>
+                                        <span class="translation-popup">Lamb of God, who takest away the sins of the world, grant us peace.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text space-y-2">
+                                    <p>Lamb of God, who takest away the sins of the world, have mercy on us.</p>
+                                    <p>Lamb of God, who takest away the sins of the world, have mercy on us.</p>
+                                    <p>Lamb of God, who takest away the sins of the world, grant us peace.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Communion (Proper) -->
+                    <div class="propers-section p-4 rounded-lg mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Communion</h3>
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text">
+                                    <p class="interactive-text">
+                                        <span class="latin-text">{{propers.communion.latin}}</span>
+                                        <span class="translation-popup">{{propers.communion.english}}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text">
+                                    <p>{{propers.communion.english}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Postcommunion (Proper) -->
+                    <div class="propers-section p-4 rounded-lg mb-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Postcommunion</h3>
+                        <div class="side-by-side">
+                            <div class="latin-column">
+                                <div class="liturgical-text space-y-2">
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-priest">P.</span> Dóminus vobíscum.</span>
+                                        <span class="translation-popup">The Lord be with you.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Et cum spíritu tuo.</span>
+                                        <span class="translation-popup">And with thy spirit.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-priest">P.</span> Orémus.</span>
+                                        <span class="translation-popup">Let us pray.</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text">{{propers.postcommunion.latin}}</span>
+                                        <span class="translation-popup">{{propers.postcommunion.english}}</span>
+                                    </p>
+                                    <p class="interactive-text">
+                                        <span class="latin-text"><span class="dialogue-server">S.</span> Amen.</span>
+                                        <span class="translation-popup">Amen.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="english-column">
+                                <div class="liturgical-text english-text space-y-2">
+                                    <p><span class="dialogue-priest">P.</span> The Lord be with you.</p>
+                                    <p><span class="dialogue-server">S.</span> And with thy spirit.</p>
+                                    <p><span class="dialogue-priest">P.</span> Let us pray.</p>
+                                    <p>{{propers.postcommunion.english}}</p>
+                                    <p><span class="dialogue-server">S.</span> Amen.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Dismissal -->
+        <div class="accordion-section ordinary-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2>
+                    IV. Dismissal
+                    <i class="fas fa-chevron-down accordion-icon"></i>
+                </h2>
+            </div>
+            <div class="accordion-content">
+                <div class="accordion-body">
+                    <div class="side-by-side">
+                        <div class="latin-column">
+                            <div class="liturgical-text space-y-2">
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Dóminus vobíscum.</span>
+                                    <span class="translation-popup">The Lord be with you.</span>
+                                </p>
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Et cum spíritu tuo.</span>
+                                    <span class="translation-popup">And with thy spirit.</span>
+                                </p>
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Ite, missa est.</span>
+                                    <span class="translation-popup">Go, the Mass is ended.</span>
+                                </p>
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Deo grátias.</span>
+                                    <span class="translation-popup">Thanks be to God.</span>
+                                </p>
+                                
+                                <h4 class="font-bold mt-6 mb-3 text-lg">Last Gospel</h4>
+                                <p class="rubric text-sm mb-3">John 1:1-14</p>
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> Dóminus vobíscum.</span>
+                                    <span class="translation-popup">The Lord be with you.</span>
+                                </p>
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Et cum spíritu tuo.</span>
+                                    <span class="translation-popup">And with thy spirit.</span>
+                                </p>
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-priest">P.</span> ✠ Inítium sancti Evangélii secúndum Ioánnem.</span>
+                                    <span class="translation-popup">✠ The beginning of the holy Gospel according to John.</span>
+                                </p>
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Glória tibi, Dómine.</span>
+                                    <span class="translation-popup">Glory be to Thee, O Lord.</span>
+                                </p>
+                                <p class="interactive-text">
+                                    <span class="latin-text">In princípio erat Verbum, et Verbum erat apud Deum, et Deus erat Verbum. Hoc erat in princípio apud Deum. Omnia per ipsum facta sunt: et sine ipso factum est nihil, quod factum est: in ipso vita erat, et vita erat lux hóminum: et lux in ténebris lucet, et ténebræ eam non comprehendérunt. Fuit homo missus a Deo, cui nomen erat Ioánnes. Hic venit in testimónium, ut testimónium perhibéret de lúmine, ut omnes créderent per illum. Non erat ille lux, sed ut testimónium perhibéret de lúmine. Erat lux vera, quæ illúminat omnem hóminem veniéntem in hunc mundum. In mundo erat, et mundus per ipsum factus est, et mundus eum non cognóvit. In própria venit, et sui eum non recepérunt. Quotquot autem recepérunt eum, dedit eis potestátem fílios Dei fíeri, his qui credunt in nómine eius: qui non ex sanguínibus, neque ex voluntáte carnis, neque ex voluntáte viri, sed ex Deo nati sunt. <span class="rubric">Et Verbum caro factum est, et habitávit in nobis:</span> et vídimus glóriam eius, glóriam quasi Unigéniti a Patre, plenum grátiæ et veritátis.</span>
+                                    <span class="translation-popup">In the beginning was the Word, and the Word was with God, and the Word was God. The same was in the beginning with God. All things were made by Him, and without Him was made nothing that was made. In Him was life, and the life was the light of men. And the light shineth in the darkness, and the darkness did not comprehend it. There was a man sent from God, whose name was John. This man came for a witness, to give testimony of the light, that all men might believe through him. He was not the light, but was to give testimony of the light. That was the true light, which enlighteneth every man that cometh into this world. He was in the world, and the world was made by Him, and the world knew Him not. He came unto His own, and His own received Him not. But as many as received Him, He gave them power to be made the sons of God, to them that believe in His name. Who are born not of blood, nor of the will of the flesh, nor of the will of man, but of God. And the Word was made flesh, and dwelt among us: and we saw His glory, the glory as it were of the only begotten of the Father, full of grace and truth.</span>
+                                </p>
+                                <p class="interactive-text">
+                                    <span class="latin-text"><span class="dialogue-server">S.</span> Deo grátias.</span>
+                                    <span class="translation-popup">Thanks be to God.</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="english-column">
+                            <div class="liturgical-text english-text space-y-2">
+                                <p><span class="dialogue-priest">P.</span> The Lord be with you.</p>
+                                <p><span class="dialogue-server">S.</span> And with thy spirit.</p>
+                                <p><span class="dialogue-priest">P.</span> Go, the Mass is ended.</p>
+                                <p><span class="dialogue-server">S.</span> Thanks be to God.</p>
+                                
+                                <h4 class="font-bold mt-6 mb-3 text-lg">Last Gospel</h4>
+                                <p class="rubric text-sm mb-3">John 1:1-14</p>
+                                <p><span class="dialogue-priest">P.</span> The Lord be with you.</p>
+                                <p><span class="dialogue-server">S.</span> And with thy spirit.</p>
+                                <p><span class="dialogue-priest">P.</span> ✠ The beginning of the holy Gospel according to John.</p>
+                                <p><span class="dialogue-server">S.</span> Glory be to Thee, O Lord.</p>
+                                <p>In the beginning was the Word, and the Word was with God, and the Word was God. The same was in the beginning with God. All things were made by Him, and without Him was made nothing that was made. In Him was life, and the life was the light of men. And the light shineth in the darkness, and the darkness did not comprehend it. There was a man sent from God, whose name was John. This man came for a witness, to give testimony of the light, that all men might believe through him. He was not the light, but was to give testimony of the light. That was the true light, which enlighteneth every man that cometh into this world. He was in the world, and the world was made by Him, and the world knew Him not. He came unto His own, and His own received Him not. But as many as received Him, He gave them power to be made the sons of God, to them that believe in His name. Who are born not of blood, nor of the will of the flesh, nor of the will of man, but of God. <span class="rubric">And the Word was made flesh, and dwelt among us:</span> and we saw His glory, the glory as it were of the only begotten of the Father, full of grace and truth.</p>
+                                <p><span class="dialogue-server">S.</span> Thanks be to God.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Accordion functionality
+        function toggleAccordion(header) {
+            const section = header.parentElement;
+            const isOpen = section.classList.contains('open');
+            
+            // Close all other sections
+            document.querySelectorAll('.accordion-section').forEach(s => {
+                s.classList.remove('open');
+            });
+            
+            // Toggle current section
+            if (!isOpen) {
+                section.classList.add('open');
+            }
+        }
+
+        // Settings panel functionality
+        document.getElementById('openSettings').addEventListener('click', function() {
+            document.getElementById('settingsPanel').classList.add('open');
+            document.getElementById('settingsOverlay').classList.add('open');
+        });
+
+        document.getElementById('closeSettings').addEventListener('click', closeSettings);
+        document.getElementById('settingsOverlay').addEventListener('click', closeSettings);
+
+        function closeSettings() {
+            document.getElementById('settingsPanel').classList.remove('open');
+            document.getElementById('settingsOverlay').classList.remove('open');
+        }
+
+        // Display mode toggle
+        document.querySelectorAll('input[name="displayMode"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'interlinear') {
+                    document.body.classList.add('interlinear-mode');
+                } else {
+                    document.body.classList.remove('interlinear-mode');
+                }
+            });
+        });
+
+        // Font size adjustment
+        const fontSizeSlider = document.getElementById('fontSizeSlider');
+        const fontSizeValue = document.getElementById('fontSizeValue');
+        
+        fontSizeSlider.addEventListener('input', function() {
+            const size = this.value + 'px';
+            fontSizeValue.textContent = size;
+            document.documentElement.style.setProperty('--base-font-size', size);
+            document.querySelectorAll('.liturgical-text').forEach(el => {
+                el.style.fontSize = size;
+            });
+        });
+
+        // Audio functionality (placeholder)
+        document.getElementById('enableAudio').addEventListener('change', function() {
+            if (this.checked) {
+                console.log('Audio enabled');
+                // Implement audio functionality here
+            } else {
+                console.log('Audio disabled');
+            }
+        });
+
+        // Initialize first accordion section as open
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstSection = document.querySelector('.accordion-section');
+            if (firstSection) {
+                firstSection.classList.add('open');
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeSettings();
+            }
+        });
+    </script>
+
+
+
+</body></html>

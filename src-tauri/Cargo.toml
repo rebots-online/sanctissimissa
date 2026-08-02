@@ -1,0 +1,24 @@
+[package]
+name = "st-androids-missal"
+version = "1.25.59353"
+description = "St. Android's Missal — the Traditional Latin Mass and Divine Office as a navigable subway map"
+authors = ["Robin L. M. Cheung, MBA"]
+edition = "2021"
+
+[lib]
+name = "st_androids_missal_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

@@ -1,0 +1,254 @@
+{
+ "Sancti/12-15": {
+  "color": "white",
+  "rankClass": "Duplex majus",
+  "rankNum": 4,
+  "title": "In Octava Immaculatæ Concept. Beatæ Mariæ Virgini"
+ },
+ "Sancti/12-14bmv": {
+  "color": "white",
+  "rankClass": "Semiduplex",
+  "rankNum": 2.5,
+  "title": "De VII die Infra Octavam Immaculatæ Concept. Beatæ Mariæ Virgini"
+ },
+ "Sancti/12-13bmv": {
+  "color": "white",
+  "rankClass": "Semiduplex",
+  "rankNum": 2.19,
+  "title": "De VI die Infra Octavam Immaculatæ Concept. Beatæ Mariæ Virgini"
+ },
+ "Sancti/12-12n": {
+  "color": "white",
+  "rankClass": "Duplex",
+  "rankNum": 3,
+  "title": "Beatæ Mariæ Virginis de Guadalupe"
+ },
+ "Sancti/12-12bmv": {
+  "color": "white",
+  "rankClass": "Semiduplex",
+  "rankNum": 2.19,
+  "title": "De V die Infra Octavam Immaculatæ Concept. Beatæ Mariæ Virgini"
+ },
+ "Sancti/12-12a": {
+  "color": "white",
+  "rankClass": "Semiduplex",
+  "rankNum": 2.5,
+  "title": "De V die Infra Octavam Immaculatæ Concept. Beatæ Mariæ Virgini"
+ },
+ "Sancti/12-11bmv": {
+  "color": "white",
+  "rankClass": "Semiduplex",
+  "rankNum": 2.19,
+  "title": "De IV die Infra Octavam Immaculatæ Concept. Beatæ Mariæ Virgini"
+ },
+ "Sancti/12-10bmv": {
+  "color": "white",
+  "rankClass": "Semiduplex",
+  "rankNum": 2.19,
+  "title": "De III die Infra Octavam Immaculatæ Concept. Beatæ Mariæ Virgini"
+ },
+ "Sancti/12-09bmv": {
+  "color": "white",
+  "rankClass": "Semiduplex",
+  "rankNum": 2.19,
+  "title": "De II die Infra Octavam Immaculatæ Concept. Beatæ Mariæ Virgini"
+ },
+ "Sancti/12-08o": {
+  "color": "white",
+  "rankClass": "Duplex",
+  "rankNum": 3,
+  "title": "Conceptione Beatæ Mariæ Virginis"
+ },
+ "Sancti/12-08": {
+  "color": "white",
+  "rankClass": "Duplex I classis cum octava communi",
+  "rankNum": 6.5,
+  "title": "In Conceptione Immaculata Beatæ Mariæ Virginis"
+ },
+ "Sancti/11-21": {
+  "color": "white",
+  "rankClass": "Duplex majus",
+  "rankNum": 4,
+  "title": "In Presentatione Beatæ Mariæ Virginis"
+ },
+ "Sancti/11-12pl": {
+  "color": "red",
+  "rankClass": null,
+  "rankNum": 0,
+  "title": "Ss. Protomartyrum Poloniae"
+ },
+ "Sancti/10-11": {
+  "color": "white",
+  "rankClass": "Duplex 2 classis",
+  "rankNum": 5,
+  "title": "Maternitatis Beatæ Mariæ Virginis"
+ },
+ "Sancti/10-07": {
+  "color": "white",
+  "rankClass": "Duplex 2 classis",
+  "rankNum": 5.1,
+  "title": "Sanctissimi Rosarii Beatæ Mariæ Virginis"
+ },
+ "Sancti/09-24": {
+  "color": "white",
+  "rankClass": "Duplex majus",
+  "rankNum": 4,
+  "title": "Beatæ Mariæ Virginis de Mercede"
+ },
+ "Sancti/09-15t": {
+  "color": "white",
+  "rankClass": "Duplex",
+  "rankNum": 3,
+  "title": "In Octava Nativitatis Beatæ Mariæ Virginis"
+ },
+ "Sancti/09-15": {
+  "color": "white",
+  "rankClass": "Duplex 2nd class",
+  "rankNum": 5.1,
+  "title": "Septem Dolorum Beatæ Mariæ Virginis"
+ },
+ "Sancti/09-14bmv": {
+  "color": "white",
+  "rankClass": "Semiduplex",
+  "rankNum": 2,
+  "title": "Septima die infra Octavam Nativitatis Beatæ Mariæ Virginis"
+ },
+ "Sancti/09-13bmv": {
+  "color": "white",
+  "rankClass": "Semiduplex",
+  "rankNum": 2,
+  "title": "Sexta die infra Octavam Nativitatis Beatæ Mariæ Virginis"
+ },
+ "Sancti/09-12bmv": {
+  "color": "white",
+  "rankClass": "Semiduplex",
+  "rankNum": 2,
+  "title": "Quinta die infra Octavam Nativitatis Beatæ Mariæ Virginis"
+ },
+ "Sancti/09-12": {
+  "color": "white",
+  "rankClass": "Duplex majus",
+  "rankNum": 4,
+  "title": "S. Nominis Beatæ Mariæ Virginis"
+ },
+ "Sancti/09-11bmv": {
+  "color": "white",
+  "rankClass": "Semiduplex",
+  "rankNum": 2,
+  "title": "Quarta die infra Octavam Nativitatis Beatæ Mariæ Virginis"
+ },
+ "Sancti/09-10bmv": {
+  "color": "white",
+  "rankClass": "Semiduplex",
+  "rankNum": 2,
+  "title": "Tertia die infra Octavam S. Nativitatis Beatæ Mariæ Virginis"
+ },
+ "Sancti/09-09bmv": {
+  "color": "white",
+  "rankClass": "Semiduplex",
+  "rankNum": 2,
+  "title": "Secunda die infra Octavam S. Nativitatis Beatæ Mariæ Virginis"
+ },
+ "Sancti/09-08": {
+  "color": "white",
+  "rankClass": "Duplex II classis cum Octava simplici",
+  "rankNum": 5.1,
+  "title": "Nativitate Beatæ Mariæ Virginis"
+ },
+ "Sancti/08-22": {
+  "color": "white",
+  "rankClass": "Duplex II classis",
+  "rankNum": 5.1,
+  "title": "Immaculati Cordis Beatæ Mariæ Virginis"
+ },
+ "Sancti/08-15t": {
+  "color": "white",
+  "rankClass": "Duplex I classis",
+  "rankNum": 7,
+  "title": "In Assumptione Beatæ Mariæ Virginis"
+ },
+ "Sancti/08-15": {
+  "color": "white",
+  "rankClass": "Duplex I classis cum Octava Communi",
+  "rankNum": 7,
+  "title": "In Assumptione Beatæ Mariæ Virginis"
+ },
+ "Sancti/08-06": {
+  "color": "white",
+  "rankClass": "Duplex II classis",
+  "rankNum": 5.1,
+  "title": "In Transfiguratione Domini Nostri Jesu Christi"
+ },
+ "Sancti/07-16": {
+  "color": "white",
+  "rankClass": "Duplex majus",
+  "rankNum": 4,
+  "title": "Beatæ Mariæ Virginis de Monte Carmelo"
+ },
+ "Sancti/07-03r": {
+  "color": "red",
+  "rankClass": "Duplex",
+  "rankNum": 3,
+  "title": "S. Irenæi Episcopi et Martyris"
+ },
+ "Sancti/07-02": {
+  "color": "white",
+  "rankClass": "Duplex II classis",
+  "rankNum": 5.1,
+  "title": "In Visitatione B. Mariæ Virginis"
+ },
+ "Sancti/05-31": {
+  "color": "white",
+  "rankClass": "Duplex II classis",
+  "rankNum": 5.1,
+  "title": "Beatæ Mariæ Virginis Reginæ"
+ },
+ "Sancti/05-16n": {
+  "color": "red",
+  "rankClass": "Duplex",
+  "rankNum": 3,
+  "title": "S. Joannis Nepomuceni Martyris"
+ },
+ "Sancti/03-25": {
+  "color": "white",
+  "rankClass": "Duplex I classis",
+  "rankNum": 6.5,
+  "title": "In Annuntiatione Beate Mariæ Virgine"
+ },
+ "Sancti/02-11": {
+  "color": "white",
+  "rankClass": "Duplex",
+  "rankNum": 2.1,
+  "title": "In Apparitione Beatæ Mariæ Virginis"
+ },
+ "Sancti/02-02": {
+  "color": "white",
+  "rankClass": "Duplex 2 class",
+  "rankNum": 5.1,
+  "title": "In Purificatione Beatæ Mariæ Virginis"
+ },
+ "Sancti/01-06": {
+  "color": "white",
+  "rankClass": "Duplex I classis",
+  "rankNum": 7,
+  "title": "In Epiphania Domini"
+ },
+ "Sancti/01-05": {
+  "color": "white",
+  "rankClass": "Semiduplex",
+  "rankNum": 4.9,
+  "title": "In Vigilia Epiphaniæ"
+ },
+ "Commune/C12N": {
+  "color": "white",
+  "rankClass": "Simplex",
+  "rankNum": 1,
+  "title": "Officium parvum Beatae Mariae Virginis Tempora Nativitatis"
+ },
+ "Commune/C12A": {
+  "color": "white",
+  "rankClass": "Simplex",
+  "rankNum": 1,
+  "title": "Officium Parvum Beatae Mariae Virginis tempore Adventus et in Annuntiationis"
+ }
+}

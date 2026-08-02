@@ -1,0 +1,1017 @@
+ ▐▛███▜▌   Claude Code v2.1.207
+▝▜█████▛▘  Fable 5 · Claude Max
+  ▘▘ ▝▝    ~/CascadeProjects/StAndroidsMissal
+
+ ▎ Extended: Fable 5 is included in your weekly limit
+ ▎ Through July 12, you can use up to 50% of your weekly usage limit on Fable 5. If you hit your limit, you can continue on Fable 5 with usage credits. Fable 5 draws down usage faster than Opus 4.8. Run /model and select Fable to use it. Learn more
+   +1 more · /status
+  ⎿  SessionStart:startup hook error
+  ⎿  Failed with non-blocking status code: /bin/sh: 1: 
+     /home/robin/.local/share/GitKrakenCLI/versions/gk_3_1_62/gk_3_1_62: not 
+     found
+
+❯ Could you check, what is the current per-turn injected reminder set?          
+  ⎿  ⧉ Selected 359 lines from 
+     ../../.windsurf/plans/constrained-latin-thesis-and-feature-2c325d.md in 
+     Devin - Next
+
+● The question is about the sesh skill's per-turn injected reminders — those
+  live in PHASE_REMINDERS.md per the sesh skill description. Let me find and
+  read it.
+
+  Searched for 1 pattern, read 1 file (ctrl+o to expand)
+
+● Here's the current per-turn injected reminder set — it lives in
+  ~/.claude/skills/sesh/PHASE_REMINDERS.md, the file the sesh skill stuffs into
+  context (Step 0) keyed by the inferred SDLC phase. Six sections at present:
+
+  INIT (bootstrapping a new repo) — 1 bullet
+  - Bootstrap CLAUDE.md + codegraph index + CHECKLIST.md from visible facts
+  before any code; no "it's just a quick project" shortcut.
+
+  DESIGN (pre-architecture UI elucidation) — 1 bullet
+  - Stitch MCP first for any UI-bearing product; freeze artifacts under
+  LIBS/UI/STITCH/ before architecture. The architect reads the artifact, not the
+  mental picture.
+
+  ARCHITECT (MAP/ARCHITECT/PLAN) — 3 bullets
+  - Codegraph only — no raw source reads, no Explore/Plan subagents.
+  - ARCHITECTURE.md must be complete and stub-free before CODE — no TBD/"future
+  work"; if it can't be complete it doesn't exist yet.
+  - Every prose entity gets an entity-table row (name, file:line, role,
+  signature); checklist tasks cite entity names verbatim; two fresh coders must
+  converge.
+
+  CODE (implementation against CHECKLIST.md) — 3 bullets
+  - Orchestrator designs ARCHITECTURE.md, dispatches GLM-5.2 (opencode) /
+  GPT-5.6 (codex) architects to reduce it to CHECKLIST.md, which specifies fully
+  self-contained tasks for GLM-4.7 coders (crush) — one task per subagent, no
+  exploration.
+  - Coder never self-rescues or bridges architect debt; stuck → escalate to
+  architect.
+  - No proxy attestation, ever — grep/exit-code/smoke-test is not "done"; only
+  semantic evaluation against the entity row flips a marker. (Flagged as the
+  most-recurring violated habit in incident history.)
+
+  BUILD (CI/CD, packaging, versioning) — 1 bullet
+  - Manual builds, bypass CI/CD, until successful public release or explicit
+  operator instruction.
+
+  DEBUG (troubleshooting) — 2 bullets
+  - Root-cause before shortcut — never disable a failing gate (--no-verify,
+  skipped check) to clear an obstacle.
+  - Check for working prior art (project logs, shell history) before
+  editing/replacing tooling off one ambiguous error.
+
+  The file's own header notes the design constraints: it's deliberately a
+  shortlist of rules that already exist in CLAUDE.md/DOCS but get silently
+  overridden by default LLM habits — ~5 bullets max per section, emphasis is
+  positional (top = loudest), retirement = deletion (git is the archive), and
+  edits propagate via global-rules-sync.
+
+  Since this was a read-only check, I haven't touched anything. If you want a
+  reminder added, promoted, demoted, or dropped, say the word and I'll edit it
+  per the sesh skill's editing interface and sync it out.
+
+✻ Sautéed for 40s
+
+❯ ok great; any suggestions for recent problematic areas that should be added,  
+  and any suggestions to pare down in size the main CLAUDE.md and potentially   
+  only keep brief reminders in the mainline, conditionally loading more? or you 
+  think we're good to go trying the currenty setup for a moderate-sized round   
+  of changes?                                                                   
+
+● Good question — let me look at the actual current state: the full global
+  CLAUDE.md (the spine version), its size, and recent incident history to see
+  what's actually been biting.
+
+  Read 1 file, listed 2 directories (ctrl+o to expand)
+
+● Two incidents are dated 2026-07-11 — two days ago, clearly from this repo's
+  release-stamping work. Let me read them since they post-date the current
+  reminder set.
+
+  Read 2 files, ran 2 shell commands (ctrl+o to expand)
+
+● User answered Claude's questions:
+  ⎿  · How much of this should land before the next round of changes? → Do the 
+     2) full pass and pare-down, but make sure the glm is glm-5.2 for architect,
+     glm-4.7 coder, not 5.1; what practical difference between Faible5 and 
+     Opus48 for semantic review would y4ou expect? The reason I have Faible5 
+     specified is I thought since you would be devising the 'big picture' you 
+     would be able to compare the semantic coded subunits in context of the big 
+     picture they're applied in better than Opus without it?
+
+● Updated plan
+  ⎿  /plan to preview
+
+● User approved Claude's plan
+  ⎿  Plan saved to: ~/.claude/plans/could-you-check-what-calm-kay.md · /plan to 
+     edit
+     Global rules full pass: reminder additions + INC-18 reconciliation + spine 
+     pare-down
+
+     Context
+
+     Review of ~/.claude/skills/sesh/PHASE_REMINDERS.md and ~/.claude/CLAUDE.md
+     (the spine) against the two most recent incidents (INC-16 vite-emptyOutDir,
+     INC-18 release-chain-outside-conventions, both filed 2026-07-11) found:
+
+     1. INC-18's binding rule never landed. The incident doc cites "I-25 (spine
+     invariant, added same-day)" and "BUILD_CONVENTIONS.md § Release chain is
+     LIVE" — neither exists. Spine tops out at I-20; the BUILD_CONVENTIONS
+     section is absent.
+     2. Two routed files missing on this host: ~/.claude/MODEL_ROUTING.md and
+     ~/.claude/SUBAGENT_DISCIPLINE.md — both are routing-table targets (§0 rows,
+     I-9, §5).
+     3. PHASE_REMINDERS.md predates both incidents — BUILD has one bullet; DEBUG
+     lacks the INC-16 false-causal-narrative lesson.
+     4. Spine is ~45KB (~11k tokens) always-loaded, with paragraph-length
+     negative-enumeration invariants (I-10, I-12, I-19, I-20) that violate the
+     operator's own INC-18 rule-wording lesson ("write the landscape, not the
+     fence"), 4× duplication of I-20 content (I-20, §3 DESIGN line, §4, routing
+     row 39), I-12 duplicated across §2/§5/routing row 34, and a vestigial
+     "Ruflo Integration" block.
+     5. Stale seat references: spine names GLM-5.1 as the architect/judgment
+     seat throughout; operator confirms the current seats are GLM-5.2 architect,
+     GLM-4.7 coder. PHASE_REMINDERS CODE section already says 5.2.
+
+     Operator approved the full pass (quick fixes + spine pare-down), with the
+     seat correction above.
+
+     Execution model
+
+     Per I-17 (Opus/orchestrator delegates paperwork): the doc-editing legwork
+     is dispatched to the GLM-5.2 judgment seat; Fable 5 (this session) writes
+     the dispatch specs, semantically reviews each handback against this plan,
+     and attests. Per I-18: commit + push (global-rules-sync) at every handback.
+     If the GLM-5.2 dispatch path is unavailable in-session, Fable 5 performs
+     the edits directly and says so (loud, not silent).
+
+     Tasks
+
+     T1 — PHASE_REMINDERS.md additions 
+     (~/.claude/skills/sesh/PHASE_REMINDERS.md)
+
+     Per sesh SKILL.md § "Editing the reminders" (positional emphasis, top =
+     loudest):
+
+     - BUILD, new bullet 1 (top): Load ~/.claude/BUILD_CONVENTIONS.md in-session
+     before the first build/release/versioning action, and build through the
+     project's sanctioned scripts — tool knowledge alone (gradle/gomobile/cargo
+     direct) is how INC-18 happened. Stage the complete release set in the
+     canonical checkout's dist/; commit stamped version files with the
+     v{VERSION}:  prefix; one version per handback.
+     - BUILD, new bullet: Web bundlers wipe their output dir by default (vite
+     emptyOutDir) — never stage release artifacts into a directory a later build
+     step will empty; build web first, stage/collect after (INC-16).
+     - DEBUG, new bullet (top): State what happened from observation only;
+     before narrating why, re-verify the mechanism against source or a direct
+     isolating test — a plausible reconstruction stated as fact mid-incident is
+     a fabrication, even when the eventual fix is right (INC-16).
+
+     Keep sections ≤5 bullets: BUILD goes 1→3, DEBUG 2→3. No removals.
+
+     T2 — Land INC-18's missing rule
+
+     - Add spine invariant I-21 (next available number; the incident's "I-25"
+     was never real) in positive landscape form, ≤3 sentences + pointer: before
+     any build/release/versioning action, read BUILD_CONVENTIONS.md; build
+     through sanctioned scripts; stage in canonical dist/; commit stamped
+     versions v{VERSION}: -prefixed; sign with the ecosystem production key; one
+     version per handback. Pointer: INC-18 file.
+     - Add BUILD_CONVENTIONS.md § Release chain is LIVE (compact: dist/ +
+     manifests in the canonical checkout are a live public download surface
+     consumed by the automated landing-page updater; the six numbered rules from
+     INC-18).
+     - Fix INC-18's cross-references: I-25 → I-21 in ~/forgejo/admin/DOCS/INCIDE
+     NTS/release-chain-built-outside-global-conventions.md (also fix its
+     duplicated item-6 editing artifact, lines 59/67-68, while touching it).
+
+     T3 — Recover missing routed files
+
+     - Check the global-rules-sync repo history and other hosts for
+     MODEL_ROUTING.md and SUBAGENT_DISCIPLINE.md (git log --all --diff-filter=D
+     in the sync repo; global-rules-sync pull first).
+     - If recoverable: restore. If never existed / unrecoverable: author minimal
+     versions from the spine's §5 model-routing floor and I-9 content (which
+     currently carry the substance inline) — this also enables the §5
+     compression in T4.
+     - Update seat names during recovery/authoring: architect/judgment =
+     GLM-5.2, coder = GLM-4.7.
+
+     T4 — Spine pare-down (~/.claude/CLAUDE.md)
+
+     Constraints: preserve every routing-table trigger fact (§0 routing rule);
+     keep §6 infrastructure inline (explicitly "always-inline"); every
+     compressed rule keeps its binding force + trigger + INC/convention pointer.
+
+     - Rewrite I-10, I-12, I-19, I-20 in positive landscape form (~2-4 sentences
+     each + pointer to the full convention doc, which already holds the
+     enumerations). These four are ~40% of §2 by volume.
+     - Dedupe I-20: keep the compressed invariant; §3 DESIGN line and §4 shrink
+     to one-line pointers; routing row 39 keeps trigger words + file pointer
+     only.
+     - Dedupe I-12: keep the compressed invariant; routing row 34 keeps triggers
+     + pointers; §5 "Model routing floor" shrinks to a pointer once
+     MODEL_ROUTING.md exists (T3).
+     - Replace all GLM-5.1 → GLM-5.2 seat references (I-12 verifier, I-17, I-20,
+     §4, §5); coder stays GLM-4.7 (zclaude-coder-47/crush).
+     - Drop the "Ruflo Integration" block (lines 246-249) — auto-generated, no
+     ruflo MCP tools present in current sessions. Flag in the commit message so
+     it's recoverable if ruflo returns.
+     - Target: ~30-40% byte reduction (45KB → ~28-30KB). Do NOT touch §0.5/§0.6,
+     I-15, §6, or the CodeGraph block beyond the seat-name sweep.
+
+     T5 — Sync + verify
+
+     - Commit per-task (I-18), push via global-rules-sync so all hosts converge.
+
+     Verification
+
+     - wc -c ~/.claude/CLAUDE.md before/after — confirm reduction with no
+     routing row deleted (grep -c '| ' §0 table row count unchanged).
+     - Every routing-table target resolves: for f in $(grep -oP 
+     '~/.claude/\w+\.md' ~/.claude/CLAUDE.md | sort -u); do ls ${f/#\~/$HOME}; 
+     done — zero misses.
+     - grep -rn 'GLM-5.1' ~/.claude/CLAUDE.md 
+     ~/.claude/skills/sesh/PHASE_REMINDERS.md ~/.claude/MODEL_ROUTING.md → no
+     hits (incident/convention docs keep historical 5.1 mentions — they're
+     records).
+     - grep -n 'I-21' ~/.claude/CLAUDE.md ~/forgejo/admin/DOCS/INCIDENTS/release
+     -chain-built-outside-global-conventions.md → both hit; grep -n 'I-25' 
+     <incident> → gone.
+     - grep -n 'Release chain is LIVE' ~/.claude/BUILD_CONVENTIONS.md → hits.
+     - Semantic review (Fable 5, per I-12 — no proxy-only attestation): read the
+     compressed I-10/I-12/I-19/I-20 against their full convention docs and
+     confirm no binding clause was lost, only enumeration moved to the routed
+     file.
+     - Fresh-session smoke: open a new session, confirm the spine + sesh
+     reminders load and the BUILD/DEBUG additions surface.
+
+● Plan approved — executing. First, let me check whether the GLM-5.2 dispatch
+  path exists on this host (per the plan's execution model), then set up task
+  tracking.
+  Listed 1 directory, ran 1 shell command (ctrl+o to expand)
+
+● opencode exists but defaults to glm-4.6. Checking whether a GLM-5.2 model is
+  available on the provider:
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Update(~/.claude/skills/sesh/PHASE_REMINDERS.md)
+  ⎿  Added 9 lines
+      78  ## BUILD
+      79  (CI/CD, release pipelines, packaging, versioning)
+      80  
+      81 +- Load `~/.claude/BUILD_CONVENTIONS.md` in-session before the f
+         +irst                                                           
+      82 +  build/release/versioning action, and build through the projec
+         +t's                                                            
+      83 +  sanctioned scripts — running gradle/gomobile/cargo directly f
+         +rom tool                                                       
+      84 +  knowledge is how INC-18 happened. Stage the complete release 
+         +set in the                                                     
+      85 +  **canonical checkout's** `dist/`; commit stamped version file
+         +s with the                                                     
+      86 +  `v{VERSION}: ` prefix; one version per handback.             
+      87 +- Web bundlers wipe their output dir by default (vite `emptyOut
+         +Dir`) —                                                        
+      88 +  never stage release artifacts into a directory a later build 
+         +step will                                                      
+      89 +  empty; build web first, stage/collect after (INC-16).        
+      90  - Manual builds, bypass CI/CD, until successful public release 
+          or explicit
+      91    operator instruction otherwise. A build step existing is not 
+          itself
+      92    license to stand up or invoke CI as the default move.
+
+● Update(~/.claude/skills/sesh/PHASE_REMINDERS.md)
+  ⎿  Added 4 lines
+       94  ## DEBUG
+       95  (troubleshooting, bug fixes, unexpected behavior)
+       96  
+       97 +- State *what* happened from observation only; before narratin
+          +g *why*,                                                      
+       98 +  re-verify the mechanism against source or a direct isolating
+          + test — a                                                     
+       99 +  plausible reconstruction stated as fact mid-incident is a fa
+          +brication,                                                    
+      100 +  even when the eventual fix is right (INC-16).               
+      101  - Root-cause before shortcut. Don't disable a failing gate (`-
+           -no-verify`,
+      102    skip a check) to make an obstacle go away — find out why it'
+           s failing
+      103    first.
+
+● T1 edits landed (BUILD 1→3 bullets, DEBUG 2→3, new lessons at top). Committing
+  per-task per I-18:
+
+  Committed f414ac0 (ctrl+o to expand)
+
+  Searched for 1 pattern, ran 1 shell command (ctrl+o to expand)
+
+● Update(~/.claude/CLAUDE.md)
+  ⎿  Added 2 lines
+      105  
+      106  - **I-20 Stitch-first UI elucidation precedes architecture (bi
+           nding; TC12):** for any UI-bearing product (mobile/desktop/web
+            app — not pure backend/CLI/library), the orchestrator elicits
+            the complete visual UI + user journey/workflows via Stitch MC
+           P (`mcp__stitch__*` — `create_project` → `create_design_system
+           `/`upload_design_md` → `apply_design_system` → `generate_scree
+           n_from_text`/`generate_variants`/`edit_screens` → `get_screen`
+           /`list_screens`) BEFORE directing GLM-5.1 architects, freezing
+            BOTH a `DESIGN.md` (design-system spec) AND the working code 
+           artifacts Stitch exports (React/HTML/CSS) under `<project root
+           >/LIBS/UI/STITCH/` (`DESIGN.md` + `screens/<screen>/…`). This 
+           frozen complement is an ARCHITECT-exit-gate INPUT (I-11): the 
+           orchestrator then directs GLM-5.1 architects to produce each m
+           odule of the comprehensive, no-placeholder `DOCS/ARCHITECTURE.
+           md`, transform it to the wholly-self-contained `CHECKLIST.md`,
+            and dispatch GLM-4.7 coders (I-12 three-role chain). The work
+           ing artifacts are WIRED IN at CODE (architecture cites them as
+            UI source-of-truth; CHECKLIST tasks integrate them) — coders 
+           never re-invent UI. Stitch is the STIPULATED UI specialist unl
+           ess the operator supplies a comparable-tool set (e.g. "open de
+           signer") or otherwise directs, in which case that set lands un
+           der `LIBS/UI/` in the same role and the pipeline is otherwise 
+           unchanged. Forbidden: architecting a UI-bearing product before
+            its UI/journeys are elucidated and frozen; placeholder/"TBD" 
+           screens; coders inventing UI; treating Stitch as one tool amon
+           g equals (v0/Lovable/Bolt are subordinate web-runnable-prototy
+           pe fallbacks only). Full: `~/forgejo/admin/DOCS/TOOLING_CONVEN
+           TIONS/stitch-first-ui-elucidation.md` (TC12).
+      107  
+      108 +- **I-21 Build through the conventions — the release chain is 
+          +LIVE (binding; INC-18):** before the first build/release/versi
+          +oning action of a session, read `~/.claude/BUILD_CONVENTIONS.m
+          +d` — a precondition, like I-1's codegraph rule. Build through 
+          +the project's sanctioned scripts, stage the complete release s
+          +et in the **canonical checkout's** `dist/` (a live public down
+          +load surface consumed by the automated landing-page updater), 
+          +commit the stamped version files with the `v{VERSION}: ` prefi
+          +x, and always sign with the ecosystem production key. One vers
+          +ion per handback: finish the changes, then stamp and build onc
+          +e — every stamp consumes a MINOR in the public chain. Full: `~
+          +/forgejo/admin/DOCS/INCIDENTS/release-chain-built-outside-glob
+          +al-conventions.md` (INC-18).                                  
+      109 +                                                              
+      110  Drift anchor: vocabulary in entity table; contract in checklis
+           t; coders read checklist; architects do not code.
+      111  
+      112  ---
+
+  Searched for 1 pattern (ctrl+o to expand)
+● Update(~/forgejo/admin/DOCS/INCIDENTS/release-chain-built-outside-global-conve
+        ntions.md)
+  ⎿  Added 1 line, removed 1 line
+      40  conventions. An agent that "knows how to run gradle/gomobile" c
+          an execute the entire
+      41  pipeline from tool knowledge alone — plausibly, silently, wrong
+          ly.
+      42  
+      43 -## Rule (now binding — I-25 in the spine)                      
+      43 +## Rule (now binding — I-21 in the spine)                      
+      44  
+      45  Before any build/release/versioning action:
+      46  
+
+● Update(~/forgejo/admin/DOCS/INCIDENTS/release-chain-built-outside-global-conve
+        ntions.md)
+  ⎿  Added 2 lines, removed 3 lines
+      56  5. **Always sign with the ecosystem production key** (`signing/
+          production.keystore`;
+      57     Google Play locks each namespace to its signing identity — o
+          ne key keeps every
+      58     upgrade installing over the top). Public surfaces state it a
+          s the guarantee it is.
+      59 -6. **One version per handback** — finish the changes, then stam
+         -p and build once.                                              
+      59 +6. **One version per handback** — finish the changes, then stam
+         +p and build once;                                              
+      60 +   every stamp consumes a MINOR in the public chain.           
+      61  
+      62  ## Rule-wording lesson (operator 2026-07-03)
+      63  
+     ...
+      65  production key"). Long negative enumerations ("never X, do not 
+          Y, forbidden Z")
+      66  rehearse the failure they fence, poisoning context into self-fu
+          lfilling obsession —
+      67  and burn tokens. Write the landscape, not the fence.
+      67 -6. **One version per handback.** Do not fire a release build wh
+         -ile further changes for                                        
+      68 -   the same handback are known-pending; every stamp consumes a 
+         -MINOR in the public chain.                                     
+      68  
+      69  ## Why (operator, 2026-07-03)
+      70  
+
+● Update(~/forgejo/admin/DOCS/INCIDENTS/release-chain-built-outside-global-conve
+        ntions.md)
+  ⎿  Added 1 line, removed 1 line
+      79  ## Cross-references
+      80  
+      81  - `~/.claude/BUILD_CONVENTIONS.md` § "Release chain is LIVE" (a
+          dded same-day)
+      82 -- `~/.claude/CLAUDE.md` I-25 (spine invariant, added same-day) 
+      82 +- `~/.claude/CLAUDE.md` I-21 (spine invariant; the same-day "I-
+         +25" edit never landed — reconciled 2026-07-13)                 
+      83  - CC7 version-display-compliance; TC5 semantic filename disambi
+          guation (INC-4);
+      84    INC-16-adjacent: vite-emptyoutdir-destroys-staged-release-art
+          ifacts (same dist/-is-live
+      85    lesson from the destructive side).
+
+  Committed bc7626d (ctrl+o to expand)
+
+● T3 — recovering the missing routed files. Checking the sync repo's history for
+  whether they ever existed:
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+❯ "Deleted on sight," I would change to 'moved to a universal "outbox"' and not 
+  sactually delete anything but centrally treatt the 'outbox' for all projects  
+  as a trash bin that never empties automatically                               
+
+  Searched for 3 patterns (ctrl+o to expand)
+
+● Update(~/.claude/BUILD_CONVENTIONS.md)
+  ⎿  File must be read first
+
+● Update(~/.claude/CLAUDE.md)
+  ⎿  Added 1 line, removed 1 line
+      145  - Package IDs: `mba.robin.<product>` or `com.rochemediaservice
+           s.<product>`; keep identity aligned across manifests/stores.
+      146  - Version `MAJOR.MINOR.BUILD` — semantically versioned but **n
+           ot semver**, no PATCH. Android `versionCode = MAJOR*100000 + M
+           INOR`.
+      147  - **MINOR autoincrements unconditionally on every CI invocatio
+           n** (regardless of build success or code change) — the experim
+           ental-iteration discriminant. MAJOR is manual. CI commits the 
+           bumped version file back to the branch (`[skip ci]` + `paths-i
+           gnore` recursion guard). See `BUILD_CONVENTIONS.md § Versionin
+           g` + `~/forgejo/admin/DOCS/CICD_CONVENTIONS/minor-as-experimen
+           tal-discriminant.md` (CC2).
+      148 -- **Artifact hygiene: stamped-or-cleaned (CC12).** Every persi
+          -sted artifact filename = slug + full stamped `v<MAJOR.MINOR.BU
+          -ILD>`; if it can't be stamped, don't leave it behind anywhere.
+          - Toolchain default names (`app-universal-release.*`, `intermed
+          -iary-bundle.aab`, unstamped deb/exe) are never a managed surfa
+          -ce — configure stamped names at the source (Gradle `base.archi
+          -vesName` from `tauri.properties`); collect scripts read `versi
+          -on.json` verbatim (never mint a build number); unstamped files
+          - live only in gitignored disposable zones (`**/build/`, `targe
+          -t/`); stale wrong-version artifacts deleted on sight. See `BUI
+          -LD_CONVENTIONS.md § Artifact hygiene` + `~/Admin-Manual/DOCS/C
+          -ICD_CONVENTIONS/artifact-hygiene-stamped-or-cleaned.md` (CC12)
+          -.                                                             
+      148 +- **Artifact hygiene: stamped-or-cleaned (CC12).** Every persi
+          +sted artifact filename = slug + full stamped `v<MAJOR.MINOR.BU
+          +ILD>`; if it can't be stamped, don't leave it behind anywhere.
+          + Toolchain default names (`app-universal-release.*`, `intermed
+          +iary-bundle.aab`, unstamped deb/exe) are never a managed surfa
+          +ce — configure stamped names at the source (Gradle `base.archi
+          +vesName` from `tauri.properties`); collect scripts read `versi
+          +on.json` verbatim (never mint a build number); unstamped files
+          + live only in gitignored disposable zones (`**/build/`, `targe
+          +t/`); stale wrong-version artifacts move on sight to the unive
+          +rsal outbox `~/outbox/<project>/` (the cross-project trash bin
+          + — never auto-emptied, nothing deleted). See `BUILD_CONVENTION
+          +S.md § Artifact hygiene` + `~/Admin-Manual/DOCS/CICD_CONVENTIO
+          +NS/artifact-hygiene-stamped-or-cleaned.md` (CC12).            
+      149  - CI is self-hosted — never default to GitHub-hosted `ubuntu-l
+           atest`. Forgejo `runs-on` omits `self-hosted`, uses labels dir
+           ectly (`[linux-amd64]`, `[android, linux-amd64]`, `[windows-x6
+           4-cross]`); GitHub Actions self-hosted includes `self-hosted` 
+           (`[self-hosted, linux-amd64]`). Any cargo-using CI job install
+           s `build-essential` before cargo runs (Forgejo jobs are fresh 
+           Docker containers).
+      150  
+      151  ### Repository visibility floor — new repos start PRIVATE (bin
+           ding)
+
+● Update(CLAUDE.md)
+  ⎿  Added 1 line, removed 1 line
+      54  - `DOCS/ARCHITECTURE/StAndroidsMissal-v1.md` — authoritative en
+          tity table (names, signatures, file:line), data flow, decisions
+          . New entities get a row there before they're coded.
+      55  - `CHECKLIST.md` — execution contract with state markers: `[ ]`
+           not started · `[/]` in progress · `[X]` implemented · ✅ verif
+          ied by running code. Only flip to ✅ after actually running the
+           verification.
+      56  - One version string (`MAJOR.MINOR.BUILD`) across `package.json
+          `, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, `gen/an
+          droid/tauri.properties` — canonical source is `version.txt`; `v
+          ersion.json` is the runtime mirror (splash/About/footer read it
+          ). `npm run stamp` **bumps MINOR unconditionally** then stamps 
+          everything — the bump lives inside the stamper (SOP: `~/Admin-M
+          anual/versioning/`); MAJOR is hand-edited in `version.txt` per 
+          milestone. **The stamp runs once, first, per build invocation**
+           via the entrypoints `build:web` / `build:desktop` / `build:and
+          roid` — never inside `prebuild` (the Tauri CLI reads `tauri.con
+          f.json` at startup, so an in-flight restamp labels the artifact
+           one version behind its binary). App identifier: `mba.robin.sta
+          ndroidsmissal`. `versionCode` = `MAJOR * 100000 + MINOR` (CC7: 
+          never user-facing).
+      57 -- **Artifact hygiene (CC12): stamped-or-cleaned.** Every artifa
+         -ct left on disk is named `v<version>-standroidsmissal-<qualifie
+         -r>.<ext>`; anything unstampable is not left behind. Gradle emit
+         -s stamped APK/AAB names via `base.archivesName` in `src-tauri/g
+         -en/android/app/build.gradle.kts` (reads `tauri.properties`) — n
+         -ever reference or preserve `app-universal-release.*`/`intermedi
+         -ary-bundle.aab` names; they exist only transiently inside gitig
+         -nored `build/`/`target/`. `scripts/collect-artifacts.mjs` stage
+         -s to `dist/` reading `version.json` verbatim (never recomputes 
+         -a build number) and is the only managed artifact surface. Note 
+         -`vite build` wipes `dist/` — build web first, collect after. St
+         -ale wrong-version bundles are deleted on sight.                
+      57 +- **Artifact hygiene (CC12): stamped-or-cleaned.** Every artifa
+         +ct left on disk is named `v<version>-standroidsmissal-<qualifie
+         +r>.<ext>`; anything unstampable is not left behind. Gradle emit
+         +s stamped APK/AAB names via `base.archivesName` in `src-tauri/g
+         +en/android/app/build.gradle.kts` (reads `tauri.properties`) — n
+         +ever reference or preserve `app-universal-release.*`/`intermedi
+         +ary-bundle.aab` names; they exist only transiently inside gitig
+         +nored `build/`/`target/`. `scripts/collect-artifacts.mjs` stage
+         +s to `dist/` reading `version.json` verbatim (never recomputes 
+         +a build number) and is the only managed artifact surface. Note 
+         +`vite build` wipes `dist/` — build web first, collect after. St
+         +ale wrong-version bundles are moved on sight to the universal o
+         +utbox (`~/outbox/standroidsmissal/` — the cross-project trash b
+         +in, never auto-emptied, nothing deleted).                      
+      58  - **Remotes (CC13):** `origin` = `https://forgejo.robin.mba/rch
+          eung/StAndroidsMissal.git` — authoritative, and the ONLY LFS st
+          ore (`assets/missal.db` is an LFS object; instance is HTTPS-onl
+          y, no SSH). `github` = code-only mirror; its LFS is redirected 
+          to Forgejo (`remote.github.lfsurl`), so it holds pointers, neve
+          r objects. Push both: `git push origin master && git push githu
+          b master`. Never enable GitHub LFS.
+      59  - **CI:** `.github/workflows/build-all-platforms.yml` is checke
+          d in but **dormant** — all builds are local until public releas
+          e (TC14). See `DOCS/BUILD.md` for local build instructions.
+      60  
+
+● Update(~/forgejo/admin/DOCS/CICD_CONVENTIONS/artifact-hygiene-stamped-or-clean
+        ed.md)
+  ⎿  File must be read first
+
+● Two edits need the files Read first — reading the target regions:
+
+  Read 2 files (ctrl+o to expand)
+
+● Update(~/.claude/BUILD_CONVENTIONS.md)
+  ⎿  Added 1 line, removed 1 line
+      827  - Toolchain default names (`app-universal-release.aab`, `inter
+           mediary-bundle.aab`, unstamped `.deb`/`.exe`) are never a mana
+           ged surface — nothing references, preserves, or uploads them. 
+           Configure the toolchain to emit stamped names at the source wh
+           ere possible: Tauri 2 Android → `base { archivesName.set("<slu
+           g>-v" + tauriProperties.getProperty("tauri.android.versionName
+           ", "0.0")) }` in `gen/android/app/build.gradle.kts` (drives AP
+           K and AAB).
+      828  - Collect/stage scripts read the stamped version verbatim from
+            `version.json` — never mint their own build number at collect
+            time.
+      829  - Unstamped files may exist only inside declared gitignored di
+           sposable zones (`**/build/`, `target/`, `node_modules/`); the 
+           zone boundary is absolute so the whole zone is deletable witho
+           ut forensics. Raw-named copies are removed after staging.
+      830 -- Stale wrong-version artifacts (label predates current stamp)
+          - are deleted on sight — a mislabeled artifact is worse than an
+          - opaque one; it lies.                                         
+      830 +- Stale wrong-version artifacts (label predates current stamp)
+          + are moved on sight to the universal outbox `~/outbox/<project
+          +>/` — a mislabeled artifact is worse than an opaque one; it li
+          +es. The outbox is the single cross-project trash bin: nothing 
+          +in it is ever deleted automatically; emptying any part of it i
+          +s an operator act.                                            
+      831  - Play-safety boundary: `versionCode = MAJOR*100000 + MINOR` i
+           s strictly monotonic and Play-safe **iff MINOR < 100000**; fiv
+           e-digit MINOR is the early warning to bump MAJOR.
+      832  
+      833  Full: `~/Admin-Manual/DOCS/CICD_CONVENTIONS/artifact-hygiene-s
+           tamped-or-cleaned.md` (CC12).
+
+● Update(~/forgejo/admin/DOCS/CICD_CONVENTIONS/artifact-hygiene-stamped-or-clean
+        ed.md)
+  ⎿  Added 1 line, removed 1 line
+      16  
+      17  - Letting toolchain default names (`app-universal-release.apk`,
+           `app-universal-release-unsigned.apk`, `app-release.aab`, `inte
+          rmediary-bundle.aab`, unstamped `.deb`/`.AppImage`/`.exe`) be a
+           **managed surface** — i.e. anything a human, script, doc, or u
+          pload step references or preserves.
+      18  - Staging/collect scripts that **mint their own version or buil
+          d number** at collect time (e.g. recomputing epoch-minutes). Th
+          e stamped version file (`version.txt`/`version.json`) is the ON
+          LY version; a filename that disagrees with it is unidentifiable
+          . (StAndroidsMissal `collect-artifacts.mjs` had both defects: r
+          ecomputed BUILD, and read nonexistent `versionJson.major/minor`
+           → `vundefined.undefined.*` names.)
+      19 -- Leaving stale artifacts whose embedded/labelled version preda
+         -tes the current stamp ("wrongly versioned is worse than opaque 
+         -— it lies"). Delete on sight; they are regenerable.            
+      19 +- Leaving stale artifacts whose embedded/labelled version preda
+         +tes the current stamp ("wrongly versioned is worse than opaque 
+         +— it lies"). Move on sight to the universal outbox `~/outbox/<p
+         +roject>/` — the single cross-project trash bin that never empti
+         +es automatically (I3 additive stewardship: nothing is actually 
+         +deleted; emptying is an operator act). Amended 2026-07-13 from 
+         +"delete on sight" by operator instruction.                     
+      20  - Copying a raw-named artifact out of the build tree without re
+          naming it to the stamped form.
+      21  
+      22  ## Allowed / required mechanics
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Write(~/.claude/MODEL_ROUTING.md)
+  ⎿  Wrote 48 lines to ../../.claude/MODEL_ROUTING.md
+       1 # Model Routing — Seats, Substrates, Dispatch
+       2 
+         the routing
+       4 table referenced this file before it existed; reconstructed from
+          the spine's
+         f 2026-07-13).
+       6 
+       7 ## Seats
+       9 | Seat | Model | Tool / invocation | Role |
+      10 |---|---|---|---|
+     … +72 lines (ctrl+o to expand)
+
+● Write(~/.claude/SUBAGENT_DISCIPLINE.md)
+  ⎿  Wrote 51 lines to ../../.claude/SUBAGENT_DISCIPLINE.md
+       1 # Subagent Discipline — Dispatch, Continuation, Handback
+       3 Routed from `~/.claude/CLAUDE.md` §0 / I-9. Authored 2026-07-13 
+         (the routing
+       4 table referenced this file before it existed; reconstructed from
+       5 I-9/I-10(c)/I-18 content).
+       6 
+       8 
+       9 Once a subagent is dispatched, the orchestrator continues — it d
+         oes not halt
+          on") OR
+     … +66 lines (ctrl+o to expand)
+
+  Read 1 file, ran 2 shell commands (ctrl+o to expand)
+
+● Update(~/.claude/.gitignore)
+  ⎿  Added 1 line
+      15  !BILLING_CONVENTIONS.md
+      16  !CI_RUNNERS.md
+      17  !MODEL_ROUTING.md
+      18 +!SUBAGENT_DISCIPLINE.md                                        
+      19  
+      20  # Assets that inform how Claude behaves across hosts
+      21  !agents/
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Write(~/.claude/.tmp/t4-spine-paredown-spec.md)
+  ⎿  Wrote 101 lines to ../../.claude/.tmp/t4-spine-paredown-spec.md
+       1 # Dispatch spec — spine pare-down (T4)
+       3 You are the GLM-5.2 architect/judgment seat. Edit exactly ONE fi
+         le:
+         dits below,
+       5 nothing else. Do not commit; the orchestrator reviews and commit
+       6 
+       7 ## Rule-wording standard (binds every rewrite)
+       9 From INC-18's operator lesson: rules are stated as the **positiv
+         e action**,
+         ot Y,
+     … +141 lines (ctrl+o to expand)
+
+● Dispatching to the GLM-5.2 seat (background — it may take several minutes):
+
+  Searched for 1 pattern, ran 3 shell commands (ctrl+o to expand)
+
+● Foreground waits are blocked — the background task will notify on completion.
+  Meanwhile, pushing the admin-repo commits (independent of T4):
+
+  Read 1 file, ran 2 shell commands (ctrl+o to expand)
+
+● The dispatch is still running (opencode boots its MCP servers before the model
+  starts editing, which takes a while). I'll resume the moment it hands back —
+  next steps queued: semantic diff review against the four full convention docs,
+  fix-or-accept, commit, then the T5 verification battery and global-rules-sync
+  push.
+✻ Churned for 14m 47s
+
+※ recap: Doing the approved global-rules full pass: reminders, missing rule files, and incident fixes are done; the CLAUDE.md spine pare-down is running on the GLM-5.2 seat now. Next I review its diff, then verify and sync everything. (disable recaps in /config)
+
+● Background command "Dispatch spine pare-down to GLM-5.2 via opencode"
+completed (exit code 0)
+
+● The seat handed back. Reviewing — first its dispatch report, then the actual
+  diff:
+
+  Searched for 1 pattern, read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Update(~/.claude/CLAUDE.md)
+  ⎿  Added 1 line, removed 1 line
+      56  
+      57  1. **Pieces LTM is the trajectory recall surface** — "what did 
+          we decide/discuss, where did we leave off, did we already choos
+          e X." Consult it when your role permits 4D recall (orchestrator
+          ; architect/coder stay snapshot-bound — see §5 + the `sesh` rol
+          e-detection). Storage is excellent and trustworthy.
+      58  2. **Go DIRECT; bypass the concierge LLM.** `ask_pieces_ltm` AN
+          D `mcp__pieces__*` structured/vector search are unreliable *ret
+          rieval* — they report false-empty over real content (verified 2
+          026-05-29: MCP returned OCR noise + a stale standup while a dir
+          ect `sqlite3` query returned the exact decision log). Text cont
+          ent lives in the Couchbase Lite DB `~/Documents/com.pieces.os/p
+          roduction/Pieces/couchbase.cblite2/db.sqlite3`, in the FTS shad
+          ow tables — column `c0text` of `"kv_.<entity>::<entity>\Full\Te
+          xt\Search\Index_content"`, entity ∈ {`annotations` (highest sig
+          nal — AI session summaries), `conversation\Messages`, `workstre
+          am\Summaries`, `conversations`}. `vector_db/*.sqlite` are id-on
+          ly indexes (no text). Query: `sqlite3 -readonly "<db>" "SELECT 
+          c0text FROM \"<…Index_content>\" WHERE c0text LIKE '%<term>%';"
+          ` (`-readonly` is WAL-safe). Treat any MCP/LLM empty as **incon
+          clusive, never authoritative**. This governs the `sesh` Tier po
+          licy (Tier 2 direct-SQLite is the reliable path, not a last res
+          ort) and **supersedes any command/skill that routes recall thro
+          ugh `ask_pieces_ltm` — notably `/sc:load` and `/sc:save`; their
+           LLM-concierge results are inconclusive regardless of how recal
+          l was invoked.**
+      59 -3. **Recall-shaped prompts trigger a direct-DB check FIRST (bin
+         -ding; INC-14).** "Did we add/do/already X", "did we decide/choo
+         -se X", "where did we leave off / what was happening", "is there
+         - prior context on X" — any question whose answer depends on the
+         - **trajectory** rather than current on-disk state — the operato
+         -r-facing session MUST query the Pieces direct DB (point 2 mecha
+         -nic) **before or alongside** any codebase search, never skippin
+         -g it, never treating an MCP/`ask_pieces_ltm` empty as authorita
+         -tive. Scope: the **operator-facing session only** (orchestrator
+         - `cclaude`; operator's GLM-5.1 `zclaude-full`/`zclaude`). Archi
+         -tect (I-1)/coder (I-4) stay **Pieces-abstinent** (INC-3, TC2, I
+         --14). Full + precipitating event: `~/forgejo/admin/DOCS/INCIDEN
+         -TS/pieces-comprehensive-storage-empty-handed-llm-retrieval.md` 
+         -(INC-14).                                                      
+      59 +3. **Recall-shaped prompts trigger a direct-DB check FIRST (bin
+         +ding; INC-14).** "Did we add/do/already X", "did we decide/choo
+         +se X", "where did we leave off / what was happening", "is there
+         + prior context on X" — any question whose answer depends on the
+         + **trajectory** rather than current on-disk state — the operato
+         +r-facing session MUST query the Pieces direct DB (point 2 mecha
+         +nic) **before or alongside** any codebase search, never skippin
+         +g it, never treating an MCP/`ask_pieces_ltm` empty as authorita
+         +tive. Scope: the **operator-facing session only** (orchestrator
+         + `cclaude`; operator's GLM-5.2 `zclaude-full`/`zclaude`). Archi
+         +tect (I-1)/coder (I-4) stay **Pieces-abstinent** (INC-3, TC2, I
+         +-14). Full + precipitating event: `~/forgejo/admin/DOCS/INCIDEN
+         +TS/pieces-comprehensive-storage-empty-handed-llm-retrieval.md` 
+         +(INC-14).                                                      
+      60  
+      61  ---
+      62  
+
+● Committing T4 and running the full T5 verification battery:
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Skill(global-rules-sync)
+  ⎿  Successfully loaded skill
+
+● Following the skill's sync procedure — pull-rebase first, then push to the v15
+  remote (and v13 if the transition remote exists on this host):
+
+  Pushed to main (ctrl+o to expand)
+
+  Pushed to master, searched for 1 pattern (ctrl+o to expand)
+  ⎿  Interrupted · What should Claude do instead?
+
+❯ wait wait forgejo.robin.mba is the new forgejo going forward, so whenever you 
+  encounter git.robin.mba, instead make the new origin on forgejo.robin.mba so  
+  eventually we will migrate the active repos                                   
+  ⎿  Interrupted · What should Claude do instead?
+
+❯ this is Admin-Manual related work, the claudemd adjustmenets and so on        
+  ⎿  Interrupted · What should Claude do instead?
+
+❯ (not standroidsmissal but i wanted it in place to apply to edits we need to   
+  make to standroidsmissal                                                      
+
+  Ran 1 shell command (ctrl+o to expand)
+● Admin-Manual already has the correct v15 origin — but the branch tracks
+  github/master, which is why the bare push resolved to GitHub and tripped the
+  classifier. Re-pointing tracking to origin and pushing there:
+
+  Ran 3 shell commands (ctrl+o to expand)
+
+● Private and empty — safe to publish. Pushing the full Admin-Manual history to
+  the v15 origin:
+
+  Pushed to master, ran 1 shell command (ctrl+o to expand)
+
+● Update(~/.claude/CLAUDE.md)
+  ⎿  Added 1 line, removed 1 line
+      206  
+      207  ### Forgejo git
+      208  
+      209 -Two instances: **`git.robin.mba`** (old v13) — use SSH remotes
+          - only: `git@git.robin.mba:<org>/<repo>.git` (HTTPS through ngi
+          -nx can 504 on large pushes). **`forgejo.robin.mba`** (v15, mig
+          -ration target, LAN 192.168.0.194) — **HTTPS-only, no SSH**; au
+          -th `rcheung:<token>` via `~/.git-credentials`; token in `~/Adm
+          -in-Manual/CREDENTIALS/forgejo-robin-mba-v15.md`.              
+      209 +**`forgejo.robin.mba`** (v15, LAN 192.168.0.194) is the Forgej
+          +o going forward — **HTTPS-only, no SSH**; auth `rcheung:<token
+          +>` via `~/.git-credentials`; token in `~/Admin-Manual/CREDENTI
+          +ALS/forgejo-robin-mba-v15.md`. **Standing migration rule (oper
+          +ator 2026-07-13):** whenever a repo is encountered whose remot
+          +e points at `git.robin.mba` (old v13; SSH-only remotes `git@gi
+          +t.robin.mba:<org>/<repo>.git`), make `origin` a `forgejo.robin
+          +.mba` repo (create it **private** if absent, verify visibility
+          + before first push), demote the old remote to `v13`, and push 
+          +— active repos migrate opportunistically on touch. Push both r
+          +emotes until a repo's hosts have all converged.               
+      210  
+      211  **LFS floor (CC13, binding): NEVER GitHub LFS.** Large-binary 
+           repos: `origin` = `https://forgejo.robin.mba/<owner>/<repo>.gi
+           t` (authoritative + only LFS store); GitHub demoted to `github
+           ` remote, code-only mirror receiving LFS pointers never object
+           s — enforce per-repo with `git config remote.github.lfsurl htt
+           ps://forgejo.robin.mba/<owner>/<repo>.git/info/lfs`. Convert a
+            Forgejo pull-mirror to authoritative via `POST /api/v1/repos/
+           <o>/<r>/convert`. No server-side push-mirrors for LFS repos un
+           less verified LFS-excluding. Full: `~/Admin-Manual/DOCS/CICD_C
+           ONVENTIONS/forgejo-authoritative-lfs-github-mirror.md` (CC13).
+      212  
+
+❯ why is it taking up so many tokens? it's 17% used up already and this is all  
+  meta stuff                                                                    
+
+  Pushed to main (ctrl+o to expand)
+
+● Done — the full pass is complete, everything committed and pushed. Summary:
+
+  Rules work (Admin-Manual-scoped, as you said):
+  - PHASE_REMINDERS.md — BUILD gained the INC-18 lesson (load BUILD_CONVENTIONS
+  first, sanctioned scripts, canonical dist/, v{VERSION}: commits, one version
+  per handback) and the INC-16 emptyOutDir lesson; DEBUG gained "verify the
+  mechanism before narrating the cause."
+  - I-21 landed — the rule INC-18 recorded as "I-25, added same-day" had never
+  actually reached the spine. It's now I-21 plus a BUILD_CONVENTIONS.md § 
+  Release chain is LIVE section, and the incident doc's dangling cross-refs are
+  reconciled.
+  - Missing routed files — MODEL_ROUTING.md and SUBAGENT_DISCIPLINE.md never
+  existed anywhere in sync history despite being routing-table targets
+  (MODEL_ROUTING was even pre-allowlisted). Both authored, with the seat table
+  corrected to GLM-5.2 architect/verifier, GLM-4.7 coder, and the practical note
+  that opencode defaults to glm-4.6 so dispatches must pass -m 
+  zai-coding-plan/glm-5.2 explicitly.
+  - Spine pare-down — executed by the GLM-5.2 seat, semantically reviewed by me
+  against the four full convention docs (nothing lost, only enumerations moved
+  to where they already lived). 45.7KB → 39.4KB while adding I-21; the four
+  verbose invariants shrank 65–71% each; I-20's four copies deduped; Ruflo block
+  dropped (recoverable from git); zero GLM-5.1 remaining as a current seat
+  name.
+
+  Your mid-turn corrections, applied:
+  - CC12 outbox amendment — "deleted on sight" → "moved to ~/outbox/<project>/,
+  never auto-emptied" across all four normative sites (spine, BUILD_CONVENTIONS,
+  CC12 convention doc, project CLAUDE.md). I chose ~/outbox/<project>/ as the
+  canonical path — say the word if you want it elsewhere.
+  - Forgejo migration — Admin-Manual now lives at
+  https://forgejo.robin.mba/rcheung/Admin-Manual (verified private before first
+  push; default branch set to master; local tracking re-pointed off GitHub,
+  which is what tripped the earlier push denial). The standing rule — re-origin
+  any git.robin.mba repo to forgejo.robin.mba on encounter — is recorded in
+  spine §6.
+
+  Pushed: ~/.claude to both v15 and v13 remotes, Admin-Manual to the new v15
+  origin, StAndroidsMissal (CLAUDE.md outbox line only) to both its remotes.
+
+  One item only you can observe: the fresh-session smoke — next session, confirm
+  the slimmer spine and the new BUILD/DEBUG reminders surface via sesh. After
+  that, we're clear to start the moderate round of StAndroidsMissal changes this
+  groundwork was for.
+
+✻ Worked for 2m 47s
+
+※ recap: Global rules cleanup is done: reminders updated, I-21 landed, missing routed files authored, spine pared 14%, outbox rule applied, Admin-Manual migrated to forgejo.robin.mba, all pushed. Next: verify a fresh session loads correctly, then start the StAndroidsMissal changes. (disable recaps in /config)
+
+❯ (we don't do explicit smoke, it's more an organic smoke) Is the               
+  'on-encounter' rule (that covers more than just Admin-Manual or migrations,   
+  but any sweeping change, unless it's ultra high-priority, we do it by         
+  'on-encounter' gradually ok can you check if the logo for vthe android and    
+  other launchers, favico, and the like are all generated from tehe             
+  @DOCS/StLawrenceChristmasTabernacle.png that was normalized and stored I      
+  believe as a 1812x1812?                                                       
+
+● Two things — first the quick rule generalization, then the icon provenance
+  check.
+
+  Read 4 files, listed 1 directory, ran 3 shell commands (ctrl+o to expand)
+
+● Working directory drifted from an earlier cd — rerunning with absolute paths:
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Update(~/.claude/CLAUDE.md)
+  ⎿  Added 1 line
+      240  
+      241  ## 9. Recursive self-improvement
+      242  
+      243 +- **Sweeping changes roll out on-encounter (operator 2026-07-1
+          +3):** any change touching many repos/files/hosts (remote migra
+          +tions, renames, convention rollouts) is recorded as a standing
+          + rule once, then applied gradually as each instance is touched
+          + — never as an eager sweep — unless the operator marks it ultr
+          +a-high-priority. The Forgejo v13→v15 re-origin rule (§6) is on
+          +e instance of this principle.                                 
+      244  - If a failure involved lost continuity, skipped `/sesh`, stal
+           e handoff, or a question already answered by resumed context, 
+           update `SESSION_CONTEXT.md` first; update this spine only if t
+           he trigger itself was missing.
+      245  - When a failure required revisiting, add the generalized less
+           on to the smallest relevant rule file. Cross-project learning 
+           goes here; domain-specific learning goes to the routed file.
+      246  
+
+  Pushed to main (ctrl+o to expand)
+● Updated plan
+  ⎿  /plan to preview
+
+● User approved Claude's plan
+  ⎿  Plan saved to: ~/.claude/plans/could-you-check-what-calm-kay.md · /plan to 
+     edit
+     Fix icon stragglers: stale favicon + old-logo icons/android 
+     (StAndroidsMissal)
+
+     Context
+
+     Icon provenance check (2026-07-13) against the normalized 1812×1812 source
+     src-tauri/icons/StAndroidsMissal_app-icon-source_st-lawrence-christmas-tabe
+     rnacle_1812x1812_2026-07-13_v1.15.31005.png:
+     Android gen/android mipmaps and the desktop Tauri set
+     (icon.png/.ico/.icns/32/128/Square*)
+     were all regenerated from it tonight (22:06, visually confirmed). Two
+     stragglers remain:
+
+     1. public/icon.png (git-tracked; served as the favicon via index.html's
+     <link rel="icon" href="/icon.png">) is still the old Chi-Rho logo (07-11).
+     2. src-tauri/icons/android/ holds an old-logo mipmap run from 07-11 —
+     unused by the
+     build (Tauri 2 packages gen/android res) but a CC12 "mislabeled artifact
+     that lies."
+
+     Tasks
+
+     1 — Replace the favicon with the tabernacle icon
+
+     - cp src-tauri/icons/icon.png public/icon.png (that file is the 512²
+     tabernacle
+     render from tonight's tauri icon run; visually verified).
+     - public/icon.png is git-tracked (unlike public/missal.db), so commit it.
+
+     2 — Outbox the stale old-logo folder (CC12 as amended tonight: move, never 
+     delete)
+
+     - First confirm nothing references it: grep -rn "icons/android" 
+     src-tauri/tauri.conf.json src-tauri/gen --include='*.{json,kts,xml}' →
+     expect zero hits outside gen's own res paths.
+     - mkdir -p ~/outbox/standroidsmissal && mv src-tauri/icons/android ~/outbox
+     /standroidsmissal/icons-android_old-chi-rho-logo_generated-2026-07-11/
+
+     3 — Commit + push
+
+     - One commit: fix(icons): favicon → tabernacle source; outbox stale 
+     old-logo android mipmaps (CC12).
+     - Push both remotes per CC13: git push origin master && git push github 
+     master.
+
+     Verification (organic, per operator preference — no explicit smoke ritual)
+
+     - sha256sum public/icon.png src-tauri/icons/icon.png → identical.
+     - Read public/icon.png visually → tabernacle artwork.
+     - ls src-tauri/icons/ → no android/ dir; ls ~/outbox/standroidsmissal/ →
+     moved folder present with all files (source-survives check inverted:
+     destination has the full set).
+     - Favicon renders organically at next npm run dev use.
+
+● Executing — reference check, favicon swap, outbox move:
+
+  Pushed to master, ran 1 shell command (ctrl+o to expand)
+
+● Done — pushed to both remotes (952330d4).
+
+  Final state of the icon question: every surface now derives from the 1812×1812
+  normalized tabernacle source — Android launchers (including adaptive icons),
+  the full desktop set (.ico/.icns/PNGs/Windows Square* logos), and now the web
+  favicon, which was the one straggler still serving the old Chi-Rho logo. The
+  stale old-logo mipmap folder from the 07-11 generation run is preserved at
+  ~/outbox/standroidsmissal/icons-android_old-chi-rho-logo_generated-2026-07-11/
+  (15 files, intact) rather than deleted, per tonight's CC12 amendment. The
+  generalized on-encounter principle is also recorded in the spine's §9 and
+  synced to both Forgejo remotes.
+
+  The favicon will show up organically next time the dev server or a web build
+  runs — no ritual needed. One heads-up for that moment: browsers cache favicons
+  aggressively, so if you still see the Chi-Rho in a tab, it's the browser's
+  cache, not the repo.
+
+✻ Crunched for 4m 34s

@@ -1,0 +1,15 @@
+{
+  "version": "1.24.37311",
+  "sourceHead": "1052b478d4c704b8e515ba8e442b716b65159ed6",
+  "startedAt": "2026-07-16T21:51:39.989Z",
+  "completedStages": [
+    "test",
+    "web",
+    "linux",
+    "windows",
+    "android-debug",
+    "android-release",
+    "symbols",
+    "collect"
+  ]
+}
