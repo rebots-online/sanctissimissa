@@ -22,6 +22,7 @@ import SettingsView from './ui/SettingsView.tsx';
 import AboutView from './ui/AboutView.tsx';
 import ResizableInspectorLayout from './ui/ResizableInspectorLayout.tsx';
 import TrayPanel from './ui/TrayPanel.tsx';
+import { useNarrow } from './ui/BilingualText.tsx';
 
 type View = 'map' | 'reader' | 'calendar' | 'office' | 'bible' | 'journal' | 'homily' | 'settings' | 'about';
 
@@ -44,6 +45,19 @@ export default function App() {
   const [db, setDb] = useState<CorpusDb | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<View>('map');
+  /**
+   * One breakpoint, not two: the rail collapses to icons at the same width the
+   * bilingual reader collapses to a single column, so the whole shell changes
+   * register once (#3). `railPinned` is the hold-open, which wins while set.
+   */
+  const narrowShell = useNarrow(1100);
+  /** null = follow the viewport; otherwise the user's explicit choice, which
+   *  wins until they toggle again (hold-open, and hold-collapsed). */
+  const [railOverride, setRailOverride] = useState<'open' | 'icons' | null>(null);
+  const railCollapsed = railOverride ? railOverride === 'icons' : narrowShell;
+  const railPinned = railOverride === 'open';
+  const toggleRail = () => setRailOverride(railCollapsed ? 'open' : 'icons');
+  const [dayFlyout, setDayFlyout] = useState(false);
   // The user's LOCAL calendar date — never UTC: an evening user in Canada must
   // see today's feast, not tomorrow's (toISOString would skip ahead at 20:00 EDT).
   const [date, setDate] = useState(() => {
@@ -236,9 +250,28 @@ export default function App() {
   }
 
   return (
-    <div className="app">
+    <div className="app" data-rail={railCollapsed ? 'icons' : 'full'}>
       <nav className="rail">
-        <div className="brand">St. Android's Missal</div>
+        {/*
+          The rail collapses to icons at the same width the bilingual reader
+          collapses — one transformation, not two. Collapsed, it may show no
+          text that cannot fit an icon column: the brand words and the feast
+          name move to tooltips, and the day chip becomes a calendar button
+          that flies its picker out over the main area (#3).
+        */}
+        <div className="rail-head">
+          <img className="rail-mark" src="/icon.png" alt="" aria-hidden="true" />
+          <button
+            className="rail-toggle"
+            onClick={toggleRail}
+            aria-expanded={!railCollapsed}
+            aria-label={railCollapsed ? 'Open navigation' : 'Hold navigation open'}
+            title={railCollapsed ? 'Open navigation' : 'Collapse to icons'}
+          >
+            {railCollapsed ? '☰' : railPinned ? '📌' : '☰'}
+          </button>
+          <div className="brand">St. Android's Missal</div>
+        </div>
         {NAV.map((n) => (
           <button
             key={n.id}
@@ -260,10 +293,44 @@ export default function App() {
             <span className="label">{n.label}</span>
           </button>
         ))}
-        <div className="day-chip">
+        {railCollapsed ? (
+          <button
+            className={`day-chip-icon${dayFlyout ? ' open' : ''}`}
+            onClick={() => setDayFlyout((o) => !o)}
+            title={day ? `${day.feastName ?? day.weekKey} — ${day.date}` : 'Choose a date'}
+            aria-label="Choose a date"
+            aria-expanded={dayFlyout}
+          >
+            <span className="swatch" title={`Liturgical color: ${day?.color}`} />
+            <span aria-hidden="true">📅</span>
+          </button>
+        ) : (
+          <div className="day-chip">
+            <div className="date-row">
+              <span className="swatch" title={`Liturgical color: ${day?.color}`} />
+              <input type="date" value={date} onChange={(e) => e.target.value && setDate(e.target.value)} />
+            </div>
+            {day && (
+              <>
+                <div className="feast">{day.feastName ?? day.weekKey}</div>
+                <div className="season">{day.season} · {day.weekday} · {day.weekKey}</div>
+              </>
+            )}
+          </div>
+        )}
+      </nav>
+
+      {railCollapsed && dayFlyout && (
+        <div className="day-flyout" role="dialog" aria-label="Choose a date">
           <div className="date-row">
             <span className="swatch" title={`Liturgical color: ${day?.color}`} />
-            <input type="date" value={date} onChange={(e) => e.target.value && setDate(e.target.value)} />
+            <input
+              type="date"
+              autoFocus
+              value={date}
+              onChange={(e) => { if (e.target.value) { setDate(e.target.value); setDayFlyout(false); } }}
+            />
+            <button className="day-flyout-close" onClick={() => setDayFlyout(false)} aria-label="Close">×</button>
           </div>
           {day && (
             <>
@@ -272,7 +339,7 @@ export default function App() {
             </>
           )}
         </div>
-      </nav>
+      )}
 
       <div className="main">
         <header className="masthead">
