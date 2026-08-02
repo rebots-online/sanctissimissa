@@ -228,7 +228,7 @@ export default function App() {
           <h1 className="splash-title">St. Android&apos;s Missal</h1>
           <p>Opening the liturgical corpus…</p>
           <p className="splash-meta">
-            v{versionInfo.version} · © Robin L. M. Cheung, MBA
+            v{versionInfo.version} · © 2026 Robin L. M. Cheung, MBA
           </p>
         </div>
       </div>
