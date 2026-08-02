@@ -7,12 +7,16 @@ import {
   existsSync,
   mkdirSync,
   readdirSync,
+  closeSync,
+  openSync,
   readFileSync,
+  readSync,
   renameSync,
   statSync,
   writeFileSync,
 } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { homedir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -229,8 +233,25 @@ for (const artifact of sources) {
   console.log(`  ✓ ${artifact.id} → dist/${artifact.filename}`);
 }
 
+/**
+ * Hash in-process. This shelled out to `sha256sum`, which a stock Windows host
+ * does not have — so the collection aborted after every artifact had already
+ * been copied into dist/, leaving a release staged but unmanifested. Node's
+ * crypto is portable and streams, so the 194 MB corpus zip does not have to be
+ * held in memory.
+ */
 function sha256(path) {
-  return execFileSync('sha256sum', [path], { encoding: 'utf8' }).split(/\s+/, 1)[0];
+  const hash = createHash('sha256');
+  const CHUNK = 1 << 20;
+  const buf = Buffer.allocUnsafe(CHUNK);
+  const fd = openSync(path, 'r');
+  try {
+    let bytes;
+    while ((bytes = readSync(fd, buf, 0, CHUNK, null)) > 0) hash.update(buf.subarray(0, bytes));
+  } finally {
+    closeSync(fd);
+  }
+  return hash.digest('hex');
 }
 
 for (const artifact of copied) {
