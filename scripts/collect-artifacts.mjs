@@ -34,6 +34,24 @@ mkdirSync(DIST, { recursive: true });
 // dist/ is an append-only release archive. Older versions remain in place;
 // cleanup and deployment retention are separate, explicit operator actions.
 
+/**
+ * Per-host collection (`--partial` / `RELEASE_PARTIAL=1`).
+ *
+ * The ten-artifact set cannot be produced by any single machine: the Linux
+ * deb/AppImage need a Linux host, while the MSI and MSIX need Windows (WiX and
+ * the winapp CLI do not cross-build). Collecting strictly therefore ALWAYS
+ * throws on whichever host you run it — which is why release artifacts have
+ * been left orphaned in `target/` instead of landing in the tracked `dist/`.
+ *
+ * In partial mode a missing artifact is recorded with its reason and skipped,
+ * the manifest is marked `partial`, and `missing[]` names exactly what still
+ * has to come from another host. Strict mode is unchanged and remains the
+ * default, so a genuine single-host complete set still fails loudly if it is
+ * incomplete.
+ */
+const PARTIAL = process.argv.includes('--partial') || process.env.RELEASE_PARTIAL === '1';
+const missing = [];
+
 function exactOne(dir, predicate, label) {
   if (!existsSync(dir)) throw new Error(`${label}: missing directory ${dir}`);
   const matches = readdirSync(dir).filter(predicate).sort();
@@ -43,46 +61,58 @@ function exactOne(dir, predicate, label) {
   return join(dir, matches[0]);
 }
 
+/** Wrap a source entry so partial mode records the gap instead of aborting. */
+function optional(id, platform, kind, build) {
+  try {
+    return build();
+  } catch (err) {
+    if (!PARTIAL) throw err;
+    missing.push({ id, platform, kind, reason: err.message });
+    console.warn(`  ⏭  ${id}: not present on this host — ${err.message}`);
+    return null;
+  }
+}
+
 const sources = [
   {
     id: 'linux-deb', platform: 'linux', kind: 'deb',
-    source: exactOne(resolve(ROOT, 'src-tauri/target/release/bundle/deb'),
-      (f) => f.endsWith('.deb') && f.includes(VERSION), 'Linux deb'),
+    source: optional('linux-deb', 'linux', 'deb', () => exactOne(resolve(ROOT, 'src-tauri/target/release/bundle/deb'),
+      (f) => f.endsWith('.deb') && f.includes(VERSION), 'Linux deb')),
     filename: `${PREFIX}-linux-amd64.deb`,
   },
   {
     id: 'linux-appimage', platform: 'linux', kind: 'appimage',
-    source: exactOne(resolve(ROOT, 'src-tauri/target/release/bundle/appimage'),
-      (f) => f.endsWith('.AppImage') && f.includes(VERSION), 'Linux AppImage'),
+    source: optional('linux-appimage', 'linux', 'appimage', () => exactOne(resolve(ROOT, 'src-tauri/target/release/bundle/appimage'),
+      (f) => f.endsWith('.AppImage') && f.includes(VERSION), 'Linux AppImage')),
     filename: `${PREFIX}-linux-amd64.AppImage`,
   },
   {
     id: 'windows-standalone', platform: 'windows', kind: 'exe',
-    source: resolve(ROOT, 'src-tauri/target/x86_64-pc-windows-msvc/release/st-androids-missal.exe'),
+    source: optional('windows-standalone', 'windows', 'exe', () => resolve(ROOT, 'src-tauri/target/x86_64-pc-windows-msvc/release/st-androids-missal.exe')),
     filename: `${PREFIX}-windows-x64-standalone.exe`,
   },
   {
     id: 'android-apk-debug', platform: 'android', kind: 'apk-debug',
-    source: exactOne(resolve(ROOT, 'src-tauri/gen/android/app/build/outputs/apk/universal/debug'),
-      (f) => f === `${PREFIX}-universal-debug.apk`, 'Android debug APK'),
+    source: optional('android-apk-debug', 'android', 'apk-debug', () => exactOne(resolve(ROOT, 'src-tauri/gen/android/app/build/outputs/apk/universal/debug'),
+      (f) => f === `${PREFIX}-universal-debug.apk`, 'Android debug APK')),
     filename: `${PREFIX}-android-universal-debug.apk`,
   },
   {
     id: 'android-apk-release', platform: 'android', kind: 'apk-release',
-    source: exactOne(resolve(ROOT, 'src-tauri/gen/android/app/build/outputs/apk/universal/release'),
-      (f) => f === `${PREFIX}-universal-release.apk`, 'Android release APK'),
+    source: optional('android-apk-release', 'android', 'apk-release', () => exactOne(resolve(ROOT, 'src-tauri/gen/android/app/build/outputs/apk/universal/release'),
+      (f) => f === `${PREFIX}-universal-release.apk`, 'Android release APK')),
     filename: `${PREFIX}-android-universal-release.apk`,
   },
   {
     id: 'android-aab-release', platform: 'android', kind: 'aab-release',
-    source: exactOne(resolve(ROOT, 'src-tauri/gen/android/app/build/outputs/bundle/universalRelease'),
-      (f) => f === `${PREFIX}-universal-release.aab`, 'Android release AAB'),
+    source: optional('android-aab-release', 'android', 'aab-release', () => exactOne(resolve(ROOT, 'src-tauri/gen/android/app/build/outputs/bundle/universalRelease'),
+      (f) => f === `${PREFIX}-universal-release.aab`, 'Android release AAB')),
     filename: `${PREFIX}-android-universal-release.aab`,
   },
   {
     id: 'android-native-debug-symbols', platform: 'android', kind: 'native-debug-symbols',
-    source: exactOne(resolve(ROOT, 'src-tauri/gen/android/app/build/outputs/native-debug-symbols/universalRelease'),
-      (f) => f === `${PREFIX}-android-native-debug-symbols.zip`, 'Android native debug symbols'),
+    source: optional('android-native-debug-symbols', 'android', 'native-debug-symbols', () => exactOne(resolve(ROOT, 'src-tauri/gen/android/app/build/outputs/native-debug-symbols/universalRelease'),
+      (f) => f === `${PREFIX}-android-native-debug-symbols.zip`, 'Android native debug symbols')),
     filename: `${PREFIX}-android-native-debug-symbols.zip`,
   },
 ];
@@ -122,9 +152,16 @@ if (existsSync(msixPath)) {
   });
 }
 
-for (const artifact of sources) {
-  if (!existsSync(artifact.source)) throw new Error(`${artifact.id}: missing ${artifact.source}`);
+// `optional()` yields null for anything this host cannot produce (partial mode).
+const present = sources.filter((a) => a.source !== null);
+for (const artifact of present) {
+  if (!existsSync(artifact.source)) {
+    if (!PARTIAL) throw new Error(`${artifact.id}: missing ${artifact.source}`);
+    missing.push({ id: artifact.id, platform: artifact.platform, kind: artifact.kind, reason: `missing ${artifact.source}` });
+  }
 }
+sources.length = 0;
+sources.push(...present.filter((a) => existsSync(a.source)));
 
 // Web/PWA: the runnable web surface lives in the clean `dist-web/` embed dir
 // (vite outDir), zipped into `dist/` alongside the native artifacts. dist-web/
@@ -190,10 +227,22 @@ for (const artifact of copied) {
 }
 
 const apkSources = sources.filter((a) => a.kind.startsWith('apk-'));
-const buildTools = resolve(process.env.ANDROID_HOME || join(homedir(), 'Android', 'Sdk'), 'build-tools');
-const latestBuildTools = readdirSync(buildTools).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).at(-1);
-const apksigner = resolve(buildTools, latestBuildTools, 'apksigner');
-const aapt2 = resolve(buildTools, latestBuildTools, 'aapt2');
+// Android identity/signature verification only runs when Android artifacts are
+// actually present. Skipping it must be RECORDED, never silently implied by an
+// empty loop — `android_signatures_verified` is a claim the manifest makes.
+const androidVerified = apkSources.length > 0;
+if (!androidVerified) {
+  if (!PARTIAL) throw new Error('no Android artifacts to verify — refusing to write a manifest claiming otherwise');
+  console.warn('  ⏭  Android signature verification skipped: no Android artifacts on this host.');
+}
+const buildTools = androidVerified
+  ? resolve(process.env.ANDROID_HOME || join(homedir(), 'Android', 'Sdk'), 'build-tools')
+  : null;
+if (androidVerified) {
+const buildToolsInner = resolve(process.env.ANDROID_HOME || join(homedir(), 'Android', 'Sdk'), 'build-tools');
+const latestBuildTools = readdirSync(buildToolsInner).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).at(-1);
+const apksigner = resolve(buildToolsInner, latestBuildTools, 'apksigner');
+const aapt2 = resolve(buildToolsInner, latestBuildTools, 'aapt2');
 for (const artifact of apkSources) {
   execFileSync(apksigner, ['verify', '--verbose', artifact.source], { stdio: 'pipe' });
   const badging = execFileSync(aapt2, ['dump', 'badging', artifact.source], { encoding: 'utf8' });
@@ -203,7 +252,8 @@ for (const artifact of apkSources) {
   }
 }
 const aab = sources.find((a) => a.kind === 'aab-release');
-execFileSync('jarsigner', ['-verify', aab.source], { stdio: 'pipe' });
+if (aab) execFileSync('jarsigner', ['-verify', aab.source], { stdio: 'pipe' });
+}
 
 /**
  * Change notes are a build INPUT, not an afterthought. `DOCS/CHANGELOG.md`
@@ -262,12 +312,14 @@ const manifest = {
   version: VERSION,
   versionCode: versionJson.versionCode,
   built_at: versionJson.buildDate,
-  release_status: 'release-candidate',
+  release_status: PARTIAL ? 'partial' : 'release-candidate',
+  host: { platform: process.platform, complete: missing.length === 0 },
+  missing,
   working_status: process.env.RELEASE_WORKING_STATUS || 'unknown',
   source: { commit: sourceCommit, branch: execFileSync('git', ['branch', '--show-current'], { cwd: ROOT, encoding: 'utf8' }).trim() },
   change_notes: changeNotes,
   artifacts: copied,
-  verification: { sha256_command: 'sha256sum <filename>', android_signatures_verified: true },
+  verification: { sha256_command: 'sha256sum <filename>', android_signatures_verified: androidVerified },
 };
 
 const jsonName = `release-manifest-v${VERSION}.json`;
