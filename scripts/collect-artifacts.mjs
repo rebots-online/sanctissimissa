@@ -188,10 +188,30 @@ if (existsSync(webPath)) {
   throw new Error(`Refusing to overwrite existing release artifact: ${webPath}`);
 }
 console.log(`  ⟳ web-pwa: archiving dist-web/ to dist/${webFilename}`);
-execFileSync('zip', ['-r', webPath, ...readdirSync(WEBDIST).sort()], {
-  cwd: WEBDIST,
-  stdio: 'inherit',
-});
+/**
+ * `zip` is not present on a stock Windows host, so this step aborted the whole
+ * collection there — another place the pipeline silently assumed Linux. Prefer
+ * the real `zip` when it exists (deterministic, streaming, handles the 194 MB
+ * corpus well) and fall back to PowerShell's Compress-Archive on Windows.
+ */
+function archiveWeb() {
+  const entries = readdirSync(WEBDIST).sort();
+  try {
+    execFileSync('zip', ['-r', webPath, ...entries], { cwd: WEBDIST, stdio: 'inherit' });
+    return 'zip';
+  } catch (err) {
+    if (err.code !== 'ENOENT' || process.platform !== 'win32') throw err;
+  }
+  console.log('     zip not found — falling back to Compress-Archive');
+  execFileSync('powershell.exe', [
+    '-NoProfile', '-NonInteractive', '-Command',
+    `Compress-Archive -Path ${entries.map((e) => `'${e.replace(/'/g, "''")}'`).join(',')} ` +
+    `-DestinationPath '${webPath.replace(/'/g, "''")}' -CompressionLevel Optimal -Force`,
+  ], { cwd: WEBDIST, stdio: 'inherit' });
+  return 'Compress-Archive';
+}
+const archiver = archiveWeb();
+console.log(`     archived with ${archiver}`);
 
 const copied = [{ id: 'web-pwa', platform: 'web', kind: 'pwa-zip', filename: webFilename }];
 for (const artifact of sources) {
