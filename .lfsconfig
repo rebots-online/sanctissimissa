@@ -1,0 +1,5 @@
+# LFS objects live ONLY on forgejo.robin.mba (CC13) — GitHub stores pointers.
+# Committed so clones from ANY remote (incl. the GitHub mirror) resolve LFS
+# against Forgejo automatically; public repo → anonymous download works.
+[lfs]
+	url = https://forgejo.robin.mba/rcheung/StAndroidsMissal.git/info/lfs
