@@ -317,11 +317,11 @@ Status: **S** = shipped (on disk now) · **P-<phase>** = planned, target locatio
 | `MapFlyout` / `FlyoutData` | comp/type | `src/ui/MapFlyout.tsx:1` | S | hover/focus flyout shared by strip + full map: dual-language incipit, about, flagged planned-media slot | props `FlyoutData { title, subtitle, incipit, about, media, x, y }` |
 | `SubwayMap` / `StationDot` | comps | `src/ui/SubwayMap.tsx:28` | S | SVG Mass map; hover flyouts via `data-sid` event delegation (M); P-C adds lore callout triggers | props `{ db, day, onStation }` |
 | `LoreCallout` | comp | `src/ui/LoreCallout.tsx:1` | P-C | rich positioned popover, keyboard/touch accessible, scrollable | props `{ title: string; subtitle?: string; lore: Lore; x: number; y: number; onClose: () => void }` |
-| `ReaderView` | comp | `src/ui/ReaderView.tsx:53` | ✅ | Mass-proper concerns ONLY: `READER_ORDER` assembly, seasonal chant filter (`stationActive`), Mass-specials filter, focus scrolling, scroll-spy for the map strip, export bar. Rendering and interaction delegate to `SectionReader`; re-exports `SelectionAction` for compatibility. | props `{ db, day, focusSection, focusNonce, onAction, sidecar?, onCapture?, onVisibleSection? }` |
-| `SectionReader` / `SelectionAction` / `ReaderSection` / `MenuContext` | comp/types | `src/ui/SectionReader.tsx:1` | ✅ | **THE** bilingual reading surface, mounted by ReaderView, OfficeView and BibleView. Owns column/interleaved rendering, the line echo, the phrase echo (`alignPhrase`), the word flyout (`placeFloatingCallout`/`reconcileCallout`), the selection context menu with ESC + outside-click dismissal, right-click-on-hovered-word (`wordAtPoint`), Copy, dual-language Highlight, and annotations. A view that re-implements any of it is a defect. | props `{ db; sections: ReaderSection[]; sidecar?; onAction?; onCapture?; menuExtras?; collapsible?; className?; baseClass?; rootData?; toolbar?; rootRef?; openAnchor?; openNonce? }`; `ReaderSection { anchor; nodeKey; quoteKeys?; title; meta?; latin; english; sectionClass?; beforeText?; afterText?; headingOnly? }`; `SelectionAction { kind: 'meaning'\|'similar'\|'crossrefs'; term: string; nodeKey: string \| null }`; `MenuContext { term; nodeKey; line: number \| null; close() }` |
+| `ReaderView` | comp | `src/ui/ReaderView.tsx:81` | S | full-Mass entry assembler; scroll-spy for the strip; accordion section headings (▾/▸, focus-nav auto-unfolds); seasonal chant filter (delegates rendering to `SectionReader` after P-B refactor) | props `{ db, day, focusSection, focusNonce, onAction, onVisibleSection? }` |
+| `SectionReader` / `SelectionAction` | comp/type | `src/ui/SectionReader.tsx:1` | P-B | shared bilingual section renderer + annotations + selection menu + optional print/export/share toolbar (`SelectionAction` definition moves here) | props `{ entries: ReaderEntry[]; focusSection: string \| null; focusNonce: number; onAction: (a: SelectionAction) => void; emptyMessage?: React.ReactNode; toolbar?: { day: DayInfo; view: string } }`; `SelectionAction { kind: 'meaning'\|'similar'\|'crossrefs'; term: string; nodeKey: string \| null }` |
 | `MeaningPanel` | comp | `src/ui/MeaningPanel.tsx:26` | S | concordance + vector exegesis grouped by concept; human references (`humanRef`: section — feast title · readable source) with click-through in-context open; LLM slot labelled | props `{ db, action, onClose, onOpenKey }` |
 | `CalendarView` | comp | `src/ui/CalendarView.tsx:1` | S | perpetual month grid; P-D adds indicator dots (`.cal-dot`), status chips (`.cal-status--*`), theme-span bars (`.cal-themespan`) | props `{ db, selected, onPick }` → P-D adds `sidecar: SidecarDb \| null`, `onOpenPlanner?: (iso: string) => void` |
-| `OfficeView` | comp | `src/ui/OfficeView.tsx:22` | ✅ | loop line + `buildHour` entries mapped to `ReaderSection[]` (rubric entries → `headingOnly`) and rendered by `SectionReader` with `baseClass="reader office-reader"`. The private `OfficeText` renderer and its duplicate `bangLineClass` are gone; the Breviary gets the echo, flyout and context menu as a consequence (BUGS #2, #10). | props `{ db, day, hour, onHour, sidecar?, onAction?, onCapture? }` |
+| `OfficeView` | comp | `src/ui/OfficeView.tsx:17` | S | loop line + engine-built hour texts; hour selection lifted to App (controlled, strip-synced); accordion sections; P-B adds `SectionReader`/`onAction` | props `{ db, day, hour, onHour }` → P-B adds `onAction` |
 | `PlannerView` | comp | `src/ui/PlannerView.tsx:1` | P-D | homily-planner (priest) / journal (laity) mini-app: month grid + theme painting + status colors; opens `HomilyEditor` overlay | props `{ db, sidecar, mode: UserMode, initialDate?: string }` |
 | `HomilyEditor` | comp | `src/ui/HomilyEditor.tsx:1` | P-D | split-pane editor: day/season/readings header, markdown body, anchored passages, base-vs-year toggle | props `{ db, sidecar, mode: UserMode, day: DayInfo, onClose: () => void }` |
 | `ThemePicker` | comp | `src/ui/ThemePicker.tsx:1` | P-E | family × mode picker in the rail; persists to sidecar settings | props `{ sidecar: SidecarDb \| null }` |
@@ -351,7 +351,7 @@ Supersessions within the entity table: `PlannerView`/`HomilyEditor` (P-D) are **
 | `Accompaniment` / `OccurrenceSelector` / `Exposure` | types | `src/core/accompaniment/types.ts:1` | P-S | the one object, four exposures (§7.6) | per §7.6 DDL; `Exposure = 'journal'\|'homily'\|'study'\|'newsletter'` |
 | `accompanimentsForDay` / `forAnchor` / `matchesSelector` | fns | `src/core/accompaniment/resolve.ts:1` | P-S | selector → concrete dates via computus; anchored + longitudinal queries | `accompanimentsForDay(db, sidecar, iso): Accompaniment[]` |
 | `AccompanimentEditor` | comp | `src/ui/AccompanimentEditor.tsx:1` | P-S | one rich-text editor for all exposures (TipTap/ProseMirror) | props `{ sidecar, acc: Accompaniment \| null, day?: DayInfo, onClose }` |
-| `BibleView` | comp | `src/ui/BibleView.tsx:30` | ✅ | book/chapter navigation + atlas modes; the chapter renders as ONE line-parallel `ReaderSection` (verse *n* = line *n*-1) through `SectionReader`, so every alignment works on scripture as on the Mass. Verse-anchored annotations survive via `quoteKeys`; "Copy verse link" is a `menuExtras` item. Its duplicate Menu/echo/callout copy is deleted. | props `{ db, focusRef, focusNonce, onAction, sidecar?, onCapture?, onOpenKey }` |
+| `BibleView` | comp | `src/ui/BibleView.tsx:1` | P-S | rail "Sacred Scripture": book/chapter nav, bilingual verses, selection → MeaningPanel, CITES "appears in the liturgy" | props `{ db, sidecar, focusRef?: string, onAction }` |
 | `JournalView` / `HomilyPlanner` / `StudyBuilder` / `NewsletterDesk` | comps | `src/ui/{JournalView,HomilyPlanner,StudyBuilder,NewsletterDesk}.tsx:1` | P-S | exposure surfaces (§7.6); NewsletterDesk institutional-gated, parish_profile masthead | each `{ db, sidecar, day? }`; NewsletterDesk behind `EntitlementGate feature='newsletter-desk'` |
 | `FeatureId` additions | type | `src/core/entitlements/index.ts` | P-S | extends P-G gate map | adds `'companion'\|'companion-hosted'\|'newsletter-desk'`; RC entitlement ids `companion_ondevice`, `companion_hosted`, `institutional` |
 | `SharePayload` routes | type | `src/core/share/shareLink.ts` | P-S | extends P-F deep links | adds `#/verse/<book>/<ch>/<v>`, `#/acc/<id>`, `#/day/<iso>` |
@@ -376,12 +376,6 @@ Supersessions within the entity table: `PlannerView`/`HomilyEditor` (P-D) are **
 | `SimilarityGlyph` | comp | `src/ui/SimilarityGlyph.tsx:1` | P-T | icon-sized radial SVG: query center, hit dot radius ∝ (1−score), siblings ghosted; score → tooltip | props `{ score: number; siblings: number[]; size?: number }` |
 | `IMAGERY_CONCEPTS` | const | `src/core/ontology/concepts.ts` | P-T | ~15 imagery/metaphor/typology concepts (§7.7 list) merged into the exported taxonomy | same shape as existing `CONCEPTS` entries |
 | `Pericope` / `PERICOPES` / `SCENARIO_CLUSTERS` | type/consts | `src/core/ontology/parallels.ts:1` | P-T | curated Gospel-parallel spine + scenario clusters | `Pericope { id: string; title: string; cluster: string; refs: { Matt?: string; Marc?: string; Luc?: string; Joann?: string } }` (keys = BOOK_MAP canonical Gospel keys) |
-| `App.railOverride` / `railCollapsed` / `toggleRail` | state | `src/App.tsx:47` | ✅ | one-breakpoint shell: the rail collapses to icons at the same width the bilingual reader collapses (1100). `railOverride` is the user's explicit hold-open/hold-collapsed and wins over the viewport until toggled again; `data-rail` on `.app` drives the CSS so the override can win against a media query | `railOverride: 'open' \| 'icons' \| null` |
-| `App.dayFlyout` | state | `src/App.tsx:56` | ✅ | in icon mode the day chip becomes a calendar button whose picker flies out over the main area (`.day-flyout`), because a date input and a feast name cannot render in 64px (BUGS #3) | `boolean` |
-| `AboutProse` / `inline` | comp/fn | `src/ui/AboutView.tsx:13` | ✅ | About prose splits on BLANK lines, not every newline (which emitted an empty `<p>` per blank line); bullet runs become real lists with one nesting level; `**bold**` renders | `AboutProse({ text: string })` |
-| `content/origin-story.md` | tracked content | `content/origin-story.md` | ✅ | the operator's own account, imported verbatim at build time via `?raw`. There is deliberately NO fallback string: a missing file fails the build, because a placeholder here would publish fabricated biography. Replaces the invented "St. Android of the Circuits" origin | consumed by `ABOUT_CONTENT.origin` |
-| `windows-msi` / `windows-msix` stages | release stages | `scripts/release-state.mjs:186` | ✅ | the installers are part of `build:release` rather than produced out of band; skipped with a clear log on non-Windows hosts because WiX and winapp do not cross-build (BUGS #7) | `STAGE_ORDER` = test · web · linux · windows · windows-msi · windows-msix · android-debug · android-release · symbols · collect |
-| MSIX package identity | build contract | `scripts/stamp-version.mjs`, `Package.appxmanifest` | ✅ | `Identity/@Version` = `MAJOR.MINOR.0.0`. Appx parts must be ≤ 65535 and the Store requires revision 0, but display BUILD is `epoch-minutes % 100000` — so ~a third of builds would mint a package Windows rejects outright. MINOR is the monotonic per-release quantity, exactly as for Play's `versionCode` | stamped by `npm run stamp`; nothing stamped it before, so it sat at 1.24.37311.0 |
 | `AtlasMode` / `ScriptureAtlas` | type/comp | `src/ui/ScriptureAtlas.tsx:1` | P-T | imagery + parallels navigation modes hosted by BibleView's mode switch | `AtlasMode = 'canonical' \| 'imagery' \| 'parallels'`; props `{ db: CorpusDb; mode: AtlasMode; onOpenKey: (k: string) => void }` |
 | `CorpusDb.commentaryFor` / `conceptVerseCounts` / `chapterCiteCounts` | methods | `src/core/data/corpusDb.ts` | P-T | interpretive-layer + atlas query surface | `commentaryFor(book: string, ch: number, verse?: number): SectionText[]`, `conceptVerseCounts(): { conceptId: string; label: string; count: number }[]`, `chapterCiteCounts(book: string): Map<number, number>` |
 | `NucleusAuthorityKind` / `NucleusSourceManifest` | type/interface | `src/core/data/types.ts` | P-T | source role + exact-edition provenance; authority is displayed/faceted, never added to relevance score | `NucleusAuthorityKind = 'scriptural-commentary' \| 'catechesis' \| 'magisterium' \| 'patristics' \| 'scholastic-theology' \| 'spiritual-classic' \| 'encyclopedic'`; `NucleusSourceManifest { id: string; label: string; authorityKind: NucleusAuthorityKind; workDate: string; editionDate: string; translationDate: string \| null; languages: string[]; translator: string \| null; publicationPlace: string; rightsBasis: string; provenanceUrl: string; sha256: string; moduleId: string }` |
@@ -976,50 +970,3 @@ be marked ✅ until BX.1R is `[X]`/✅ and every Verify/Accept command exits 0. 
 gate.
 — Authored and attested by Claude Fable 5 (`claude-fable-5`, Claude Code session, operator-directed architect pass) · 2026-07-14
 — Authored and attested by GLM-5.2 (`zai-coding-plan/glm-5.2`, opencode architect/plan seat, base `7595f625`, branch `architect/bx1r-1.17-20260715`) · 2026-07-15
-
-
----
-
-## 10.1 v1.26 bug-wave amendments (2026-08-02)
-
-Recorded here because each supersedes something stated earlier in this file.
-
-**One reader, actually built (decision 12, now shipped).** Decision 12 called for
-a single shared bilingual renderer and decision 410 rejected duplicating the
-annotation/menu machinery. Neither held in the code: `ReaderView` owned the
-interaction layer, `BibleView` carried a divergent copy, and `OfficeView` had a
-private `OfficeText` with no interaction layer at all. `SectionReader` now
-exists and all three views mount it. §9.8's BS.1R2 contract, previously written
-against `BibleView.livePhraseEcho`, binds `SectionReader` — the single owner —
-and the source-contract tests were retargeted accordingly.
-
-**The phrase echo now fires in two-column mode.** `lineInfoAt` required
-`data-lang`, which only the interleaved renderer stamps, so the exact-range echo
-could never fire in columns. `langOf` falls back to the `.latin`/`.english` pane
-wrapper.
-
-**Scripture granularity.** A chapter is one line-parallel section (verse *n* =
-line *n*-1) rather than per-verse blocks. The previous aggregation had already
-removed the `data-verse`/`data-nodekey` elements that BibleView's own callout
-and echo depended on, so those features were dead in scripture; alignment over
-the joined text restores them and matches how the Mass works.
-
-**One breakpoint, superseding the frozen three.** The frozen Stitch design
-system (`LIBS/UI/STITCH/.../design-md.md` §4.1) specifies 640 / 860 / 1100, with
-the rail collapsing at 860 and the reader at 1100. The operator superseded this
-on 2026-08-02: the rail collapses at the same width the reader does, so the
-shell changes register once. The stray 860/980/981 media queries converge onto
-1100, and collapse is driven by `data-rail` so the hold-open can win.
-
-**Subway map relevance (BUGS #9) — unresolved by design, not by oversight.** The
-map must project the *active reader's* structure: parts of the Mass in the
-missal, Books→Chapters in scripture, the hour's actual shape in the Office. All
-three frozen Stitch map screens are Mass-only, and §7's screen table itself says
-"SVG map of the Mass", so the design system has no coverage for the non-Mass
-vocabularies. This needs design before code; it is not implemented in v1.26.
-
-**Installers are pipeline artifacts.** See the `windows-msi` / `windows-msix`
-rows above. The MSI and MSIX were never built by `build:release`; the `windows`
-stage builds `--no-bundle`. Acceptance for these artifacts is installation —
-install, launch, confirm the splash version and that the corpus loads, then
-uninstall — never a successful build.

@@ -4,6 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## ⛔ URGENT — Phase-specific rules check (every turn)
 
+**CC12 covers EVERY file you author, not just build output** — slug-first
+`standroidsmissal-v<version>-<qualifier>.<ext>`, handoff notes and checklists
+and logs included. Rule lives in
+`~/Admin-Manual/DOCS/CICD_CONVENTIONS/artifact-hygiene-stamped-or-cleaned.md`.
+
+**DO NOT BUILD ON WSL**, and this repo has three copies — see the "Build host"
+section of `~/Admin-Manual/PROJECTS/BUILD-INSTRUCTIONS-StAndroidsMissal.md`
+before touching a build or assuming which checkout you are in.
+
 **I-22:** Long-running processes: poll status **once per minute**, no backoff, until exit.
 
 Before taking any action each turn, check the appropriate phase-specific rules file:

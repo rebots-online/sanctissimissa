@@ -1,8 +1,8 @@
 # BUGS TO FIX AS AT v.1.25-31jul2026
 
-Note: All front-end/UI to be generated through the Open Design MCP.
+Note: All front-end/UI to be generated through the Stitch MCP.
 
- - we will deal with the MSI/MSIX issue *after* planning and executing the fixes for the following, since it is a build-time issue not the same as the following bugs: (not exhaustive)
+ - **Superseded 2026-08-02:** MSI/MSIX is no longer deferred. The v1.27 baseline deliverable includes a first working .msi and .msix, alongside the rest of the artifact set. The bugs below are worked separately and do not gate it. (list not exhaustive)
 
 1. I need the "Origin Story" to be specified in the .env file along with any necessary variables, as it describes a personal saga of seeking refuge in the Church during the tempestuous parental alienation decades when I served the traditional Latin Mass at the altar daily for four years. The .env file will also be used to draw other customizations but not for public consumption, such as api keys or host settings when we introduce the Liturgibot Chatbot in both local inference and hosted inference (prepaid token allotment, using per-user-issued & spend-limited on load, openrouter api keys using my account admin key)
     - this will require addition of gating and revenuecat (authoritative for user management), with accommodation for blink.sv POS, alby, btcpay, and especially woocommerce, which eventually to take over the revenuecat functionality, but for now, all payment processing/billing user changes to be synced to revenuecat.
@@ -25,7 +25,7 @@ Note: All front-end/UI to be generated through the Open Design MCP.
 
 6. The loading splash screen (src/App.tsx, the `!db` loading branch) renders the copyright as `© Robin L. M. Cheung, MBA` with no year. It should read `© 2026 Robin L. M. Cheung, MBA` to match the About footer (src/ui/AboutView.tsx:75) and the license string in src/content/about.ts:56, both of which already carry `© 2026`.
 
-7. Neither the .msi nor the .msix Windows installer works; both error out. This is a build-time issue (scripts/build-windows.sh, scripts/build-windows-msix.sh, src-tauri/tauri.conf.json bundle config) and will be addressed after the bugs above.
+7. Neither the .msi nor the .msix Windows installer works; both error out. This is a build-time issue (scripts/build-windows.sh, scripts/build-windows-msix.sh, src-tauri/tauri.conf.json bundle config). **Superseded 2026-08-02: this is now part of the v1.27 baseline deliverable, not deferred behind the other bugs.** Acceptance is installation, not production: install (`msiexec /i /qn` with a verbose log; `Add-AppxPackage`), launch, confirm the splash version and that the corpus actually loads, then uninstall. v1.25 staged both without ever installing either — that is the defect being corrected.
 
 8. The major component to add here is the Chatbot; mostly minimized, like Intercom Chat, or smaller if it occupies too much screen space during a Mass: 
  - free trial and lifetime purchase both use atomic.chat's turboquant-enabled llama.cpp back-end; wllama3 for web app
