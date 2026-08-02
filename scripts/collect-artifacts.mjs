@@ -205,6 +205,55 @@ for (const artifact of apkSources) {
 const aab = sources.find((a) => a.kind === 'aab-release');
 execFileSync('jarsigner', ['-verify', aab.source], { stdio: 'pipe' });
 
+/**
+ * Change notes are a build INPUT, not an afterthought. `DOCS/CHANGELOG.md`
+ * carries one `## v<version>` section per release; the section matching this
+ * build is embedded in both manifests and written out as RELEASE_NOTES.
+ *
+ * A missing section yields empty notes that say so. It deliberately does NOT
+ * fall back to boilerplate — the previous RELEASE_NOTES stub was hardcoded
+ * prose about the "v0.5 browser-verified wave" that every later release
+ * silently reprinted, which is worse than nothing because it reads as true.
+ */
+function readChangeNotes(version) {
+  const path = resolve(ROOT, 'DOCS/CHANGELOG.md');
+  const empty = {
+    source: 'DOCS/CHANGELOG.md',
+    present: false,
+    heading: null,
+    highlights: [],
+    markdown: `No changelog section for v${version}. Add a "## v${version}" section to DOCS/CHANGELOG.md.`,
+  };
+  if (!existsSync(path)) return empty;
+  const lines = readFileSync(path, 'utf8').split('\n');
+  const start = lines.findIndex((l) => new RegExp(`^##\\s+v${version.replace(/\./g, '\\.')}(\\s|$)`).test(l));
+  if (start === -1) return empty;
+  let end = lines.length;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (/^##\s+v/.test(lines[i]) || /^---\s*$/.test(lines[i])) { end = i; break; }
+  }
+  const body = lines.slice(start + 1, end);
+  // Highlights are the top-level bullets before the first sub-heading.
+  const firstSub = body.findIndex((l) => /^###\s/.test(l));
+  const highlightScope = firstSub === -1 ? body : body.slice(0, firstSub);
+  const highlights = highlightScope
+    .filter((l) => /^-\s+/.test(l))
+    .map((l) => l.replace(/^-\s+/, '').trim());
+  return {
+    source: 'DOCS/CHANGELOG.md',
+    present: true,
+    heading: lines[start].replace(/^##\s+/, '').trim(),
+    highlights,
+    markdown: body.join('\n').trim(),
+  };
+}
+const changeNotes = readChangeNotes(VERSION);
+if (!changeNotes.present) {
+  console.warn(`  ⚠ no DOCS/CHANGELOG.md section for v${VERSION} — manifests will carry empty change notes.`);
+} else {
+  console.log(`  ⟳ change notes: ${changeNotes.highlights.length} highlight(s) from DOCS/CHANGELOG.md`);
+}
+
 const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
 const manifest = {
   schema: 'mba.robin.release-manifest.v1',
@@ -216,6 +265,7 @@ const manifest = {
   release_status: 'release-candidate',
   working_status: process.env.RELEASE_WORKING_STATUS || 'unknown',
   source: { commit: sourceCommit, branch: execFileSync('git', ['branch', '--show-current'], { cwd: ROOT, encoding: 'utf8' }).trim() },
+  change_notes: changeNotes,
   artifacts: copied,
   verification: { sha256_command: 'sha256sum <filename>', android_signatures_verified: true },
 };
@@ -228,9 +278,18 @@ const xmlEscape = (s) => String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt
 const xmlArtifacts = copied.map((a) =>
   `  <artifact id="${xmlEscape(a.id)}" platform="${xmlEscape(a.platform)}" kind="${xmlEscape(a.kind)}"><filename>${xmlEscape(a.filename)}</filename><size_bytes>${a.size_bytes}</size_bytes><sha256>${a.sha256}</sha256></artifact>`
 ).join('\n');
+const xmlHighlights = changeNotes.highlights
+  .map((h) => `    <highlight>${xmlEscape(h)}</highlight>`)
+  .join('\n');
+const xmlChangeNotes =
+  `  <change_notes source="${xmlEscape(changeNotes.source)}" present="${changeNotes.present}">\n` +
+  (xmlHighlights ? `${xmlHighlights}\n` : '') +
+  `  </change_notes>`;
 writeFileSync(join(DIST, `release-manifest-v${VERSION}.xml`),
-  `<?xml version="1.0" encoding="UTF-8"?>\n<release schema="mba.robin.release-manifest.v1" version="${xmlEscape(VERSION)}" versionCode="${VERSION_CODE}">\n${xmlArtifacts}\n</release>\n`);
+  `<?xml version="1.0" encoding="UTF-8"?>\n<release schema="mba.robin.release-manifest.v1" version="${xmlEscape(VERSION)}" versionCode="${VERSION_CODE}">\n${xmlChangeNotes}\n${xmlArtifacts}\n</release>\n`);
 writeFileSync(join(DIST, `RELEASE_NOTES-v${VERSION}.md`),
-  `# St. Android's Missal v${VERSION}\n\nRelease-candidate multiplatform build of the v0.5 browser-verified wave. See the adjacent release manifest for exact artifact hashes and verification state.\n`);
+  `# St. Android's Missal v${VERSION}\n\n${changeNotes.markdown}\n\n---\n\n` +
+  `Built from commit ${sourceCommit}. See the adjacent release manifest for exact ` +
+  `artifact hashes and verification state.\n`);
 
 console.log(`\nCollected ${copied.length} coherent artifacts for v${VERSION}`);

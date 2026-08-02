@@ -380,6 +380,7 @@ Supersessions within the entity table: `PlannerView`/`HomilyEditor` (P-D) are **
 | `App.dayFlyout` | state | `src/App.tsx:56` | ✅ | in icon mode the day chip becomes a calendar button whose picker flies out over the main area (`.day-flyout`), because a date input and a feast name cannot render in 64px (BUGS #3) | `boolean` |
 | `AboutProse` / `inline` | comp/fn | `src/ui/AboutView.tsx:13` | ✅ | About prose splits on BLANK lines, not every newline (which emitted an empty `<p>` per blank line); bullet runs become real lists with one nesting level; `**bold**` renders | `AboutProse({ text: string })` |
 | `content/origin-story.md` | tracked content | `content/origin-story.md` | ✅ | the operator's own account, imported verbatim at build time via `?raw`. There is deliberately NO fallback string: a missing file fails the build, because a placeholder here would publish fabricated biography. Replaces the invented "St. Android of the Circuits" origin | consumed by `ABOUT_CONTENT.origin` |
+| `DOCS/CHANGELOG.md` / `readChangeNotes` | build input | `DOCS/CHANGELOG.md`, `scripts/collect-artifacts.mjs` | ✅ | change notes are a build INPUT: the `## v<version>` section is parsed into `change_notes {source, present, heading, highlights[], markdown}`, embedded in the JSON manifest and as `<change_notes>` in the XML, and written out as `RELEASE_NOTES-v<version>.md`. A missing section yields empty notes that say so — it does NOT fall back to boilerplate, which is how every release since v0.5 silently reprinted the same hardcoded paragraph | manifest schema stays `mba.robin.release-manifest.v1`: the field is additive, so existing CC8 consumers keep working |
 | `windows-msi` / `windows-msix` stages | release stages | `scripts/release-state.mjs:186` | ✅ | the installers are part of `build:release` rather than produced out of band; skipped with a clear log on non-Windows hosts because WiX and winapp do not cross-build (BUGS #7) | `STAGE_ORDER` = test · web · linux · windows · windows-msi · windows-msix · android-debug · android-release · symbols · collect |
 | MSIX package identity | build contract | `scripts/stamp-version.mjs`, `Package.appxmanifest` | ✅ | `Identity/@Version` = `MAJOR.MINOR.0.0`. Appx parts must be ≤ 65535 and the Store requires revision 0, but display BUILD is `epoch-minutes % 100000` — so ~a third of builds would mint a package Windows rejects outright. MINOR is the monotonic per-release quantity, exactly as for Play's `versionCode` | stamped by `npm run stamp`; nothing stamped it before, so it sat at 1.24.37311.0 |
 | `AtlasMode` / `ScriptureAtlas` | type/comp | `src/ui/ScriptureAtlas.tsx:1` | P-T | imagery + parallels navigation modes hosted by BibleView's mode switch | `AtlasMode = 'canonical' \| 'imagery' \| 'parallels'`; props `{ db: CorpusDb; mode: AtlasMode; onOpenKey: (k: string) => void }` |
@@ -1023,3 +1024,13 @@ rows above. The MSI and MSIX were never built by `build:release`; the `windows`
 stage builds `--no-bundle`. Acceptance for these artifacts is installation —
 install, launch, confirm the splash version and that the corpus loads, then
 uninstall — never a successful build.
+
+
+**Release-manifest change notes (2026-08-02).** `RELEASE_NOTES-v<version>.md`
+was previously a hardcoded string describing "the v0.5 browser-verified wave",
+reprinted verbatim by every subsequent release. It is now generated from
+`DOCS/CHANGELOG.md`, and the same content reaches the JSON and XML manifests as
+`change_notes` so the CC8 landing-page autopopulator can render per-release
+highlights without a second source of truth. Top-level bullets under a version
+heading become `highlights[]`; the whole section becomes `markdown`. The schema
+identifier is unchanged because the field is purely additive.
