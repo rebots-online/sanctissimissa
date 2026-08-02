@@ -24,3 +24,7 @@ tests/.tmp/
 # MSIX build artifacts (winapp CLI)
 devcert.pfx
 msix-stage/
+
+# tsc -b incremental state — build output; tracking it makes the
+# pre-build gate fail on every build after the first.
+tsconfig.tsbuildinfo
