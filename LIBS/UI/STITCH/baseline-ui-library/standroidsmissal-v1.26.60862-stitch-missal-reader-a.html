@@ -1,0 +1,480 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>St. Android's Missal - Reader</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        :root {
+            --parchment-texture: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+        }
+        body {
+            background-color: #fdf8f6;
+            background-image: var(--parchment-texture);
+            color: #1d1b1a;
+            -webkit-font-smoothing: antialiased;
+        }
+        .parchment-wash-latin { background-color: rgba(84, 62, 26, 0.075); }
+        .parchment-wash-english { background-color: rgba(84, 62, 26, 0.035); }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .small-caps { font-variant: small-caps; }
+        .bento-card {
+            border: 1px solid #ece2cc;
+            background-color: #fbf7ee;
+            transition: all 0.3s ease;
+        }
+        .bento-card:hover {
+            border-color: #d4a017;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #ece2cc; border-radius: 10px; }
+        .drop-cap::first-letter {
+            float: left;
+            font-size: 3.5rem;
+            line-height: 1;
+            padding-top: 4px;
+            padding-right: 8px;
+            color: #d4a017;
+            font-family: 'Source Serif 4', serif;
+            font-weight: 700;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#050300",
+                        "tertiary-fixed": "#ffdea2",
+                        "rail-bg": "#2b241b",
+                        "accent-green": "#3f7a52",
+                        "primary": "#040200",
+                        "accent-black": "#33302b",
+                        "on-secondary-container": "#686459",
+                        "error": "#ba1a1a",
+                        "primary-container": "#221c14",
+                        "primary-fixed": "#ede0d3",
+                        "surface-dim": "#ded9d7",
+                        "accent-white": "#a97e13",
+                        "on-surface-variant": "#4c463f",
+                        "accent-purple": "#5d3a80",
+                        "on-primary": "#ffffff",
+                        "on-background": "#1d1b1a",
+                        "inverse-surface": "#32302f",
+                        "on-tertiary-fixed-variant": "#5c4200",
+                        "secondary": "#615e54",
+                        "on-primary-fixed-variant": "#4d463c",
+                        "dialogue-p": "#9c2733",
+                        "outline-variant": "#cfc5bb",
+                        "on-tertiary-fixed": "#261900",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#1d1c13",
+                        "line-catechumens": "#a97e13",
+                        "secondary-container": "#e8e2d4",
+                        "on-tertiary-container": "#a97e13",
+                        "secondary-fixed-dim": "#cbc6b9",
+                        "ink-soft": "#4a4034",
+                        "on-secondary-fixed-variant": "#49473d",
+                        "accent-red": "#9c2733",
+                        "on-primary-container": "#8d8378",
+                        "surface-container-low": "#f8f3f0",
+                        "surface-bright": "#fdf8f6",
+                        "parchment-deep": "#ece2cc",
+                        "on-secondary": "#ffffff",
+                        "line-faithful": "#7a1f2b",
+                        "error-container": "#ffdad6",
+                        "gold-bright": "#d4a017",
+                        "accent-rose": "#b76a7d",
+                        "surface-container-high": "#ece7e5",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed-dim": "#d0c5b8",
+                        "rail-text": "#d9cdb8",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#d0c5b8",
+                        "tertiary-fixed-dim": "#f2bf53",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#211b13",
+                        "outline": "#7d766e",
+                        "surface": "#fdf8f6",
+                        "ink-faint": "#8a7d6a",
+                        "line-office": "#274b69",
+                        "inverse-on-surface": "#f5f0ee",
+                        "secondary-fixed": "#e8e2d4",
+                        "background": "#fdf8f6",
+                        "surface-container": "#f2edeb",
+                        "rubric": "#9c2733",
+                        "dialogue-s": "#5d3a80",
+                        "surface-container-highest": "#e6e1df",
+                        "on-surface": "#1d1b1a",
+                        "surface-variant": "#e6e1df",
+                        "vellum": "#fbf7ee",
+                        "surface-tint": "#665d53",
+                        "tertiary-container": "#281b00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "rail-collapsed": "64px",
+                        "stack-gap": "16px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "rail-width": "232px",
+                        "margin-main": "32px"
+                    },
+                    "fontFamily": {
+                        "feast-title-mobile": ["Source Serif 4"],
+                        "liturgical-english": ["Source Serif 4"],
+                        "liturgical-latin": ["Source Serif 4"],
+                        "rubric-sm": ["Inter"],
+                        "ui-label": ["Inter"],
+                        "rail-link": ["Inter"],
+                        "feast-title": ["Source Serif 4"]
+                    },
+                    "fontSize": {
+                        "feast-title-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "liturgical-english": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "liturgical-latin": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "rubric-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "ui-label": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "rail-link": ["13px", {"lineHeight": "16px", "letterSpacing": "0.03em", "fontWeight": "600"}],
+                        "feast-title": ["32px", {"lineHeight": "40px", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-ui-label text-on-surface overflow-hidden">
+<!-- Side Navigation Rail -->
+<aside class="w-rail-width h-full fixed left-0 top-0 bg-rail-bg border-r border-parchment-deep flex flex-col py-gutter z-50">
+<div class="px-6 mb-10">
+<h1 class="font-feast-title text-rail-link font-bold text-xl leading-tight">St. Android's Missal</h1>
+<p class="text-[10px] uppercase tracking-widest text-rail-text opacity-60 mt-1">Sacred Parchment Edition</p>
+</div>
+<nav class="flex-grow space-y-1">
+<!-- Nav Items Mapping from JSON -->
+<a class="flex items-center px-6 py-3 group hover:bg-primary-container hover:text-accent-white transition-colors text-rail-text opacity-80" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="map">map</span>
+<span class="font-rail-link">Subway Map</span>
+</a>
+<!-- ACTIVE TAB: Missal Reader -->
+<a class="flex items-center px-6 py-3 group transition-all text-accent-white font-bold border-l-4 border-accent-white bg-primary-container" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="menu_book">menu_book</span>
+<span class="font-rail-link">Missal Reader</span>
+</a>
+<a class="flex items-center px-6 py-3 group hover:bg-primary-container hover:text-accent-white transition-colors text-rail-text opacity-80" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="calendar_month">calendar_month</span>
+<span class="font-rail-link">Perpetual Calendar</span>
+</a>
+<a class="flex items-center px-6 py-3 group hover:bg-primary-container hover:text-accent-white transition-colors text-rail-text opacity-80" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="auto_stories">auto_stories</span>
+<span class="font-rail-link">Divine Office</span>
+</a>
+<a class="flex items-center px-6 py-3 group hover:bg-primary-container hover:text-accent-white transition-colors text-rail-text opacity-80" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="menu_book">menu_book</span>
+<span class="font-rail-link">Sacred Scripture</span>
+</a>
+<a class="flex items-center px-6 py-3 group hover:bg-primary-container hover:text-accent-white transition-colors text-rail-text opacity-80" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="edit_note">edit_note</span>
+<span class="font-rail-link">Journal</span>
+</a>
+<a class="flex items-center px-6 py-3 group hover:bg-primary-container hover:text-accent-white transition-colors text-rail-text opacity-80" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="history_edu">history_edu</span>
+<span class="font-rail-link">Homily Writer</span>
+</a>
+</nav>
+<div class="mt-auto px-6 space-y-1">
+<a class="flex items-center py-2 text-rail-text opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined text-sm mr-3" data-icon="settings">settings</span>
+<span class="text-xs font-semibold">Settings</span>
+</a>
+<a class="flex items-center py-2 text-rail-text opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined text-sm mr-3" data-icon="help">help</span>
+<span class="text-xs font-semibold">Help</span>
+</a>
+</div>
+</aside>
+<!-- Main View Container -->
+<main class="pl-rail-width h-screen flex flex-col relative overflow-hidden">
+<!-- Top App Bar -->
+<header class="flex justify-between items-center h-16 px-margin-main bg-surface border-b border-gold-bright shrink-0">
+<div class="flex items-center gap-4">
+<span class="font-feast-title-mobile text-primary text-lg">St. Android's Missal</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface hover:text-primary transition-colors" data-icon="account_circle">account_circle</button>
+</div>
+</header>
+<!-- Main Workspace Split -->
+<div class="flex flex-1 overflow-hidden">
+<!-- CONTENT AREA (Bilingual Reader) -->
+<section class="flex-1 flex flex-col overflow-y-auto custom-scrollbar">
+<!-- Masthead & MapStrip -->
+<div class="px-margin-main pt-8 pb-4">
+<div class="mb-6">
+<div class="flex gap-4 mb-1 flex-col">
+<div class="flex items-baseline gap-4"><h2 class="font-feast-title text-primary text-3xl">Dominica VIII Post Pentecosten</h2><span class="px-2 py-0.5 bg-accent-black text-white text-[10px] font-bold tracking-widest rounded-sm">II CLASSIS</span></div><p class="text-base italic text-on-surface-variant mt-1">Eighth Sunday after Pentecost</p>
+
+</div>
+<p class="font-rubric-sm text-ink-soft italic">Pentecost · Sunday · Pent08-0</p>
+</div>
+<!-- MapStrip -->
+<div class="relative py-8">
+<div class="absolute top-1/2 left-0 w-full h-[1px] bg-gold-bright/30 -translate-y-1/2"></div>
+<div class="relative flex justify-between items-center">
+<div class="flex flex-col items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-gold-bright ring-4 ring-surface"></div>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-ink-faint">Introitus</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-gold-bright ring-4 ring-surface"></div>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-ink-faint">Kyrie</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-gold-bright ring-4 ring-surface"></div>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-ink-faint">Gloria</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-gold-bright ring-4 ring-surface"></div>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-ink-faint">Oratio</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-gold-bright ring-4 ring-surface"></div>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-ink-faint">Epistola</span>
+</div>
+<!-- ACTIVE STATION -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-4 h-4 rounded-full bg-gold-bright ring-4 ring-surface shadow-sm"></div>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-primary">Graduale</span>
+</div>
+<div class="flex flex-col items-center gap-2 opacity-40">
+<div class="w-2 h-2 rounded-full bg-ink-faint ring-4 ring-surface"></div>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-ink-faint">Evangelium</span>
+</div>
+<div class="flex flex-col items-center gap-2 opacity-40">
+<div class="w-2 h-2 rounded-full bg-ink-faint ring-4 ring-surface"></div>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-ink-faint">Credo</span>
+</div>
+<div class="flex flex-col items-center gap-2 opacity-40">
+<div class="w-2 h-2 rounded-full bg-ink-faint ring-4 ring-surface"></div>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-ink-faint">Offertorium</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Liturgical Sections -->
+<div class="max-w-5xl mx-auto w-full px-margin-main pb-20 space-y-12">
+<!-- Section 1: INTROITUS -->
+<section class="group">
+<header class="flex items-center gap-3 border-b border-parchment-deep pb-2 mb-4 cursor-pointer">
+<span class="material-symbols-outlined text-ink-faint group-hover:text-primary" data-icon="expand_more">expand_more</span>
+<h3 class="font-liturgical-latin small-caps tracking-widest text-ink-soft text-sm font-bold">INTROITUS</h3>
+</header>
+<div class="grid grid-cols-2 gap-px bg-parchment-deep border border-parchment-deep rounded-sm overflow-hidden">
+<div class="parchment-wash-latin p-6 relative">
+<p class="font-liturgical-latin text-liturgical-latin drop-cap">
+                                    Suscépimus, Deus, <span class="bg-gold-bright/20 border-b-2 border-gold-bright cursor-help relative group/word">misericórdiam tuam
+                                        <!-- Floating Tooltip Menu -->
+</span></p><div class="absolute top-full left-0 mt-2 hidden group-hover/word:block z-20 w-48 bg-white shadow-xl rounded-lg border border-parchment-deep overflow-hidden">
+<div class="flex flex-col text-[12px] font-semibold text-primary">
+<button class="px-4 py-2 hover:bg-surface-container flex items-center gap-3"><span class="material-symbols-outlined text-sm" data-icon="menu_book">menu_book</span> Meaning</button>
+<button class="px-4 py-2 hover:bg-surface-container flex items-center gap-3 border-t border-parchment-deep"><span class="material-symbols-outlined text-sm" data-icon="edit_note">edit_note</span> Journal</button>
+<button class="px-4 py-2 hover:bg-surface-container flex items-center gap-3 border-t border-parchment-deep"><span class="material-symbols-outlined text-sm" data-icon="content_copy">content_copy</span> Copy</button>
+</div>
+</div>
+ in médio templi tui: secúndum nomen tuum, Deus, ita et laus tua in fines terræ: iustítia plena est déxtera tua.
+                                <p></p>
+</div>
+<div class="parchment-wash-english p-6">
+<p class="font-liturgical-english text-liturgical-english leading-relaxed">
+                                    We have received Thy mercy, O God, in the midst of Thy temple; according to Thy name, O God, so also is Thy praise unto the ends of the earth: Thy right hand is full of justice.
+                                </p>
+</div>
+</div>
+</section>
+<!-- Section 2: ORATIO with Rubric -->
+<section class="group">
+<div class="mb-4">
+<p class="font-rubric-sm text-rubric italic text-center mb-4">Sacerdos ad medium altaris</p>
+<header class="flex items-center gap-3 border-b border-parchment-deep pb-2 cursor-pointer">
+<span class="material-symbols-outlined text-ink-faint group-hover:text-primary" data-icon="expand_more">expand_more</span>
+<h3 class="font-liturgical-latin small-caps tracking-widest text-ink-soft text-sm font-bold">ORATIO</h3>
+</header>
+</div>
+<div class="grid grid-cols-2 gap-px bg-parchment-deep border border-parchment-deep rounded-sm overflow-hidden mb-4">
+<div class="parchment-wash-latin p-6">
+<div class="flex items-start gap-4 mb-4">
+<span class="font-feast-title text-dialogue-p leading-none">℣</span>
+<p class="font-liturgical-latin text-liturgical-latin">Dómine, exáudi oratiónem meam.</p>
+</div>
+<div class="flex items-start gap-4 mb-8">
+<span class="font-feast-title text-dialogue-s leading-none">℟</span>
+<p class="font-liturgical-latin text-liturgical-latin">Et clamor meus ad te véniat.</p>
+</div>
+<p class="font-liturgical-latin text-liturgical-latin">
+                                    Largíre nobis, quǽsumus, Dómine, semper spíritum cogitándi quæ recta sunt, propítius et agéndi: ut, qui sine te esse non póssumus, secúndum te vívere valeámus.
+                                </p>
+</div>
+<div class="parchment-wash-english p-6">
+<div class="flex items-start gap-4 mb-4">
+<span class="font-feast-title text-dialogue-p leading-none">℣</span>
+<p class="font-liturgical-english text-liturgical-english">O Lord, hear my prayer.</p>
+</div>
+<div class="flex items-start gap-4 mb-8">
+<span class="font-feast-title text-dialogue-s leading-none">℟</span>
+<p class="font-liturgical-english text-liturgical-english">And let my cry come unto Thee.</p>
+</div>
+<p class="font-liturgical-english text-liturgical-english leading-relaxed">
+                                    Graciously grant us, O Lord, we beseech Thee, always the spirit to think and to do such things as are rightful; that we, who cannot exist without Thee, may be enabled to live according to Thy will.
+                                </p>
+</div>
+</div>
+</section>
+<!-- Section 3: GRADUALE (Highlighted) -->
+<section class="group bento-card p-2 rounded-lg ring-2 ring-gold-bright/20 ring-offset-4 ring-offset-surface">
+<header class="flex items-center justify-between px-4 pt-2 pb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="expand_more">expand_more</span>
+<h3 class="font-liturgical-latin small-caps tracking-widest text-primary text-sm font-bold">GRADUALE</h3>
+</div>
+<span class="px-3 py-1 bg-ink-faint/10 text-ink-faint text-[10px] font-bold uppercase tracking-wider rounded-full">supplied from Commune</span>
+</header>
+<div class="grid grid-cols-2 gap-px bg-parchment-deep rounded-sm overflow-hidden">
+<div class="parchment-wash-latin p-6">
+<p class="font-liturgical-latin text-liturgical-latin italic">
+                                    Esto mihi in Deum protectórem, et in locum refúgii, ut salvum me fácias. Deus, in te sperávi: Dómine, non confúndar in ætérnum.
+                                </p>
+</div>
+<div class="parchment-wash-english p-6">
+<p class="font-liturgical-english text-liturgical-english leading-relaxed italic">
+                                    Be Thou unto me a God, a protector, and a place of refuge, to save me. In Thee, O God, have I hoped: O Lord, let me never be confounded.
+                                </p>
+</div>
+</div>
+</section>
+<!-- Section 4: EVANGELIUM (Collapsed) -->
+<section class="group">
+<header class="flex items-center gap-3 border-b border-parchment-deep pb-2 cursor-pointer opacity-60 hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-ink-faint" data-icon="chevron_right">chevron_right</span>
+<h3 class="font-liturgical-latin small-caps tracking-widest text-ink-soft text-sm font-bold">EVANGELIUM</h3>
+</header>
+</section>
+</div>
+</section>
+<!-- RIGHT INSPECTOR (Meaning Panel) -->
+<aside class="w-[380px] bg-vellum border-l border-parchment-deep flex flex-col h-full overflow-hidden">
+<header class="p-6 border-b border-parchment-deep flex justify-between items-center bg-white/50 backdrop-blur-sm sticky top-0 z-10">
+<h4 class="font-feast-title text-xl text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-gold-bright" data-icon="auto_stories">auto_stories</span>
+                        Meaning
+                    </h4>
+<button class="material-symbols-outlined text-ink-faint hover:text-error transition-colors" data-icon="close">close</button>
+</header>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8">
+<!-- Selected Phrase Display -->
+<div class="p-5 bento-card rounded-xl border-dashed border-2">
+<span class="text-[10px] font-bold uppercase tracking-widest text-ink-faint block mb-2">Active Selection</span>
+<h5 class="font-liturgical-latin text-2xl text-accent-red leading-tight italic">misericórdiam tuam</h5>
+<p class="text-sm mt-3 text-on-surface-variant font-medium">"Thy mercy" / "Your loving-kindness"</p>
+</div>
+<!-- Concept Groups -->
+<div class="space-y-4">
+<h6 class="text-[10px] font-bold uppercase tracking-widest text-ink-faint">Theological Context</h6>
+<div class="space-y-2">
+<details class="group/detail bento-card rounded-lg" open="">
+<summary class="flex justify-between items-center p-4 cursor-pointer list-none">
+<span class="text-sm font-bold text-ink-soft flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] opacity-40 group-open/detail:rotate-90 transition-transform" data-icon="chevron_right">chevron_right</span>
+                                        Doxology
+                                    </span>
+<span class="text-[11px] font-bold bg-gold-bright/10 text-gold-bright px-2 py-0.5 rounded-full">2</span>
+</summary>
+<div class="px-4 pb-4 text-xs text-on-surface-variant leading-relaxed">
+                                    Found in the Introit and the Postcommunion. Refers to the public recognition of God's attribute of mercy as a communal shield.
+                                </div>
+</details>
+<details class="group/detail bento-card rounded-lg">
+<summary class="flex justify-between items-center p-4 cursor-pointer list-none">
+<span class="text-sm font-bold text-ink-soft flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] opacity-40 group-open/detail:rotate-90 transition-transform" data-icon="chevron_right">chevron_right</span>
+                                        Collect
+                                    </span>
+<span class="text-[11px] font-bold bg-gold-bright/10 text-gold-bright px-2 py-0.5 rounded-full">1</span>
+</summary>
+<div class="px-4 pb-4 text-xs text-on-surface-variant">
+                                    A summary of the community's gathered intentions focused on divine grace.
+                                </div>
+</details>
+<details class="group/detail bento-card rounded-lg">
+<summary class="flex justify-between items-center p-4 cursor-pointer list-none">
+<span class="text-sm font-bold text-ink-soft flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] opacity-40 group-open/detail:rotate-90 transition-transform" data-icon="chevron_right">chevron_right</span>
+                                        Petition
+                                    </span>
+<span class="text-[11px] font-bold bg-gold-bright/10 text-gold-bright px-2 py-0.5 rounded-full">4</span>
+</summary>
+<div class="px-4 pb-4 text-xs text-on-surface-variant">
+                                    Formal requests for specific spiritual or temporal aid.
+                                </div>
+</details>
+</div>
+</div>
+<!-- Concordance -->
+<div class="space-y-4">
+<h6 class="text-[10px] font-bold uppercase tracking-widest text-ink-faint">Concordance</h6>
+<div class="space-y-3">
+<div class="p-3 bg-white/40 border-l-2 border-gold-bright">
+<p class="text-[10px] font-extrabold small-caps text-primary mb-1">PSALM 47:10</p>
+<p class="text-xs italic text-ink-soft">"Suscepimus, Deus, misericordiam..."</p>
+</div>
+<div class="p-3 bg-white/40 border-l-2 border-gold-bright/30">
+<p class="text-[10px] font-extrabold small-caps text-primary mb-1">LUKE 1:54</p>
+<p class="text-xs italic text-ink-soft">"...recordatus misericordiae suae."</p>
+</div>
+<div class="p-3 bg-white/40 border-l-2 border-gold-bright/30">
+<p class="text-[10px] font-extrabold small-caps text-primary mb-1">MICAH 7:18</p>
+<p class="text-xs italic text-ink-soft">"...quoniam volens misericordiam est."</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Inspector Footer -->
+<footer class="p-4 bg-parchment-deep/20 text-center">
+<button class="text-[11px] font-bold text-gold-bright uppercase tracking-widest hover:underline">View Scholarly Commentary</button>
+</footer>
+</aside>
+</div>
+<!-- System Footer -->
+<footer class="fixed bottom-4 right-4 z-50 flex gap-4 items-end pointer-events-none">
+<span class="font-rubric-sm text-rubric-sm text-ink-faint">v1.26.53142 - Sacred Parchment</span>
+</footer>
+</main>
+<!-- Overlay Micro-interactions -->
+<script>
+        // Simple logic for toggle sections (simplified version of interaction)
+        document.querySelectorAll('header.cursor-pointer').forEach(header => {
+            header.addEventListener('click', () => {
+                const icon = header.querySelector('.material-symbols-outlined');
+                if (icon.textContent === 'expand_more') {
+                    icon.textContent = 'chevron_right';
+                    header.nextElementSibling.classList.add('hidden');
+                } else if (icon.textContent === 'chevron_right') {
+                    icon.textContent = 'expand_more';
+                    header.nextElementSibling.classList.remove('hidden');
+                }
+            });
+        });
+    </script>
+
+
+</body></html>

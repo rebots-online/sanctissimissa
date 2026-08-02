@@ -3,16 +3,18 @@
  * Origin story, purpose, acknowledgements, and privacy sections. Each slot
  * accepts prose of any length; AboutView renders as a normal scrollable
  * workspace without modal height/width caps.
+ *
+ * `origin` is NOT authored here. It is the operator's own account, held in the
+ * tracked file `content/origin-story.md` and imported verbatim at build time.
+ * There is deliberately no fallback string: if the file goes missing the build
+ * fails loudly, which is the only acceptable behaviour for a first-person
+ * account — a placeholder would silently publish fabricated biography.
  */
 
+import originStory from '../../content/origin-story.md?raw';
+
 export const ABOUT_CONTENT = {
-  origin: `
-St. Android's Missal began as a reimagining of the Traditional Latin Mass and Divine Office as a navigable subway map. The project takes its name from the patron saint of technology, St. Android of the Circuits, and seeks to bring the beauty of the ancient liturgy into the digital age.
-
-The application is a complete rewrite of the earlier SanctissiMissa project (also known as "Hello, Word"), transforming László Kiss's Divinum Officium flat-text corpus into a modern graph and vector database. This architecture enables powerful search, concept discovery, and liturgical calendar resolution while maintaining faithfulness to the 1962 rubrics.
-
-Built with Tauri 2 for cross-platform deployment (web/PWA, Windows, Linux, Android), the application uses React 18 with Vite for the frontend and sql.js for the embedded corpus database. Every component is designed to work identically across platforms, following the "collinear rule" of a single query layer everywhere.
-  `.trim(),
+  origin: originStory.trim(),
 
   purpose: `
 The mission of St. Android's Missal is to provide priests, seminarians, and laity with a comprehensive digital tool for the Traditional Latin Mass and Divine Office. The application supports:

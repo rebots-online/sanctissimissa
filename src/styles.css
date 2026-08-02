@@ -1331,6 +1331,21 @@ html[data-mode='dark'] .settings-workspace .theme-picker button {
 .about-workspace .about-prose p:last-child {
   margin-bottom: 0;
 }
+.about-workspace .about-prose ul {
+  margin: 0 0 14px;
+  padding-left: 1.35em;
+}
+.about-workspace .about-prose li {
+  margin: 0 0 6px;
+}
+.about-workspace .about-prose li.about-bullet-sub {
+  margin-left: 1.2em;
+  list-style-type: circle;
+  color: var(--ink-soft);
+}
+.about-workspace .about-prose strong {
+  font-weight: 600;
+}
 .about-workspace .about-meta {
   display: grid;
   grid-template-columns: 140px 1fr;

@@ -32,55 +32,59 @@ describe('BS.1R2 Bible Echo Contract', () => {
       assert.ok((matches?.length ?? 0) <= 1, 'Must have at most one PhraseSelectionInput interface declaration');
     });
 
-    it('BibleView.tsx imports SelectionEcho from BilingualText.tsx', () => {
-      const bibleView = readFileSync('src/ui/BibleView.tsx', 'utf-8');
-      assert.ok(bibleView.includes('SelectionEcho') && bibleView.includes("from './BilingualText.tsx';"),
-        'BibleView must import SelectionEcho type from BilingualText.tsx');
+    it('SectionReader.tsx imports SelectionEcho from BilingualText.tsx', () => {
+      const src = readFileSync('src/ui/SectionReader.tsx', 'utf-8');
+      assert.ok(src.includes('SelectionEcho') && src.includes("from './BilingualText.tsx';"),
+        'SectionReader must import SelectionEcho type from BilingualText.tsx');
     });
 
-    it('BibleView.tsx declares livePhraseEcho typed as SelectionEcho | null', () => {
-      const bibleView = readFileSync('src/ui/BibleView.tsx', 'utf-8');
-      assert.ok(bibleView.includes('const [livePhraseEcho, setLivePhraseEcho] = useState<SelectionEcho | null>(null);'),
-        'BibleView must declare livePhraseEcho state with correct type');
+    it('SectionReader.tsx declares livePhraseEcho typed as SelectionEcho | null', () => {
+      const src = readFileSync('src/ui/SectionReader.tsx', 'utf-8');
+      assert.ok(src.includes('const [livePhraseEcho, setLivePhraseEcho] = useState<SelectionEcho | null>(null);'),
+        'SectionReader must declare livePhraseEcho state with correct type');
     });
 
-    it('BibleView.tsx reciprocal branch consumes dstStart AND dstEnd', () => {
-      const bibleView = readFileSync('src/ui/BibleView.tsx', 'utf-8');
+    it('SectionReader.tsx reciprocal branch consumes dstStart AND dstEnd', () => {
+      const src = readFileSync('src/ui/SectionReader.tsx', 'utf-8');
       // The reciprocal branch should reference both dstStart and dstEnd from the alignment result
-      const hasDstStart = bibleView.includes('.dstStart');
-      const hasDstEnd = bibleView.includes('.dstEnd');
+      const hasDstStart = src.includes('.dstStart');
+      const hasDstEnd = src.includes('.dstEnd');
       assert.ok(hasDstStart && hasDstEnd,
         'Reciprocal branch must consume both dstStart and dstEnd from alignPhrase result');
     });
 
-    it('BibleView.tsx reciprocal range is NOT carried only by echoVerse', () => {
-      const bibleView = readFileSync('src/ui/BibleView.tsx', 'utf-8');
+    it('SectionReader.tsx reciprocal range is NOT carried only by echoVerse', () => {
+      const src = readFileSync('src/ui/SectionReader.tsx', 'utf-8');
       // The reciprocal range should be set via livePhraseEcho, not only echoVerse
       // Check that setLivePhraseEcho is called with dstStart/dstEnd values
-      assert.ok(bibleView.includes('setLivePhraseEcho({') &&
-                bibleView.includes('start: aligned.dstStart') &&
-                bibleView.includes('end: aligned.dstEnd'),
+      assert.ok(src.includes('setLivePhraseEcho({') &&
+                src.includes('start: aligned.dstStart') &&
+                src.includes('end: aligned.dstEnd'),
         'Reciprocal range must be set via livePhraseEcho with dstStart/dstEnd, not only echoVerse');
     });
 
-    it('BibleView.tsx has selectionEcho rendering in both panes (count >= 2)', () => {
-      const bibleView = readFileSync('src/ui/BibleView.tsx', 'utf-8');
-      // The selectionEcho prop must be passed to BilingualText
-      const hasSelectionEchoProp = bibleView.includes('selectionEcho: livePhraseEcho');
-      assert.ok(hasSelectionEchoProp,
-        'BibleView must pass selectionEcho prop to BilingualText (found selectionEcho: livePhraseEcho)');
+    it('SectionReader.tsx has selectionEcho rendering in both panes (count >= 2)', () => {
+      const src = readFileSync('src/ui/SectionReader.tsx', 'utf-8');
+      // The aligned phrase range must reach BOTH panes: the interleaved
+      // renderer once, and each column renderer under its own language guard.
+      const passes = src.match(/selectionEcho=\{/g) ?? [];
+      assert.ok(passes.length >= 3,
+        `SectionReader must pass selectionEcho to the interleaved renderer and both columns (found ${passes.length})`);
+      assert.ok(/selectionEcho\?\.lang === 'latin'/.test(src) && /selectionEcho\?\.lang === 'english'/.test(src)
+        || /sectionEcho\?\.lang === 'latin'/.test(src) && /sectionEcho\?\.lang === 'english'/.test(src),
+        'each column must receive only its own language\'s echo');
     });
 
-    it('BibleView.tsx does NOT have renderWithSelectionEcho local workaround', () => {
-      const bibleView = readFileSync('src/ui/BibleView.tsx', 'utf-8');
-      assert.ok(!bibleView.includes('renderWithSelectionEcho'),
-        'BibleView must not have renderWithSelectionEcho function (use shared renderer)');
+    it('SectionReader.tsx does NOT have renderWithSelectionEcho local workaround', () => {
+      const src = readFileSync('src/ui/SectionReader.tsx', 'utf-8');
+      assert.ok(!src.includes('renderWithSelectionEcho'),
+        'SectionReader must not have renderWithSelectionEcho function (use shared renderer)');
     });
 
-    it('BibleView.tsx does NOT have direct <mark className="selection-echo"> workaround', () => {
-      const bibleView = readFileSync('src/ui/BibleView.tsx', 'utf-8');
-      assert.ok(!bibleView.includes('<mark className="selection-echo">') && !bibleView.includes('<mark class="selection-echo">'),
-        'BibleView must not have direct selection-echo mark elements (use shared renderer)');
+    it('SectionReader.tsx does NOT have direct <mark className="selection-echo"> workaround', () => {
+      const src = readFileSync('src/ui/SectionReader.tsx', 'utf-8');
+      assert.ok(!src.includes('<mark className="selection-echo">') && !src.includes('<mark class="selection-echo">'),
+        'SectionReader must not have direct selection-echo mark elements (use shared renderer)');
     });
   });
 

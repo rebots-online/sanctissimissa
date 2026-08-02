@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+
+<html class="light" lang="la"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --parchment-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+        body {
+            background-color: #fdf8f6;
+            background-image: var(--parchment-texture);
+        }
+        .vellum-surface {
+            background-color: #fbf7ee;
+            background-image: var(--parchment-texture);
+        }
+        .small-caps { font-variant: small-caps; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#7d766e",
+                        "parchment-deep": "#ece2cc",
+                        "primary-container": "#221c14",
+                        "surface": "#fdf8f6",
+                        "primary": "#040200",
+                        "rubric": "#9c2733",
+                        "rail-text": "#d9cdb8",
+                        "rail-bg": "#2b241b",
+                        "vellum": "#fbf7ee",
+                        "ink-soft": "#4a4034",
+                        "ink-faint": "#8a7d6a",
+                        "gold-bright": "#d4a017",
+                        "accent-white": "#a97e13",
+                        "accent-green": "#3f7a52",
+                        "accent-red": "#9c2733",
+                        "accent-purple": "#5d3a80",
+                        "accent-rose": "#b76a7d",
+                        "accent-black": "#33302b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "rail-collapsed": "64px",
+                        "margin-main": "32px",
+                        "gutter": "24px",
+                        "rail-width": "232px",
+                        "stack-gap": "16px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "liturgical-english": ["Source Serif 4"],
+                        "feast-title": ["Source Serif 4"],
+                        "rail-link": ["Inter"],
+                        "ui-label": ["Inter"],
+                        "rubric-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "liturgical-english": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "feast-title": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "rail-link": ["13px", {"lineHeight": "16px", "letterSpacing": "0.03em", "fontWeight": "600"}],
+                        "ui-label": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "rubric-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-ui-label text-on-surface selection:bg-gold-bright/30">
+<!-- SideNavBar Component -->
+<nav class="bg-rail-bg text-rail-text w-rail-width h-full fixed left-0 top-0 border-r border-parchment-deep flex flex-col py-gutter z-50">
+<div class="px-6 mb-8">
+<h1 class="font-feast-title text-rail-link font-bold text-lg text-accent-white">St. Android's Missal</h1>
+<p class="text-[10px] uppercase tracking-widest opacity-60">Sacred Parchment Edition</p>
+</div>
+<div class="flex-1 space-y-1">
+<a class="flex items-center px-6 py-3 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">map</span>
+<span class="font-rail-link text-rail-link">Subway Map</span>
+</a>
+<a class="flex items-center px-6 py-3 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">menu_book</span>
+<span class="font-rail-link text-rail-link">Missal Reader</span>
+</a>
+<a class="flex items-center px-6 py-3 text-accent-white font-bold border-l-4 border-accent-white bg-primary-container" href="#">
+<span class="material-symbols-outlined mr-3">calendar_month</span>
+<span class="font-rail-link text-rail-link">Perpetual Calendar</span>
+</a>
+<a class="flex items-center px-6 py-3 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">auto_stories</span>
+<span class="font-rail-link text-rail-link">Divine Office</span>
+</a>
+<a class="flex items-center px-6 py-3 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">menu_book</span>
+<span class="font-rail-link text-rail-link">Sacred Scripture</span>
+</a>
+<a class="flex items-center px-6 py-3 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">edit_note</span>
+<span class="font-rail-link text-rail-link">Journal</span>
+</a>
+<a class="flex items-center px-6 py-3 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">history_edu</span>
+<span class="font-rail-link text-rail-link">Homily Writer</span>
+</a>
+</div>
+<div class="px-6 pt-4 border-t border-white/5 space-y-1">
+<a class="flex items-center py-2 text-rail-text opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined mr-3 text-sm">settings</span>
+<span class="text-xs">Settings</span>
+</a>
+<a class="flex items-center py-2 text-rail-text opacity-60 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined mr-3 text-sm">help</span>
+<span class="text-xs">Help</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="ml-rail-width min-h-screen flex flex-col">
+<!-- Masthead -->
+<header class="pt-10 px-margin-main pb-4 border-b border-gold-bright bg-surface/50 backdrop-blur-sm sticky top-0 z-40">
+<div class="flex justify-between items-end max-w-6xl mx-auto">
+<div>
+<div class="flex items-center gap-4 mb-1">
+<h2 class="font-feast-title text-feast-title text-primary">Dominica VIII Post Pentecosten</h2>
+<span class="px-2 py-0.5 rounded-sm border border-rubric text-rubric text-[10px] font-bold tracking-widest uppercase">II Classis</span>
+</div>
+<p class="font-ui-label text-ink-faint text-sm">2026-07-27 · Pentecost · Tempora/Pent08-0</p>
+</div>
+<div class="flex gap-2 pb-1">
+<button class="p-2 hover:bg-parchment-deep rounded-full transition-colors">
+<span class="material-symbols-outlined text-ink-soft">share</span>
+</button>
+<button class="p-2 hover:bg-parchment-deep rounded-full transition-colors">
+<span class="material-symbols-outlined text-ink-soft">print</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Calendar Section -->
+<section class="flex-1 p-margin-main">
+<div class="max-w-6xl mx-auto">
+<!-- Toolbar -->
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-6">
+<button class="flex items-center gap-1 text-ink-soft hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+<span class="text-xs font-bold uppercase tracking-tighter">Previous</span>
+</button>
+<h3 class="font-feast-title text-2xl text-primary">July 2026</h3>
+<button class="flex items-center gap-1 text-ink-soft hover:text-primary transition-colors">
+<span class="text-xs font-bold uppercase tracking-tighter">Next</span>
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<button class="px-4 py-1.5 vellum-surface border border-parchment-deep text-ink-soft text-xs font-bold uppercase tracking-widest hover:border-gold-bright transition-all active:scale-95 shadow-sm">
+                        Today
+                    </button>
+</div>
+<!-- Weekday Header -->
+<div class="grid grid-cols-7 mb-2 border-b border-parchment-deep/50">
+<div class="py-2 text-center text-ink-faint text-xs small-caps font-bold">Dom</div>
+<div class="py-2 text-center text-ink-faint text-xs small-caps font-bold">Lun</div>
+<div class="py-2 text-center text-ink-faint text-xs small-caps font-bold">Mar</div>
+<div class="py-2 text-center text-ink-faint text-xs small-caps font-bold">Mer</div>
+<div class="py-2 text-center text-ink-faint text-xs small-caps font-bold">Iov</div>
+<div class="py-2 text-center text-ink-faint text-xs small-caps font-bold">Ven</div>
+<div class="py-2 text-center text-ink-faint text-xs small-caps font-bold">Sab</div>
+</div>
+<!-- Calendar Grid -->
+<div class="grid grid-cols-7 gap-px bg-parchment-deep border border-parchment-deep shadow-inner rounded-sm overflow-hidden">
+<!-- Row 1: June Padding -->
+<div class="vellum-surface h-32 p-3 opacity-40">
+<span class="font-feast-title text-ink-faint">28</span>
+</div>
+<div class="vellum-surface h-32 p-3 opacity-40">
+<span class="font-feast-title text-ink-faint">29</span>
+</div>
+<div class="vellum-surface h-32 p-3 opacity-40">
+<span class="font-feast-title text-ink-faint">30</span>
+</div>
+<!-- July Starts -->
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-primary">1</span>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-red" title="Precious Blood"></div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2 group-hover:text-primary">Pretiosissimi Sanguinis D.N.I.C.</p>
+</div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-primary">2</span>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-white" title="Visitation"></div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2 group-hover:text-primary">Visitatio B.M.V.</p>
+</div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-primary">3</span>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-white" title="St. Irenaeus"></div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2 group-hover:text-primary">S. Irenaei Ep. et M.</p>
+</div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-primary">4</span>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-green" title="Feria"></div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2 group-hover:text-primary">Sabbato</p>
+</div>
+<!-- Row 2 -->
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-primary">5</span>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-green"></div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2 font-bold group-hover:text-primary italic">Dom. VI Post Pent.</p>
+</div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-primary">6</span>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-green"></div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2">Feria II</p>
+</div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-primary">7</span>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-white"></div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2">Ss. Cyrilli et Methodii</p>
+</div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-primary">8</span>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-white"></div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2">S. Elisabeth Reg. Lusit.</p>
+</div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-primary">9</span>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-green"></div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2">Feria V</p>
+</div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-primary">10</span>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-red"></div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2">Ss. Septem Fratrum</p>
+</div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-primary">11</span>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-white"></div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2">S. Pii I Papae et M.</p>
+</div>
+<!-- Row 3 -->
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-primary">12</span>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-green"></div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2 font-bold italic">Dom. VII Post Pent.</p>
+</div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group"><div class="flex justify-between items-start"><span class="font-feast-title text-xl text-primary">13</span><div class="w-2.5 h-2.5 rounded-full bg-accent-green"></div></div><p class="text-[10px] mt-2">Feria II</p></div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group"><div class="flex justify-between items-start"><span class="font-feast-title text-xl text-primary">14</span><div class="w-2.5 h-2.5 rounded-full bg-accent-white"></div></div><p class="text-[10px] mt-2">S. Bonaventurae</p></div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group"><div class="flex justify-between items-start"><span class="font-feast-title text-xl text-primary">15</span><div class="w-2.5 h-2.5 rounded-full bg-accent-white"></div></div><p class="text-[10px] mt-2">S. Henrici Imp.</p></div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group"><div class="flex justify-between items-start"><span class="font-feast-title text-xl text-primary">16</span><div class="w-2.5 h-2.5 rounded-full bg-accent-white"></div></div><p class="text-[10px] mt-2">B.M.V. de Monte Carmelo</p></div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group"><div class="flex justify-between items-start"><span class="font-feast-title text-xl text-primary">17</span><div class="w-2.5 h-2.5 rounded-full bg-accent-green"></div></div><p class="text-[10px] mt-2">Feria VI</p></div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group"><div class="flex justify-between items-start"><span class="font-feast-title text-xl text-primary">18</span><div class="w-2.5 h-2.5 rounded-full bg-accent-white"></div></div><p class="text-[10px] mt-2">S. Camilli de Lellis</p></div>
+<!-- Row 4 -->
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-primary">19</span>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-green"></div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2 font-bold italic">Dom. VIII Post Pent.</p>
+</div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group"><div class="flex justify-between items-start"><span class="font-feast-title text-xl text-primary">20</span><div class="w-2.5 h-2.5 rounded-full bg-accent-white"></div></div><p class="text-[10px] mt-2">S. Hieronymi Aemiliani</p></div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group"><div class="flex justify-between items-start"><span class="font-feast-title text-xl text-primary">21</span><div class="w-2.5 h-2.5 rounded-full bg-accent-white"></div></div><p class="text-[10px] mt-2">S. Praxedis Virg.</p></div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group"><div class="flex justify-between items-start"><span class="font-feast-title text-xl text-primary">22</span><div class="w-2.5 h-2.5 rounded-full bg-accent-white"></div></div><p class="text-[10px] mt-2">S. Mariae Magdalenae</p></div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group"><div class="flex justify-between items-start"><span class="font-feast-title text-xl text-primary">23</span><div class="w-2.5 h-2.5 rounded-full bg-accent-white"></div></div><p class="text-[10px] mt-2">S. Apollinaris</p></div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group"><div class="flex justify-between items-start"><span class="font-feast-title text-xl text-primary">24</span><div class="w-2.5 h-2.5 rounded-full bg-accent-purple"></div></div><p class="text-[10px] mt-2">Vigilia S. Jacobi</p></div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-primary">25</span>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-white"></div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2">S. Jacobi Apostoli</p>
+</div>
+<!-- Row 5 (Selected) -->
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-primary">26</span>
+<div class="flex gap-1">
+<div class="w-2.5 h-2.5 rounded-full bg-accent-green" title="Sunday IX"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-white" title="S. Annae"></div>
+</div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2 font-bold italic">Dom. IX Post Pent. (S. Annae)</p>
+</div>
+<!-- SELECTED DAY -->
+<div class="vellum-surface h-32 p-3 ring-2 ring-inset ring-accent-green bg-accent-green/5 relative shadow-lg z-10">
+<div class="flex justify-between items-start">
+<span class="font-feast-title text-xl text-accent-green font-bold">27</span>
+<div class="w-2.5 h-2.5 rounded-full bg-accent-green"></div>
+</div>
+<p class="text-[10px] leading-tight text-ink-soft mt-2 font-bold">Feria II infra Hebd. VIII</p>
+<div class="absolute bottom-2 right-2 opacity-30">
+<span class="material-symbols-outlined text-accent-green text-lg">church</span>
+</div>
+</div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group"><div class="flex justify-between items-start"><span class="font-feast-title text-xl text-primary">28</span><div class="w-2.5 h-2.5 rounded-full bg-accent-red"></div></div><p class="text-[10px] mt-2">Ss. Nazarii et Celsi</p></div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group"><div class="flex justify-between items-start"><span class="font-feast-title text-xl text-primary">29</span><div class="w-2.5 h-2.5 rounded-full bg-accent-white"></div></div><p class="text-[10px] mt-2">S. Marthae Virg.</p></div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group"><div class="flex justify-between items-start"><span class="font-feast-title text-xl text-primary">30</span><div class="w-2.5 h-2.5 rounded-full bg-accent-red"></div></div><p class="text-[10px] mt-2">Ss. Abdon et Sennen</p></div>
+<div class="vellum-surface h-32 p-3 hover:bg-surface-container transition-colors group"><div class="flex justify-between items-start"><span class="font-feast-title text-xl text-primary">31</span><div class="w-2.5 h-2.5 rounded-full bg-accent-white"></div></div><p class="text-[10px] mt-2">S. Ignatii Conf.</p></div>
+<!-- August Padding -->
+<div class="vellum-surface h-32 p-3 opacity-40">
+<span class="font-feast-title text-ink-faint">1</span>
+</div>
+<!-- Row 6: August Padding -->
+<div class="vellum-surface h-32 p-3 opacity-40"><span class="font-feast-title text-ink-faint">2</span></div>
+<div class="vellum-surface h-32 p-3 opacity-40"><span class="font-feast-title text-ink-faint">3</span></div>
+<div class="vellum-surface h-32 p-3 opacity-40"><span class="font-feast-title text-ink-faint">4</span></div>
+<div class="vellum-surface h-32 p-3 opacity-40"><span class="font-feast-title text-ink-faint">5</span></div>
+<div class="vellum-surface h-32 p-3 opacity-40"><span class="font-feast-title text-ink-faint">6</span></div>
+<div class="vellum-surface h-32 p-3 opacity-40"><span class="font-feast-title text-ink-faint">7</span></div>
+<div class="vellum-surface h-32 p-3 opacity-40"><span class="font-feast-title text-ink-faint">8</span></div>
+</div>
+<!-- Legend Row -->
+<div class="mt-12 flex flex-wrap gap-8 justify-center items-center py-6 border-t border-parchment-deep">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-accent-green"></div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-ink-soft">Green</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-accent-purple"></div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-ink-soft">Purple</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-accent-red"></div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-ink-soft">Red</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-outline"></div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-ink-soft">White</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-accent-black"></div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-ink-soft">Black</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-accent-rose"></div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-ink-soft">Rose</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer Details -->
+<footer class="p-6 mt-auto">
+<div class="max-w-6xl mx-auto flex justify-between items-center text-ink-faint">
+<p class="text-[10px] font-rubric-sm">Sacred Parchment Engine · 2026</p>
+<p class="text-[10px] font-rubric-sm opacity-50 tracking-widest">v1.26.53142</p>
+</div>
+</footer>
+</main>
+<script>
+        // Micro-interaction for calendar cells
+        document.querySelectorAll('.vellum-surface').forEach(cell => {
+            cell.addEventListener('mousedown', () => {
+                cell.style.transform = 'scale(0.98)';
+                cell.style.transition = 'transform 0.1s ease';
+            });
+            cell.addEventListener('mouseup', () => {
+                cell.style.transform = 'scale(1)';
+            });
+            cell.addEventListener('mouseleave', () => {
+                cell.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

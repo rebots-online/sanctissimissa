@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>St. Android's Missal - Subway Map (Vertical)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "vellum": "#fbf7ee",
+                        "ink-soft": "#4a4034",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#e8e2d4",
+                        "on-secondary-fixed-variant": "#49473d",
+                        "surface-container-highest": "#e6e1df",
+                        "accent-black": "#33302b",
+                        "on-primary-fixed": "#211b13",
+                        "accent-purple": "#5d3a80",
+                        "surface": "#fdf8f6",
+                        "tertiary": "#050300",
+                        "on-surface": "#1d1b1a",
+                        "tertiary-fixed": "#ffdea2",
+                        "inverse-primary": "#d0c5b8",
+                        "on-surface-variant": "#4c463f",
+                        "primary-fixed": "#ede0d3",
+                        "tertiary-fixed-dim": "#f2bf53",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#cfc5bb",
+                        "line-catechumens": "#a97e13",
+                        "tertiary-container": "#281b00",
+                        "background": "#fdf8f6",
+                        "outline": "#7d766e",
+                        "line-office": "#274b69",
+                        "dialogue-p": "#9c2733",
+                        "on-primary-container": "#8d8378",
+                        "rail-text": "#d9cdb8",
+                        "on-tertiary": "#ffffff",
+                        "rubric": "#9c2733",
+                        "accent-red": "#9c2733",
+                        "ink-faint": "#8a7d6a",
+                        "line-faithful": "#7a1f2b",
+                        "dialogue-s": "#5d3a80",
+                        "surface-container-high": "#ece7e5",
+                        "primary-fixed-dim": "#d0c5b8",
+                        "accent-white": "#a97e13",
+                        "secondary-fixed-dim": "#cbc6b9",
+                        "surface-container-low": "#f8f3f0",
+                        "on-secondary-container": "#686459",
+                        "surface-tint": "#665d53",
+                        "secondary-container": "#e8e2d4",
+                        "secondary": "#615e54",
+                        "accent-rose": "#b76a7d",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#a97e13",
+                        "on-tertiary-fixed-variant": "#5c4200",
+                        "inverse-on-surface": "#f5f0ee",
+                        "on-secondary-fixed": "#1d1c13",
+                        "primary": "#040200",
+                        "primary-container": "#221c14",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#32302f",
+                        "on-primary-fixed-variant": "#4d463c",
+                        "surface-bright": "#fdf8f6",
+                        "on-error": "#ffffff",
+                        "accent-green": "#3f7a52",
+                        "rail-bg": "#2b241b",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#261900",
+                        "surface-container": "#f2edeb",
+                        "parchment-deep": "#ece2cc",
+                        "gold-bright": "#d4a017",
+                        "surface-dim": "#ded9d7",
+                        "on-background": "#1d1b1a",
+                        "surface-variant": "#e6e1df",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-gap": "16px",
+                        "margin-mobile": "16px",
+                        "margin-main": "32px",
+                        "gutter": "24px",
+                        "rail-width": "232px",
+                        "rail-collapsed": "64px"
+                    },
+                    "fontFamily": {
+                        "ui-label": ["Inter"],
+                        "liturgical-latin": ["Source Serif 4"],
+                        "feast-title": ["Source Serif 4"],
+                        "liturgical-english": ["Source Serif 4"],
+                        "feast-title-mobile": ["Source Serif 4"],
+                        "rubric-sm": ["Inter"],
+                        "rail-link": ["Inter"]
+                    },
+                    "fontSize": {
+                        "ui-label": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "liturgical-latin": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "feast-title": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "liturgical-english": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "feast-title-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "rubric-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "rail-link": ["13px", { "lineHeight": "16px", "letterSpacing": "0.03em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); }
+        /* Texture overlay for skeuomorphic feel */
+        .texture-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none; z-index: 9999; opacity: 0.4;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            mix-blend-mode: multiply;
+        }
+    </style>
+</head>
+<body class="text-on-surface antialiased h-screen overflow-hidden flex">
+<div class="texture-overlay"></div>
+<!-- SideNavBar -->
+<nav class="bg-rail-bg text-rail-text font-rail-link text-rail-link w-rail-width h-full fixed left-0 top-0 border-r border-parchment-deep flex flex-col py-gutter z-50 hidden md:flex">
+<div class="px-gutter mb-8">
+<h1 class="font-feast-title text-rail-link font-bold text-accent-white">St. Android's Missal</h1>
+<p class="text-xs opacity-70 mt-1">Sacred Parchment Edition</p>
+</div>
+<div class="flex-1 overflow-y-auto px-4 flex flex-col gap-2">
+<!-- Active Tab -->
+<a class="flex items-center gap-4 p-3 rounded text-accent-white font-bold border-l-4 border-accent-white bg-primary-container scale-[0.98] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span>Subway Map</span>
+</a>
+<a class="flex items-center gap-4 p-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span>Missal Reader</span>
+</a>
+<a class="flex items-center gap-4 p-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span>Perpetual Calendar</span>
+</a>
+<a class="flex items-center gap-4 p-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
+<span>Divine Office</span>
+</a>
+<a class="flex items-center gap-4 p-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span>Sacred Scripture</span>
+</a>
+<a class="flex items-center gap-4 p-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+<span>Journal</span>
+</a>
+<a class="flex items-center gap-4 p-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+<span>Homily Writer</span>
+</a>
+</div>
+<div class="px-4 mt-auto pt-4 border-t border-white/10 flex flex-col gap-2">
+<a class="flex items-center gap-4 p-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-4 p-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span>Help</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-rail-width flex flex-col h-full bg-background relative">
+<!-- TopAppBar (Mobile) -->
+<header class="bg-surface dark:bg-surface-dim text-primary dark:text-on-surface font-ui-label text-ui-label flex justify-between items-center h-16 px-margin-main border-b border-gold-bright md:hidden w-full docked top-0 z-40">
+<h1 class="font-feast-title-mobile text-primary dark:text-on-surface">St. Android's Missal</h1>
+<div class="flex items-center gap-4">
+<button class="hover:text-primary transition-colors opacity-70">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Vertical Subway Map Canvas -->
+<div class="flex-1 overflow-y-auto relative p-8 md:p-12 pb-32">
+<div class="max-w-3xl mx-auto relative min-h-[1200px]">
+<!-- Title -->
+<div class="mb-12 text-center">
+<h2 class="font-feast-title text-feast-title text-accent-white mb-2">Ordo Missae</h2>
+<p class="font-rubric-sm text-rubric-sm text-rubric italic">The Order of Mass - Vertical Path</p>
+<div class="w-16 h-px bg-gold-bright mx-auto mt-6"></div>
+</div>
+<!-- Map Structure Container -->
+<div class="relative w-full pl-12 md:pl-32">
+<!-- Vertical Spines (Lines) -->
+<!-- Catechumens Line (Gold) -->
+<div class="absolute left-12 md:left-32 top-0 bottom-[50%] w-1.5 bg-line-catechumens transform -translate-x-1/2 z-0 rounded-t-full"></div>
+<!-- Faithful Line (Red) -->
+<div class="absolute left-12 md:left-32 top-[50%] bottom-0 w-1.5 bg-line-faithful transform -translate-x-1/2 z-0 rounded-b-full"></div>
+<!-- Transition Node (Where Gold meets Red) -->
+<div class="absolute left-12 md:left-32 top-[50%] transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 border-surface bg-gradient-to-b from-line-catechumens to-line-faithful z-10"></div>
+<!-- STATIONS -->
+<!-- Station 1: Introibo -->
+<div class="relative z-10 mb-20 group cursor-pointer">
+<!-- Node -->
+<div class="absolute left-0 top-6 w-4 h-4 rounded-full border-2 border-line-catechumens bg-surface transform -translate-x-1/2 group-hover:bg-line-catechumens transition-colors shadow-[0_0_0_4px_theme('colors.surface')]"></div>
+<!-- Content Card -->
+<div class="ml-8 bg-vellum border border-parchment-deep rounded-xl p-6 relative group-hover:border-line-catechumens transition-colors shadow-sm">
+<h3 class="font-liturgical-latin text-liturgical-latin text-ink-soft font-bold mb-1">Introibo ad altare Dei</h3>
+<p class="font-liturgical-english text-liturgical-english text-on-surface-variant mb-3">Prayers at the Foot of the Altar</p>
+<p class="font-rubric-sm text-rubric-sm text-rubric italic">Sacerdos paratus...</p>
+<!-- Hover Flyout (Desktop only for simplicity in this mockup) -->
+<div class="hidden group-hover:block absolute left-full top-0 ml-4 w-64 bg-surface-container-high border border-outline-variant rounded-lg p-4 shadow-lg z-20">
+<h4 class="font-ui-label text-ui-label text-ink-soft mb-2">Theological Note</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">The priest approaches the altar as Christ approaching Calvary. The Psalm Judica me sets the tone of penitence and profound trust.</p>
+</div>
+</div>
+</div>
+<!-- Station 2: Introit -->
+<div class="relative z-10 mb-20 group cursor-pointer">
+<div class="absolute left-0 top-6 w-4 h-4 rounded-full border-2 border-line-catechumens bg-surface transform -translate-x-1/2 group-hover:bg-line-catechumens transition-colors shadow-[0_0_0_4px_theme('colors.surface')]"></div>
+<div class="ml-8 bg-vellum border border-parchment-deep rounded-xl p-6 relative group-hover:border-line-catechumens transition-colors shadow-sm">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-line-catechumens text-sm" data-icon="music_note">music_note</span>
+<h3 class="font-liturgical-latin text-liturgical-latin text-ink-soft font-bold">Introitus</h3>
+</div>
+<p class="font-liturgical-english text-liturgical-english text-on-surface-variant">Entrance Antiphon</p>
+<div class="mt-4 p-3 bg-parchment-deep/30 rounded border border-parchment-deep/50 text-sm italic text-ink-soft">
+                                "Gaudete in Domino semper..." (Phil 4:4)
+                            </div>
+</div>
+</div>
+<!-- Station 3: Kyrie & Gloria (Branching path example) -->
+<div class="relative z-10 mb-20 group cursor-pointer">
+<div class="absolute left-0 top-6 w-4 h-4 rounded-full border-2 border-line-catechumens bg-surface transform -translate-x-1/2 group-hover:bg-line-catechumens transition-colors shadow-[0_0_0_4px_theme('colors.surface')]"></div>
+<!-- Branching line -->
+<div class="absolute left-0 top-8 w-8 h-20 border-l-2 border-b-2 border-line-catechumens rounded-bl-xl opacity-50 z-[-1]"></div>
+<div class="ml-8 bg-vellum border border-parchment-deep rounded-xl p-6 shadow-sm">
+<h3 class="font-liturgical-latin text-liturgical-latin text-ink-soft font-bold mb-1">Kyrie eleison</h3>
+<p class="font-liturgical-english text-liturgical-english text-on-surface-variant">Lord have mercy</p>
+</div>
+<!-- Sub-node (Gloria) -->
+<div class="ml-16 mt-6 relative group/sub">
+<div class="absolute -left-16 top-1/2 w-4 h-4 rounded-full border-2 border-line-catechumens bg-surface transform -translate-y-1/2 z-10"></div>
+<div class="bg-surface-container-low border border-parchment-deep rounded-lg p-4 group-hover/sub:border-line-catechumens transition-colors">
+<h3 class="font-liturgical-latin text-liturgical-latin text-ink-soft font-bold mb-1">Gloria in excelsis Deo</h3>
+<p class="font-rubric-sm text-rubric-sm text-rubric italic">Omitted in Advent &amp; Lent</p>
+</div>
+</div>
+</div>
+<!-- Station 4: Offertory (Start of Mass of Faithful) -->
+<div class="relative z-10 mb-20 group cursor-pointer mt-32"> <!-- Extra margin for visual separation of the two masses -->
+<div class="absolute left-0 top-6 w-4 h-4 rounded-full border-2 border-line-faithful bg-surface transform -translate-x-1/2 group-hover:bg-line-faithful transition-colors shadow-[0_0_0_4px_theme('colors.surface')]"></div>
+<div class="ml-8 bg-vellum border border-parchment-deep rounded-xl p-6 relative group-hover:border-line-faithful transition-colors shadow-sm">
+<h3 class="font-liturgical-latin text-liturgical-latin text-ink-soft font-bold mb-1">Offertorium</h3>
+<p class="font-liturgical-english text-liturgical-english text-on-surface-variant">The Offertory</p>
+<div class="hidden group-hover:block absolute left-full top-0 ml-4 w-64 bg-surface-container-high border border-outline-variant rounded-lg p-4 shadow-lg z-20">
+<h4 class="font-ui-label text-ui-label text-ink-soft mb-2">Action Note</h4>
+<p class="text-sm text-on-surface-variant">The bread and wine are prepared and offered. The veil is removed from the chalice.</p>
+</div>
+</div>
+</div>
+<!-- Station 5: Canon (Highlight/Active State Example) -->
+<div class="relative z-10 mb-20 group cursor-pointer">
+<!-- Active Node -->
+<div class="absolute left-0 top-6 w-6 h-6 rounded-full border-4 border-line-faithful bg-vellum transform -translate-x-1/2 shadow-[0_0_12px_theme('colors.line-faithful')] z-20 flex items-center justify-center">
+<div class="w-2 h-2 bg-line-faithful rounded-full"></div>
+</div>
+<div class="ml-8 bg-surface-container-highest border-2 border-line-faithful rounded-xl p-6 relative shadow-md">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-feast-title-mobile text-feast-title-mobile text-line-faithful font-bold">Canon Missae</h3>
+<span class="bg-line-faithful text-on-primary px-2 py-1 rounded text-xs font-bold uppercase tracking-wider">Current</span>
+</div>
+<p class="font-liturgical-english text-liturgical-english text-on-surface-variant mb-4">The Roman Canon (Eucharistic Prayer I)</p>
+<div class="space-y-3">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-line-faithful opacity-50"></div>
+<span class="text-sm text-ink-soft">Te Igitur</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-line-faithful opacity-50"></div>
+<span class="text-sm text-ink-soft">Communicantes</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-line-faithful"></div>
+<span class="text-sm font-bold text-ink-soft">Consecration</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ThinkSpace Navigator (Bottom Right) -->
+<div class="fixed bottom-6 right-6 z-50 bg-surface-container-high border border-outline-variant rounded-2xl shadow-xl p-4 w-72 backdrop-blur-sm bg-opacity-90">
+<div class="flex items-center gap-3 mb-3 border-b border-parchment-deep pb-2">
+<span class="material-symbols-outlined text-line-office" data-icon="explore">explore</span>
+<h4 class="font-ui-label text-ui-label text-ink-soft font-bold">Navigator</h4>
+</div>
+<div class="space-y-2">
+<button class="w-full text-left px-3 py-2 rounded hover:bg-surface-variant text-sm flex justify-between items-center transition-colors">
+<span>Jump to Canon</span>
+<span class="material-symbols-outlined text-sm opacity-50" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="w-full text-left px-3 py-2 rounded hover:bg-surface-variant text-sm flex justify-between items-center transition-colors">
+<span>View Propers (Gaudete)</span>
+<span class="material-symbols-outlined text-sm opacity-50" data-icon="open_in_new">open_in_new</span>
+</button>
+</div>
+<div class="mt-4 pt-3 border-t border-parchment-deep flex justify-between items-center text-xs text-on-surface-variant">
+<span>Progress</span>
+<span class="font-bold text-line-faithful">65%</span>
+</div>
+<div class="w-full bg-surface-variant h-1 mt-1 rounded-full overflow-hidden">
+<div class="bg-line-faithful h-full w-[65%]"></div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="fixed bottom-4 right-8 flex gap-4 items-end bg-transparent text-ink-faint font-rubric-sm text-rubric-sm z-40">
+<span class="mr-4">v2.4.1 - Sacred Parchment</span>
+<a class="text-ink-faint hover:text-ink-soft transition-colors" href="#">Privacy</a>
+<a class="text-ink-faint hover:text-ink-soft transition-colors" href="#">Terms</a>
+</footer>
+</main>
+</body></html>

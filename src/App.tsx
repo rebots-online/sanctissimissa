@@ -321,7 +321,17 @@ export default function App() {
               {view === 'calendar' && (
                 <CalendarView db={db} selected={date} onPick={(iso) => { setDate(iso); setView('reader'); setFocus({ section: null, nonce: 0 }); }} />
               )}
-              {view === 'office' && <OfficeView db={db} day={day} hour={officeHour} onHour={setOfficeHour} sidecar={sidecar} />}
+              {view === 'office' && (
+                <OfficeView
+                  db={db}
+                  day={day}
+                  hour={officeHour}
+                  onHour={setOfficeHour}
+                  sidecar={sidecar}
+                  onAction={openAction}
+                  onCapture={openCapture}
+                />
+              )}
               {view === 'bible' && (
                 <BibleView
                   db={db}

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homily Writer - St. Android's Missal</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "vellum": "#fbf7ee",
+                        "ink-soft": "#4a4034",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#e8e2d4",
+                        "on-secondary-fixed-variant": "#49473d",
+                        "surface-container-highest": "#e6e1df",
+                        "accent-black": "#33302b",
+                        "on-primary-fixed": "#211b13",
+                        "accent-purple": "#5d3a80",
+                        "surface": "#fdf8f6",
+                        "tertiary": "#050300",
+                        "on-surface": "#1d1b1a",
+                        "tertiary-fixed": "#ffdea2",
+                        "inverse-primary": "#d0c5b8",
+                        "on-surface-variant": "#4c463f",
+                        "primary-fixed": "#ede0d3",
+                        "tertiary-fixed-dim": "#f2bf53",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#cfc5bb",
+                        "line-catechumens": "#a97e13",
+                        "tertiary-container": "#281b00",
+                        "background": "#fdf8f6",
+                        "outline": "#7d766e",
+                        "line-office": "#274b69",
+                        "dialogue-p": "#9c2733",
+                        "on-primary-container": "#8d8378",
+                        "rail-text": "#d9cdb8",
+                        "on-tertiary": "#ffffff",
+                        "rubric": "#9c2733",
+                        "accent-red": "#9c2733",
+                        "ink-faint": "#8a7d6a",
+                        "line-faithful": "#7a1f2b",
+                        "dialogue-s": "#5d3a80",
+                        "surface-container-high": "#ece7e5",
+                        "primary-fixed-dim": "#d0c5b8",
+                        "accent-white": "#a97e13",
+                        "secondary-fixed-dim": "#cbc6b9",
+                        "surface-container-low": "#f8f3f0",
+                        "on-secondary-container": "#686459",
+                        "surface-tint": "#665d53",
+                        "secondary-container": "#e8e2d4",
+                        "secondary": "#615e54",
+                        "accent-rose": "#b76a7d",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#a97e13",
+                        "on-tertiary-fixed-variant": "#5c4200",
+                        "inverse-on-surface": "#f5f0ee",
+                        "on-secondary-fixed": "#1d1c13",
+                        "primary": "#040200",
+                        "primary-container": "#221c14",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#32302f",
+                        "on-primary-fixed-variant": "#4d463c",
+                        "surface-bright": "#fdf8f6",
+                        "on-error": "#ffffff",
+                        "accent-green": "#3f7a52",
+                        "rail-bg": "#2b241b",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#261900",
+                        "surface-container": "#f2edeb",
+                        "parchment-deep": "#ece2cc",
+                        "gold-bright": "#d4a017",
+                        "surface-dim": "#ded9d7",
+                        "on-background": "#1d1b1a",
+                        "surface-variant": "#e6e1df",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-gap": "16px",
+                        "margin-mobile": "16px",
+                        "margin-main": "32px",
+                        "gutter": "24px",
+                        "rail-width": "232px",
+                        "rail-collapsed": "64px"
+                    },
+                    "fontFamily": {
+                        "ui-label": ["Inter", "sans-serif"],
+                        "liturgical-latin": ["Source Serif 4", "serif"],
+                        "feast-title": ["Source Serif 4", "serif"],
+                        "liturgical-english": ["Source Serif 4", "serif"],
+                        "feast-title-mobile": ["Source Serif 4", "serif"],
+                        "rubric-sm": ["Inter", "sans-serif"],
+                        "rail-link": ["Inter", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "ui-label": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "liturgical-latin": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "feast-title": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "liturgical-english": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "feast-title-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "rubric-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "rail-link": ["13px", { "lineHeight": "16px", "letterSpacing": "0.03em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom scrollbar to match the skeuomorphic feel */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--color-parchment-deep); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--color-outline-variant); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--color-outline); }
+        
+        /* Utility to align bilingual text */
+        .baseline-sync { display: flex; align-items: baseline; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-liturgical-english antialiased overflow-hidden w-screen h-screen flex">
+<!-- JSON Component: SideNavBar -->
+<nav class="hidden md:flex w-rail-width h-full fixed left-0 top-0 bg-rail-bg border-r border-parchment-deep flex-col py-gutter z-50">
+<!-- Brand / Header -->
+<div class="px-6 mb-8 flex flex-col gap-2">
+<h1 class="font-feast-title text-rail-link font-bold text-rail-text tracking-tight leading-none">St. Android's Missal</h1>
+<p class="font-rubric-sm text-rubric-sm text-ink-faint">Sacred Parchment Edition</p>
+</div>
+<!-- Main Navigation -->
+<ul class="flex flex-col gap-1 px-4 flex-grow">
+<li>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors font-rail-link text-rail-link" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="map">map</span>
+<span>Subway Map</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors font-rail-link text-rail-link" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="menu_book">menu_book</span>
+<span>Missal Reader</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors font-rail-link text-rail-link" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="calendar_month">calendar_month</span>
+<span>Perpetual Calendar</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors font-rail-link text-rail-link" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="auto_stories">auto_stories</span>
+<span>Divine Office</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors font-rail-link text-rail-link" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="menu_book">menu_book</span>
+<span>Sacred Scripture</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors font-rail-link text-rail-link" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit_note">edit_note</span>
+<span>Journal</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-accent-white font-bold border-l-4 border-accent-white bg-primary-container font-rail-link text-rail-link transform scale-98 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="history_edu">history_edu</span>
+<span>Homily Writer</span>
+</a>
+</li>
+</ul>
+<!-- Footer Navigation -->
+<ul class="flex flex-col gap-1 px-4 mt-auto">
+<li>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors font-rail-link text-rail-link" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors font-rail-link text-rail-link" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="help">help</span>
+<span>Help</span>
+</a>
+</li>
+</ul>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full w-full md:pl-[232px]">
+<!-- JSON Component: TopAppBar (Mobile Only - overrides to show nav cluster on desktop usually, but per instructions, SideNavBar is active for top-level destination. TopAppBar serves as structural header here) -->
+<header class="flex justify-between items-center h-16 px-margin-main bg-surface dark:bg-surface-dim border-b border-gold-bright z-40 sticky top-0 md:hidden w-full">
+<div class="flex items-center gap-4">
+<h1 class="font-feast-title-mobile text-primary dark:text-on-surface">St. Android's Missal</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-primary dark:text-on-surface hover:text-primary transition-colors opacity-70">
+<span class="material-symbols-outlined text-[24px]" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Canvas -->
+<div class="flex-1 overflow-y-auto p-4 md:p-8 bg-background relative z-0">
+<div class="max-w-[1200px] mx-auto w-full flex flex-col gap-8 pb-32">
+<!-- Masthead -->
+<div class="flex flex-col gap-2 border-b border-gold-bright pb-6">
+<h2 class="font-feast-title text-feast-title text-accent-purple mb-1">Homily Writer</h2>
+<p class="font-liturgical-english text-liturgical-english text-ink-soft italic">Twenty-Third Sunday in Ordinary Time · Year A</p>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
+<!-- Editor & Semantic Research Column (Left / Main) -->
+<div class="lg:col-span-8 flex flex-col gap-6">
+<!-- ThinkSpace Graph Panel (Glassmorphism/Skeuomorphic Hybrid) -->
+<div class="bg-vellum border border-parchment-deep rounded-xl shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)] p-1 flex flex-col">
+<div class="flex justify-between items-center px-4 py-3 border-b border-parchment-deep bg-surface-container-low rounded-t-lg">
+<h3 class="font-ui-label text-ui-label text-ink-soft uppercase tracking-wider flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-accent-purple" data-icon="hub">hub</span>
+                                    ThinkSpace Graph
+                                </h3>
+<button class="text-ink-faint hover:text-ink-soft transition-colors"><span class="material-symbols-outlined text-[18px]" data-icon="open_in_full">open_in_full</span></button>
+</div>
+<div class="h-[250px] bg-surface relative rounded-b-lg overflow-hidden group">
+<!-- Interactive Graph Visual Placeholder -->
+<div class="absolute inset-0 flex items-center justify-center p-4">
+<div class="relative w-full h-full border border-dashed border-outline-variant rounded flex items-center justify-center bg-surface-container-lowest opacity-50 transition-opacity group-hover:opacity-100">
+<div class="text-center">
+<span class="material-symbols-outlined text-4xl text-outline mb-2" data-icon="account_tree">account_tree</span>
+<p class="font-rubric-sm text-rubric-sm text-outline">Semantic links for "Fraternal Correction" (Matt 18:15-20)</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Editor Canvas -->
+<div class="bg-vellum border border-parchment-deep rounded-xl min-h-[500px] shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] flex flex-col">
+<div class="px-6 py-4 border-b border-parchment-deep flex justify-between items-center bg-surface-container-lowest rounded-t-xl">
+<input class="font-liturgical-english text-xl font-semibold text-primary bg-transparent border-none p-0 focus:ring-0 w-full placeholder:text-outline-variant" placeholder="Homily Title..." type="text" value="The Responsibility of Love"/>
+</div>
+<div class="flex-1 p-8 bg-[#fdfaf5] rounded-b-xl cursor-text relative">
+<!-- Decorative Drop Cap -->
+<p class="font-liturgical-english text-liturgical-english text-ink-soft leading-[1.65]">
+<span class="float-left text-5xl font-liturgical-latin text-accent-red pr-2 pt-1 leading-none">I</span>n today's Gospel, Jesus offers us a profoundly challenging, yet deeply practical, teaching on how to handle conflict within the community. "If your brother sins against you, go and tell him his fault between you and him alone."
+                                </p>
+<p class="font-liturgical-english text-liturgical-english text-ink-soft leading-[1.65] mt-4">
+                                    Notice the order. He does not say, "post about it online," or "gossip about it with your friends." He demands the hardest thing first: direct, private confrontation motivated by love.
+                                </p>
+<div class="mt-8 border-l-4 border-gold-bright pl-4 bg-[rgba(84,62,26,0.035)] py-2 pr-2">
+<p class="font-rubric-sm text-rubric-sm text-rubric italic">Note: Connect this to Ezekiel 33 (First Reading) - the role of the watchman. We are responsible for one another.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Scheduling & Meta Column (Right / Sidebar) -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<!-- Scheduling Panel -->
+<div class="bg-vellum border border-parchment-deep rounded-xl p-5 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
+<h3 class="font-ui-label text-ui-label text-ink-soft uppercase tracking-wider mb-4 border-b border-outline-variant pb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="calendar_clock">calendar_clock</span>
+                                Schedule &amp; Cycle
+                            </h3>
+<div class="flex flex-col gap-4">
+<!-- Date Picker Mock -->
+<button class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 flex justify-between items-center hover:border-outline transition-colors text-left">
+<div class="flex flex-col">
+<span class="font-rubric-sm text-rubric-sm text-ink-faint">Delivery Date</span>
+<span class="font-ui-label text-ui-label text-primary">Sun, Sep 10, 2023 · 9:00 AM</span>
+</div>
+<span class="material-symbols-outlined text-outline" data-icon="arrow_drop_down">arrow_drop_down</span>
+</button>
+<!-- Periodicity Flags -->
+<div class="flex flex-wrap gap-2">
+<span class="inline-flex items-center gap-1 bg-surface-variant text-on-surface-variant px-2 py-1 rounded font-rubric-sm text-[11px] uppercase tracking-wider border border-parchment-deep">
+<span class="material-symbols-outlined text-[12px]" data-icon="sync">sync</span> Year A
+                                    </span>
+<span class="inline-flex items-center gap-1 bg-surface-variant text-on-surface-variant px-2 py-1 rounded font-rubric-sm text-[11px] uppercase tracking-wider border border-parchment-deep">
+<span class="material-symbols-outlined text-[12px]" data-icon="event_repeat">event_repeat</span> Annual
+                                    </span>
+<button class="inline-flex items-center justify-center border border-dashed border-outline-variant text-outline hover:text-primary hover:border-outline w-7 h-7 rounded transition-colors">
+<span class="material-symbols-outlined text-[14px]" data-icon="add">add</span>
+</button>
+</div>
+<!-- Integrations -->
+<div class="mt-2 pt-4 border-t border-parchment-deep">
+<div class="flex items-center justify-between">
+<span class="font-ui-label text-ui-label text-ink-soft">Google/CalDAV Sync</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent-green"></div>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Attachments Panel -->
+<div class="bg-vellum border border-parchment-deep rounded-xl p-5 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
+<h3 class="font-ui-label text-ui-label text-ink-soft uppercase tracking-wider mb-4 border-b border-outline-variant pb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="attach_file">attach_file</span>
+                                Attachments
+                            </h3>
+<ul class="flex flex-col gap-2">
+<li class="flex items-center justify-between p-2 rounded hover:bg-surface-container-low border border-transparent hover:border-parchment-deep transition-all group">
+<div class="flex items-center gap-3 overflow-hidden">
+<span class="material-symbols-outlined text-accent-red" data-icon="picture_as_pdf">picture_as_pdf</span>
+<span class="font-ui-label text-ui-label text-primary truncate">Bulletin_Insert_Sep10.pdf</span>
+</div>
+<button class="text-outline hover:text-error opacity-0 group-hover:opacity-100 transition-opacity"><span class="material-symbols-outlined text-[18px]" data-icon="close">close</span></button>
+</li>
+<li class="flex items-center justify-between p-2 rounded hover:bg-surface-container-low border border-transparent hover:border-parchment-deep transition-all group">
+<div class="flex items-center gap-3 overflow-hidden">
+<span class="material-symbols-outlined text-outline" data-icon="image">image</span>
+<span class="font-ui-label text-ui-label text-primary truncate">Rublev_Trinity_Handout.jpg</span>
+</div>
+<button class="text-outline hover:text-error opacity-0 group-hover:opacity-100 transition-opacity"><span class="material-symbols-outlined text-[18px]" data-icon="close">close</span></button>
+</li>
+<li class="mt-2">
+<button class="w-full py-2 border-2 border-dashed border-outline-variant rounded-lg text-outline font-ui-label text-ui-label hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2 bg-surface-container-lowest">
+<span class="material-symbols-outlined text-[18px]" data-icon="upload">upload</span> Upload Resource
+                                    </button>
+</li>
+</ul>
+</div>
+<!-- Publish & Share Panel -->
+<div class="bg-vellum border border-parchment-deep rounded-xl p-5 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] border-t-4 border-t-gold-bright">
+<h3 class="font-ui-label text-ui-label text-ink-soft uppercase tracking-wider mb-4 border-b border-outline-variant pb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="campaign">campaign</span>
+                                Publish &amp; Share
+                            </h3>
+<div class="flex flex-col gap-5">
+<!-- TTS Podcast Generation -->
+<div class="bg-surface-container-low p-3 rounded border border-parchment-deep">
+<div class="flex items-center justify-between mb-2">
+<span class="font-ui-label text-ui-label text-primary font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-accent-purple" data-icon="record_voice_over">record_voice_over</span> AI Voice Clone
+                                        </span>
+<span class="bg-surface-variant text-on-surface-variant px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest">Beta</span>
+</div>
+<p class="font-rubric-sm text-rubric-sm text-ink-faint mb-3">Generate audio podcast using your trained voice profile.</p>
+<button class="w-full bg-accent-black text-on-primary py-2 rounded font-ui-label text-ui-label hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="play_arrow">play_arrow</span> Generate Audio
+                                    </button>
+</div>
+<!-- Quick Share Icons -->
+<div>
+<span class="font-rubric-sm text-rubric-sm text-ink-soft block mb-2">Quick Share</span>
+<div class="flex gap-3">
+<button class="w-10 h-10 rounded-full border border-parchment-deep bg-surface-container-lowest flex items-center justify-center text-outline hover:text-accent-red hover:border-accent-red transition-colors shadow-sm" title="YouTube">
+<span class="material-symbols-outlined" data-icon="smart_display">smart_display</span>
+</button>
+<button class="w-10 h-10 rounded-full border border-parchment-deep bg-surface-container-lowest flex items-center justify-center text-outline hover:text-line-office hover:border-line-office transition-colors shadow-sm" title="WordPress">
+<span class="material-symbols-outlined" data-icon="article">article</span>
+</button>
+<button class="w-10 h-10 rounded-full border border-parchment-deep bg-surface-container-lowest flex items-center justify-center text-outline hover:text-primary hover:border-primary transition-colors shadow-sm" title="Social Media">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- JSON Component: Footer -->
+<footer class="fixed bottom-4 right-4 flex gap-4 items-end bg-transparent z-50">
+<span class="font-rubric-sm text-rubric-sm text-ink-faint">v2.4.1 - Sacred Parchment</span>
+<a class="font-rubric-sm text-rubric-sm text-ink-faint hover:text-ink-soft" href="#">Privacy</a>
+<a class="font-rubric-sm text-rubric-sm text-ink-faint hover:text-ink-soft" href="#">Terms</a>
+</footer>
+</body></html>

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>St. Android's Missal - Journal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#fdf8f6",
+                    "line-faithful": "#7a1f2b",
+                    "accent-purple": "#5d3a80",
+                    "surface-container-low": "#f8f3f0",
+                    "rail-bg": "#2b241b",
+                    "on-primary-fixed-variant": "#4d463c",
+                    "surface-dim": "#ded9d7",
+                    "on-tertiary-fixed-variant": "#5c4200",
+                    "line-catechumens": "#a97e13",
+                    "surface-bright": "#fdf8f6",
+                    "primary-fixed-dim": "#d0c5b8",
+                    "background": "#fdf8f6",
+                    "rail-text": "#d9cdb8",
+                    "on-tertiary-container": "#a97e13",
+                    "on-error": "#ffffff",
+                    "on-background": "#1d1b1a",
+                    "error-container": "#ffdad6",
+                    "tertiary": "#050300",
+                    "on-surface": "#1d1b1a",
+                    "surface-variant": "#e6e1df",
+                    "on-secondary-fixed": "#1d1c13",
+                    "on-primary-fixed": "#211b13",
+                    "error": "#ba1a1a",
+                    "dialogue-p": "#9c2733",
+                    "on-tertiary": "#ffffff",
+                    "ink-faint": "#8a7d6a",
+                    "secondary-fixed-dim": "#cbc6b9",
+                    "tertiary-fixed": "#ffdea2",
+                    "accent-white": "#a97e13",
+                    "outline-variant": "#cfc5bb",
+                    "surface-tint": "#665d53",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed-dim": "#f2bf53",
+                    "inverse-on-surface": "#f5f0ee",
+                    "surface-container": "#f2edeb",
+                    "outline": "#7d766e",
+                    "on-secondary-container": "#686459",
+                    "accent-rose": "#b76a7d",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-highest": "#e6e1df",
+                    "on-error-container": "#93000a",
+                    "on-surface-variant": "#4c463f",
+                    "tertiary-container": "#281b00",
+                    "vellum": "#fbf7ee",
+                    "gold-bright": "#d4a017",
+                    "accent-red": "#9c2733",
+                    "primary": "#040200",
+                    "dialogue-s": "#5d3a80",
+                    "inverse-primary": "#d0c5b8",
+                    "secondary-fixed": "#e8e2d4",
+                    "secondary": "#615e54",
+                    "on-secondary-fixed-variant": "#49473d",
+                    "line-office": "#274b69",
+                    "secondary-container": "#e8e2d4",
+                    "accent-black": "#33302b",
+                    "ink-soft": "#4a4034",
+                    "rubric": "#9c2733",
+                    "inverse-surface": "#32302f",
+                    "on-tertiary-fixed": "#261900",
+                    "primary-container": "#221c14",
+                    "on-secondary": "#ffffff",
+                    "accent-green": "#3f7a52",
+                    "parchment-deep": "#ece2cc",
+                    "on-primary-container": "#8d8378",
+                    "surface-container-high": "#ece7e5",
+                    "primary-fixed": "#ede0d3"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "rail-collapsed": "64px",
+                    "rail-width": "232px",
+                    "stack-gap": "16px",
+                    "margin-mobile": "16px",
+                    "margin-main": "32px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "liturgical-english": ["Source Serif 4"],
+                    "ui-label": ["Inter"],
+                    "feast-title": ["Source Serif 4"],
+                    "rail-link": ["Inter"],
+                    "rubric-sm": ["Inter"],
+                    "liturgical-latin": ["Source Serif 4"],
+                    "feast-title-mobile": ["Source Serif 4"]
+            },
+            "fontSize": {
+                    "liturgical-english": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "ui-label": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "feast-title": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "rail-link": ["13px", {"lineHeight": "16px", "letterSpacing": "0.03em", "fontWeight": "600"}],
+                    "rubric-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "liturgical-latin": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "feast-title-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #fdf8f6;
+            color: #1d1b1a;
+            font-feature-settings: "ss01", "ss02", "cv01", "cv11";
+        }
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 24px;
+        }
+        .pane-latin-bg {
+            background-color: rgba(84, 62, 26, 0.075);
+        }
+        .inset-shadow-vellum {
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fab-shadow {
+            box-shadow: 0 4px 12px rgba(43, 36, 27, 0.25);
+        }
+        
+        /* Custom Scrollbar for sidebar */
+        .rail-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .rail-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .rail-scroll::-webkit-scrollbar-thumb {
+            background: rgba(217, 205, 184, 0.2);
+            border-radius: 4px;
+        }
+        .rail-scroll:hover::-webkit-scrollbar-thumb {
+            background: rgba(217, 205, 184, 0.4);
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- SideNavBar (Rail) -->
+<aside class="w-rail-width h-full fixed left-0 top-0 bg-rail-bg border-r border-parchment-deep flex flex-col py-gutter z-50">
+<!-- Brand Header -->
+<div class="px-6 mb-6 flex-shrink-0">
+<h1 class="font-feast-title text-rail-link font-bold leading-tight">St. Android's Missal</h1>
+<p class="font-rubric-sm text-rail-text opacity-60 uppercase tracking-widest text-[10px]">Sacred Parchment Edition</p>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 overflow-y-auto rail-scroll space-y-4 px-3 pb-6">
+<!-- THE MASS -->
+<div class="bg-primary-container/40 rounded-lg py-2">
+<h3 class="px-4 py-2 font-rubric-sm text-[10px] text-rail-text opacity-50 uppercase tracking-widest">The Mass</h3>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">map</span>
+<span class="font-rail-link text-rail-link">Subway Map</span>
+</a>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">calendar_month</span>
+<span class="font-rail-link text-rail-link">Perpetual Calendar</span>
+</a>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">menu_book</span>
+<span class="font-rail-link text-rail-link">Missal Reader</span>
+</a>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">music_note</span>
+<span class="font-rail-link text-rail-link">Chant &amp; Hymnal Planner</span>
+</a>
+</div>
+<!-- LEARN -->
+<div class="bg-primary-container/40 rounded-lg py-2">
+<h3 class="px-4 py-2 font-rubric-sm text-[10px] text-rail-text opacity-50 uppercase tracking-widest">Learn</h3>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">account_tree</span>
+<span class="font-rail-link text-rail-link">Structure of the Mass</span>
+</a>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">queue_music</span>
+<span class="font-rail-link text-rail-link">Gregorian Chant</span>
+</a>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">church</span>
+<span class="font-rail-link text-rail-link">Serving at the Altar</span>
+</a>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">view_list</span>
+<span class="font-rail-link text-rail-link">Liturgical Formats</span>
+</a>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">groups</span>
+<span class="font-rail-link text-rail-link">Bible Study &amp; Fellowship</span>
+</a>
+</div>
+<!-- STUDY -->
+<div class="bg-primary-container/40 rounded-lg py-2">
+<h3 class="px-4 py-2 font-rubric-sm text-[10px] text-rail-text opacity-50 uppercase tracking-widest">Study</h3>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">auto_stories</span>
+<span class="font-rail-link text-rail-link">Sacred Scripture</span>
+</a>
+<!-- Active Tab: Journal -->
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-accent-white font-bold bg-primary border-l-2 border-accent-white" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">edit_note</span>
+<span class="font-rail-link text-rail-link">Journal</span>
+</a>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">history_edu</span>
+<span class="font-rail-link text-rail-link">Homily Writer</span>
+</a>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">local_library</span>
+<span class="font-rail-link text-rail-link">Study Library</span>
+</a>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">storefront</span>
+<span class="font-rail-link text-rail-link">Bookstore</span>
+</a>
+</div>
+<!-- UTILITIES -->
+<div class="bg-primary-container/40 rounded-lg py-2 mt-4">
+<h3 class="px-4 py-2 font-rubric-sm text-[10px] text-rail-text opacity-50 uppercase tracking-widest">Utilities</h3>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">settings</span>
+<span class="font-rail-link text-rail-link">Settings</span>
+</a>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">help</span>
+<span class="font-rail-link text-rail-link">Help</span>
+</a>
+<a class="flex items-center px-4 py-2.5 mx-2 rounded-md text-rail-text opacity-80 hover:bg-primary hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-3 text-lg">forum</span>
+<span class="font-rail-link text-rail-link">Forum</span>
+</a>
+</div>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-rail-width flex-1 bg-surface min-h-screen pb-24 relative">
+<!-- TopAppBar / Masthead Integration -->
+<header class="pt-margin-main px-margin-main flex flex-col">
+<div class="flex justify-between items-end mb-4">
+<div>
+<h2 class="font-feast-title text-primary text-feast-title leading-none">Journal</h2>
+<p class="font-rubric-sm text-ink-soft opacity-70 mt-1">Sacred Parchment Edition</p>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-primary hover:opacity-70 transition-opacity">
+<span class="material-symbols-outlined text-3xl">account_circle</span>
+</button>
+</div>
+</div>
+<!-- Horizontal Gold Rule -->
+<div class="h-px w-full bg-gold-bright opacity-40"></div>
+</header>
+<!-- Toolbar -->
+<div class="px-margin-main mt-8 flex flex-wrap items-center justify-between gap-6">
+<!-- Search -->
+<div class="relative w-full max-w-sm">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-vellum border border-parchment-deep rounded-lg font-ui-label text-on-surface focus:ring-1 focus:ring-accent-white focus:outline-none placeholder:text-ink-faint/50" placeholder="Search your journal…" type="text"/>
+</div>
+<!-- Filter Chips -->
+<div class="flex items-center gap-2">
+<button class="px-4 py-1.5 bg-primary-container text-accent-white rounded-full font-ui-label text-sm border border-primary-container">All</button>
+<button class="px-4 py-1.5 bg-vellum text-ink-soft rounded-full font-ui-label text-sm border border-parchment-deep hover:bg-parchment-deep transition-colors">Private</button>
+<button class="px-4 py-1.5 bg-vellum text-ink-soft rounded-full font-ui-label text-sm border border-parchment-deep hover:bg-parchment-deep transition-colors">Shared</button>
+<button class="px-4 py-1.5 bg-vellum text-ink-soft rounded-full font-ui-label text-sm border border-parchment-deep hover:bg-parchment-deep transition-colors">Anchored to today</button>
+</div>
+<!-- Sort Segmented Button -->
+<div class="flex border border-parchment-deep rounded-lg bg-vellum overflow-hidden">
+<button class="px-4 py-2 font-ui-label text-sm bg-primary-container text-accent-white transition-colors">Newest</button>
+<div class="w-px bg-parchment-deep"></div>
+<button class="px-4 py-2 font-ui-label text-sm text-ink-soft hover:bg-parchment-deep transition-colors">By anchor</button>
+</div>
+</div>
+<!-- Journal Entries Grid -->
+<div class="px-margin-main mt-10">
+<div class="masonry-grid">
+<!-- Entry 1 -->
+<div class="bg-vellum border border-parchment-deep rounded-[4px] p-6 flex flex-col gap-4 inset-shadow-vellum">
+<header>
+<span class="font-rubric-sm text-ink-faint uppercase text-[11px] tracking-wider">INTROITUS · Dominica VIII Post Pentecosten</span>
+</header>
+<div class="pane-latin-bg p-4 rounded-sm italic font-liturgical-latin text-ink-soft border-l-2 border-accent-white/30">
+                        "Suscépimus, Deus, misericórdiam tuam in médio templi tui: secúndum nomen tuum, Deus, ita et laus tua in fines terræ."
+                    </div>
+<p class="font-liturgical-english text-on-surface">
+                        We *receive* mercy — the verb is passive. Nothing here is earned. Worth sitting with before Mass.
+                    </p>
+<footer class="mt-4 pt-4 border-t border-parchment-deep flex items-center justify-between">
+<span class="font-rubric-sm text-ink-faint">2026-07-27</span>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 bg-accent-black/5 text-ink-soft rounded-sm text-[10px] uppercase font-bold tracking-tight">Private</span>
+<span class="px-2 py-0.5 bg-line-catechumens/10 text-line-catechumens rounded-sm text-[10px] font-bold">#mercy</span>
+<span class="px-2 py-0.5 bg-line-catechumens/10 text-line-catechumens rounded-sm text-[10px] font-bold">#grace</span>
+</div>
+</footer>
+</div>
+<!-- Entry 2 -->
+<div class="bg-vellum border border-parchment-deep rounded-[4px] p-6 flex flex-col gap-4 inset-shadow-vellum">
+<header>
+<span class="font-rubric-sm text-ink-faint uppercase text-[11px] tracking-wider">PSALMUS 92 · Laudes</span>
+</header>
+<div class="pane-latin-bg p-4 rounded-sm italic font-liturgical-latin text-ink-soft border-l-2 border-line-office/30">
+                        "Dóminus regnávit, decórem indútus est: indútus est Dóminus fortitúdinem, et præcínxit se."
+                    </div>
+<p class="font-liturgical-english text-on-surface">
+                        Clothed with beauty, girded with strength — kingship described as vesture, not conquest.
+                    </p>
+<footer class="mt-4 pt-4 border-t border-parchment-deep flex items-center justify-between">
+<span class="font-rubric-sm text-ink-faint">2026-07-26</span>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 bg-accent-black/5 text-ink-soft rounded-sm text-[10px] uppercase font-bold tracking-tight">Private</span>
+<span class="px-2 py-0.5 bg-line-catechumens/10 text-line-catechumens rounded-sm text-[10px] font-bold">#kingship</span>
+</div>
+</footer>
+</div>
+<!-- Entry 3 -->
+<div class="bg-vellum border border-parchment-deep rounded-[4px] p-6 flex flex-col gap-4 inset-shadow-vellum">
+<header>
+<span class="font-rubric-sm text-ink-faint uppercase text-[11px] tracking-wider">CANON · Ordo Missae</span>
+</header>
+<div class="pane-latin-bg p-4 rounded-sm italic font-liturgical-latin text-ink-soft border-l-2 border-line-faithful/30">
+                        "Te ígitur, clementíssime Pater, per Jesum Christum, Fílium tuum, Dóminum nostrum, súpplices rogámus, ac pétimus..."
+                    </div>
+<p class="font-liturgical-english text-on-surface">
+                        The Canon opens by addressing the Father directly. The T of Te was the origin of the crucifix in old manuscripts.
+                    </p>
+<footer class="mt-4 pt-4 border-t border-parchment-deep flex items-center justify-between">
+<span class="font-rubric-sm text-ink-faint">2026-07-24</span>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 bg-accent-green/10 text-accent-green rounded-sm text-[10px] uppercase font-bold tracking-tight">Shared</span>
+<span class="px-2 py-0.5 bg-line-catechumens/10 text-line-catechumens rounded-sm text-[10px] font-bold">#canon</span>
+</div>
+</footer>
+</div>
+<!-- Entry 4 -->
+<div class="bg-vellum border border-parchment-deep rounded-[4px] p-6 flex flex-col gap-4 inset-shadow-vellum">
+<header>
+<span class="font-rubric-sm text-ink-faint uppercase text-[11px] tracking-wider">GENESIS 1:3 · Sacred Scripture</span>
+</header>
+<div class="pane-latin-bg p-4 rounded-sm italic font-liturgical-latin text-ink-soft border-l-2 border-accent-purple/30">
+                        "Dixítque Deus: Fiat lux. Et facta est lux."
+                    </div>
+<p class="font-liturgical-english text-on-surface">
+                        Read at the Easter Vigil. Creation and resurrection sharing one sentence.
+                    </p>
+<footer class="mt-4 pt-4 border-t border-parchment-deep flex items-center justify-between">
+<span class="font-rubric-sm text-ink-faint">2026-07-21</span>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 bg-accent-green/10 text-accent-green rounded-sm text-[10px] uppercase font-bold tracking-tight">Shared</span>
+<span class="px-2 py-0.5 bg-line-catechumens/10 text-line-catechumens rounded-sm text-[10px] font-bold">#creation</span>
+<span class="px-2 py-0.5 bg-line-catechumens/10 text-line-catechumens rounded-sm text-[10px] font-bold">#vigil</span>
+</div>
+</footer>
+</div>
+<!-- Entry 5 -->
+<div class="bg-vellum border border-parchment-deep rounded-[4px] p-6 flex flex-col gap-4 inset-shadow-vellum">
+<header>
+<span class="font-rubric-sm text-ink-faint uppercase text-[11px] tracking-wider">AGNUS DEI · Ordo Missae</span>
+</header>
+<div class="pane-latin-bg p-4 rounded-sm italic font-liturgical-latin text-ink-soft border-l-2 border-rubric/30">
+                        "Agnus Dei, qui tollis peccáta mundi: dona nobis pacem."
+                    </div>
+<p class="font-liturgical-english text-on-surface">
+                        Twice miserere, then once pacem. The pattern matters.
+                    </p>
+<footer class="mt-4 pt-4 border-t border-parchment-deep flex items-center justify-between">
+<span class="font-rubric-sm text-ink-faint">2026-07-19</span>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 bg-accent-black/5 text-ink-soft rounded-sm text-[10px] uppercase font-bold tracking-tight">Private</span>
+<span class="px-2 py-0.5 bg-line-catechumens/10 text-line-catechumens rounded-sm text-[10px] font-bold">#peace</span>
+</div>
+</footer>
+</div>
+</div>
+</div>
+<!-- Footer / Version / Widgets -->
+<div class="fixed bottom-margin-main right-margin-main flex flex-col items-end gap-4 pointer-events-none z-50">
+<!-- ThinkSpace Widget -->
+<div class="pointer-events-auto bg-vellum border border-gold-bright/40 rounded-lg p-4 shadow-[0_4px_12px_rgba(43,36,27,0.15)] flex flex-col gap-2 w-64 backdrop-blur-sm bg-opacity-95">
+<div class="flex items-center justify-between">
+<span class="font-rubric-sm text-ink-soft text-[10px] tracking-widest font-bold uppercase">Nearby Nodes</span>
+<button class="text-ink-soft hover:text-accent-white transition-colors">
+<span class="material-symbols-outlined text-sm">open_in_full</span>
+</button>
+</div>
+<div class="h-24 border border-parchment-deep rounded bg-surface/50 relative overflow-hidden flex items-center justify-center">
+<!-- Simple 2D graph visualization mockup -->
+<svg class="absolute inset-0 opacity-40 w-full h-full" preserveaspectratio="none" viewbox="0 0 100 100">
+<line stroke="#8a7d6a" stroke-width="0.5" x1="20" x2="50" y1="30" y2="50"></line>
+<line stroke="#8a7d6a" stroke-width="0.5" x1="50" x2="80" y1="50" y2="40"></line>
+<line stroke="#8a7d6a" stroke-width="0.5" x1="50" x2="60" y1="50" y2="80"></line>
+<line stroke="#8a7d6a" stroke-width="0.5" x1="20" x2="50" y1="70" y2="50"></line>
+</svg>
+<div class="absolute top-[30%] left-[20%] w-2 h-2 rounded-full bg-line-faithful -translate-x-1/2 -translate-y-1/2"></div>
+<div class="absolute top-[50%] left-[50%] w-3 h-3 rounded-full bg-accent-purple -translate-x-1/2 -translate-y-1/2 shadow-[0_0_8px_rgba(93,58,128,0.6)]"></div>
+<div class="absolute top-[40%] left-[80%] w-2 h-2 rounded-full bg-line-catechumens -translate-x-1/2 -translate-y-1/2"></div>
+<div class="absolute top-[80%] left-[60%] w-1.5 h-1.5 rounded-full bg-line-office -translate-x-1/2 -translate-y-1/2"></div>
+<div class="absolute top-[70%] left-[20%] w-1.5 h-1.5 rounded-full bg-ink-faint -translate-x-1/2 -translate-y-1/2"></div>
+</div>
+</div>
+<div class="font-rubric-sm text-ink-faint text-[10px] opacity-40 bg-surface/80 px-2 rounded backdrop-blur-sm">v1.26.53142</div>
+<!-- FAB -->
+<button class="pointer-events-auto flex items-center gap-3 bg-rail-bg text-accent-white px-6 py-4 rounded-full fab-shadow hover:scale-105 active:scale-95 transition-all group">
+<span class="material-symbols-outlined text-2xl group-hover:rotate-12 transition-transform">edit</span>
+<span class="font-rail-link text-sm font-bold tracking-wide">New entry</span>
+</button>
+</div>
+</main>
+<!-- Micro-interaction Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const entries = document.querySelectorAll('.masonry-grid > div');
+            entries.forEach((entry, idx) => {
+                entry.style.opacity = '0';
+                entry.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    entry.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                    entry.style.opacity = '1';
+                    entry.style.transform = 'translateY(0)';
+                }, idx * 100);
+            });
+        });
+    </script>
+</body></html>

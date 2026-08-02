@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings | St. Android's Missal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --parchment-texture: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+        }
+        body {
+            background-color: #fdf8f6; /* Surface */
+            background-image: var(--parchment-texture);
+            min-height: 100vh;
+        }
+        .vellum-card {
+            background-color: #fbf7ee; /* Vellum */
+            background-image: var(--parchment-texture);
+            border: 1px solid #ece2cc; /* Parchment Deep */
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #2b241b;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4a4034;
+            border-radius: 2px;
+        }
+        .glass-swatch {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .brutalist-swatch {
+            border: 2px solid #000;
+            box-shadow: 2px 2px 0px #000;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#ede0d3",
+                        "on-tertiary-fixed": "#261900",
+                        "surface-container-highest": "#e6e1df",
+                        "on-error": "#ffffff",
+                        "vellum": "#fbf7ee",
+                        "background": "#fdf8f6",
+                        "rubric": "#9c2733",
+                        "inverse-on-surface": "#f5f0ee",
+                        "tertiary-fixed-dim": "#f2bf53",
+                        "surface-container-high": "#ece7e5",
+                        "accent-rose": "#b76a7d",
+                        "secondary-fixed-dim": "#cbc6b9",
+                        "accent-white": "#a97e13",
+                        "on-secondary-fixed": "#1d1c13",
+                        "rail-text": "#d9cdb8",
+                        "dialogue-p": "#9c2733",
+                        "accent-purple": "#5d3a80",
+                        "on-tertiary-fixed-variant": "#5c4200",
+                        "line-faithful": "#7a1f2b",
+                        "tertiary": "#050300",
+                        "on-primary-fixed": "#211b13",
+                        "secondary-container": "#e8e2d4",
+                        "gold-bright": "#d4a017",
+                        "surface-variant": "#e6e1df",
+                        "on-background": "#1d1b1a",
+                        "on-error-container": "#93000a",
+                        "ink-soft": "#4a4034",
+                        "on-primary-container": "#8d8378",
+                        "parchment-deep": "#ece2cc",
+                        "accent-black": "#33302b",
+                        "line-catechumens": "#a97e13",
+                        "on-secondary-fixed-variant": "#49473d",
+                        "on-tertiary-container": "#a97e13",
+                        "tertiary-fixed": "#ffdea2",
+                        "surface-tint": "#665d53",
+                        "on-surface": "#1d1b1a",
+                        "accent-red": "#9c2733",
+                        "surface-container": "#f2edeb",
+                        "surface-bright": "#fdf8f6",
+                        "primary-fixed-dim": "#d0c5b8",
+                        "inverse-surface": "#32302f",
+                        "outline-variant": "#cfc5bb",
+                        "line-office": "#274b69",
+                        "surface-container-low": "#f8f3f0",
+                        "rail-bg": "#2b241b",
+                        "on-secondary-container": "#686459",
+                        "surface": "#fdf8f6",
+                        "surface-dim": "#ded9d7",
+                        "on-surface-variant": "#4c463f",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#615e54",
+                        "outline": "#7d766e",
+                        "inverse-primary": "#d0c5b8",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#4d463c",
+                        "dialogue-s": "#5d3a80",
+                        "primary": "#040200",
+                        "accent-green": "#3f7a52",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#e8e2d4",
+                        "ink-faint": "#8a7d6a",
+                        "tertiary-container": "#281b00",
+                        "primary-container": "#221c14",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "stack-gap": "16px",
+                        "rail-collapsed": "64px",
+                        "rail-width": "232px",
+                        "margin-main": "32px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "liturgical-english": ["Source Serif 4"],
+                        "feast-title": ["Source Serif 4"],
+                        "rail-link": ["Inter"],
+                        "feast-title-mobile": ["Source Serif 4"],
+                        "ui-label": ["Inter"],
+                        "rubric-sm": ["Inter"],
+                        "liturgical-latin": ["Source Serif 4"]
+                    },
+                    "fontSize": {
+                        "liturgical-english": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "feast-title": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "rail-link": ["13px", {"lineHeight": "16px", "letterSpacing": "0.03em", "fontWeight": "600"}],
+                        "feast-title-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "ui-label": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "rubric-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "liturgical-latin": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-ui-label text-on-surface">
+<!-- Persistent Side Navigation Rail -->
+<aside class="bg-rail-bg w-rail-width h-full fixed left-0 top-0 flex flex-col h-full py-gutter z-50 border-r border-parchment-deep overflow-y-auto custom-scrollbar">
+<div class="px-6 mb-10">
+<h1 class="font-feast-title text-rail-link font-bold text-xl leading-tight">St. Android's Missal</h1>
+<p class="font-rubric-sm text-ink-faint uppercase tracking-wider text-[10px]">Sacred Parchment Edition</p>
+</div>
+<nav class="flex-1 flex flex-col gap-1 px-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]">map</span>
+<span class="font-rail-link text-rail-link">Subway Map</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]">menu_book</span>
+<span class="font-rail-link text-rail-link">Missal Reader</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]">calendar_month</span>
+<span class="font-rail-link text-rail-link">Perpetual Calendar</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]">auto_stories</span>
+<span class="font-rail-link text-rail-link">Divine Office</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]">menu_book</span>
+<span class="font-rail-link text-rail-link">Sacred Scripture</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]">edit_note</span>
+<span class="font-rail-link text-rail-link">Journal</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]">history_edu</span>
+<span class="font-rail-link text-rail-link">Homily Writer</span>
+</a>
+</nav>
+<div class="mt-auto px-2 pt-6 border-t border-ink-soft/20 flex flex-col gap-1">
+<a class="flex items-center gap-4 px-4 py-3 rounded text-accent-white font-bold border-l-4 border-accent-white bg-primary-container active:scale-[0.98] transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-rail-link text-rail-link">Settings</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span class="font-rail-link text-rail-link">Help</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="pl-rail-width min-h-screen relative flex justify-center pb-20">
+<div class="w-full max-w-[900px] px-margin-main py-12 flex flex-col gap-12">
+<!-- Masthead -->
+<header class="masthead">
+<h2 class="font-feast-title text-feast-title text-primary mb-2">Settings</h2>
+<div class="h-[1px] w-full bg-gold-bright"></div>
+</header>
+<!-- Settings Content Grid -->
+<div class="flex flex-col gap-8">
+<!-- CARD 1: APPEARANCE -->
+<section class="vellum-card p-6 rounded-lg flex flex-col gap-6 shadow-sm">
+<div class="header">
+<h3 class="font-feast-title text-sm uppercase tracking-[0.2em] text-ink-soft mb-2">Appearance</h3>
+<hr class="border-parchment-deep"/>
+</div>
+<div class="row flex flex-col gap-4">
+<label class="text-sm font-semibold text-primary">Theme family</label>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+<!-- Theme Tiles -->
+<button class="flex flex-col items-start gap-2 p-2 rounded-lg border-2 border-accent-green bg-white shadow-sm ring-1 ring-accent-green/20 group">
+<div class="w-full aspect-video rounded bg-[#fbf7ee] border border-parchment-deep flex items-center justify-center overflow-hidden relative">
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/paper-fibers.png')] opacity-40"></div>
+<div class="w-4 h-4 rounded-full bg-accent-red"></div>
+</div>
+<span class="text-[11px] font-bold text-ink-soft">Parchment</span>
+</button>
+<button class="flex flex-col items-start gap-2 p-2 rounded-lg border border-outline-variant hover:border-gold-bright transition-all bg-white group">
+<div class="w-full aspect-video rounded bg-[#2b241b] flex items-center justify-center">
+<div class="w-4 h-4 rounded-full bg-gold-bright"></div>
+</div>
+<span class="text-[11px] text-ink-soft">Sanctissimissa</span>
+</button>
+<button class="flex flex-col items-start gap-2 p-2 rounded-lg border border-outline-variant hover:border-gold-bright transition-all bg-white group">
+<div class="w-full aspect-video rounded glass-swatch flex items-center justify-center">
+<div class="w-4 h-4 rounded-full bg-accent-purple"></div>
+</div>
+<span class="text-[11px] text-ink-soft">Glass — acrylic</span>
+</button>
+<button class="flex flex-col items-start gap-2 p-2 rounded-lg border border-outline-variant hover:border-gold-bright transition-all bg-white group">
+<div class="w-full aspect-video rounded border border-blue-100 flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
+<div class="w-4 h-4 rounded-full bg-blue-500 z-10"></div>
+</div>
+<span class="text-[11px] text-ink-soft">Glass — clear</span>
+</button>
+<button class="flex flex-col items-start gap-2 p-2 rounded-lg border border-outline-variant hover:border-gold-bright transition-all bg-white group">
+<div class="w-full aspect-video rounded bg-black flex items-center justify-center">
+<div class="w-4 h-4 rounded-full bg-[#00ff41] shadow-[0_0_8px_#00ff41]"></div>
+</div>
+<span class="text-[11px] text-ink-soft">Retro-futurist</span>
+</button>
+<button class="flex flex-col items-start gap-2 p-2 rounded-lg border border-outline-variant hover:border-gold-bright transition-all bg-white group">
+<div class="w-full aspect-video rounded bg-[#888] border-2 border-black flex items-center justify-center">
+<div class="w-4 h-4 bg-black"></div>
+</div>
+<span class="text-[11px] text-ink-soft">Brutalist</span>
+</button>
+<button class="flex flex-col items-start gap-2 p-2 rounded-lg border border-outline-variant hover:border-gold-bright transition-all bg-white group">
+<div class="w-full aspect-video rounded bg-[#ff00ff] border-2 border-black flex items-center justify-center">
+<div class="font-bold text-xs italic">MAX</div>
+</div>
+<span class="text-[11px] text-ink-soft leading-tight">Neo-brutalist maximalist</span>
+</button>
+<button class="flex flex-col items-start gap-2 p-2 rounded-lg border border-outline-variant hover:border-gold-bright transition-all bg-white group">
+<div class="w-full aspect-video rounded bg-[#111] flex items-center justify-center">
+<div class="w-4 h-4 rounded-full bg-yellow-400 blur-[1px]"></div>
+</div>
+<span class="text-[11px] text-ink-soft">Hello Word Glow</span>
+</button>
+</div>
+</div>
+<div class="row flex items-center justify-between py-2 border-t border-parchment-deep/30">
+<label class="text-sm font-semibold text-primary">Mode</label>
+<div class="flex bg-secondary-container rounded-full p-1 border border-outline-variant">
+<button class="px-4 py-1 text-xs rounded-full hover:bg-white transition-all">Light</button>
+<button class="px-4 py-1 text-xs rounded-full hover:bg-white transition-all">Dark</button>
+<button class="px-4 py-1 text-xs rounded-full bg-primary text-white shadow-md">System</button>
+</div>
+</div>
+<div class="row flex flex-col gap-2 py-2 border-t border-parchment-deep/30">
+<div class="flex justify-between items-center">
+<label class="text-sm font-semibold text-primary">Liturgical accent</label>
+<div class="flex gap-2">
+<div class="w-5 h-5 rounded-full bg-accent-green ring-2 ring-offset-2 ring-accent-green cursor-default" title="Green"></div>
+<div class="w-5 h-5 rounded-full bg-accent-purple opacity-40 hover:opacity-100 transition-opacity cursor-default" title="Purple"></div>
+<div class="w-5 h-5 rounded-full bg-accent-red opacity-40 hover:opacity-100 transition-opacity cursor-default" title="Red"></div>
+<div class="w-5 h-5 rounded-full bg-accent-white opacity-40 hover:opacity-100 transition-opacity cursor-default" title="White"></div>
+<div class="w-5 h-5 rounded-full bg-accent-black opacity-40 hover:opacity-100 transition-opacity cursor-default" title="Black"></div>
+<div class="w-5 h-5 rounded-full bg-accent-rose opacity-40 hover:opacity-100 transition-opacity cursor-default" title="Rose"></div>
+</div>
+</div>
+<p class="text-[11px] font-rubric-sm text-rubric italic">Follows the calendar automatically — Time after Pentecost</p>
+</div>
+<div class="row flex items-center justify-between py-2 border-t border-parchment-deep/30">
+<label class="text-sm font-semibold text-primary">Text size</label>
+<div class="flex bg-secondary-container rounded p-1 border border-outline-variant">
+<button class="px-5 py-1 text-sm font-serif">A−</button>
+<button class="px-5 py-1 text-sm font-serif bg-white shadow-sm font-bold border border-outline-variant/30">A</button>
+<button class="px-5 py-1 text-sm font-serif">A+</button>
+</div>
+</div>
+</section>
+<!-- CARD 2: READING -->
+<section class="vellum-card p-6 rounded-lg flex flex-col gap-4 shadow-sm">
+<div class="header">
+<h3 class="font-feast-title text-sm uppercase tracking-[0.2em] text-ink-soft mb-2">Reading</h3>
+<hr class="border-parchment-deep"/>
+</div>
+<div class="row flex items-center justify-between py-1">
+<label class="text-sm font-semibold text-primary">Bilingual layout</label>
+<div class="flex bg-secondary-container rounded p-1">
+<button class="px-3 py-1 text-[11px] font-medium text-ink-soft uppercase tracking-wider">Latin only</button>
+<button class="px-3 py-1 text-[11px] font-bold text-primary uppercase tracking-wider bg-white shadow-sm rounded-sm">Bilingual</button>
+<button class="px-3 py-1 text-[11px] font-medium text-ink-soft uppercase tracking-wider">English only</button>
+</div>
+</div>
+<div class="row flex items-center justify-between py-1 border-t border-parchment-deep/30">
+<label class="text-sm font-semibold text-primary">Show rubrics</label>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-green"></div>
+</label>
+</div>
+<div class="row flex flex-col gap-1 py-1 border-t border-parchment-deep/30">
+<div class="flex justify-between items-center">
+<label class="text-sm font-semibold text-primary">Mark supplied text</label>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-green"></div>
+</label>
+</div>
+<p class="text-[11px] font-rubric-sm text-ink-faint italic">Flags passages gap-filled from the Commune</p>
+</div>
+<div class="row flex items-center justify-between py-1 border-t border-parchment-deep/30">
+<label class="text-sm font-semibold text-primary">Collapse sections by default</label>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-green"></div>
+</label>
+</div>
+</section>
+<!-- CARD 3: JOURNAL -->
+<section class="vellum-card p-6 rounded-lg flex flex-col gap-4 shadow-sm">
+<div class="header">
+<h3 class="font-feast-title text-sm uppercase tracking-[0.2em] text-ink-soft mb-2">Journal</h3>
+<hr class="border-parchment-deep"/>
+</div>
+<div class="row flex items-center justify-between py-1">
+<label class="text-sm font-semibold text-primary">Default exposure</label>
+<div class="flex bg-secondary-container rounded p-1 border border-outline-variant">
+<button class="px-4 py-1 text-xs font-bold bg-white shadow-sm border border-outline-variant/30">Private</button>
+<button class="px-4 py-1 text-xs">Shared</button>
+</div>
+</div>
+<div class="row flex flex-col gap-1 py-1 border-t border-parchment-deep/30">
+<div class="flex justify-between items-center">
+<label class="text-sm font-semibold text-primary">Peer sync</label>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-green"></div>
+</label>
+</div>
+<p class="text-[11px] font-rubric-sm text-ink-faint italic">Sidecar syncs to paired devices only</p>
+</div>
+<div class="row flex items-center justify-between py-1 border-t border-parchment-deep/30">
+<label class="text-sm font-semibold text-primary">Device ID</label>
+<div class="flex items-center gap-3">
+<code class="font-mono text-xs text-ink-soft bg-surface px-2 py-1 rounded border border-parchment-deep">a3f9-2c17-88be</code>
+<button class="text-xs text-accent-white font-bold hover:underline flex items-center gap-1 group">
+<span class="material-symbols-outlined text-sm">content_copy</span>
+                                Copy
+                            </button>
+</div>
+</div>
+</section>
+<!-- CARD 4: CORPUS -->
+<section class="vellum-card p-6 rounded-lg flex flex-col gap-4 shadow-sm">
+<div class="header">
+<h3 class="font-feast-title text-sm uppercase tracking-[0.2em] text-ink-soft mb-2">Corpus</h3>
+<hr class="border-parchment-deep"/>
+</div>
+<div class="row flex items-center justify-between py-1">
+<label class="text-sm font-semibold text-primary">Database</label>
+<span class="text-xs font-mono text-ink-faint">missal.db · 194 MB · committed 2026-07-16</span>
+</div>
+<div class="row flex items-center justify-between py-2 border-t border-parchment-deep/30 hover:bg-parchment-deep/10 transition-colors cursor-pointer group">
+<label class="text-sm font-semibold text-primary cursor-pointer">Fill log</label>
+<span class="text-xs text-accent-white font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                            View corpus fill log <span class="material-symbols-outlined text-sm">chevron_right</span>
+</span>
+</div>
+<div class="row flex items-center justify-between py-2 border-t border-parchment-deep/30">
+<label class="text-sm font-semibold text-primary">Re-index search</label>
+<button class="px-4 py-1.5 border border-outline-variant text-ink-soft text-xs font-bold rounded hover:bg-surface transition-colors active:bg-parchment-deep">
+                            Rebuild index
+                        </button>
+</div>
+</section>
+</div>
+</div>
+<!-- Footer Version Tag -->
+<footer class="fixed bottom-4 right-4 flex gap-4 items-end bg-transparent pointer-events-none">
+<div class="font-rubric-sm text-rubric-sm text-ink-faint bg-white/40 backdrop-blur-sm px-3 py-1 rounded-full border border-parchment-deep/50">
+                v1.26.53142 — Sacred Parchment
+            </div>
+</footer>
+</main>
+<!-- Micro-interaction Script -->
+<script>
+        // Simple theme selection visual feedback
+        const themeButtons = document.querySelectorAll('button[class*="theme-family"]');
+        themeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                themeButtons.forEach(b => b.classList.remove('ring-2', 'ring-accent-green', 'border-accent-green'));
+                btn.classList.add('ring-2', 'ring-accent-green', 'border-accent-green');
+            });
+        });
+
+        // Copy device ID simulation
+        const copyBtn = document.querySelector('button:has(.material-symbols-outlined:contains("content_copy"))');
+        if(copyBtn) {
+            copyBtn.addEventListener('click', () => {
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = `<span class="material-symbols-outlined text-sm">check</span> Copied!`;
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+    </script>
+</body></html>

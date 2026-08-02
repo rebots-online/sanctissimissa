@@ -6,21 +6,15 @@
  * canticles, orations — all real corpus rows, Latin normative).
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { OFFICE_CURSUS } from '../core/model/officeCursus.ts';
 import { buildHour, type OfficeEntry } from '../core/office/engine.ts';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 import type { DayInfo } from '../core/data/types.ts';
-import { isScriptureCitationLine, isSpecialsControlLine } from '../core/liturgy/massSpecials.ts';
 import type { SidecarDb } from '../core/accompaniment/store.ts';
+import SectionReader, { type ReaderSection, type SelectionAction } from './SectionReader.tsx';
 import { downloadExport, type ExportEntry } from '../core/export/exportFormats.ts';
 import { shareUrl } from '../core/share/shareLink.ts';
-
-function bangLineClass(line: string): 'suppress' | 'verse-ref' | 'rubric-text' {
-  if (isSpecialsControlLine(line)) return 'suppress';
-  if (isScriptureCitationLine(line)) return 'verse-ref';
-  return 'rubric-text';
-}
 
 interface Props {
   db: CorpusDb;
@@ -29,49 +23,15 @@ interface Props {
   hour: string;
   onHour: (id: string) => void;
   sidecar?: SidecarDb | null;
+  onAction?: (a: SelectionAction) => void;
+  onCapture?: (capture: { quote: string; quoteAlt?: string; anchor: string | null }) => void;
 }
 
-/** Corpus text renderer: "!Citation" lines become styled rubric refs. */
-function OfficeText({ text }: { text: string }) {
-  return (
-    <p>
-      {text.split('\n').map((line, i) => {
-        if (line.startsWith('!')) {
-          const kind = bangLineClass(line);
-          if (kind === 'suppress') return null;
-          return (
-            <span className={kind} key={i}>
-              {line.slice(1)}
-            </span>
-          );
-        }
-        return (
-          <span key={i}>
-            {line}
-            {'\n'}
-          </span>
-        );
-      })}
-    </p>
-  );
-}
-
-export default function OfficeView({ db, day, hour, onHour, sidecar }: Props) {
+export default function OfficeView({ db, day, hour, onHour, sidecar, onAction, onCapture }: Props) {
   const sel = OFFICE_CURSUS.find((h) => h.id === hour) ?? OFFICE_CURSUS[1];
-  /** Accordion: folded section indices (per hour; reset on hour change). */
-  const [collapsed, setCollapsed] = useState<Set<number>>(new Set());
-  const toggle = (i: number) =>
-    setCollapsed((prev) => {
-      const next = new Set(prev);
-      if (next.has(i)) next.delete(i);
-      else next.add(i);
-      return next;
-    });
   const R = 92;
   const CX = 130;
   const CY = 130;
-
-  useEffect(() => setCollapsed(new Set()), [sel.id, day?.date]);
 
   const entries: OfficeEntry[] = useMemo(() => {
     if (!day) return [];
@@ -84,6 +44,36 @@ export default function OfficeView({ db, day, hour, onHour, sidecar }: Props) {
 
   const rubricsOn = (sidecar?.getSetting('mass.rubrics') ?? '1') === '1';
   const roleLens = sidecar?.getSetting('mass.roleLens') ?? 'off';
+
+  /**
+   * The hour's constructed entries as reader sections. Rubric entries are bare
+   * headings; everything else gets the full reading surface — which is what
+   * gives the Breviary the synchronized highlight, the flyout and the context
+   * menu it never had (BUGS #2, #10).
+   */
+  const sections: ReaderSection[] = entries.map((e, i) => ({
+    anchor: `${e.source}#${i}`,
+    nodeKey: e.source,
+    title: e.title,
+    latin: e.latin,
+    english: e.english,
+    headingOnly: e.rubric,
+    meta: <span className="src">{e.source.replace(/^section:/, '')}</span>,
+  }));
+
+  const exportEntries = entries.map((e) => ({
+    title: e.title,
+    latin: e.latin,
+    english: e.english,
+    source: e.source,
+    rubric: e.rubric,
+  })) as ExportEntry[];
+  const exportMeta = {
+    day: day?.date ?? '',
+    feastName: day?.feastName ?? null,
+    season: day?.season ?? 'Tempus per Annum',
+    source: sel.id,
+  };
 
   return (
     <div className="content office-full" data-rubrics={rubricsOn ? 'on' : 'off'} data-role-lens={roleLens}>
@@ -125,58 +115,44 @@ export default function OfficeView({ db, day, hour, onHour, sidecar }: Props) {
         </div>
       </aside>
 
-      <div className="reader office-reader">
-        {!day && <p>Choose a date to construct the office.</p>}
-        {day && entries.length === 0 && (
-          <p>
-            The corpus carries no constructible texts for <b>{sel.latin}</b> on {day.date} — this
-            should not happen; please report the date.
-          </p>
-        )}
-        {day && entries.length > 0 && (
-          <div className="export-bar">
-            <span className="export-label">Export {sel.latin}:</span>
-            <button onClick={() => downloadExport('html', { day: day.date, feastName: day.feastName, season: day.season, source: sel.id }, entries.map((e) => ({ title: e.title, latin: e.latin, english: e.english, source: e.source, rubric: e.rubric })) as ExportEntry[])}>HTML</button>
-            <button onClick={() => downloadExport('md', { day: day.date, feastName: day.feastName, season: day.season, source: sel.id }, entries.map((e) => ({ title: e.title, latin: e.latin, english: e.english, source: e.source, rubric: e.rubric })) as ExportEntry[])}>Markdown</button>
-            <button onClick={() => downloadExport('json', { day: day.date, feastName: day.feastName, season: day.season, source: sel.id }, entries.map((e) => ({ title: e.title, latin: e.latin, english: e.english, source: e.source, rubric: e.rubric })) as ExportEntry[])}>JSON</button>
-            <span className="export-sep" />
-            <button onClick={() => { const url = shareUrl(`#/day/${day.date}`); if (navigator.share) navigator.share({ title: `${sel.latin} — ${day.feastName ?? day.date}`, text: `${sel.latin} — ${day.feastName ?? day.date}`, url }); else navigator.clipboard.writeText(url); }}>Share link</button>
-          </div>
-        )}
-        {entries.map((e, i) =>
-          e.rubric ? (
-            <h2 className="office-heading" key={i}>
-              {e.title}
-            </h2>
-          ) : (
-            <section className={`reader-section${collapsed.has(i) ? ' collapsed' : ''}`} key={i} data-nodekey={e.source}>
-              <div
-                className="head"
-                onClick={() => toggle(i)}
-                role="button"
-                aria-expanded={!collapsed.has(i)}
-                title={collapsed.has(i) ? 'Unfold section' : 'Fold section away'}
-              >
-                <span className="chev">{collapsed.has(i) ? '▸' : '▾'}</span>
-                <h3>{e.title}</h3>
-                <span className="src">{e.source.replace(/^section:/, '')}</span>
+      <SectionReader
+        db={db}
+        baseClass="reader office-reader"
+        sections={sections}
+        sidecar={sidecar}
+        onAction={onAction}
+        onCapture={onCapture}
+        toolbar={
+          <>
+            {!day && <p>Choose a date to construct the office.</p>}
+            {day && entries.length === 0 && (
+              <p>
+                The corpus carries no constructible texts for <b>{sel.latin}</b> on {day.date} — this
+                should not happen; please report the date.
+              </p>
+            )}
+            {day && entries.length > 0 && (
+              <div className="export-bar">
+                <span className="export-label">Export {sel.latin}:</span>
+                <button onClick={() => downloadExport('html', exportMeta, exportEntries)}>HTML</button>
+                <button onClick={() => downloadExport('md', exportMeta, exportEntries)}>Markdown</button>
+                <button onClick={() => downloadExport('json', exportMeta, exportEntries)}>JSON</button>
+                <span className="export-sep" />
+                <button
+                  onClick={() => {
+                    const url = shareUrl(`#/day/${day.date}`);
+                    const title = `${sel.latin} — ${day.feastName ?? day.date}`;
+                    if (navigator.share) navigator.share({ title, text: title, url });
+                    else navigator.clipboard.writeText(url);
+                  }}
+                >
+                  Share link
+                </button>
               </div>
-              {collapsed.has(i) ? null : (
-              <div className="bilingual">
-                <div className="latin" lang="la">
-                  <span className="lang-tag">Latine</span>
-                  {e.latin ? <OfficeText text={e.latin} /> : <p style={{ opacity: 0.5 }}>—</p>}
-                </div>
-                <div className="english" lang="en">
-                  <span className="lang-tag">English</span>
-                  {e.english ? <OfficeText text={e.english} /> : <p style={{ opacity: 0.5 }}>—</p>}
-                </div>
-              </div>
-              )}
-            </section>
-          ),
-        )}
-      </div>
+            )}
+          </>
+        }
+      />
     </div>
   );
 }

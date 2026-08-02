@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>St. Android's Missal - Subway Map</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        /* Custom scrollbar for skeuomorphic feel */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #ece2cc; }
+        ::-webkit-scrollbar-thumb { background: #8a7d6a; border-radius: 4px; }
+        
+        .parchment-texture {
+            background-color: #fdf8f6;
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+        }
+        
+        .station-node:hover .station-label {
+            color: #9c2733;
+            transform: translateY(-2px);
+            transition: all 0.2s ease;
+        }
+
+        @media (max-width: 860px) {
+            .nav-rail { width: 64px; }
+            .nav-label { display: none; }
+            .nav-header-text { display: none; }
+            .main-content { margin-left: 64px; }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-surface": "#32302f",
+                        "primary-fixed-dim": "#d0c5b8",
+                        "line-catechumens": "#a97e13",
+                        "surface-container": "#f2edeb",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#e8e2d4",
+                        "vellum": "#fbf7ee",
+                        "on-surface": "#1d1b1a",
+                        "tertiary": "#050300",
+                        "rubric": "#9c2733",
+                        "surface-dim": "#ded9d7",
+                        "tertiary-container": "#281b00",
+                        "surface-variant": "#e6e1df",
+                        "parchment-deep": "#ece2cc",
+                        "primary": "#040200",
+                        "surface": "#fdf8f6",
+                        "secondary": "#615e54",
+                        "on-tertiary-fixed": "#261900",
+                        "accent-rose": "#b76a7d",
+                        "on-surface-variant": "#4c463f",
+                        "rail-text": "#d9cdb8",
+                        "accent-purple": "#5d3a80",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#211b13",
+                        "surface-bright": "#fdf8f6",
+                        "tertiary-fixed-dim": "#f2bf53",
+                        "on-secondary-fixed": "#1d1c13",
+                        "line-office": "#274b69",
+                        "on-tertiary-container": "#a97e13",
+                        "surface-container-highest": "#e6e1df",
+                        "primary-container": "#221c14",
+                        "on-primary-fixed-variant": "#4d463c",
+                        "rail-bg": "#2b241b",
+                        "line-faithful": "#7a1f2b",
+                        "on-secondary": "#ffffff",
+                        "dialogue-s": "#5d3a80",
+                        "on-primary-container": "#8d8378",
+                        "accent-white": "#a97e13",
+                        "accent-green": "#3f7a52",
+                        "on-secondary-fixed-variant": "#49473d",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#686459",
+                        "on-tertiary-fixed-variant": "#5c4200",
+                        "on-error": "#ffffff",
+                        "accent-red": "#9c2733",
+                        "outline": "#7d766e",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#cbc6b9",
+                        "background": "#fdf8f6",
+                        "inverse-primary": "#d0c5b8",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f5f0ee",
+                        "surface-container-high": "#ece7e5",
+                        "ink-soft": "#4a4034",
+                        "primary-fixed": "#ede0d3",
+                        "dialogue-p": "#9c2733",
+                        "tertiary-fixed": "#ffdea2",
+                        "surface-tint": "#665d53",
+                        "secondary-container": "#e8e2d4",
+                        "accent-black": "#33302b",
+                        "ink-faint": "#8a7d6a",
+                        "on-background": "#1d1b1a",
+                        "gold-bright": "#d4a017",
+                        "outline-variant": "#cfc5bb",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#f8f3f0"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "stack-gap": "16px",
+                        "rail-width": "232px",
+                        "margin-main": "32px",
+                        "rail-collapsed": "64px"
+                    },
+                    fontFamily: {
+                        "rail-link": ["Inter", "sans-serif"],
+                        "ui-label": ["Inter", "sans-serif"],
+                        "liturgical-latin": ["Source Serif 4", "serif"],
+                        "liturgical-english": ["Source Serif 4", "serif"],
+                        "feast-title-mobile": ["Source Serif 4", "serif"],
+                        "rubric-sm": ["Inter", "sans-serif"],
+                        "feast-title": ["Source Serif 4", "serif"]
+                    },
+                    fontSize: {
+                        "rail-link": ["13px", { "lineHeight": "16px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+                        "ui-label": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "liturgical-latin": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "liturgical-english": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "feast-title-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "rubric-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "feast-title": ["32px", { "lineHeight": "40px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-ui-label overflow-x-hidden">
+<!-- SIDE NAV RAIL -->
+<nav class="bg-rail-bg text-rail-text w-rail-width h-full fixed left-0 top-0 flex flex-col py-gutter z-50 border-r border-parchment-deep nav-rail"><div class="px-6 mb-10 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-accent-white flex items-center justify-center">
+<span class="material-symbols-outlined text-rail-bg" style="font-variation-settings: 'FILL' 1;">replace_video</span>
+</div>
+<div class="nav-header-text">
+<h2 class="font-feast-title text-rail-link font-bold text-lg leading-tight">St. Android's Missal</h2>
+<p class="text-[10px] uppercase tracking-widest opacity-60">Sacred Parchment Edition</p>
+</div>
+</div>
+<div class="flex-1 space-y-6 overflow-y-auto">
+<div>
+<p class="px-6 text-[10px] uppercase tracking-widest opacity-40 mb-2">Mass</p>
+<div class="space-y-1">
+<a class="flex items-center gap-4 px-6 py-3 text-accent-white font-bold border-l-4 border-accent-white bg-primary-container transition-all" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-rail-link text-rail-link nav-label">Subway Map</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-rail-link text-rail-link nav-label">Missal Reader</span>
+</a>
+</div>
+</div>
+<div>
+<p class="px-6 text-[10px] uppercase tracking-widest opacity-40 mb-2">Calendar</p>
+<div class="space-y-1">
+<a class="flex items-center gap-4 px-6 py-3 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-rail-link text-rail-link nav-label">Perpetual Calendar</span>
+</a>
+</div>
+</div>
+<div>
+<p class="px-6 text-[10px] uppercase tracking-widest opacity-40 mb-2">Office</p>
+<div class="space-y-1">
+<a class="flex items-center gap-4 px-6 py-3 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-rail-link text-rail-link nav-label">Divine Office</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-rail-link text-rail-link nav-label">Sacred Scripture</span>
+</a>
+</div>
+</div>
+<div>
+<p class="px-6 text-[10px] uppercase tracking-widest opacity-40 mb-2">Tools</p>
+<div class="space-y-1">
+<a class="flex items-center gap-4 px-6 py-3 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-rail-link text-rail-link nav-label">Journal</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="font-rail-link text-rail-link nav-label">Homily Writer</span>
+</a>
+</div>
+</div>
+</div>
+<div class="mt-auto px-6 space-y-4">
+<div class="space-y-1">
+<a class="flex items-center gap-4 py-2 text-rail-text opacity-80 hover:text-accent-white" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-rail-link text-rail-link nav-label">Settings</span>
+</a>
+<a class="flex items-center gap-4 py-2 text-rail-text opacity-80 hover:text-accent-white" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-rail-link text-rail-link nav-label">Help</span>
+</a>
+</div>
+<div class="nav-label bg-black/20 p-3 rounded-lg border border-white/10">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-3 h-3 rounded-full bg-accent-green"></div>
+<span class="text-[11px] font-bold tracking-wider">2026-07-27</span>
+</div>
+<p class="text-xs font-semibold leading-tight mb-1">Dominica VIII Post Pentecosten</p>
+<p class="text-[10px] opacity-60">Pentecost · Sunday · Pent08-0</p>
+</div>
+</div></nav>
+<!-- MAIN CONTENT AREA -->
+<main class="ml-rail-width min-h-screen parchment-texture flex flex-col main-content">
+<!-- TopAppBar (Simulated for Desktop Anchor) -->
+<header class="flex justify-between items-center h-16 px-margin-main border-b border-gold-bright bg-surface/50 backdrop-blur-sm sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary lg:hidden">menu</span>
+<span class="font-feast-title-mobile text-primary font-bold hidden md:block">St. Android's Missal</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">account_circle</span>
+</div>
+</header>
+<div class="flex-1 p-margin-main max-w-[1400px] w-full mx-auto">
+<!-- Masthead -->
+<div class="mb-12">
+<div class="flex items-baseline gap-4 mb-2">
+<h1 class="font-feast-title text-feast-title text-primary">Dominica VIII Post Pentecosten</h1>
+<span class="bg-parchment-deep text-ink-soft px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded border border-outline-variant">II classis</span>
+</div>
+<p class="font-rubric-sm text-rubric-sm text-ink-soft">2026-07-27 · Pentecost · Tempora/Pent08-0</p>
+<div class="w-full h-[1px] bg-gold-bright mt-6 shadow-sm"></div>
+</div>
+<!-- SUBWAY MAP HERO -->
+<div class="relative bg-vellum border border-parchment-deep rounded-xl p-12 shadow-[inset_0_1px_4px_rgba(0,0,0,0.05)] overflow-hidden">
+<!-- Background decorative text / Watermark -->
+<div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
+<span class="font-feast-title text-[240px] rotate-12">ORDO MISSAE</span>
+</div>
+<!-- Legend -->
+<div class="absolute top-6 left-6 flex flex-col gap-3 bg-white/40 p-4 backdrop-blur-md rounded border border-parchment-deep z-10">
+<div class="flex items-center gap-3">
+<div class="w-8 h-1.5 bg-line-catechumens rounded-full"></div>
+<span class="text-xs font-bold text-ink-soft">MASS OF THE CATECHUMENS</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-1.5 bg-line-faithful rounded-full"></div>
+<span class="text-xs font-bold text-ink-soft">MASS OF THE FAITHFUL</span>
+</div>
+</div>
+<!-- SVG Map Container -->
+<div class="relative h-[600px] w-full flex items-center justify-center">
+<svg class="w-full h-full drop-shadow-sm" viewbox="0 0 1000 400">
+<!-- Line 1: Catechumens -->
+<path d="M 50 200 L 450 200" fill="none" stroke="#a97e13" stroke-linecap="round" stroke-width="8"></path>
+<!-- Line 2: Faithful -->
+<path d="M 550 200 L 950 200" fill="none" stroke="#7a1f2b" stroke-linecap="round" stroke-width="8"></path>
+<!-- Interchange: Credo to Offertorium -->
+<circle cx="500" cy="200" fill="#fbf7ee" r="24" stroke="#221c14" stroke-width="1.5"></circle>
+<circle cx="500" cy="200" fill="none" r="18" stroke="#221c14" stroke-width="1.5"></circle>
+</svg>
+<!-- Station Nodes (Catechumens) -->
+<div class="absolute inset-0 pointer-events-none">
+<!-- Positioning logic matching SVG Path: M 50 to 450 -->
+<!-- Station 1 -->
+<div class="station-node absolute" style="left: 5%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-6 h-6 rounded-full bg-vellum border-2 border-primary shadow-sm cursor-pointer hover:scale-110 transition-transform"></div>
+<span class="station-label absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-xs font-bold text-primary italic">Asperges</span>
+</div>
+<!-- Station 2 -->
+<div class="station-node absolute" style="left: 10%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-4 h-4 rounded-full bg-vellum border-2 border-primary cursor-pointer hover:scale-110 transition-transform"></div>
+<span class="station-label absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-[10px] font-bold text-ink-soft">Introitus</span>
+</div>
+<!-- Station 3 -->
+<div class="station-node absolute" style="left: 15%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-4 h-4 rounded-full bg-vellum border-2 border-primary cursor-pointer"></div>
+<span class="station-label absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-[10px] font-bold text-ink-soft">Kyrie</span>
+</div>
+<!-- Station 4 -->
+<div class="station-node absolute" style="left: 20%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-4 h-4 rounded-full bg-vellum border-2 border-primary cursor-pointer"></div>
+<span class="station-label absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-[10px] font-bold text-ink-soft">Gloria</span>
+</div>
+<!-- Station 5 -->
+<div class="station-node absolute" style="left: 25%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-4 h-4 rounded-full bg-vellum border-2 border-primary cursor-pointer"></div>
+<span class="station-label absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-[10px] font-bold text-ink-soft">Oratio</span>
+</div>
+<!-- Station 6 -->
+<div class="station-node absolute" style="left: 30%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-4 h-4 rounded-full bg-vellum border-2 border-primary cursor-pointer"></div>
+<span class="station-label absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-[10px] font-bold text-ink-soft">Epistola</span>
+</div>
+<!-- Station 7 -->
+<div class="station-node absolute" style="left: 35%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-4 h-4 rounded-full bg-vellum border-2 border-primary cursor-pointer"></div>
+<span class="station-label absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-[10px] font-bold text-ink-soft">Graduale</span>
+</div>
+<!-- Station 8 -->
+<div class="station-node absolute" style="left: 40%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-4 h-4 rounded-full bg-vellum border-2 border-primary cursor-pointer"></div>
+<span class="station-label absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-[10px] font-bold text-ink-soft">Evangelium</span>
+</div>
+<!-- Station 9: Credo (End of Line 1) -->
+<div class="station-node absolute" style="left: 45%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-6 h-6 rounded-full bg-vellum border-2 border-line-catechumens cursor-pointer"></div>
+<span class="station-label absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-xs font-bold text-line-catechumens">Credo</span>
+</div>
+<!-- INTERCHANGE NODE -->
+<div class="absolute" style="left: 50%; top: 50%; transform: translate(-50%, -50%);">
+<span class="absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap font-feast-title text-sm font-bold text-primary uppercase tracking-tighter">Praeparatio</span>
+</div>
+<!-- Station 10: Offertorium (Start of Line 2) -->
+<div class="station-node absolute" style="left: 55%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-6 h-6 rounded-full bg-vellum border-2 border-line-faithful cursor-pointer"></div>
+<span class="station-label absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-xs font-bold text-line-faithful">Offertorium</span>
+</div>
+<!-- Station 11 -->
+<div class="station-node absolute" style="left: 60%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-4 h-4 rounded-full bg-vellum border-2 border-primary cursor-pointer"></div>
+<span class="station-label absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-[10px] font-bold text-ink-soft">Secreta</span>
+</div>
+<!-- Station 12 -->
+<div class="station-node absolute" style="left: 65%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-4 h-4 rounded-full bg-vellum border-2 border-primary cursor-pointer"></div>
+<span class="station-label absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-[10px] font-bold text-ink-soft">Praefatio</span>
+</div>
+<!-- Station 13 -->
+<div class="station-node absolute" style="left: 70%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-7 h-7 rounded-full bg-vellum border-[3px] border-rubric cursor-pointer hover:scale-110 transition-transform"></div>
+<span class="station-label absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-xs font-bold text-rubric">Canon</span>
+</div>
+<!-- Station 14 -->
+<div class="station-node absolute" style="left: 75%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-4 h-4 rounded-full bg-vellum border-2 border-primary cursor-pointer"></div>
+<span class="station-label absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-[10px] font-bold text-ink-soft">Pater Noster</span>
+</div>
+<!-- Station 15 -->
+<div class="station-node absolute" style="left: 80%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-4 h-4 rounded-full bg-vellum border-2 border-primary cursor-pointer"></div>
+<span class="station-label absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-[10px] font-bold text-ink-soft">Agnus Dei</span>
+</div>
+<!-- Station 16 -->
+<div class="station-node absolute" style="left: 85%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-6 h-6 rounded-full bg-vellum border-2 border-line-faithful cursor-pointer"></div>
+<span class="station-label absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-[10px] font-bold text-ink-soft">Communio</span>
+</div>
+<!-- Station 17 -->
+<div class="station-node absolute" style="left: 90%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-4 h-4 rounded-full bg-vellum border-2 border-primary cursor-pointer"></div>
+<span class="station-label absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-[10px] font-bold text-ink-soft">Postcommunio</span>
+</div>
+<!-- Station 18 -->
+<div class="station-node absolute" style="left: 95%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto;">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-accent-white cursor-pointer hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-sm">church</span>
+</div>
+<span class="station-label absolute top-10 left-1/2 -translate-x-1/2 whitespace-nowrap font-liturgical-latin text-xs font-bold text-primary">Ite Missa Est</span>
+</div>
+</div>
+</div>
+<!-- Atmospheric shader for subtle movement behind the map -->
+<div class="absolute bottom-0 left-0 w-full h-32 opacity-20 pointer-events-none">
+</div>
+<div class="absolute bottom-6 right-6 w-64 bg-white/80 backdrop-blur-md border border-parchment-deep rounded-lg shadow-sm p-4 z-10">
+<div class="flex items-center justify-between mb-3">
+<span class="text-[10px] font-bold uppercase tracking-widest text-ink-faint">Nearby Nodes</span>
+<span class="material-symbols-outlined text-sm text-ink-faint">explore</span>
+</div>
+<div class="space-y-2">
+<div class="flex items-center gap-3 p-2 rounded hover:bg-primary/5 cursor-pointer transition-colors">
+<div class="w-2 h-2 rounded-full bg-line-catechumens"></div>
+<div class="flex-1">
+<p class="text-[11px] font-bold text-primary">Evangelium</p>
+<p class="text-[9px] text-ink-faint">Previous Station</p>
+</div>
+<span class="material-symbols-outlined text-xs text-ink-faint">chevron_left</span>
+</div>
+<div class="flex items-center gap-3 p-2 rounded bg-primary/5 border border-primary/10">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="flex-1">
+<p class="text-[11px] font-bold text-primary">Credo</p>
+<p class="text-[9px] text-ink-faint">Current Station</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-2 rounded hover:bg-primary/5 cursor-pointer transition-colors">
+<div class="w-2 h-2 rounded-full bg-line-faithful"></div>
+<div class="flex-1">
+<p class="text-[11px] font-bold text-primary">Offertorium</p>
+<p class="text-[9px] text-ink-faint">Next Station</p>
+</div>
+<span class="material-symbols-outlined text-xs text-ink-faint">chevron_right</span>
+</div>
+</div>
+</div></div>
+<!-- Additional Detail Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mt-margin-main">
+<div class="bg-vellum border border-parchment-deep p-6 rounded-lg">
+<h3 class="font-feast-title text-sm font-bold text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-line-catechumens">info</span>
+                        Mass of the Catechumens
+                    </h3>
+<p class="text-xs leading-relaxed text-ink-soft">
+                        The instructional portion of the Mass. In antiquity, those not yet baptized were dismissed after the Gospel or Sermon, as they were not permitted to witness the Holy Sacrifice.
+                    </p>
+</div>
+<div class="bg-vellum border border-parchment-deep p-6 rounded-lg">
+<h3 class="font-feast-title text-sm font-bold text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-line-faithful">history</span>
+                        The Great Interchange
+                    </h3>
+<p class="text-xs leading-relaxed text-ink-soft">
+                        At the Credo, the public profession of faith acts as the final gate. The Offertorium marks the beginning of the "Sacrifice" where the gifts are set apart for God.
+                    </p>
+</div>
+<div class="bg-vellum border border-parchment-deep p-6 rounded-lg">
+<h3 class="font-feast-title text-sm font-bold text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-rubric">bolt</span>
+                        The Roman Canon
+                    </h3>
+<p class="text-xs leading-relaxed text-ink-soft">
+                        The unchanging heart of the Latin Mass. Dating back to the apostolic era, it is the silent center where the miracle of Transubstantiation occurs.
+                    </p>
+</div>
+</div>
+</div>
+<!-- Footer / Version Tag -->
+<footer class="mt-auto px-margin-main py-gutter flex justify-between items-end">
+<div class="text-[10px] text-ink-faint font-rubric-sm uppercase tracking-[0.2em]">
+                © 2026 St. Android's Missal · Ad Maiorem Dei Gloriam
+            </div>
+<div class="bg-primary/5 px-2 py-1 rounded text-[10px] font-mono text-ink-faint border border-primary/10">
+                v1.26.53142
+            </div>
+</footer>
+</main>
+<script>
+        // Micro-interaction for the rail hover
+        document.querySelectorAll('.nav-rail a').forEach(link => {
+            link.addEventListener('mousedown', () => {
+                link.style.transform = 'scale(0.98)';
+            });
+            link.addEventListener('mouseup', () => {
+                link.style.transform = 'scale(1)';
+            });
+            link.addEventListener('mouseleave', () => {
+                link.style.transform = 'scale(1)';
+            });
+        });
+
+        // Simple parallax or motion effect on the map container
+        const mapContainer = document.querySelector('.relative.bg-vellum');
+        mapContainer.addEventListener('mousemove', (e) => {
+            const { width, height, left, top } = mapContainer.getBoundingClientRect();
+            const x = (e.clientX - left) / width - 0.5;
+            const y = (e.clientY - top) / height - 0.5;
+            
+            // Subtle tilt effect
+            mapContainer.style.transform = `perspective(1000px) rotateY(${x * 1}deg) rotateX(${-y * 1}deg)`;
+        });
+
+        mapContainer.addEventListener('mouseleave', () => {
+            mapContainer.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
+        });
+    </script>
+</body></html>

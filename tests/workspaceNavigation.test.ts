@@ -110,24 +110,43 @@ describe('workspaceNavigation (BX.5)', () => {
     assert.equal(allIds.length, uniqueIds.size, 'All route IDs must be unique');
   });
 
-  test('ABOUT_CONTENT has nonempty origin-story slot', () => {
-    assert(ABOUT_CONTENT.origin, 'ABOUT_CONTENT.origin must exist');
-    assert(typeof ABOUT_CONTENT.origin === 'string', 'ABOUT_CONTENT.origin must be a string');
-    assert(ABOUT_CONTENT.origin.trim().length > 0, 'ABOUT_CONTENT.origin must not be empty');
+  // The origin story is the operator's own account. It is NOT authored in
+  // about.ts — it lives in the tracked file `content/origin-story.md` and is
+  // imported verbatim at build time, so the assertions below check the file
+  // and the wiring rather than a string constant. (Node cannot resolve Vite's
+  // `?raw` import, which is why this is a source contract, not a value test.)
+  test('origin story is a tracked file, substantive, and not fabricated', () => {
+    const story = readFileSync('content/origin-story.md', 'utf-8');
+    assert(story.trim().length > 500, 'Origin story should be substantive (long prose)');
+    assert(
+      !/St\. Android of the Circuits|serving millions of users worldwide/.test(story),
+      'the fabricated origin story must never return',
+    );
   });
 
-  test('ABOUT_CONTENT has all required sections', () => {
-    const requiredSections = ['origin', 'purpose', 'acknowledgements', 'privacy', 'license'];
+  test('about.ts sources the origin story from the tracked file, with no fallback', () => {
+    const about = readFileSync('src/content/about.ts', 'utf-8');
+    assert(
+      /import\s+originStory\s+from\s+'\.\.\/\.\.\/content\/origin-story\.md\?raw'/.test(about),
+      'about.ts must import the origin story from content/origin-story.md',
+    );
+    assert(
+      /origin:\s*originStory/.test(about),
+      'ABOUT_CONTENT.origin must be the imported story',
+    );
+    assert(
+      !/St\. Android of the Circuits/.test(about),
+      'the fabricated origin story must not remain in about.ts',
+    );
+  });
+
+  test('ABOUT_CONTENT has all required authored sections', () => {
+    const requiredSections = ['purpose', 'acknowledgements', 'privacy', 'license'];
     for (const section of requiredSections) {
       assert(ABOUT_CONTENT[section], `ABOUT_CONTENT.${section} must exist`);
       assert(typeof ABOUT_CONTENT[section] === 'string', `ABOUT_CONTENT.${section} must be a string`);
       assert(ABOUT_CONTENT[section].trim().length > 0, `ABOUT_CONTENT.${section} must not be empty`);
     }
-  });
-
-  test('origin story accepts long prose without length restriction', () => {
-    // The origin story is intentionally long; verify it's substantive
-    assert(ABOUT_CONTENT.origin.length > 500, 'Origin story should be substantive (long prose)');
   });
 
   test('four distinct workspaces: journal, homily, settings, about', () => {

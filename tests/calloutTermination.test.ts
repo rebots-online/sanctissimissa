@@ -3,7 +3,7 @@
  *
  * Three gates:
  *  (1) Behavioral idempotence of placementsEqual / reconcileCallout.
- *  (2) Source-contract loop guard over src/ui/BibleView.tsx (no browser run).
+ *  (2) Source-contract loop guard over src/ui/SectionReader.tsx (no browser run).
  *  (3) Termination simulation — a fixed point reached in exactly one mutation.
  */
 
@@ -17,7 +17,7 @@ import {
   type FloatingCalloutPlacement,
 } from '../src/core/ui/calloutPlacement.ts';
 
-const bibleViewSrc = readFileSync(new URL('../src/ui/BibleView.tsx', import.meta.url), 'utf8');
+const sectionReaderSrc = readFileSync(new URL('../src/ui/SectionReader.tsx', import.meta.url), 'utf8');
 
 const rect = (left: number, top: number, width: number, height: number): DOMRectLike => ({
   left,
@@ -89,13 +89,13 @@ describe('BX.1R (1) behavioral idempotence', () => {
   });
 });
 
-describe('BX.1R (2) BibleView source-contract loop guard', () => {
+describe('BX.1R (2) SectionReader source-contract loop guard', () => {
   it('measurement effect is keyed on the echo identity, never on the whole callout', () => {
     // No effect may depend on the bare [callout] object.
-    assert.ok(!/\[callout\]/.test(bibleViewSrc), 'no bare [callout] dependency array');
+    assert.ok(!/\[callout\]/.test(sectionReaderSrc), 'no bare [callout] dependency array');
     // The measurement hook depends on callout?.echo (or callout.echo).
     assert.ok(
-      /\[callout\?\.echo\]|\[callout\.echo\]/.test(bibleViewSrc),
+      /\[callout\?\.echo\]|\[callout\.echo\]/.test(sectionReaderSrc),
       'measurement effect depends on callout?.echo',
     );
   });
@@ -103,12 +103,12 @@ describe('BX.1R (2) BibleView source-contract loop guard', () => {
   it('every measurement/resize setCallout updater goes through reconcileCallout', () => {
     // The pre-BX.1R unconditional spread must be gone.
     assert.ok(
-      !/setCallout\(prev => prev \? \{\.\.\.prev, placement\}/.test(bibleViewSrc),
+      !/setCallout\(prev => prev \? \{\.\.\.prev, placement\}/.test(sectionReaderSrc),
       'unconditional { ...prev, placement } spread removed',
     );
     // The updater must route through reconcileCallout.
     assert.ok(
-      /setCallout\(prev => prev \? reconcileCallout\(/.test(bibleViewSrc),
+      /setCallout\(\s*\(?prev\)?\s*=>\s*\(?\s*prev\s*\?\s*reconcileCallout\(/.test(sectionReaderSrc),
       'setCallout updater uses reconcileCallout',
     );
   });
@@ -116,19 +116,19 @@ describe('BX.1R (2) BibleView source-contract loop guard', () => {
   it('resize path re-measures the live anchor element and never a stored hover-time rect', () => {
     // No placeFloatingCallout(callout.anchor, ...) — that would reuse the hover rect.
     assert.ok(
-      !/placeFloatingCallout\(callout\.anchor/.test(bibleViewSrc),
+      !/placeFloatingCallout\(callout\.anchor/.test(sectionReaderSrc),
       'no stored hover-time anchor fed to placeFloatingCallout',
     );
     // The live source element is captured via anchorElRef and re-measured.
-    assert.ok(/anchorElRef\.current/.test(bibleViewSrc), 'anchorElRef.current is read');
-    assert.ok(/getBoundingClientRect\(\)/.test(bibleViewSrc), 'live getBoundingClientRect call present');
+    assert.ok(/anchorElRef\.current/.test(sectionReaderSrc), 'anchorElRef.current is read');
+    assert.ok(/getBoundingClientRect\(\)/.test(sectionReaderSrc), 'live getBoundingClientRect call present');
   });
 
   it('a null/detached anchor element clears the callout', () => {
     // The detached-source guard exists and routes to setCallout(null).
-    assert.ok(/isConnected/.test(bibleViewSrc), 'detached guard uses isConnected');
+    assert.ok(/isConnected/.test(sectionReaderSrc), 'detached guard uses isConnected');
     assert.ok(
-      /!\s*anchorEl\b[\s\S]{0,120}setCallout\(null\)/.test(bibleViewSrc),
+      /!\s*anchorEl\b[\s\S]{0,120}setCallout\(null\)/.test(sectionReaderSrc),
       'null/detached anchorEl clears the callout',
     );
   });

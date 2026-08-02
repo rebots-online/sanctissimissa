@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sacred Scripture - St. Android's Missal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .parchment-texture {
+            background-color: #fdf8f6;
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+        }
+        .latin-wash { background-color: rgba(84, 62, 26, 0.075); }
+        .english-wash { background-color: rgba(84, 62, 26, 0.035); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#050300",
+                        "outline-variant": "#cfc5bb",
+                        "accent-purple": "#5d3a80",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#4d463c",
+                        "secondary-fixed-dim": "#cbc6b9",
+                        "primary-fixed": "#ede0d3",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#ece7e5",
+                        "on-surface": "#1d1b1a",
+                        "accent-rose": "#b76a7d",
+                        "on-primary-fixed": "#211b13",
+                        "vellum": "#fbf7ee",
+                        "on-background": "#1d1b1a",
+                        "tertiary-fixed-dim": "#f2bf53",
+                        "rubric": "#9c2733",
+                        "surface-tint": "#665d53",
+                        "dialogue-s": "#5d3a80",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#281b00",
+                        "surface-container-low": "#f8f3f0",
+                        "inverse-surface": "#32302f",
+                        "accent-green": "#3f7a52",
+                        "primary-fixed-dim": "#d0c5b8",
+                        "on-secondary-fixed": "#1d1c13",
+                        "surface": "#fdf8f6",
+                        "inverse-primary": "#d0c5b8",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#040200",
+                        "background": "#fdf8f6",
+                        "on-surface-variant": "#4c463f",
+                        "surface-bright": "#fdf8f6",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#49473d",
+                        "primary-container": "#221c14",
+                        "outline": "#7d766e",
+                        "line-catechumens": "#a97e13",
+                        "accent-white": "#a97e13",
+                        "on-tertiary-fixed": "#261900",
+                        "secondary-fixed": "#e8e2d4",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#ffdea2",
+                        "surface-variant": "#e6e1df",
+                        "surface-container": "#f2edeb",
+                        "inverse-on-surface": "#f5f0ee",
+                        "dialogue-p": "#9c2733",
+                        "on-tertiary-container": "#a97e13",
+                        "gold-bright": "#d4a017",
+                        "accent-red": "#9c2733",
+                        "ink-faint": "#8a7d6a",
+                        "secondary-container": "#e8e2d4",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#686459",
+                        "rail-bg": "#2b241b",
+                        "accent-black": "#33302b",
+                        "secondary": "#615e54",
+                        "surface-container-highest": "#e6e1df",
+                        "parchment-deep": "#ece2cc",
+                        "on-primary-container": "#8d8378",
+                        "ink-soft": "#4a4034",
+                        "rail-text": "#d9cdb8",
+                        "surface-dim": "#ded9d7",
+                        "on-tertiary-fixed-variant": "#5c4200",
+                        "line-faithful": "#7a1f2b",
+                        "on-secondary": "#ffffff",
+                        "line-office": "#274b69"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "rail-collapsed": "64px",
+                        "stack-gap": "16px",
+                        "rail-width": "232px",
+                        "margin-main": "32px"
+                    },
+                    "fontFamily": {
+                        "rail-link": ["Inter", "sans-serif"],
+                        "feast-title-mobile": ["Source Serif 4", "serif"],
+                        "ui-label": ["Inter", "sans-serif"],
+                        "liturgical-english": ["Source Serif 4", "serif"],
+                        "rubric-sm": ["Inter", "sans-serif"],
+                        "liturgical-latin": ["Source Serif 4", "serif"],
+                        "feast-title": ["Source Serif 4", "serif"]
+                    },
+                    "fontSize": {
+                        "rail-link": ["13px", { "lineHeight": "16px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+                        "feast-title-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "ui-label": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "liturgical-english": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "rubric-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "liturgical-latin": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "feast-title": ["32px", { "lineHeight": "40px", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-ui-label selection:bg-accent-white selection:text-white">
+<!-- SideNavBar (Rail) -->
+<aside class="w-rail-width h-full fixed left-0 top-0 bg-rail-bg border-r border-parchment-deep flex flex-col py-gutter z-50">
+<div class="px-6 mb-10">
+<h1 class="font-feast-title text-rail-link font-bold text-lg tracking-tight">St. Android's Missal</h1>
+<p class="text-rail-text opacity-60 text-[11px] uppercase tracking-widest mt-1">Sacred Parchment Edition</p>
+</div>
+<nav class="flex-1 space-y-1"><div class="px-6 mb-2"><p class="text-[10px] font-bold uppercase tracking-widest text-rail-text opacity-40">Liturgy</p></div><a class="flex items-center px-6 py-2.5 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors group" href="#"><span class="material-symbols-outlined mr-4" data-icon="menu_book">menu_book</span><span class="font-rail-link">Missal Reader</span></a><a class="flex items-center px-6 py-2.5 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors group" href="#"><span class="material-symbols-outlined mr-4" data-icon="auto_stories">auto_stories</span><span class="font-rail-link">Divine Office</span></a><a class="flex items-center px-6 py-2.5 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors group" href="#"><span class="material-symbols-outlined mr-4" data-icon="calendar_month">calendar_month</span><span class="font-rail-link">Calendar</span></a><div class="px-6 mt-6 mb-2"><p class="text-[10px] font-bold uppercase tracking-widest text-rail-text opacity-40">Study</p></div><a class="flex items-center px-6 py-2.5 text-accent-white font-bold border-l-4 border-accent-white bg-primary-container group" href="#"><span class="material-symbols-outlined mr-4" data-icon="menu_book">menu_book</span><span class="font-rail-link">Sacred Scripture</span></a><a class="flex items-center px-6 py-2.5 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors group" href="#"><span class="material-symbols-outlined mr-4" data-icon="edit_note">edit_note</span><span class="font-rail-link">Journal</span></a><a class="flex items-center px-6 py-2.5 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors group" href="#"><span class="material-symbols-outlined mr-4" data-icon="history_edu">history_edu</span><span class="font-rail-link">Homily Writer</span></a><div class="px-6 mt-6 mb-2"><p class="text-[10px] font-bold uppercase tracking-widest text-rail-text opacity-40">Tools</p></div><a class="flex items-center px-6 py-2.5 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors group" href="#"><span class="material-symbols-outlined mr-4" data-icon="map">map</span><span class="font-rail-link">Subway Map</span></a></nav>
+<div class="mt-auto pt-6 border-t border-white/5 space-y-1">
+<a class="flex items-center px-6 py-3 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="settings">settings</span>
+<span class="font-rail-link text-rail-link">Settings</span>
+</a>
+<a class="flex items-center px-6 py-3 text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined mr-4" data-icon="help">help</span>
+<span class="font-rail-link text-rail-link">Help</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-rail-width min-h-screen parchment-texture flex flex-col">
+<!-- Masthead -->
+<header class="pt-margin-main px-margin-main pb-4 bg-surface/40 backdrop-blur-sm sticky top-0 z-40">
+<div class="flex justify-between items-baseline">
+<div>
+<h2 class="font-feast-title text-feast-title text-primary tracking-tight">Sacred Scripture</h2>
+<p class="font-liturgical-english text-ink-soft italic text-lg mt-1">Genesis 1 <span class="mx-2 text-outline">•</span> July 2026</p>
+</div>
+<div class="flex gap-4">
+<button class="material-symbols-outlined text-ink-soft hover:text-primary transition-colors" data-icon="bookmark">bookmark</button>
+<button class="material-symbols-outlined text-ink-soft hover:text-primary transition-colors" data-icon="share">share</button>
+<button class="material-symbols-outlined text-ink-soft hover:text-primary transition-colors" data-icon="account_circle">account_circle</button>
+</div>
+</div>
+<hr class="mt-6 border-gold-bright border-t-2"/>
+</header>
+<!-- Toolbar / Breadcrumbs -->
+<div class="px-margin-main py-3 flex items-center justify-between bg-surface-container-low/50 border-b border-parchment-deep">
+<button class="flex items-center font-ui-label text-ink-soft hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg mr-1" data-icon="chevron_left">chevron_left</span>
+                Back to books
+            </button>
+<div class="flex items-center space-x-2 text-ui-label text-ink-faint">
+<span class="hover:text-primary cursor-pointer">Sacred Scripture</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="chevron_right">chevron_right</span>
+<span class="hover:text-primary cursor-pointer">Genesis</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="chevron_right">chevron_right</span>
+<span class="text-primary font-bold">Chapter 1</span>
+</div>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint text-lg" data-icon="search">search</span>
+<input class="bg-vellum border border-parchment-deep rounded-full pl-10 pr-4 py-1.5 text-sm focus:ring-1 focus:ring-gold-bright focus:border-gold-bright outline-none w-64 transition-all group-hover:border-outline" placeholder="Search the Vulgate..." type="text"/>
+</div>
+</div>
+<!-- content-container -->
+<div class="flex-1 flex max-w-[1500px] mx-auto w-full px-margin-main py-gutter gap-10">
+<!-- Bilingual Reader -->
+<article class="flex-1 max-w-4xl space-y-4">
+<!-- Verse 1 -->
+<div class="grid grid-cols-2 group hover:shadow-sm transition-shadow">
+<div class="latin-wash p-gutter border-r border-parchment-deep/40 font-liturgical-latin text-liturgical-latin leading-relaxed relative">
+<sup class="absolute left-3 top-6 font-rubric-sm text-ink-faint text-[11px]">1</sup>
+                        In princípio creávit Deus cælum et terram.
+                    </div>
+<div class="english-wash p-gutter font-liturgical-english text-liturgical-english leading-relaxed relative">
+<sup class="absolute left-3 top-6 font-rubric-sm text-ink-faint text-[11px]">1</sup>
+                        In the beginning God created heaven, and earth.
+                    </div>
+</div>
+<!-- Verse 2 -->
+<div class="grid grid-cols-2 group">
+<div class="latin-wash p-gutter border-r border-parchment-deep/40 font-liturgical-latin text-liturgical-latin leading-relaxed relative">
+<sup class="absolute left-3 top-6 font-rubric-sm text-ink-faint text-[11px]">2</sup>
+                        Terra autem erat inánis et vácua, et ténebræ erant super fáciem abyssi : et spíritus Dei ferebátur super aquas.
+                    </div>
+<div class="english-wash p-gutter font-liturgical-english text-liturgical-english leading-relaxed relative">
+<sup class="absolute left-3 top-6 font-rubric-sm text-ink-faint text-[11px]">2</sup>
+                        And the earth was void and empty, and darkness was upon the face of the deep; and the spirit of God moved over the waters.
+                    </div>
+</div>
+<!-- Verse 3 -->
+<div class="grid grid-cols-2 group">
+<div class="latin-wash p-gutter border-r border-parchment-deep/40 font-liturgical-latin text-liturgical-latin leading-relaxed relative">
+<sup class="absolute left-3 top-6 font-rubric-sm text-ink-faint text-[11px]">3</sup>
+                        Dixítque Deus : Fiat lux. Et facta est lux.
+                        <div class="mt-4 flex items-center gap-2 bg-gold-bright/10 text-gold-bright border border-gold-bright/20 px-3 py-1 rounded-full text-[12px] font-ui-label w-fit">
+<span class="material-symbols-outlined text-sm" data-icon="cross">replace_video</span>
+                            used at Sabbato Sancto — Prophetia I
+                        </div>
+</div>
+<div class="english-wash p-gutter font-liturgical-english text-liturgical-english leading-relaxed relative">
+<sup class="absolute left-3 top-6 font-rubric-sm text-ink-faint text-[11px]">3</sup>
+                        And God said: Be light made. And light was made.
+                    </div>
+</div>
+<!-- Verse 4 -->
+<div class="grid grid-cols-2 group">
+<div class="latin-wash p-gutter border-r border-parchment-deep/40 font-liturgical-latin text-liturgical-latin leading-relaxed relative">
+<sup class="absolute left-3 top-6 font-rubric-sm text-ink-faint text-[11px]">4</sup>
+                        Et vidit Deus lucem quod esset bona : et divísit lucem a ténebris.
+                    </div>
+<div class="english-wash p-gutter font-liturgical-english text-liturgical-english leading-relaxed relative">
+<sup class="absolute left-3 top-6 font-rubric-sm text-ink-faint text-[11px]">4</sup>
+                        And God saw the light that it was good; and he divided the light from the darkness.
+                    </div>
+</div>
+<!-- Verse 5 (Highlighted Deep Link) -->
+<div class="grid grid-cols-2 group ring-2 ring-accent-white/20 rounded-lg overflow-hidden bg-primary-container/5">
+<div class="p-gutter border-r border-parchment-deep/60 font-liturgical-latin text-liturgical-latin leading-relaxed relative bg-primary-fixed/30">
+<div class="absolute -left-1.5 top-8 w-3 h-3 bg-accent-white rotate-45 border border-white shadow-sm"></div>
+<sup class="absolute left-3 top-6 font-rubric-sm text-ink-faint text-[11px]">5</sup>
+                        Appellavítque lucem Diem, et ténebras Noctem : factúmque est véspere et mane, dies unus.
+                        <div class="mt-4 flex items-center gap-1.5 text-accent-white opacity-80 text-[11px] font-bold tracking-widest uppercase">
+<span class="material-symbols-outlined text-[14px]" data-icon="link">link</span>
+                            Linked Target
+                        </div>
+</div>
+<div class="p-gutter font-liturgical-english text-liturgical-english leading-relaxed relative bg-primary-fixed/20">
+<sup class="absolute left-3 top-6 font-rubric-sm text-ink-faint text-[11px]">5</sup>
+                        And he called the light Day, and the darkness Night; and there was evening and morning one day.
+                    </div>
+</div>
+<!-- Footer Nav Buttons -->
+<div class="pt-12 flex justify-between gap-6 pb-20">
+<button class="flex items-center px-8 py-5 bg-vellum border border-parchment-deep rounded-xl hover:bg-surface-container transition-all group shadow-sm flex-1 max-w-[300px]">
+<span class="material-symbols-outlined mr-4 text-gold-bright group-hover:-translate-x-1 transition-transform" data-icon="arrow_back">arrow_back</span>
+<div class="text-left">
+<p class="text-[10px] text-ink-faint uppercase tracking-widest font-bold">Previous Book</p>
+<p class="font-feast-title text-primary text-xl">The Apocalypse</p>
+</div>
+</button>
+<button class="flex items-center justify-between px-8 py-5 bg-vellum border border-parchment-deep rounded-xl hover:border-gold-bright transition-all group shadow-sm flex-1 max-w-[300px] text-right">
+<div class="text-right flex-1">
+<p class="text-[10px] text-ink-faint uppercase tracking-widest font-bold">Next Chapter</p>
+<p class="font-feast-title text-primary text-xl">Genesis 2</p>
+</div>
+<span class="material-symbols-outlined ml-4 text-gold-bright group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</article>
+<!-- Right Sidebar Navigation -->
+<aside class="w-[300px] flex-shrink-0">
+<div class="sticky top-[120px] bg-vellum border border-parchment-deep rounded-xl p-6 shadow-sm overflow-hidden">
+<!-- Segmented Toggle -->
+<div class="flex p-1 bg-surface-container rounded-lg mb-6 border border-parchment-deep">
+<button class="flex-1 py-2 text-[11px] font-bold uppercase tracking-wider rounded bg-white shadow-sm text-primary">Vetus</button>
+<button class="flex-1 py-2 text-[11px] font-bold uppercase tracking-wider text-ink-faint hover:text-primary transition-colors">Novum</button>
+</div>
+<h3 class="font-feast-title text-2xl text-primary mb-4 border-b border-parchment-deep pb-2">Genesis</h3>
+<div class="h-[500px] overflow-y-auto pr-2 scrollbar-hide">
+<div class="grid grid-cols-5 gap-2">
+<!-- Selected State -->
+<button class="aspect-square flex items-center justify-center rounded border-2 border-accent-white bg-primary-container text-white font-bold text-sm shadow-inner transition-all scale-105">1</button>
+<!-- Loop simulation of 49 more buttons -->
+<script>
+                                for(let i=2; i<=50; i++) {
+                                    document.write(`
+                                        <button class="aspect-square flex items-center justify-center rounded border border-parchment-deep bg-white hover:bg-gold-bright hover:text-white transition-all text-ink-soft text-sm font-medium">
+                                            ${i}
+                                        </button>
+                                    `);
+                                }
+                            </script>
+</div>
+</div>
+<!-- Sidebar Footer Decorative -->
+<div class="mt-6 pt-4 border-t border-parchment-deep flex items-center justify-between opacity-40 grayscale">
+<img class="w-12 h-12" data-alt="A small, ornate gold illumination graphic showing a dove representing the Holy Spirit in a minimalist woodcut style with religious symbolism, monochrome gold on cream." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZ3oZYZdUFI5Jb3W-1T8f7PXI1uGYungGmLYVJ0CcQQ_jcdxqfE1ktv9LBGTXLv_tYRD_UbbGCP9NW4kAhDlDZQ6mjHe_NuHTFessl8RHNnVY1gweJPcLJlFwFU2C_Yva6f6Kx6-lDswqjkP9zY-HA8SXdn2-5zmnLk8RApx_y10RJjiUnCJ-wBBLZ1ee5sWpyC0stJJV9-0lo-vorPLuYZVQcB3DYxxN8r8PQsowBc82a2Sve7bpq6GRJhlmDAI5nAscLMqhrwos"/>
+<span class="text-[10px] font-rubric-sm text-right">Liber Genesis<br/>Caput Primum</span>
+</div>
+</div>
+</aside>
+</div>
+<!-- Page Bottom Chrome -->
+<div class="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-4"><div class="bg-vellum/90 backdrop-blur-md border border-parchment-deep rounded-2xl shadow-xl p-4 w-64 transition-all hover:shadow-2xl group"><div class="flex items-center justify-between mb-3"><span class="text-[10px] font-bold uppercase tracking-widest text-ink-faint">Nearby Nodes</span><span class="material-symbols-outlined text-gold-bright text-sm">hub</span></div><div class="space-y-2"><div class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-container/10 cursor-pointer transition-colors"><div class="w-8 h-8 rounded bg-gold-bright/10 flex items-center justify-center text-gold-bright"><span class="material-symbols-outlined text-lg">menu_book</span></div><div><p class="text-[11px] font-bold text-primary">Exodus 1</p><p class="text-[9px] text-ink-faint">Next Book</p></div></div><div class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-container/10 cursor-pointer transition-colors"><div class="w-8 h-8 rounded bg-accent-purple/10 flex items-center justify-center text-accent-purple"><span class="material-symbols-outlined text-lg">history_edu</span></div><div><p class="text-[11px] font-bold text-primary">Creation Homily</p><p class="text-[9px] text-ink-faint">Related Journal</p></div></div></div><button class="w-full mt-3 py-2 bg-primary-container text-white text-[10px] font-bold uppercase tracking-widest rounded-lg hover:bg-primary transition-colors">Open ThinkingSpace</button></div></div><footer class="p-6 text-right mt-auto">
+<span class="text-[11px] font-rubric-sm text-ink-faint select-none">v1.26.53142 — Sacred Parchment Edition</span>
+</footer>
+</main>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Simple active state toggle simulation for demonstration
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => btn.classList.add('scale-95'));
+            btn.addEventListener('mouseup', () => btn.classList.remove('scale-95'));
+            btn.addEventListener('mouseleave', () => btn.classList.remove('scale-95'));
+        });
+
+        // Search highlight mock
+        const searchInput = document.querySelector('input');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('w-80');
+            searchInput.classList.add('w-80');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('w-80');
+            searchInput.classList.remove('w-80');
+        });
+    </script>
+</body></html>

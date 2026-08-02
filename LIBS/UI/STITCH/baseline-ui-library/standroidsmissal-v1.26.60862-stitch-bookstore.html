@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bookstore - St. Android's Missal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;1,8..60,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-variant": "#e6e1df",
+                      "on-tertiary": "#ffffff",
+                      "ink-faint": "#8a7d6a",
+                      "inverse-on-surface": "#f5f0ee",
+                      "dialogue-s": "#5d3a80",
+                      "inverse-primary": "#d0c5b8",
+                      "accent-white": "#a97e13",
+                      "on-primary-container": "#8d8378",
+                      "inverse-surface": "#32302f",
+                      "secondary-container": "#e8e2d4",
+                      "on-error": "#ffffff",
+                      "primary-container": "#221c14",
+                      "on-secondary-fixed-variant": "#49473d",
+                      "rail-bg": "#2b241b",
+                      "background": "#fdf8f6",
+                      "accent-green": "#3f7a52",
+                      "rubric": "#9c2733",
+                      "primary-fixed": "#ede0d3",
+                      "surface-container-low": "#f8f3f0",
+                      "accent-red": "#9c2733",
+                      "primary-fixed-dim": "#d0c5b8",
+                      "gold-bright": "#d4a017",
+                      "parchment-deep": "#ece2cc",
+                      "error-container": "#ffdad6",
+                      "on-primary-fixed-variant": "#4d463c",
+                      "secondary": "#615e54",
+                      "primary": "#040200",
+                      "accent-black": "#33302b",
+                      "dialogue-p": "#9c2733",
+                      "on-background": "#1d1b1a",
+                      "surface-container": "#f2edeb",
+                      "accent-rose": "#b76a7d",
+                      "secondary-fixed": "#e8e2d4",
+                      "tertiary-container": "#281b00",
+                      "surface-tint": "#665d53",
+                      "on-tertiary-container": "#a97e13",
+                      "surface-dim": "#ded9d7",
+                      "line-catechumens": "#a97e13",
+                      "error": "#ba1a1a",
+                      "on-secondary": "#ffffff",
+                      "surface": "#fdf8f6",
+                      "on-tertiary-fixed": "#261900",
+                      "outline-variant": "#cfc5bb",
+                      "on-secondary-container": "#686459",
+                      "surface-bright": "#fdf8f6",
+                      "secondary-fixed-dim": "#cbc6b9",
+                      "on-secondary-fixed": "#1d1c13",
+                      "tertiary-fixed": "#ffdea2",
+                      "outline": "#7d766e",
+                      "tertiary": "#050300",
+                      "ink-soft": "#4a4034",
+                      "line-faithful": "#7a1f2b",
+                      "on-error-container": "#93000a",
+                      "accent-purple": "#5d3a80",
+                      "line-office": "#274b69",
+                      "tertiary-fixed-dim": "#f2bf53",
+                      "vellum": "#fbf7ee",
+                      "rail-text": "#d9cdb8",
+                      "surface-container-highest": "#e6e1df",
+                      "on-primary-fixed": "#211b13",
+                      "on-tertiary-fixed-variant": "#5c4200",
+                      "on-primary": "#ffffff",
+                      "on-surface-variant": "#4c463f",
+                      "on-surface": "#1d1b1a",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-high": "#ece7e5"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin-main": "32px",
+                      "stack-gap": "16px",
+                      "rail-width": "232px",
+                      "margin-mobile": "16px",
+                      "rail-collapsed": "64px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "ui-label": [
+                              "Inter", "sans-serif"
+                      ],
+                      "rubric-sm": [
+                              "Inter", "sans-serif"
+                      ],
+                      "feast-title-mobile": [
+                              "Source Serif 4", "serif"
+                      ],
+                      "liturgical-english": [
+                              "Source Serif 4", "serif"
+                      ],
+                      "rail-link": [
+                              "Inter", "sans-serif"
+                      ],
+                      "feast-title": [
+                              "Source Serif 4", "serif"
+                      ],
+                      "liturgical-latin": [
+                              "Source Serif 4", "serif"
+                      ]
+              },
+              "fontSize": {
+                      "ui-label": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "rubric-sm": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "feast-title-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "liturgical-english": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "rail-link": [
+                              "13px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.03em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "feast-title": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "liturgical-latin": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        /* Texture Overlays */
+        .bg-texture-parchment {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+        
+        /* Book Cover Gradients */
+        .cover-gradient-1 { background: linear-gradient(135deg, #2b241b 0%, #1a1610 100%); }
+        .cover-gradient-2 { background: linear-gradient(135deg, #9c2733 0%, #5a171d 100%); }
+        .cover-gradient-3 { background: linear-gradient(135deg, #274b69 0%, #162a3b 100%); }
+        .cover-gradient-4 { background: linear-gradient(135deg, #3f7a52 0%, #23442d 100%); }
+
+        /* Subtle Emboss Effect */
+        .emboss-border {
+            box-shadow: inset 1px 1px 0px rgba(255,255,255,0.4), inset -1px -1px 0px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="h-full bg-background bg-texture-parchment flex text-on-background overflow-hidden antialiased">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col h-full py-gutter z-50 w-rail-width fixed left-0 top-0 bg-rail-bg border-r border-parchment-deep">
+<div class="px-gutter mb-8">
+<h1 class="font-feast-title text-rail-link font-bold text-rail-text">St. Android's Missal</h1>
+<p class="font-rubric-sm text-rubric-sm text-ink-faint mt-1">Sacred Parchment Edition</p>
+</div>
+<div class="flex-1 overflow-y-auto px-4 space-y-2">
+<!-- Navigation Items -->
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-rail-link text-rail-link">Subway Map</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-rail-link text-rail-link">Missal Reader</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-rail-link text-rail-link">Perpetual Calendar</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-rail-link text-rail-link">Divine Office</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded text-accent-white font-bold border-l-4 border-accent-white bg-primary-container" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-rail-link text-rail-link">Sacred Scripture</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-rail-link text-rail-link">Journal</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="font-rail-link text-rail-link">Homily Writer</span>
+</a>
+</div>
+<div class="mt-auto px-4 pt-4 border-t border-ink-soft/20 space-y-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-rail-link text-rail-link">Settings</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded text-rail-text opacity-80 hover:bg-primary-container hover:text-accent-white transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-rail-link text-rail-link">Help</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-rail-width h-full overflow-y-auto relative bg-background bg-texture-parchment">
+<!-- TopAppBar (Mobile Only) -->
+<header class="md:hidden flex justify-between items-center h-16 px-margin-mobile bg-surface dark:bg-surface-dim border-b border-gold-bright sticky top-0 z-40">
+<h1 class="font-feast-title-mobile text-feast-title-mobile text-primary dark:text-on-surface">St. Android's Missal</h1>
+<button class="text-primary dark:text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</header>
+<div class="max-w-[1200px] mx-auto px-margin-mobile md:px-margin-main py-8 md:py-12">
+<!-- Masthead -->
+<div class="mb-12 text-center md:text-left border-b border-gold-bright pb-6">
+<h2 class="font-feast-title text-feast-title text-accent-white mb-2">The Scriptural Archive</h2>
+<p class="font-liturgical-english text-liturgical-english text-ink-soft">Acquire sacred texts, commentaries, and liturgical studies to enrich your Missal.</p>
+</div>
+<!-- Categories / Filter -->
+<div class="flex flex-wrap gap-4 mb-8">
+<button class="px-6 py-2 bg-vellum border border-gold-bright text-accent-white font-ui-label text-ui-label rounded-full emboss-border shadow-sm">All Texts</button>
+<button class="px-6 py-2 bg-surface border border-parchment-deep text-ink-soft hover:bg-vellum hover:text-accent-white font-ui-label text-ui-label rounded-full transition-colors">Scripture</button>
+<button class="px-6 py-2 bg-surface border border-parchment-deep text-ink-soft hover:bg-vellum hover:text-accent-white font-ui-label text-ui-label rounded-full transition-colors">Commentary</button>
+<button class="px-6 py-2 bg-surface border border-parchment-deep text-ink-soft hover:bg-vellum hover:text-accent-white font-ui-label text-ui-label rounded-full transition-colors">Liturgical Studies</button>
+</div>
+<!-- Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-stack-gap">
+<!-- Featured Item: Haydock -->
+<div class="lg:col-span-2 bg-vellum border border-parchment-deep rounded-lg overflow-hidden flex flex-col md:flex-row group relative emboss-border">
+<div class="w-full md:w-2/5 min-h-[200px] cover-gradient-1 p-6 flex items-center justify-center relative overflow-hidden">
+<!-- Decorative Frame -->
+<div class="absolute inset-4 border border-gold-bright/30 rounded-sm"></div>
+<div class="absolute inset-5 border border-gold-bright/10 rounded-sm"></div>
+<div class="text-center z-10">
+<span class="material-symbols-outlined text-gold-bright text-5xl mb-2" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+<h3 class="font-feast-title-mobile text-feast-title-mobile text-on-tertiary">Haydock</h3>
+<p class="font-rubric-sm text-rubric-sm text-gold-bright mt-1">Douay-Rheims Commentary</p>
+</div>
+</div>
+<div class="p-6 md:p-8 flex flex-col justify-between w-full md:w-3/5 bg-vellum">
+<div>
+<div class="flex justify-between items-start mb-4">
+<span class="font-rubric-sm text-rubric-sm text-rubric uppercase tracking-wider">Commentary</span>
+<span class="px-3 py-1 bg-surface border border-parchment-deep text-ink-soft font-ui-label text-ui-label rounded-full shadow-sm">Free</span>
+</div>
+<h4 class="font-feast-title-mobile text-feast-title-mobile text-primary mb-3">Haydock Bible Commentary</h4>
+<p class="font-liturgical-english text-liturgical-english text-ink-soft mb-6 line-clamp-3">The comprehensive Catholic commentary on the Douay-Rheims Bible, compiled by Rev. George Leo Haydock. Essential for understanding the Patristic interpretation of Scripture.</p>
+</div>
+<button class="self-start px-6 py-2 bg-rail-bg text-rail-text font-ui-label text-ui-label rounded hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                            Acquire Text
+                        </button>
+</div>
+</div>
+<!-- Item: Catena Aurea -->
+<div class="bg-vellum border border-parchment-deep rounded-lg overflow-hidden flex flex-col group emboss-border">
+<div class="h-48 cover-gradient-2 p-6 flex items-center justify-center relative">
+<div class="absolute inset-3 border-2 border-dashed border-gold-bright/20 rounded-sm"></div>
+<div class="text-center z-10">
+<h3 class="font-feast-title-mobile text-feast-title-mobile text-on-tertiary">Catena Aurea</h3>
+<p class="font-rubric-sm text-rubric-sm text-gold-bright mt-1">St. Thomas Aquinas</p>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between bg-vellum">
+<div>
+<span class="font-rubric-sm text-rubric-sm text-rubric uppercase tracking-wider mb-2 block">Commentary</span>
+<h4 class="font-liturgical-latin text-liturgical-latin text-primary mb-2">Catena Aurea</h4>
+<p class="font-liturgical-english text-liturgical-english text-ink-soft text-sm mb-4 line-clamp-2">The Golden Chain: A commentary on the four Gospels collected out of the works of the Fathers.</p>
+</div>
+<div class="flex justify-between items-center mt-4">
+<span class="font-ui-label text-ui-label text-ink-soft">$4.99</span>
+<button class="px-4 py-2 bg-surface border border-gold-bright text-accent-white font-ui-label text-ui-label rounded hover:bg-vellum transition-colors">
+                                Acquire
+                            </button>
+</div>
+</div>
+</div>
+<!-- Item: Guéranger -->
+<div class="bg-vellum border border-parchment-deep rounded-lg overflow-hidden flex flex-col group emboss-border">
+<div class="h-48 cover-gradient-3 p-6 flex items-center justify-center relative">
+<div class="absolute inset-x-0 bottom-0 h-1 bg-gold-bright/50"></div>
+<div class="absolute inset-x-0 bottom-2 h-[1px] bg-gold-bright/30"></div>
+<div class="text-center z-10">
+<h3 class="font-feast-title-mobile text-feast-title-mobile text-on-tertiary text-center leading-tight">The Liturgical Year</h3>
+<p class="font-rubric-sm text-rubric-sm text-gold-bright mt-1">Dom Guéranger</p>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between bg-vellum">
+<div>
+<span class="font-rubric-sm text-rubric-sm text-rubric uppercase tracking-wider mb-2 block">Liturgical Studies</span>
+<h4 class="font-liturgical-latin text-liturgical-latin text-primary mb-2">L'Année Liturgique</h4>
+<p class="font-liturgical-english text-liturgical-english text-ink-soft text-sm mb-4 line-clamp-2">The monumental 15-volume work explaining the spiritual depths of the Church's calendar.</p>
+</div>
+<div class="flex justify-between items-center mt-4">
+<span class="font-ui-label text-ui-label text-ink-soft">$12.99</span>
+<button class="px-4 py-2 bg-surface border border-gold-bright text-accent-white font-ui-label text-ui-label rounded hover:bg-vellum transition-colors">
+                                Acquire
+                            </button>
+</div>
+</div>
+</div>
+<!-- Item: Summa -->
+<div class="bg-vellum border border-parchment-deep rounded-lg overflow-hidden flex flex-col group emboss-border">
+<div class="h-48 cover-gradient-4 p-6 flex items-center justify-center relative">
+<!-- Cross Motif -->
+<div class="absolute w-full h-[1px] bg-gold-bright/20"></div>
+<div class="absolute h-full w-[1px] bg-gold-bright/20"></div>
+<div class="text-center z-10 bg-[#23442d]/80 px-4 py-2 border border-gold-bright/30">
+<h3 class="font-feast-title-mobile text-feast-title-mobile text-on-tertiary">Summa</h3>
+<p class="font-rubric-sm text-rubric-sm text-gold-bright mt-1">Theologica</p>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between bg-vellum">
+<div>
+<span class="font-rubric-sm text-rubric-sm text-rubric uppercase tracking-wider mb-2 block">Theology</span>
+<h4 class="font-liturgical-latin text-liturgical-latin text-primary mb-2">Summa Theologica</h4>
+<p class="font-liturgical-english text-liturgical-english text-ink-soft text-sm mb-4 line-clamp-2">The masterwork of St. Thomas Aquinas, providing a comprehensive theological framework.</p>
+</div>
+<div class="flex justify-between items-center mt-4">
+<span class="font-ui-label text-ui-label text-ink-soft">$9.99</span>
+<button class="px-4 py-2 bg-surface border border-gold-bright text-accent-white font-ui-label text-ui-label rounded hover:bg-vellum transition-colors">
+                                Acquire
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ThinkSpace Inset Navigator (Bottom Right) -->
+<div class="fixed bottom-8 right-8 z-50">
+<button class="w-14 h-14 bg-rail-bg text-rail-text rounded-full shadow-[0_4px_12px_rgba(43,36,27,0.3)] flex items-center justify-center hover:bg-primary-container hover:-translate-y-1 transition-all border border-parchment-deep">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">explore</span>
+</button>
+</div>
+<!-- Footer -->
+<footer class="fixed bottom-4 right-4 flex gap-4 items-end z-40 md:right-28">
+<span class="font-rubric-sm text-rubric-sm text-ink-faint">v2.4.1 - Sacred Parchment</span>
+<a class="font-rubric-sm text-rubric-sm text-ink-faint hover:text-ink-soft transition-colors" href="#">Privacy</a>
+<a class="font-rubric-sm text-rubric-sm text-ink-faint hover:text-ink-soft transition-colors" href="#">Terms</a>
+</footer>
+</main>
+</body></html>
