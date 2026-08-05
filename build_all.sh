@@ -34,8 +34,17 @@ npm run build:vite
 "$TAURI" build --bundles deb,appimage --ci
 
 # Windows cross-compile: standalone PE + NSIS installer (MSI/MSIX deferred to a Windows host)
-"$TAURI" build --runner cargo-xwin --target x86_64-pc-windows-msvc --bundles nsis --ci
+NSIS_PROJ="src-tauri/target/x86_64-pc-windows-msvc/release/nsis/x64"
+if ! "$TAURI" build --runner cargo-xwin --target x86_64-pc-windows-msvc --bundles nsis --ci; then
+  # Upstream tauri-bundler defect: the apostrophe in the product name breaks
+  # the single-quoted COM parameter strings in the generated utils.nsh
+  # (NSISCOMCALL "requires 4 parameter(s), passed 7"). Requote the COM
+  # interface calls with backticks and run makensis (>= 3.11) directly.
+  sed -i '/${I[A-Za-z]*::/ s/'"'"'/`/g' "$NSIS_PROJ/utils.nsh"
+  (cd "$NSIS_PROJ" && makensis -INPUTCHARSET UTF8 installer.nsi)
+fi
 test -f src-tauri/target/x86_64-pc-windows-msvc/release/st-androids-missal.exe
+ls src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*_x64-setup.exe >/dev/null
 
 # Android: debug APK, then release APK + AAB with native symbols preserved
 "$TAURI" android build --debug --apk --ci
