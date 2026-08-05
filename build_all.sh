@@ -23,7 +23,7 @@ test -d node_modules || npm ci
 # The pre-build gate requires the stamp to be recorded source, so commit it.
 npm run stamp
 VERSION="$(tr -d '\r\n' < version.txt)"
-git add Package.appxmanifest version.txt version.json package.json package-lock.json src-tauri/tauri.conf.json src-tauri/Cargo.toml
+git add Package.appxmanifest version.txt version.json package.json package-lock.json src-tauri/tauri.conf.json src-tauri/Cargo.toml src-tauri/Cargo.lock
 git commit -m "v${VERSION}: stamp (build_all)"
 
 # Web/PWA surface (also the frontend embedded in every native shell)
