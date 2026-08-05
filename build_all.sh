@@ -22,6 +22,7 @@ test -d node_modules || npm ci
 # Automatic version bump — the stamper owns the version; never set it manually.
 # The pre-build gate requires the stamp to be recorded source, so commit it.
 npm run stamp
+(cd src-tauri && cargo update --workspace)
 VERSION="$(tr -d '\r\n' < version.txt)"
 git add Package.appxmanifest version.txt version.json package.json package-lock.json src-tauri/tauri.conf.json src-tauri/Cargo.toml src-tauri/Cargo.lock
 git commit -m "v${VERSION}: stamp (build_all)"
