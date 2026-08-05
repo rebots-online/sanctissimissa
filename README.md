@@ -63,6 +63,20 @@ npm run dev           # web dev server (port 5173)
 npm run tauri dev     # desktop shell
 ```
 
+## Build all
+
+```bash
+npm ci
+./build_all.sh
+```
+
+MSI/MSIX (Windows host only):
+
+```bash
+npm run build:windows:msi
+npm run build:windows:msix
+```
+
 ## Native builds
 
 ```bash
