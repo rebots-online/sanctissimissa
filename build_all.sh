@@ -42,6 +42,9 @@ if ! "$TAURI" build --runner cargo-xwin --target x86_64-pc-windows-msvc --bundle
   # interface calls with backticks and run makensis (>= 3.11) directly.
   sed -i '/${I[A-Za-z]*::/ s/'"'"'/`/g' "$NSIS_PROJ/utils.nsh"
   (cd "$NSIS_PROJ" && makensis -INPUTCHARSET UTF8 installer.nsi)
+  mkdir -p src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis
+  mv "$NSIS_PROJ/nsis-output.exe" \
+    "src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/St. Android's Missal_${VERSION}_x64-setup.exe"
 fi
 test -f src-tauri/target/x86_64-pc-windows-msvc/release/st-androids-missal.exe
 ls src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*_x64-setup.exe >/dev/null
