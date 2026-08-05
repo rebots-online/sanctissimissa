@@ -2,7 +2,7 @@
   "name": "st-androids-missal",
   "productName": "St. Android's Missal",
   "private": true,
-  "version": "1.30.66048",
+  "version": "1.31.66058",
   "type": "module",
   "description": "Traditional Latin Mass and Divine Office as a navigable subway map — graph + vector liturgical corpus, exegetical reader, perpetual calendar. Tauri 2 multiplatform.",
   "scripts": {
