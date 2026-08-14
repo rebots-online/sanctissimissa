@@ -38,6 +38,7 @@ import {
   addAnnotation,
   removeAnnotation,
   type Annotation,
+  type AnnotationRange,
 } from '../core/annotations/store.ts';
 import {
   alignSelection,
@@ -130,6 +131,8 @@ interface Menu {
   term: string;
   nodeKey: string | null;
   line: number | null;
+  /** Resolved exact range of the selection that opened this menu (absent for word-under-cursor). */
+  range?: { src: AnnotationRange; alt?: AnnotationRange };
 }
 
 /** Find the section node key containing the current selection anchor. */
@@ -156,6 +159,52 @@ function langOf(el: HTMLElement): 'latin' | 'english' | null {
   if (stamped === 'latin' || stamped === 'english') return stamped;
   if (el.closest('.latin')) return 'latin';
   if (el.closest('.english')) return 'english';
+  return null;
+}
+
+/**
+ * Resolve a DOM node to its `{nodeKey, line index, language, char-offset}`
+ * within the reader. Shared by the live drag-echo and the selection-range
+ * capture for highlights, so a saved highlight and a live echo use identical
+ * coordinates. `root` bounds the walk.
+ */
+function lineInfoAt(
+  root: HTMLElement | null,
+  node: Node | null,
+): { nodeKey: string; idx: number; lang: 'latin' | 'english' | null; start: number } | null {
+  let el: Node | null = node;
+  while (el && el !== root) {
+    if (el instanceof HTMLElement && el.dataset.line !== undefined) {
+      const sec = el.closest('section[data-nodekey]') as HTMLElement | null;
+      if (!sec?.dataset.nodekey) return null;
+      const lineEl = el.closest('span[data-line]') as HTMLElement | null;
+      if (!lineEl) return null;
+
+      // Character offset of the containing text node within the line.
+      let start = 0;
+      let current: Node | null = node;
+      while (current && current !== lineEl) {
+        if (current.nodeType === Node.TEXT_NODE) {
+          let pos = 0;
+          for (const sibling of Array.from(lineEl.childNodes)) {
+            if (sibling === current) break;
+            pos += (sibling.textContent ?? '').length;
+          }
+          start = pos;
+          break;
+        }
+        current = current.parentNode;
+      }
+
+      return {
+        nodeKey: sec.dataset.nodekey,
+        idx: Number(el.dataset.line),
+        lang: langOf(lineEl),
+        start,
+      };
+    }
+    el = el.parentNode;
+  }
   return null;
 }
 
@@ -355,45 +404,6 @@ export default function SectionReader({
    * single line the exact character range is aligned to its counterpart.
    */
   useEffect(() => {
-    const lineInfoAt = (
-      node: Node | null,
-    ): { nodeKey: string; idx: number; lang: 'latin' | 'english' | null; start: number } | null => {
-      let el: Node | null = node;
-      while (el && el !== root.current) {
-        if (el instanceof HTMLElement && el.dataset.line !== undefined) {
-          const sec = el.closest('section[data-nodekey]') as HTMLElement | null;
-          if (!sec?.dataset.nodekey) return null;
-          const lineEl = el.closest('span[data-line]') as HTMLElement | null;
-          if (!lineEl) return null;
-
-          // Character offset of the containing text node within the line.
-          let start = 0;
-          let current: Node | null = node;
-          while (current && current !== lineEl) {
-            if (current.nodeType === Node.TEXT_NODE) {
-              let pos = 0;
-              for (const sibling of Array.from(lineEl.childNodes)) {
-                if (sibling === current) break;
-                pos += (sibling.textContent ?? '').length;
-              }
-              start = pos;
-              break;
-            }
-            current = current.parentNode;
-          }
-
-          return {
-            nodeKey: sec.dataset.nodekey,
-            idx: Number(el.dataset.line),
-            lang: langOf(lineEl),
-            start,
-          };
-        }
-        el = el.parentNode;
-      }
-      return null;
-    };
-
     const onSel = () => {
       const sel = window.getSelection();
       if (!sel || sel.isCollapsed || sel.rangeCount === 0 || !root.current) {
@@ -401,8 +411,8 @@ export default function SectionReader({
         return;
       }
       const range = sel.getRangeAt(0);
-      const a = lineInfoAt(range.startContainer);
-      const f = lineInfoAt(range.endContainer);
+      const a = lineInfoAt(root.current, range.startContainer);
+      const f = lineInfoAt(root.current, range.endContainer);
 
       if (a && f && a.nodeKey === f.nodeKey && a.idx === f.idx && a.lang && a.lang === f.lang) {
         setEcho({ nodeKey: a.nodeKey, from: a.idx, to: a.idx });
@@ -452,13 +462,60 @@ export default function SectionReader({
     return null;
   };
 
-  const openMenuAt = (clientX: number, clientY: number, term: string, nodeKey: string | null, line: number | null) => {
+  /**
+   * Resolve the current selection to an exact source range plus its aligned
+   * counterpart, so a saved highlight anchors the one passage the user picked
+   * (not every identical word). Returns null for cross-line/cross-language or
+   * word-under-cursor selections, which fall back to content-string matching.
+   */
+  const resolveSelectionRange = useCallback((): { src: AnnotationRange; alt?: AnnotationRange } | null => {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || sel.rangeCount === 0 || !root.current) return null;
+    const range = sel.getRangeAt(0);
+    const a = lineInfoAt(root.current, range.startContainer);
+    const f = lineInfoAt(root.current, range.endContainer);
+    if (!a || !f || !a.lang || a.lang !== f.lang || a.nodeKey !== f.nodeKey || a.idx !== f.idx) return null;
+    const rawStart = range.startOffset + a.start;
+    const rawEnd = range.endOffset + f.start;
+    const src: AnnotationRange = {
+      lang: a.lang,
+      line: a.idx,
+      start: Math.min(rawStart, rawEnd),
+      end: Math.max(rawStart, rawEnd),
+    };
+    const sec = sectionFor(a.nodeKey);
+    if (sec) {
+      const aligned = alignPhrase(db, { latin: sec.latin, english: sec.english }, { srcLang: a.lang, idx: a.idx, start: src.start, end: src.end });
+      if (aligned?.dstLine) {
+        return {
+          src,
+          alt: {
+            lang: aligned.srcLang === 'latin' ? 'english' : 'latin',
+            line: aligned.idx,
+            start: aligned.dstStart,
+            end: aligned.dstEnd,
+          },
+        };
+      }
+    }
+    return { src };
+  }, [db, sectionFor]);
+
+  const openMenuAt = (
+    clientX: number,
+    clientY: number,
+    term: string,
+    nodeKey: string | null,
+    line: number | null,
+    range?: { src: AnnotationRange; alt?: AnnotationRange },
+  ) => {
     setMenu({
       x: Math.min(clientX, window.innerWidth - 270),
       y: Math.min(clientY + 6, window.innerHeight - 260),
       term: term.slice(0, 300),
       nodeKey,
       line,
+      range,
     });
   };
 
@@ -470,7 +527,7 @@ export default function SectionReader({
     const sel = window.getSelection()?.toString().trim() ?? '';
     if (sel.length > 0) {
       e.preventDefault();
-      openMenuAt(e.clientX, e.clientY, sel, nodeKeyFromSelection(root.current), selectedLine());
+      openMenuAt(e.clientX, e.clientY, sel, nodeKeyFromSelection(root.current), selectedLine(), resolveSelectionRange() ?? undefined);
       return;
     }
     const word = wordAtPoint(e.clientX, e.clientY);
@@ -529,6 +586,8 @@ export default function SectionReader({
       nodeKey: m.nodeKey,
       quote: m.term,
       quoteAlt: alignedAlt(m),
+      range: m.range?.src,
+      rangeAlt: m.range?.alt,
       note: '',
       color: 'gold',
     });
@@ -547,7 +606,7 @@ export default function SectionReader({
           const sel = window.getSelection()?.toString().trim();
           if (sel && sel.length > 1) {
             e.preventDefault();
-            openMenuAt(e.clientX, e.clientY, sel, nodeKeyFromSelection(root.current), selectedLine());
+            openMenuAt(e.clientX, e.clientY, sel, nodeKeyFromSelection(root.current), selectedLine(), resolveSelectionRange() ?? undefined);
           }
         }
       }}
@@ -588,8 +647,15 @@ export default function SectionReader({
         const keys = [s.nodeKey, ...(s.quoteKeys ?? [])];
         const anns = keys.flatMap((k) => annotationsFor(k));
         const highlights = keys.flatMap((k) => sidecar?.forAnchor(k) ?? []);
+        // Exact ranges anchor ranged annotations to the one selected passage.
+        const annMarks: AnnotationRange[] = anns.flatMap((a) =>
+          [a.range, a.rangeAlt].filter((r): r is AnnotationRange => Boolean(r)),
+        );
+        // Content-string matching only for sidecar highlights and rangeless
+        // annotations (legacy/fallback) — keeps ranged highlights from
+        // re-lighting every identical word.
         const quotes = [...new Set(
-          [...anns, ...highlights]
+          [...anns.filter((a) => !a.range), ...highlights]
             .flatMap((a) => [a.quote, a.quoteAlt])
             .filter((q): q is string => Boolean(q)),
         )];
@@ -627,6 +693,7 @@ export default function SectionReader({
                     echoLine={echoRange?.from}
                     echoTo={echoRange?.to}
                     selectionEcho={sectionEcho ?? undefined}
+                    marks={annMarks}
                   />
                 ) : (
                   <div className="bilingual">
@@ -639,6 +706,8 @@ export default function SectionReader({
                           echoLine={echoRange?.from}
                           echoTo={echoRange?.to}
                           selectionEcho={sectionEcho?.lang === 'latin' ? sectionEcho : undefined}
+                          lang="latin"
+                          marks={annMarks}
                         />
                       ) : (
                         <p style={{ opacity: 0.5 }}>—</p>
@@ -653,6 +722,8 @@ export default function SectionReader({
                           echoLine={echoRange?.from}
                           echoTo={echoRange?.to}
                           selectionEcho={sectionEcho?.lang === 'english' ? sectionEcho : undefined}
+                          lang="english"
+                          marks={annMarks}
                         />
                       ) : (
                         <p style={{ opacity: 0.5 }}>—</p>
@@ -761,6 +832,8 @@ export default function SectionReader({
                     nodeKey: noteFor.nodeKey,
                     quote: noteFor.term,
                     quoteAlt: alignedAlt(noteFor),
+                    range: noteFor.range?.src,
+                    rangeAlt: noteFor.range?.alt,
                     note: noteText,
                     color: 'gold',
                   });

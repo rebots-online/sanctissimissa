@@ -4,14 +4,33 @@
  * (annotations move server-side/SQLite without a model change).
  */
 
+/**
+ * Exact character range anchoring a highlight to ONE passage (not every
+ * identical word). Offsets are relative to the raw line text of the section
+ * (the same coordinate space the live drag-echo uses). Mirrors `SelectionEcho`
+ * but lives in core so the store owns it.
+ */
+export interface AnnotationRange {
+  lang: 'latin' | 'english';
+  /** Line index within the section (0-based, matches `data-line`). */
+  line: number;
+  /** Character offsets within that line's raw text (`end` exclusive). */
+  start: number;
+  end: number;
+}
+
 export interface Annotation {
   id: string;
   /** Section node key the annotation anchors to, e.g. "section:Tempora/Quad1-3#Introitus". */
   nodeKey: string;
-  /** Exact quoted text the user selected (anchor by content, not offsets). */
+  /** Selected text — kept for the annotation index and as a fallback display, no longer the render anchor. */
   quote: string;
-  /** Aligned counterpart line in the other language (line-level, from align.ts) — highlights both panes. */
+  /** Aligned counterpart line in the other language (line-level, from align.ts) — fallback when no `rangeAlt`. */
   quoteAlt?: string;
+  /** Exact source-language range — the authoritative render anchor (replaces content-string matching). */
+  range?: AnnotationRange;
+  /** Aligned counterpart range, so the highlight renders in both languages at the right span. */
+  rangeAlt?: AnnotationRange;
   note: string;
   color: 'gold' | 'rose' | 'sky' | 'moss';
   createdAt: string;
