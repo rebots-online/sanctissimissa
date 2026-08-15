@@ -226,3 +226,46 @@ DO renders the **Pater noster** at Matins/Prime/Compline on all four Phase-2 day
 | 2026-12-16 | Advent Ember feria | **Laudes2 not selected (D17 — inverted isFeria proven)** · Matins nocturn-3 split row · Compline ✓ (ferial row) · D6 Pater noster |
 
 Phase 2 likewise performed no remediation; it extends the enumeration. The four CRITICAL engine defects are now D1 (nocturn interleave), D2+D4+D5 (schema selection/row data), D3 (Benedictus number), D16 (lesson numbering), D17 (inverted isFeria) — with D17 and the vigil cases mapping directly onto the §11 P-V stanza as designed.
+
+---
+
+# Phase 3 — semantic exhaustiveness by codebase (AST) comparison
+
+**Method.** Both engines extracted at parse-tree level and aligned: DO's Perl engine (`horas.pl`, `horascommon.pl`, `specmatins.pl`, `specials.pl`) normalized via `B::Deparse` (opcode-tree-derived source) → **82 subs / 347 conditions**; our engine (`engine.ts`, `precedence.ts`, `liturgicalDay.ts`) via the TypeScript Compiler API walker (`tests/.tmp/diffprobe/ast/ts-ast.mjs`) → **53 functions / 175 conditions**. Per-hour structure compared data-layer to data-layer: DO's `horas/Ordinarium/{Hour}.txt` files vs our `office_skeletons` table. Artifacts: `tests/.tmp/diffprobe/ast/`.
+
+**Headline result.** Our `office_skeletons` table **is** DO's Ordinarium ingested verbatim — every `#Heading`, `$prayer`, `&macro`, and rubric-version gate (1960/1955/Monastica/Cisterciensis/altovadensis…) is present. The structural contract is therefore **provably complete at the data layer**; the exhaustiveness question reduces to the **set difference** {skeleton item-kinds} − {engine handlers}, which is enumerable without further day-sampling.
+
+## Set-difference findings (new)
+
+### D19 — MEDIUM/HIGH — Compline penitential block entirely absent
+DO's Compline ordinary (and our skeleton) carries `$Confiteor → $Misereatur → $Indulgentiam → $Converte nos` plus the `(rubrica 196) $rubrica examen`; DO renders them. Our engine renders none of it — Compline goes Lectio brevis → Psalmi → Hymnus → Nunc dimittis → Oratio → Conclusio with no confession block. Skeleton carries it; engine has no handler.
+
+### D20 — MEDIUM — Preces unimplemented (skeleton carries, engine drops)
+`#Preces Feriales` at Laudes/Vespera and the Preces block family at Prima/Completorium exist in the ordinary with their 1960 gates (feriales retained in 1960, dropped 1962 — our probe rubric is 1960, so they **should** render on eligible penitential days). Our engine has no Preces handler (its header comment self-declares "preces feriales beyond the skeleton's own conditionals" as carried-as-markers). Verifiable only in Advent/Lent/ember days — the 12-16 probe day would show it post-fix.
+
+### D21 — MEDIUM — Martyrologium at Prime absent
+The Prima ordinary carries the Martyrologium announcement (gated to non-Monastic — i.e., rendered under our rubric); DO renders the next-day martyrology preview at Prime. We render `De Officio Capituli` but no Martyrologium.
+
+### D22 — MEDIUM — Matins Absolutiones + per-lesson Benedictions absent
+DO's `specmatins.pl` machinery and vocabulary (`Absolutiones`, `Benedictio`) emit the absolution before each nocturn's lessons and the per-lesson blessings (Phase 1 saw "Benediction. May the Gospel's holy lection…"). Our engine self-declares this unimplemented (header comment); the corpus source exists (`Psalterium/Benedictions.txt`).
+
+### D23 — MEDIUM — Doxology/alleluia switching + hymn transposition absent
+DO vocabulary `Alleluia Duplex`, `Hymnus shifted`, `Hymnus merged`, and the `&Alleluia` Paschal gates — the seasonal doxology machinery (Paschal double-alleluia, hymn doxology variants on feasts). Our engine has none of it (header self-declaration again). Exercised only in Paschaltide/on doubles — outside both probes' seasons; enumerated here so the fix program owns it.
+
+## Controls that PASSED (gates correctly dropped)
+
+- **`#Suffragium`** — skeleton carries it gated `(sed rubrica 196 aut 1955 omitt…)` → correctly absent from our render under 1960 ✓.
+- **`&psalm(66)` at Laudes start** — Monastica-gated → correctly absent ✓.
+- **`$Fidelium animae` in Conclusio** — rendered (present in our Conclusio text) ✓.
+- **`(rubrica 1960) #De Officio Capituli`** — rendered ✓.
+
+## Engine-scale comparison summary
+
+| Surface | DO (Perl) | Ours (TS) | Delta concentration |
+|---|---|---|---|
+| Functions/subs | 82 | 53 | specials expansion, matins machinery, vigil logic |
+| Conditions | 347 | 175 | rubric-version gates (we defer to skeleton markers), vigil/transfer/Triduum branches |
+
+Unrepresented-in-either-finding residual: **Triduum machinery** (DO `triduum_gloria_omitted` etc. — both engines' probes excluded the Triduum; §11 scope), **transfers** (`kalendar_transfer` ingested, engine untested), and **Quicumque** (seasonal, untestable outside its Sundays). These are enumerated as known-unverified rather than silent.
+
+**Verdict.** With Phase 3, the divergence report is exhaustive at the feature level for the ordinary-driven hours: every DO capability is now either (a) implemented, (b) enumerated as a finding D1–D23, or (c) explicitly listed as season-gated-unverified (Triduum, Paschaltide, transfers, Quicumque). Day-sampling (the Phase-2-style sweep) remains the *acceptance test* for the fixes, not the discovery instrument — discovery is now complete by construction.
