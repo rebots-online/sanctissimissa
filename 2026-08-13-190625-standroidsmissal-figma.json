@@ -1,0 +1,759 @@
+{
+  "version": 1,
+  "format": "json",
+  "exportedAt": "2026-08-13T23:06:43.599Z",
+  "messageCount": 53,
+  "messages": [
+    {
+      "index": 0,
+      "sourceIndex": 18,
+      "type": "system",
+      "role": "system",
+      "content": [
+        {
+          "type": "text",
+          "text": "Kept model as \u001b[1mSetneufPT/Ornith-1.0-35B-MOE_Q4_110k_24GB-GPU:latest\u001b[22m"
+        }
+      ],
+      "subtype": "local_command",
+      "stream": "stdout",
+      "timestamp": "2026-08-13T22:50:40.110Z"
+    },
+    {
+      "index": 1,
+      "sourceIndex": 21,
+      "type": "system",
+      "role": "system",
+      "content": [
+        {
+          "type": "text",
+          "text": "Provider switched to Z.AI - GLM Coding Plan (glm-5.2[1m])"
+        }
+      ],
+      "subtype": "local_command",
+      "stream": "stdout",
+      "timestamp": "2026-08-13T22:50:46.180Z"
+    },
+    {
+      "index": 2,
+      "sourceIndex": 24,
+      "type": "system",
+      "role": "system",
+      "content": [
+        {
+          "type": "text",
+          "text": "Kept model as \u001b[1mglm-5.2[1m]\u001b[22m"
+        }
+      ],
+      "subtype": "local_command",
+      "stream": "stdout",
+      "timestamp": "2026-08-13T22:50:58.561Z"
+    },
+    {
+      "index": 3,
+      "sourceIndex": 33,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "The `hf-mem` skill is loaded — it estimates inference memory (weights + optional KV cache) for Hugging Face Hub models via HTTP Range requests (no local download).\n\nWhich model do you want me to estimate? Provide either:\n- A HF model ID (e.g. `mistralai/Mistral-7B-v0.1`), or\n- A HF URL\n\nAnd let me know if you want the `--experimental` KV cache estimate (useful for LLMs/VLMs), plus any overrides for context window (`--max-model-len`), batch size, or KV cache dtype. For GGUF repos with multiple quants, also specify the target file/quant (e.g. `Q4_K_M`)."
+        }
+      ],
+      "timestamp": "2026-08-13T22:51:24.351Z"
+    },
+    {
+      "index": 4,
+      "sourceIndex": 39,
+      "type": "system",
+      "role": "system",
+      "content": [
+        {
+          "type": "text",
+          "text": "[Cache: read=64 created=0 hit=0%]"
+        }
+      ],
+      "subtype": "informational",
+      "timestamp": "2026-08-13T22:51:24.453Z"
+    },
+    {
+      "index": 5,
+      "sourceIndex": 45,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "Superpowers framework loaded. Skills-first discipline is active: I'll check for applicable skills before any response or action (including clarifying questions), announce which skill I'm using, and follow it exactly.\n\nReady for your task."
+        }
+      ],
+      "timestamp": "2026-08-13T22:52:06.390Z"
+    },
+    {
+      "index": 6,
+      "sourceIndex": 51,
+      "type": "system",
+      "role": "system",
+      "content": [
+        {
+          "type": "text",
+          "text": "[Cache: read=37.9k created=0 hit=97%]"
+        }
+      ],
+      "subtype": "informational",
+      "timestamp": "2026-08-13T22:52:06.443Z"
+    },
+    {
+      "index": 7,
+      "sourceIndex": 57,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "The `figma-design-to-code` skill is loaded. To implement a design, I need from you:\n\n1. **A Figma URL with a `node-id`** — copy the link from a specific frame/selection (not a file-only URL). I can't guess or pass an empty node.\n2. **Target surface** — which part of the codebase this maps to. For this repo that's likely one of `src/ui/` (`SubwayMap`, `ReaderView`, `MeaningPanel`, `CalendarView`, `OfficeView`) or the `src/App.tsx` shell, unless you want something new.\n\nOnce you send the URL, I'll call `get_design_context` on that node, then adapt the returned reference (React + Tailwind) to this project's actual stack: React 18 + Vite, plain CSS (no Tailwind), and the existing component patterns in `src/ui/`. I'll reuse existing components and tokens rather than generating fresh equivalents.\n\nSend the Figma link and the target surface."
+        }
+      ],
+      "timestamp": "2026-08-13T22:52:41.857Z"
+    },
+    {
+      "index": 8,
+      "sourceIndex": 63,
+      "type": "system",
+      "role": "system",
+      "content": [
+        {
+          "type": "text",
+          "text": "[Cache: read=38.8k created=0 hit=97%]"
+        }
+      ],
+      "subtype": "informational",
+      "timestamp": "2026-08-13T22:52:41.931Z"
+    },
+    {
+      "index": 9,
+      "sourceIndex": 64,
+      "type": "user",
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "How can we operate in reverse--from codebase to figma to work on?"
+        }
+      ],
+      "timestamp": "2026-08-13T22:53:07.639Z"
+    },
+    {
+      "index": 10,
+      "sourceIndex": 67,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "For code → Figma (the reverse direction), the dedicated skill is **`figma:figma-generate-design`** — it builds or updates a design *in* Figma from code. The skill I just loaded explicitly defers to it for that direction.\n\nTo run it I'd need from you:\n\n1. **Target code** — which part of the repo to port into Figma. For this project that's typically a `src/ui/` surface (`SubwayMap`, `ReaderView`, `MeaningPanel`, `CalendarView`, `OfficeView`) or the `src/App.tsx` shell.\n2. **Destination in Figma** — a file key (and optionally a parent node / page where the new design should land), or permission to create a new file.\n3. **Fidelity intent** — is this a faithful pixel-port (colors, layout, type) to seed a design file, or a structural wireframe for review? The skill handles both differently.\n\nOnce you name the target surface and destination, I'll invoke `figma-generate-design` and follow its workflow (it owns the write-TO-Figma mechanics — MCP calls, layout rules, token mapping).\n\nWhich surface, and where should it land in Figma?"
+        }
+      ],
+      "timestamp": "2026-08-13T22:53:23.592Z"
+    },
+    {
+      "index": 11,
+      "sourceIndex": 73,
+      "type": "system",
+      "role": "system",
+      "content": [
+        {
+          "type": "text",
+          "text": "[Cache: read=40.1k created=0 hit=99%]"
+        }
+      ],
+      "subtype": "informational",
+      "timestamp": "2026-08-13T22:53:23.680Z"
+    },
+    {
+      "index": 12,
+      "sourceIndex": 74,
+      "type": "user",
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Can you create the folder/project/whatever nomenclature figma uses and then create working figmae for all screens?"
+        }
+      ],
+      "timestamp": "2026-08-13T22:54:07.283Z"
+    },
+    {
+      "index": 13,
+      "sourceIndex": 77,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "This is the code → Figma direction, which the skill I loaded defers to **`figma:figma-generate-design`**. And since you also want a new file created, **`figma:figma-create-new-file`** is in play. Let me load the primary skill before doing anything."
+        }
+      ],
+      "timestamp": "2026-08-13T22:54:29.874Z"
+    },
+    {
+      "index": 14,
+      "sourceIndex": 78,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "tool_use",
+          "id": "call_cd4de39ecf914d9f973960e2",
+          "name": "Skill",
+          "input": {
+            "skill": "figma:figma-generate-design"
+          }
+        }
+      ],
+      "timestamp": "2026-08-13T22:54:29.875Z"
+    },
+    {
+      "index": 15,
+      "sourceIndex": 81,
+      "type": "tool",
+      "role": "tool",
+      "content": [
+        {
+          "type": "tool_result",
+          "toolUseId": "call_cd4de39ecf914d9f973960e2",
+          "content": "Launching skill: figma:figma-generate-design"
+        }
+      ],
+      "timestamp": "2026-08-13T22:54:29.938Z"
+    },
+    {
+      "index": 16,
+      "sourceIndex": 89,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "Before diving in, I need to verify the Figma MCP tooling is actually wired up in this environment, load the mandatory companion skill, and understand the screens I'd be porting. Let me do that discovery in parallel.\n\nA key reality I'm already flagging: this project is **code-first with no existing Figma design system** — the `figma-generate-design` skill is built around reusing published components/variables/styles, which don't exist here yet. So the realistic path is `generate_figma_design` (pixel-perfect capture of the running web app) as the primary deliverable, with `use_figma` primitive-builds as a secondary option. Let me confirm the tools exist first."
+        }
+      ],
+      "timestamp": "2026-08-13T22:55:04.650Z"
+    },
+    {
+      "index": 17,
+      "sourceIndex": 90,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "tool_use",
+          "id": "call_793c5237c02940a9afad5c01",
+          "name": "ToolSearch",
+          "input": {
+            "max_results": 15,
+            "query": "figma use_figma create_new_file generate_figma_design get_design_context"
+          }
+        }
+      ],
+      "timestamp": "2026-08-13T22:55:04.650Z"
+    },
+    {
+      "index": 18,
+      "sourceIndex": 91,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "tool_use",
+          "id": "call_b15d479c1e224b7199b44d92",
+          "name": "Skill",
+          "input": {
+            "skill": "figma:figma-use"
+          }
+        }
+      ],
+      "timestamp": "2026-08-13T22:55:04.650Z"
+    },
+    {
+      "index": 19,
+      "sourceIndex": 94,
+      "type": "tool",
+      "role": "tool",
+      "content": [
+        {
+          "type": "tool_result",
+          "toolUseId": "call_793c5237c02940a9afad5c01",
+          "content": [
+            {
+              "type": "tool_reference",
+              "tool_name": "mcp__plugin_figma_figma__authenticate"
+            }
+          ]
+        }
+      ],
+      "timestamp": "2026-08-13T22:55:04.729Z"
+    },
+    {
+      "index": 20,
+      "sourceIndex": 101,
+      "type": "tool",
+      "role": "tool",
+      "content": [
+        {
+          "type": "tool_result",
+          "toolUseId": "call_b15d479c1e224b7199b44d92",
+          "content": "Launching skill: figma:figma-use"
+        }
+      ],
+      "timestamp": "2026-08-13T22:55:04.873Z"
+    },
+    {
+      "index": 21,
+      "sourceIndex": 109,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "Two skills loaded (`figma-use` rules + `figma-generate-design` workflow). Let me enumerate the actual screens in this repo so my proposal is concrete."
+        }
+      ],
+      "timestamp": "2026-08-13T22:55:19.479Z"
+    },
+    {
+      "index": 22,
+      "sourceIndex": 110,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "tool_use",
+          "id": "call_93fc73162c3a431f847c699a",
+          "name": "Glob",
+          "input": {
+            "pattern": "src/ui/**/*.tsx"
+          }
+        }
+      ],
+      "timestamp": "2026-08-13T22:55:19.479Z"
+    },
+    {
+      "index": 23,
+      "sourceIndex": 111,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "tool_use",
+          "id": "call_6b0a629396054be3bff8063e",
+          "name": "Glob",
+          "input": {
+            "pattern": "src/**/*.css"
+          }
+        }
+      ],
+      "timestamp": "2026-08-13T22:55:19.479Z"
+    },
+    {
+      "index": 24,
+      "sourceIndex": 115,
+      "type": "tool",
+      "role": "tool",
+      "content": [
+        {
+          "type": "tool_result",
+          "toolUseId": "call_93fc73162c3a431f847c699a",
+          "content": "src/ui/AboutView.tsx\nsrc/ui/AccompanimentEditor.tsx\nsrc/ui/BibleView.tsx\nsrc/ui/BilingualText.tsx\nsrc/ui/CalendarView.tsx\nsrc/ui/HomilyPlanner.tsx\nsrc/ui/JournalSidecar.tsx\nsrc/ui/JournalView.tsx\nsrc/ui/MapFlyout.tsx\nsrc/ui/MapStrip.tsx\nsrc/ui/MeaningPanel.tsx\nsrc/ui/OfficeView.tsx\nsrc/ui/ReaderView.tsx\nsrc/ui/ResizableInspectorLayout.tsx\nsrc/ui/ResultSnippet.tsx\nsrc/ui/ScriptureAtlas.tsx\nsrc/ui/SectionReader.tsx\nsrc/ui/SettingsView.tsx\nsrc/ui/SimilarityGlyph.tsx\nsrc/ui/SubwayMap.tsx\nsrc/ui/ThemePicker.tsx\nsrc/ui/TrayPanel.tsx"
+        }
+      ],
+      "timestamp": "2026-08-13T22:55:19.769Z"
+    },
+    {
+      "index": 25,
+      "sourceIndex": 123,
+      "type": "tool",
+      "role": "tool",
+      "content": [
+        {
+          "type": "tool_result",
+          "toolUseId": "call_6b0a629396054be3bff8063e",
+          "content": "src/styles.css"
+        }
+      ],
+      "timestamp": "2026-08-13T22:55:19.770Z"
+    },
+    {
+      "index": 26,
+      "sourceIndex": 132,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "Before any Figma work, the MCP server needs you to authenticate. Let me kick off the OAuth flow, and while that's pending I'll lay out the real decisions here, because this is a big task with genuine trade-offs."
+        }
+      ],
+      "timestamp": "2026-08-13T22:55:42.267Z"
+    },
+    {
+      "index": 27,
+      "sourceIndex": 133,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "tool_use",
+          "id": "call_dda6bceaa6a04d44845d00c1",
+          "name": "mcp__plugin_figma_figma__authenticate",
+          "input": {}
+        }
+      ],
+      "timestamp": "2026-08-13T22:55:42.267Z"
+    },
+    {
+      "index": 28,
+      "sourceIndex": 136,
+      "type": "tool",
+      "role": "tool",
+      "content": [
+        {
+          "type": "tool_result",
+          "toolUseId": "call_dda6bceaa6a04d44845d00c1",
+          "content": "Ask the user to open this URL in their browser to authorize the plugin:figma:figma MCP server:\n\nhttps://www.figma.com/oauth/mcp?response_type=code&client_id=4WqQYIRCPEIUhSfzoOKHk9&code_challenge=nug85d9Gt-hQ5PXKIouncjp7mWofjTHDExZQDlnixfU&code_challenge_method=S256&redirect_uri=http%3A%2F%2Flocalhost%3A53706%2Fcallback&state=XORPQhEJqu8L3fkW-rQ9IsbZD09RpWa2Ly5zwa_V9IE&scope=mcp%3Aconnect&resource=https%3A%2F%2Fmcp.figma.com%2Fmcp\n\nOnce they complete the flow, the server's tools will become available automatically."
+        }
+      ],
+      "timestamp": "2026-08-13T22:55:43.851Z"
+    },
+    {
+      "index": 29,
+      "sourceIndex": 142,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "Authentication is needed. **Open this URL in your browser to authorize the Figma MCP:**\n\nhttps://www.figma.com/oauth/mcp?response_type=code&client_id=4WqQYIRCPEIUhSfzoOKHk9&code_challenge=nug85d9Gt-hQ5PXKIouncjp7mWofjTHDExZQDlnixfU&code_challenge_method=S256&redirect_uri=http%3A%2F%2Flocalhost%3A53706%2Fcallback&state=XORPQhEJqu8L3fkW-rQ9IsbZD09RpWa2Ly5zwa_V9IE&scope=mcp%3Aconnect&resource=https%3A%2F%2Fmcp.figma.com%2Fmcp\n\nWhile that's pending, let me confirm the authoritative set of top-level screens (the rail-nav targets) so my scope proposal is accurate, rather than guessing from 22 files of mixed screens and sub-components."
+        }
+      ],
+      "timestamp": "2026-08-13T22:56:04.105Z"
+    },
+    {
+      "index": 30,
+      "sourceIndex": 143,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "tool_use",
+          "id": "call_d0214ecfd17d4f63a44989c3",
+          "name": "Grep",
+          "input": {
+            "-n": true,
+            "head_limit": 60,
+            "output_mode": "content",
+            "path": "src/App.tsx",
+            "pattern": "(View|Panel|Map|Reader|Office|Calendar|Journal|Bible|Homily|Atlas|Settings|About|Accompaniment)"
+          }
+        }
+      ],
+      "timestamp": "2026-08-13T22:56:04.106Z"
+    },
+    {
+      "index": 31,
+      "sourceIndex": 146,
+      "type": "tool",
+      "role": "tool",
+      "content": [
+        {
+          "type": "tool_result",
+          "toolUseId": "call_d0214ecfd17d4f63a44989c3",
+          "content": "9:import SubwayMap from './ui/SubwayMap.tsx';\n10:import MapStrip from './ui/MapStrip.tsx';\n11:import ReaderView, { type SelectionAction } from './ui/ReaderView.tsx';\n12:import MeaningPanel from './ui/MeaningPanel.tsx';\n13:import CalendarView from './ui/CalendarView.tsx';\n14:import OfficeView from './ui/OfficeView.tsx';\n15:import BibleView from './ui/BibleView.tsx';\n18:import JournalSidecar from './ui/JournalSidecar.tsx';\n19:import JournalView from './ui/JournalView.tsx';\n20:import HomilyPlanner from './ui/HomilyPlanner.tsx';\n21:import SettingsView from './ui/SettingsView.tsx';\n22:import AboutView from './ui/AboutView.tsx';\n24:import TrayPanel from './ui/TrayPanel.tsx';\n27:type View = 'map' | 'reader' | 'calendar' | 'office' | 'bible' | 'journal' | 'homily' | 'settings' | 'about';\n29:const NAV: { id: View; ico: string; label: string }[] = [\n30:  { id: 'map', ico: '🚇', label: 'Subway Map' },\n31:  { id: 'reader', ico: '📖', label: 'Missal Reader' },\n32:  { id: 'calendar', ico: '📅', label: 'Perpetual Calendar' },\n33:  { id: 'office', ico: '🕰', label: 'Divine Office' },\n35:  { id: 'journal', ico: '✎', label: 'Journal' },\n36:  { id: 'homily', ico: '✍', label: 'Homily Writer' },\n39:const UTIL_NAV: { id: View; ico: string; label: string }[] = [\n40:  { id: 'settings', ico: '⚙', label: 'Settings' },\n41:  { id: 'about', ico: 'ℹ', label: 'Help · About' },\n47:  const [view, setView] = useState<View>('map');\n74:  const [officeHour, setOfficeHour] = useState('laudes');\n75:  // Bible deep-link focus (\"Gen/1/5\"); nonce bumps so re-navigating re-scrolls.\n76:  const [bibleFocus, setBibleFocus] = useState<{ ref: string | null; nonce: number }>({ ref: null, nonce: 0 });\n101:      setBibleFocus({ ref: link.verseRef, nonce: Date.now() });\n102:      setView('bible');\n105:      setView('reader');\n111:      setView('journal');\n125:      const st = (e.state as { view?: View; panel?: boolean } | null) ?? { view: 'map', panel: false };\n127:      setView((st.view as View) ?? 'map');\n167:    setView('reader');\n170:  // Reader scroll-spy → strip marker. Stable identity so the reader's\n178:    // Bible verse hit (concordance/vector results now span scripture):\n182:      setBibleFocus({ ref: verse[1], nonce: Date.now() });\n183:      setView('bible');\n202:      // Office reference: open the office view at the hour the section names.\n213:      setOfficeHour(hourOf.find(([re]) => re.test(section))?.[1] ?? 'laudes');\n214:      setView('office');\n223:    setView('reader');\n279:            onClick={() => setView(n.id)}\n290:            onClick={() => setView(n.id)}\n356:          <MapStrip\n363:            onHour={setOfficeHour}\n373:                  <SubwayMap db={db} day={day} onStation={onStation} />\n377:                <ReaderView\n389:                <CalendarView db={db} selected={date} onPick={(iso) => { setDate(iso); setView('reader'); setFocus({ section: null, nonce: 0 }); }} />\n392:                <OfficeView\n396:                  onHour={setOfficeHour}\n403:                <BibleView\n414:                <JournalView\n427:                <HomilyPlanner db={db} sidecar={sidecar} day={day} />\n432:              {view === 'settings' && <SettingsView sidecar={sidecar} />}\n433:              {view === 'about' && <AboutView />}\n438:              <MeaningPanel db={db} action={action} onClose={() => history.back()} onOpenKey={onOpenKey} />\n440:              <JournalSidecar db={db} sidecar={sidecar} capture={capture} day={day} onClose={() => setCapture(null)} onOpenKey={onOpenKey} />\n447:        <TrayPanel sidecar={sidecar} open={trayOpen} onToggle={() => setTrayOpen((o) => !o)} />"
+        }
+      ],
+      "timestamp": "2026-08-13T22:56:04.232Z"
+    },
+    {
+      "index": 32,
+      "sourceIndex": 154,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "I have the authoritative screen list now. Before I create anything in Figma, I need you to **complete the auth flow** (URL above), and I need your call on one big decision that shapes everything.\n\n`★ Insight ─────────────────────────────────────`\n- This is a **code-first repo with no Figma design system** — there are no published Figma components, variables, or styles to reuse. `styles.css` is one global stylesheet; the 22 files in `src/ui/` are React components, not design tokens.\n- The app has **9 rail-nav screens** (`App.tsx:27`): `map`, `reader`, `calendar`, `office`, `bible`, `journal`, `homily`, `settings`, `about` — plus 3 overlays (`MeaningPanel`, `JournalSidecar`, `TrayPanel`).\n- `SubwayMap` is an SVG mass-map — faithfully reproducing it primitive-by-primitive in Figma is impractical; it must be captured, not rebuilt.\n`─────────────────────────────────────────────────`\n\n## The decision: how \"working\" should the Figma frames be?\n\nThere are three paths, and they differ enormously in effort and editability:\n\n| Path | What you get | Effort | Editable in Figma? |\n|------|--------------|--------|--------------------|\n| **A. Capture** (`generate_figma_design`) | Pixel-perfect frame per screen, rasterized from the running dev server | Low (1 capture/screen) | No — flat image layers |\n| **B. Rebuild** (`use_figma` primitives) | Editable frames built from text/rectangles/auto-layout, reading the React+CSS | Very high (9 complex screens, no design system to anchor to) | Yes, but hardcoded values |\n| **C. Hybrid** (skill's default) | Capture for layout truth + editable rebuild matched to it | Highest | Yes |\n\n**My recommendation: Path A (capture) as the deliverable.** It's the honest fit for a code-first project. You get a real Figma file with all screens as pixel-perfect frames — sharable, annotatable, usable for review — without pretending a design system exists. The `figma-generate-design` skill itself says the hybrid workflow is mandatory only when you then plan to iterate in Figma, which requires a design system to tie instances to.\n\nPath B/C would mean hand-authoring ~9 screens worth of hardcoded frames with no tokens to bind to — the skill explicitly calls hardcoded hex/pixels an anti-pattern, and the SVG subway map defeats it entirely.\n\n## What I need from you\n\n1. **Complete auth** at the URL above — nothing works until you do.\n2. **Pick a path** (A / B / C). I recommend **A**.\n3. **Confirm the dev server capture is OK** — Path A requires running `npm run dev` (port 5173) so the capture tool can hit each route. Note: the app shell is a single-page state-machine (`view` state in `App.tsx:47`), not URL routes — so I'll need to drive each screen via the UI, which makes capture meaningfully harder (the tool navigates by URL). This is a real wrinkle; I'll need to plan around it.\n4. **File name** — propose *\"St. Android's Missal — Screens\"*. OK?\n5. **Scope** — all 9 + 3 overlays, or a subset?\n\nOnce you auth and confirm, I'll create the file and start. Which path?"
+        }
+      ],
+      "timestamp": "2026-08-13T22:56:34.941Z"
+    },
+    {
+      "index": 33,
+      "sourceIndex": 161,
+      "type": "system",
+      "role": "system",
+      "content": [
+        {
+          "type": "text",
+          "text": "[Cache: read=261.9k created=0 hit=82%]"
+        }
+      ],
+      "subtype": "informational",
+      "timestamp": "2026-08-13T22:56:35.082Z"
+    },
+    {
+      "index": 34,
+      "sourceIndex": 162,
+      "type": "user",
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "sounds like B but is that effort on this end or figma's end? A sounds not useful unless figma can natively work with the elements inferred 100% accurately from a raster, even if theyre nonstandardized"
+        }
+      ],
+      "timestamp": "2026-08-13T23:00:22.843Z"
+    },
+    {
+      "index": 35,
+      "sourceIndex": 164,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "Good question, and it exposes a misconception I should clear up before you commit.\n\n## How A actually works (and why it's NOT raster OCR)\n\n`generate_figma_design` does **not** infer elements from a raster. It runs a headless browser against the live web app, reads the actual rendered **DOM + computed styles**, and produces native Figma nodes — real TEXT layers, real FRAME/RECTANGLE vector layers, real auto-layout — by translating the DOM into Figma's node tree. Each `<div>` becomes a frame, each text node a TEXT layer, CSS colors/spacing map to paint/layout properties. It's a structural translation, not pixel-guessing.\n\nSo in Figma terms, Path A's output **is** natively editable — you can select the text, recolor a rectangle, move a frame. What it is **not** is *semantically structured*: a Figma \"card\" isn't a reusable Component, colors aren't bound to Variables, the 5 nav buttons are 5 independent instances rather than 1 component × 5. It's a flattened interpretation of one render.\n\n## What \"editable\" really means across the three\n\n| | A. Capture | B. Rebuild |\n|---|---|---|\n| Text editable | ✅ | ✅ |\n| Colors/layout editable | ✅ | ✅ |\n| Bound to design tokens | ❌ hardcoded hex | ❌ hardcoded hex (no DS exists) |\n| Reusable components (Button, Card, NavItem) | ❌ flat | ✅ if I componentize |\n| Faithful to real layout | ✅ pixel-exact | ⚠️ my reconstruction |\n\n**The effort in B is on *this* end (me), not Figma.** And it's high because:\n- 9 screens × hand-authoring each layout from React+CSS reading,\n- the SVG `SubwayMap` and `ScriptureAtlas` are vector-dense — I'd be reconstructing SVG paths the skill says *never* to hand-draw,\n- with **no design system in the file**, B's \"tokens/components\" benefit is hollow — there's nothing to bind to, so I'd hardcode hex anyway, same as A, just slower and less faithful.\n\nThe only real win B gives over A is **component reuse** (edit one NavItem, all update). That matters *if* you plan to iterate the design in Figma going forward. If you don't, it's pure cost.\n\n## So the honest recommendation\n\n`★ Insight ─────────────────────────────────────`\n- **A gives you 90% of B's value (native editable layers) at 10% of the effort**, because `generate_figma_design` does the DOM→Figma translation mechanically.\n- **B only pays off if you want a real design system** (Components + Variables) to iterate against in Figma. That's a *different project goal* than \"get all screens into Figma.\"\n`─────────────────────────────────────────────────`\n\n**Three questions to pick:**\n\n1. **Do you plan to iterate these designs IN Figma** (designer edits, then ports back to code)? → If yes, B (and we should also build a minimal token set). If no, A.\n2. **The capture wrinkle**: this app is a single-page state machine (`view` state, not URL routes — `App.tsx:47`). `generate_figma_design` navigates by URL, so capturing all 9 screens means I'd need to **temporarily add route hooks** to drive `view` from the URL, capture, then revert. Acceptable? (This is the real cost of A for this codebase, not the raster misconception.)\n3. **Auth done?** I still can't call any Figma tool until you complete the OAuth flow at the URL above.\n\nYour call on 1 and 2 moves us forward."
+        }
+      ],
+      "timestamp": "2026-08-13T23:00:41.176Z"
+    },
+    {
+      "index": 36,
+      "sourceIndex": 170,
+      "type": "system",
+      "role": "system",
+      "content": [
+        {
+          "type": "text",
+          "text": "[Cache: read=59.3k created=0 hit=98%]"
+        }
+      ],
+      "subtype": "informational",
+      "timestamp": "2026-08-13T23:00:41.328Z"
+    },
+    {
+      "index": 37,
+      "sourceIndex": 171,
+      "type": "user",
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "what is the purpose for A at all then?"
+        }
+      ],
+      "timestamp": "2026-08-13T23:00:46.761Z"
+    },
+    {
+      "index": 38,
+      "sourceIndex": 174,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "Fair challenge. A isn't \"B but worse\" — it serves a different goal entirely.\n\n**A's purpose is faithful representation of an existing design, fast — when you are NOT trying to redesign in Figma.** Concrete real uses:\n\n- **Handoff to a designer.** \"Here's exactly what exists; propose changes.\" They need ground truth, not my reconstruction.\n- **Stakeholder / investor review, docs, screenshots** — a Figma file that mirrors the shipped product.\n- **Reference layer for B itself.** The skill's \"parallel workflow\" is literally: capture with A, then build B against it as the pixel-spec. A is how B avoids drift.\n\nThe flip side — when you'd never pick A: if the goal is *establish a design system and iterate in Figma*. Then A is useless (flat layers, no tokens) and B is the point.\n\n**But here's the thing that reframes your whole choice:** A is **mandatory regardless**, because of the SVG screens.\n\n`★ Insight ─────────────────────────────────────`\n- `SubwayMap` and `ScriptureAtlas` are dense vector graphics rendered from SVG. The skill explicitly forbids hand-reconstructing SVG (even single icons — let alone an entire subway map of the Mass). B *cannot* do these faithfully.\n- So the real decision isn't \"A for all 9 vs B for all 9.\" It's: **A for the 2 vector screens no matter what**, and then A or B for the other 7 structured screens.\n`─────────────────────────────────────────────────`\n\nSo your actual options collapse to:\n\n| Option | Map + Atlas | Other 7 screens | Effort | Editable components? |\n|---|---|---|---|---|\n| **A everywhere** | Capture | Capture | Low | No (flat) |\n| **Hybrid** | Capture | Rebuild + componentize | High | Yes (for the 7) |\n\nGiven this repo has **no existing design system** to bind components to (so B's components would hardcode hex anyway), A-everywhere gives you faithful editable layers for ~10% of the effort. Hybrid only wins if you're committing to *build and maintain* a Figma design system going forward.\n\nSo back to you: **do you want to establish a Figma design system here (→ hybrid), or just get all screens faithfully into Figma (→ A)?** And — auth still pending; I can't start either until you complete the OAuth URL."
+        }
+      ],
+      "timestamp": "2026-08-13T23:01:18.906Z"
+    },
+    {
+      "index": 39,
+      "sourceIndex": 181,
+      "type": "system",
+      "role": "system",
+      "content": [
+        {
+          "type": "text",
+          "text": "[Cache: read=60.1k created=0 hit=98%]"
+        }
+      ],
+      "subtype": "informational",
+      "timestamp": "2026-08-13T23:01:19.019Z"
+    },
+    {
+      "index": 40,
+      "sourceIndex": 182,
+      "type": "user",
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "oh it vsounds like i have no use at all for A then and wonder why google stitch wrote that kind of figma"
+        }
+      ],
+      "timestamp": "2026-08-13T23:01:36.259Z"
+    },
+    {
+      "index": 41,
+      "sourceIndex": 185,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "Your instinct is right, and it's worth me stopping to confirm it rather than grinding toward B.\n\n**On Google Stitch / `generate_figma_design`:** it exists for the *handoff-and-reference* audience — product managers, stakeholders, designers who need ground-truth images of a shipped app to annotate or pitch. It's explicitly *not* a \"design editor for an existing codebase.\" So yes — for \"work on the codebase via Figma,\" it's the wrong tool, and your read is correct.\n\n**But before we commit to B, I have to surface the gap in the premise itself.** \"Codebase → Figma → work on\" has a missing half:\n\n`★ Insight ─────────────────────────────────────`\n- **Figma is not a live editor for React.** Editing a frame in Figma does not change `src/ui/ReaderView.tsx` or `styles.css`. The round-trip is manual translation unless you build **Code Connect** mappings — itself a substantial project, and one that works best when a Figma component library *already exists* to map to.\n- **B gives you editable Figma frames, not a sync channel.** You'd iterate visually, then hand-port changes back to code. That's real work every time.\n`─────────────────────────────────────────────────`\n\nSo the honest question is **what does \"work on\" mean for you?**\n\n1. **\"I want to redesign the UI visually, then port changes back by hand.\"** → B is right. Big effort, no existing design system to anchor to, but it's the genuine path. I'd also recommend building a minimal token set (colors/spacing/type) so B's frames aren't all hardcoded hex.\n2. **\"I want Figma to drive the code automatically.\"** → Neither A nor B does this. You'd need Code Connect + a component library, and you'd build *that* in Figma first (not from the existing code). Different project entirely.\n3. **\"I want to see/explore/document the current screens.\"** → A, which you've now ruled out.\n\nWhich of these is actually your goal? I'd rather pin this down than spend hours building B if it doesn't serve what you're trying to do.\n\n(And — auth is still pending at the OAuth URL. Nothing in Figma starts until you complete it.)"
+        }
+      ],
+      "timestamp": "2026-08-13T23:02:06.139Z"
+    },
+    {
+      "index": 42,
+      "sourceIndex": 191,
+      "type": "system",
+      "role": "system",
+      "content": [
+        {
+          "type": "text",
+          "text": "[Cache: read=61k created=0 hit=99%]"
+        }
+      ],
+      "subtype": "informational",
+      "timestamp": "2026-08-13T23:02:06.252Z"
+    },
+    {
+      "index": 43,
+      "sourceIndex": 192,
+      "type": "user",
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Well, right now there's zero UI for UI dialoguing so there is approximately years of useless back and forth leading to preciserly 0 finished project whne trying to express UI elements inn a text-only interface that the agent has a good chance of losing off a context cliff and despite repeated re-descriptions, each time more exhausting, still months go by without even approaching what we seemingly keep agreeing on but never realizing"
+        }
+      ],
+      "timestamp": "2026-08-13T23:03:52.873Z"
+    },
+    {
+      "index": 44,
+      "sourceIndex": 195,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "That's the real goal, and it reframes everything. You don't want a \"design artifact\" — you want a **persistent visual surface to escape the text-only specification death spiral.** UI proposals die in chat because (a) they're re-described from scratch each session, (b) they fall off context cliffs, (c) there's nothing concrete to point at. Figma solves all three *if* the frames are structurally real — selectable, namable nodes you can say \"change *this*\" about. That's exactly what A's flat layers can't give you and B can.\n\nSo: **B is right for your goal.** But one refinement that matters, because I don't want you spending effort on the wrong B:\n\n`★ Insight ─────────────────────────────────────`\n- **B has two flavors, and they serve different goals.** \"B-as-design-system\" (token-bound Components + Variables, the skill's default) serves *shipping a maintainable design library*. \"B-as-dialogue-canvas\" (structured frames with **well-named layers**, components only where things actually repeat) serves *your goal*: a shared visual vocabulary for conversation.\n- For escaping the death spiral, **named layers beat tokens.** The win is being able to say \"ReaderView → Sidebar → HourPicker\" next session and point at a real node — not whether the color is bound to a Variable.\n- So the scope is: faithful editable structure + disciplined layer naming, skip the token/component-library overhead until you actually decide to iterate long-term in Figma.\n`─────────────────────────────────────────────────`\n\n**The one unavoidable wrinkle** — `SubwayMap` and `ScriptureAtlas` are dense SVG. Even B can't hand-rebuild those (the skill forbids it). For those two I'll capture-and-embed as a baseline inside the same B file, and we name the frame clearly so dialogue about them still works (\"the Map screen, top-right station cluster\"). The other 7 screens get true structural rebuilds.\n\n**Single blocker: auth.** Nothing starts until you complete the OAuth URL. I've asked three turns running — I'm not grinding on it to be pedantic; I literally cannot call a single Figma tool until the MCP server sees your token. Once you click through, I'll: create the file \"St. Android's Missal — UI Canvas\", start the dev server, and rebuild screen-by-screen with named layers, screenshotting each for your sign-off so we converge visually instead of textually.\n\nOpen the URL, tell me \"go,\" and I start building."
+        }
+      ],
+      "timestamp": "2026-08-13T23:04:35.178Z"
+    },
+    {
+      "index": 45,
+      "sourceIndex": 202,
+      "type": "system",
+      "role": "system",
+      "content": [
+        {
+          "type": "text",
+          "text": "[Cache: read=61.6k created=0 hit=99%]"
+        }
+      ],
+      "subtype": "informational",
+      "timestamp": "2026-08-13T23:04:35.342Z"
+    },
+    {
+      "index": 46,
+      "sourceIndex": 203,
+      "type": "user",
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "it's authed here now. How can subway map be an svg? wont that interfere with specifics no wonder it doesn't dynamically anything content-wise then?"
+        }
+      ],
+      "timestamp": "2026-08-13T23:05:20.787Z"
+    },
+    {
+      "index": 47,
+      "sourceIndex": 207,
+      "type": "system",
+      "role": "system",
+      "content": [
+        {
+          "type": "text",
+          "text": "Automatic compaction failed (1/3); OpenClaude will retry compaction on the next eligible turn."
+        }
+      ],
+      "subtype": "informational",
+      "timestamp": "2026-08-13T23:05:36.518Z"
+    },
+    {
+      "index": 48,
+      "sourceIndex": 208,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "The conversation is over the active-message safety limit, but automatic compaction could not reduce it before the next provider request. OpenClaude stopped before sending another oversized request. Run /compact, undo recent large tool output, or start a new session with /new."
+        }
+      ],
+      "timestamp": "2026-08-13T23:05:36.521Z"
+    },
+    {
+      "index": 49,
+      "sourceIndex": 209,
+      "type": "user",
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "wait you have 1m context why is it compacting at 64k?"
+        }
+      ],
+      "timestamp": "2026-08-13T23:05:45.932Z"
+    },
+    {
+      "index": 50,
+      "sourceIndex": 212,
+      "type": "system",
+      "role": "system",
+      "content": [
+        {
+          "type": "text",
+          "text": "Automatic compaction failed (2/3); OpenClaude will retry compaction on the next eligible turn."
+        }
+      ],
+      "subtype": "informational",
+      "timestamp": "2026-08-13T23:05:47.472Z"
+    },
+    {
+      "index": 51,
+      "sourceIndex": 213,
+      "type": "assistant",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "The conversation is over the active-message safety limit, but automatic compaction could not reduce it before the next provider request. OpenClaude stopped before sending another oversized request. Run /compact, undo recent large tool output, or start a new session with /new."
+        }
+      ],
+      "timestamp": "2026-08-13T23:05:47.475Z"
+    },
+    {
+      "index": 52,
+      "sourceIndex": 216,
+      "type": "system",
+      "role": "system",
+      "content": [
+        {
+          "type": "text",
+          "text": "\u001b[1mContext Usage\u001b[22m\n\u001b[38;2;136;136;136m⛁ ⛀ \u001b[38;2;177;185;249m⛀ \u001b[38;2;255;122;26m⛀ \u001b[38;2;255;193;7m⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛀ \u001b[38;2;147;51;234m⛁ ⛁ ⛁ ⛁ ⛁ ⛁ ⛁ \u001b[39m  \u001b[38;2;153;153;153mglm-5.2[1m] · 62.2k/1m tokens (6%)\u001b[39m\n\n\u001b[38;2;147;51;234m⛁ ⛁ ⛁ \u001b[38;2;153;153;153m⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ \u001b[39m  \u001b[38;2;153;153;153m\u001b[3mEstimated usage by category\u001b[23m\u001b[39m\n                                          \u001b[38;2;136;136;136m⛁\u001b[39m System prompt: \u001b[38;2;153;153;153m8.1k tokens (0.8%)\u001b[39m\n\u001b[38;2;153;153;153m⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ \u001b[39m  \u001b[38;2;177;185;249m⛁\u001b[39m Custom agents: \u001b[38;2;153;153;153m2.1k tokens (0.2%)\u001b[39m\n                                          \u001b[38;2;255;122;26m⛁\u001b[39m Memory files: \u001b[38;2;153;153;153m2.7k tokens (0.3%)\u001b[39m\n\u001b[38;2;153;153;153m⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ \u001b[39m  \u001b[38;2;255;193;7m⛁\u001b[39m Skills: \u001b[38;2;153;153;153m42.6k tokens (4.3%)\u001b[39m\n                                          \u001b[38;2;147;51;234m⛁\u001b[39m Messages: \u001b[38;2;153;153;153m52.1k tokens (5.2%)\u001b[39m\n\u001b[38;2;153;153;153m⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ \u001b[39m  \u001b[38;2;153;153;153m⛶\u001b[39m Free space: \u001b[38;2;153;153;153m842.3k (84.2%)\u001b[39m\n                                          \u001b[38;2;153;153;153m⛝ Autocompact buffer: 50k tokens \u001b[39m\n\u001b[38;2;153;153;153m⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ \u001b[39m                        \u001b[38;2;153;153;153m(5.0%)\u001b[39m\n\n\u001b[38;2;153;153;153m⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ \u001b[39m\n\n\u001b[38;2;153;153;153m⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ \u001b[39m\n\n\u001b[38;2;153;153;153m⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ \u001b[39m\n\n\u001b[38;2;153;153;153m⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛝ ⛝ ⛝ ⛝ ⛝ ⛝ ⛝ ⛝ ⛝ ⛝ \u001b[39m\n\n\n\u001b[1mMCP tools\u001b[22m\u001b[38;2;153;153;153m · /mcp (loaded on-demand)\u001b[39m\n\n\u001b[38;2;153;153;153mAvailable\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_browser-use_browser-use__browser_exec\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_browser-use_browser-use__browser_screenshot\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_canva_canva__authenticate\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__click\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__close_page\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__drag\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__emulate\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__evaluate_script\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__fill\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__fill_form\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__get_console_message\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__get_network_request\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__handle_dialog\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__hover\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__lighthouse_audit\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__list_console_messages\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__list_network_requests\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__list_pages\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__navigate_page\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__new_page\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__performance_analyze_insight\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__performance_start_trace\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__performance_stop_trace\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__press_key\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__resize_page\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__select_page\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__take_heapsnapshot\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__take_screenshot\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__take_snapshot\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__type_text\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__upload_file\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_chrome-devtools-mcp_chrome-devtools__wait_for\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_circleback_circleback__authenticate\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__add_code_connect_map\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__create_new_file\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__download_assets\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__export_video\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__generate_diagram\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__generate_figma_design\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__get_code_connect_map\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__get_code_connect_suggestions\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__get_context_for_code_connect\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__get_design_context\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__get_figjam\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__get_libraries\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__get_metadata\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__get_motion_context\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__get_screenshot\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__get_shader_effect\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__get_shader_fill\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__get_variable_defs\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__list_file_components_for_code_connect\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__list_shader_effects\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__list_shader_fills\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__search_design_system\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__send_code_connect_mappings\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__upload_assets\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__use_figma\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__weave_cancel_tool_run\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__weave_get_tool_inputs\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__weave_get_tool_run_output\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__weave_list_tools\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__weave_run_tool\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__weave_upload_asset\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_figma_figma__whoami\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__developerknowledge_answer_query\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__developerknowledge_get_documents\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__developerknowledge_search_documents\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_create_android_sha\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_create_app\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_create_project\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_deploy\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_deploy_status\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_get_environment\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_get_project\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_get_sdk_config\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_get_security_rules\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_init\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_list_apps\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_list_projects\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_login\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_logout\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_read_resources\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_firebase_firebase__firebase_update_environment\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_buildAgencyPlanWebsiteNodeJSAs\u001b[39m\n\u001b[38;2;153;153;153msetsV1\u001b[39m\n\u001b[38;2;153;153;153m└ \u001b[39m\n\u001b[38;2;153;153;153mmcp__plugin_hostinger_hostinger__agency-hosting_changeAgencyPlanWebsiteDomainV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_changeAgencyPlanWebsiteWordPre\u001b[39m\n\u001b[38;2;153;153;153mssCoreVersionV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_clearAgencyPlanWebsiteCacheV1\u001b[39m\n\u001b[38;2;153;153;153m└ \u001b[39m\n\u001b[38;2;153;153;153mmcp__plugin_hostinger_hostinger__agency-hosting_createAgencyPlanWebsiteCronJobV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_createAgencyPlanWebsiteDatabas\u001b[39m\n\u001b[38;2;153;153;153meUserV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_createAgencyPlanWebsiteDatabas\u001b[39m\n\u001b[38;2;153;153;153meV1\u001b[39m\n\u001b[38;2;153;153;153m└ \u001b[39m\n\u001b[38;2;153;153;153mmcp__plugin_hostinger_hostinger__agency-hosting_deleteAgencyPlanWebsiteCronJobV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_deleteAgencyPlanWebsiteDatabas\u001b[39m\n\u001b[38;2;153;153;153meUserV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_deleteAgencyPlanWebsiteDatabas\u001b[39m\n\u001b[38;2;153;153;153meV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_deleteAgencyPlanWebsiteV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_deployNodeStaticWebsite\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_deployPhpApplication\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_getAgencyPlanWebsiteDetailsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_getAgencyPlanWebsiteSetupStatu\u001b[39m\n\u001b[38;2;153;153;153msV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_getAgencyPlanWebsiteWordPressS\u001b[39m\n\u001b[38;2;153;153;153mettingsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_importAgencyPlanWebsiteFromArc\u001b[39m\n\u001b[38;2;153;153;153mhiveV1\u001b[39m\n\u001b[38;2;153;153;153m└ \u001b[39m\n\u001b[38;2;153;153;153mmcp__plugin_hostinger_hostinger__agency-hosting_linkDomainToAgencyPlanWebsiteV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_listAgencyPlanDomainsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_listAgencyPlanOrdersV1\u001b[39m\n\u001b[38;2;153;153;153m└ \u001b[39m\n\u001b[38;2;153;153;153mmcp__plugin_hostinger_hostinger__agency-hosting_listAgencyPlanWebsiteCronJobsV1\u001b[39m\n\u001b[38;2;153;153;153m└ \u001b[39m\n\u001b[38;2;153;153;153mmcp__plugin_hostinger_hostinger__agency-hosting_listAgencyPlanWebsiteDatabasesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_listAvailableDatacentersForAnA\u001b[39m\n\u001b[38;2;153;153;153mgencyPlanOrderV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_listAvailableWordPressVersions\u001b[39m\n\u001b[38;2;153;153;153mForAnAgencyPlanWebsiteV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_listRunningAgencyPlanWebsitePr\u001b[39m\n\u001b[38;2;153;153;153mocessesV1\u001b[39m\n\u001b[38;2;153;153;153m└ \u001b[39m\n\u001b[38;2;153;153;153mmcp__plugin_hostinger_hostinger__agency-hosting_provisionANewAgencyPlanWebsiteV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__agency-hosting_unlinkDomainFromAgencyPlanWebs\u001b[39m\n\u001b[38;2;153;153;153miteV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__billing_createPurchaseOrderV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__billing_deletePaymentMethodV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__billing_disableAutoRenewalV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__billing_enableAutoRenewalV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__billing_getCatalogItemListV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__billing_getPaymentMethodListV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__billing_getSubscriptionListV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__billing_renewSubscriptionV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__billing_setDefaultPaymentMethodV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__DNS_deleteDNSRecordsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__DNS_getDNSRecordsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__DNS_getDNSSnapshotListV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__DNS_getDNSSnapshotV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__DNS_resetDNSRecordsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__DNS_restoreDNSSnapshotV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__DNS_updateDNSRecordsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__DNS_validateDNSRecordsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_acceptIncomingDomainMoveV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_cancelOutgoingDomainMoveV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_cancelPendingIRTPVerificationV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_changeWHOISProfileForDomainV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_checkDomainAvailabilityV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_claimFreeDomainTransferV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_claimFreeDomainV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_createDomainForwardingV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_createWHOISProfileV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_deleteDomainForwardingV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_deleteWHOISProfileV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_disableDomainLockV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_disablePrivacyProtectionV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_enableDomainLockV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_enablePrivacyProtectionV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_getDomainAuthorizationCodeV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_getDomainDetailsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_getDomainForwardingV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_getDomainListV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_getDomainRenewalInformationV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_getIncomingDomainMoveListV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_getIncomingDomainMoveV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_getOutgoingDomainMoveListV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_getOutgoingDomainMoveV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_getPendingIRTPVerificationV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_getTransferListV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_getTransferV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_getWHOISProfileListV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_getWHOISProfileUsageV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_getWHOISProfileV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_purchaseNewDomainV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_rejectIncomingDomainMoveV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_setWHOISProfileAsDefaultV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_startOutgoingDomainMoveV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_suggestDomainNamesFromADescriptionV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_suggestDomainNamesFromADomainV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_unsetDefaultWHOISProfileV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_updateDomainForwardingV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__domains_updateDomainNameserversV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__ecommerce_createCustomSalesChannelV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__ecommerce_createDigitalProductV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__ecommerce_createPhysicalProductV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__ecommerce_createStoreV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__ecommerce_deleteStoreV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__ecommerce_enableManualPaymentMethodV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__ecommerce_getCustomStorefrontSetupInstruction\u001b[39m\n\u001b[38;2;153;153;153msV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__ecommerce_getStoreMetadataV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__ecommerce_getStoresV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__ecommerce_listSalesChannelsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__ecommerce_setStoreShippingV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__ecommerce_updateSalesChannelV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__ecommerce_uploadAndAttachAProductImageV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__horizons_createWebsiteV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__horizons_getWebsiteV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_activateWordPressPluginV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_activateWordPressThemeV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_changeDatabasePasswordV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_checkIfWooCommerceIsInstalledV1\u001b[39m\n\u001b[38;2;153;153;153m└ \u001b[39m\n\u001b[38;2;153;153;153mmcp__plugin_hostinger_hostinger__hosting_checkIfWordPressInstallationsAreValidV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_clearWebsiteCacheV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_createAccountCronJobV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_createAccountDatabaseV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_createDatabaseRemoteConnectionV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_createLoginLinksV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_createNodeJSBuildFromArchiveV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_createWebsiteParkedDomainV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_createWebsiteSubdomainV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_createWebsiteV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_deactivateWordPressPluginV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_deleteAccountCronJobV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_deleteAccountDatabaseV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_deleteDatabaseRemoteConnectionV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_deleteWebsiteParkedDomainV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_deleteWebsiteSubdomainV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_deleteWebsiteV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_deleteWordPressInstallationV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_deployJsApplication\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_deployStaticWebsite\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_deployWordpressPlugin\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_deployWordpressTheme\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_detectWordPressInstallationsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_generateAFreeSubdomainV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_getCronJobOutputV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_getInstallationJWTTokenV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_getNodeJSBuildLogsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_getPHPDetailsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_getPHPInfoV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_getPhpMyAdminLinkV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_getWebsiteFileContentV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_importWordpressWebsite\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_installWordPressPluginsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_installWordPressThemeV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_installWordPressV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listAccountCronJobsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listAccountDatabasesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listAvailableDatacentersV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listAvailableWordPressCoreUpdatesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listAvailableWordPressPluginsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listDatabaseRemoteConnectionsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listInstalledWordPressPluginsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listInstalledWordPressThemesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listJsDeployments\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listNode_jsVulnerabilitiesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listNodeJSBuildsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listOrdersV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listSuggestedWordPressPluginsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listWebsiteFilesAndDirectoriesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listWebsiteParkedDomainsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listWebsiteSubdomainsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listWebsitesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listWordPressInstallationsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_listWordPressThemesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_patchNode_jsVulnerabilitiesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_purgeLiteSpeedCacheV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_repairDatabaseV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_resetPHPExtensionsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_restartNode_jsApplicationV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_searchWordPressPluginsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_setAIOptionStatusV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_showAIOptionStatusV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_showJsDeploymentLogs\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_showLiteSpeedCacheStatusV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_showMaintenanceStatusV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_showMemcachedObjectCacheStatusV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_showWordPressCoreVersionV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_toggleCachelessModeV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_toggleMaintenanceModeV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_toggleMemcachedObjectCacheV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_toggleWebsiteCacheV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_uninstallWordPressPluginsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_uninstallWordPressThemesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_updateHostingerWordPressPluginV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_updatePHPExtensionsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_updatePHPOptionsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_updatePHPVersionV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_updateWordPressCoreV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_updateWordPressPluginsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_updateWordPressThemesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__hosting_verifyDomainOwnershipV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_changeMailboxPasswordV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_createAliasV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_createAPITokenV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_createAutoreplyV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_createCatchAllV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_createForwarderV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_createMailboxV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_createWebhookV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_deleteAliasV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_deleteAutoreplyV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_deleteCatchAllV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_deleteForwarderV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_deleteMailboxV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_deleteWebhookV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_getOrderPlanV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_getWebhookV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_listAccessLogsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_listActionLogsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_listAliasesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_listAPITokensV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_listAutorepliesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_listCatchAllsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_listForwardersV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_listInboundLogsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_listMailboxActionLogsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_listMailboxesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_listOrdersV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_listOutboundLogsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_listWebhookDeliveryLogsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_listWebhooksV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_regenerateWebhookSecretV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_resendCatchAllConfirmationV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_resendForwarderConfirmationV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_revokeAPITokenV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_testWebhookV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_updateAutoreplyV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_updateForwarderKeepCopySettingV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__mail_updateWebhookV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_assignAContactToATagV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_assignContactsToATagV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_countProfileSegmentContactsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_createAContactFieldV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_createANewContactSegmentV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_createANewContactV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_createAProfileSegmentV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_createContactsInBulkV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_createNewContactsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_createOrFindTagsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_deleteAContactFieldV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_deleteAContactV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_deleteAProfileContactV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_deleteAProfileSegmentV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_deleteATagV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_getContactDetailsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_getProfileDomainDNSStatusV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_getProfileSegmentDetailsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_getSegmentDetailsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_listContactFieldsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_listContactGroupsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_listContactsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_listProfileContactsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_listProfileSegmentContactsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_listProfileSegmentsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_listProfilesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_listProfileTagsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_listSegmentContactsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_listSegmentsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_removeAContactFromATagV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_removeContactsFromATagV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_renameATagV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_updateAContactFieldV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_updateAContactV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__reach_updateAProfileSegmentV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__v2_getDomainVerificationsDIRECT\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_activateFirewallV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_attachPublicKeyV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_createFirewallRuleV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_createNewFirewallV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_createNewProjectV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_createPostInstallScriptV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_createPTRRecordV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_createPublicKeyV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_createSnapshotV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_deactivateFirewallV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_deleteFirewallRuleV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_deleteFirewallV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_deletePostInstallScriptV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_deleteProjectV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_deletePTRRecordV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_deletePublicKeyV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_deleteSnapshotV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getActionDetailsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getActionsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getAttachedPublicKeysV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getBackupsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getDataCenterListV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getFirewallDetailsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getFirewallListV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getMetricsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getPostInstallScriptsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getPostInstallScriptV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getProjectContainersV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getProjectContentsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getProjectListV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getProjectLogsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getPublicKeysV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getScanMetricsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getSnapshotV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getTemplateDetailsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getTemplatesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getVirtualMachineDetailsV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_getVirtualMachinesV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_installMonarxV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_purchaseNewVirtualMachineV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_recreateVirtualMachineV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_resetHostnameV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_restartProjectV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_restartVirtualMachineV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_restoreBackupV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_restoreSnapshotV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_setHostnameV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_setNameserversV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_setPanelPasswordV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_setRootPasswordV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_setupPurchasedVirtualMachineV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_startProjectV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_startRecoveryModeV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_startVirtualMachineV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_stopProjectV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_stopRecoveryModeV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_stopVirtualMachineV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_syncFirewallV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_uninstallMonarxV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_updateFirewallRuleV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_updatePostInstallScriptV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_hostinger_hostinger__VPS_updateProjectV1\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_huggingface-skills_huggingface-skills__authenticate\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_legalzoom_legalzoom__authenticate\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_lovable_lovable__authenticate\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_mapbox_mapbox__authenticate\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_mapbox_mapbox-devkit__authenticate\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_mapbox_mapbox-docs__batch_get_documents_tool\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_mapbox_mapbox-docs__get_document_tool\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_mapbox_mapbox-docs__search_mapbox_docs_tool\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_miro_miro__authenticate\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_netlify-skills_netlify__authenticate\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__accept_dispute_claim\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__cancel_sent_invoice\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__cancel_subscription\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__create_invoice\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__create_order\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__create_product\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__create_refund\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__create_shipment_tracking\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__create_subscription\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__create_subscription_plan\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__generate_invoice_qr_code\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__get_dispute\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__get_invoice\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__get_merchant_insights\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__get_order\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__get_refund\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__get_shipment_tracking\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__list_disputes\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__list_invoices\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__list_products\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__list_subscription_plans\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__list_transactions\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__pay_order\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__send_invoice\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__send_invoice_reminder\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__show_product_details\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__show_subscription_details\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__show_subscription_plan_details\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__update_product\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__update_shipment_tracking\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_paypal_paypal-sandbox__update_subscription\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_click\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_close\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_console_messages\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_drag\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_drop\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_evaluate\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_file_upload\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_fill_form\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_find\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_handle_dialog\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_hover\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_navigate\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_navigate_back\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_network_request\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_network_requests\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_press_key\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_resize\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_run_code_unsafe\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_select_option\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_snapshot\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_tabs\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_take_screenshot\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_type\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_playwright_playwright__browser_wait_for\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_postman_postman__authenticate\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_qt-development-skills_qt-docs__qt_documentation_read\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_qt-development-skills_qt-docs__qt_documentation_search\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__activate_project\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__create_text_file\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__delete_memory\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__edit_memory\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__execute_shell_command\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__find_declaration\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__find_file\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__find_implementations\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__find_referencing_symbols\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__find_symbol\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__get_current_config\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__get_diagnostics_for_file\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__get_symbols_overview\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__initial_instructions\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__insert_after_symbol\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__insert_before_symbol\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__list_dir\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__list_memories\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__onboarding\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__open_dashboard\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__read_file\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__read_memory\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__rename_memory\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__rename_symbol\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__replace_content\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__replace_in_files\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__replace_symbol_body\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__safe_delete_symbol\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__search_for_pattern\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_serena_serena__write_memory\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_stripe_stripe__authenticate\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_supabase_supabase__authenticate\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_twilio-developer-kit_twilio-docs__twilio__retrieve\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_twilio-developer-kit_twilio-docs__twilio__search\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_ui5_ui5-mcp-server__create_integration_card\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_ui5_ui5-mcp-server__create_ui5_app\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_ui5_ui5-mcp-server__get_api_reference\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_ui5_ui5-mcp-server__get_guidelines\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_ui5_ui5-mcp-server__get_integration_cards_guidelines\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_ui5_ui5-mcp-server__get_project_info\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_ui5_ui5-mcp-server__get_typescript_conversion_guidelines\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_ui5_ui5-mcp-server__get_version_info\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_ui5_ui5-mcp-server__run_manifest_validation\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_ui5_ui5-mcp-server__run_ui5_linter\u001b[39m\n\u001b[38;2;153;153;153m└ mcp__plugin_vercel_vercel__authenticate\u001b[39m\n\n\u001b[1mCustom agents\u001b[22m\u001b[38;2;153;153;153m · /agents\u001b[39m\n\n\u001b[38;2;153;153;153mPlugin\u001b[39m\n└ plugin-dev:plugin-validator: \u001b[38;2;153;153;153m303 tokens\u001b[39m\n└ plugin-dev:agent-creator: \u001b[38;2;153;153;153m299 tokens\u001b[39m\n└ plugin-dev:skill-reviewer: \u001b[38;2;153;153;153m296 tokens\u001b[39m\n└ code-modernization:version-delta-analyst: \u001b[38;2;153;153;153m134 tokens\u001b[39m\n└ code-modernization:uplift-migrator: \u001b[38;2;153;153;153m108 tokens\u001b[39m\n└ hookify:conversation-analyzer: \u001b[38;2;153;153;153m101 tokens\u001b[39m\n└ vercel:ai-architect: \u001b[38;2;153;153;153m75 tokens\u001b[39m\n└ vercel:performance-optimizer: \u001b[38;2;153;153;153m75 tokens\u001b[39m\n└ vercel:deployment-expert: \u001b[38;2;153;153;153m69 tokens\u001b[39m\n└ code-modernization:business-rules-extractor: \u001b[38;2;153;153;153m69 tokens\u001b[39m\n└ postman:API Readiness Analyzer: \u001b[38;2;153;153;153m67 tokens\u001b[39m\n└ code-modernization:legacy-analyst: \u001b[38;2;153;153;153m65 tokens\u001b[39m\n└ code-modernization:scaffolder: \u001b[38;2;153;153;153m65 tokens\u001b[39m\n└ feature-dev:code-architect: \u001b[38;2;153;153;153m64 tokens\u001b[39m\n└ feature-dev:code-reviewer: \u001b[38;2;153;153;153m59 tokens\u001b[39m\n└ feature-dev:code-explorer: \u001b[38;2;153;153;153m55 tokens\u001b[39m\n└ code-modernization:architecture-critic: \u001b[38;2;153;153;153m54 tokens\u001b[39m\n└ code-simplifier:code-simplifier: \u001b[38;2;153;153;153m51 tokens\u001b[39m\n└ code-modernization:security-auditor: \u001b[38;2;153;153;153m47 tokens\u001b[39m\n└ code-modernization:test-engineer: \u001b[38;2;153;153;153m46 tokens\u001b[39m\n└ stripe:Company Researcher: \u001b[38;2;153;153;153m29 tokens\u001b[39m\n\n\u001b[1mMemory files\u001b[22m\u001b[38;2;153;153;153m · /memory\u001b[39m\n└ ~/.openclaude/CLAUDE.md: \u001b[38;2;153;153;153m13 tokens\u001b[39m\n└ ~/github/CLAUDE.md: \u001b[38;2;153;153;153m13 tokens\u001b[39m\n└ CLAUDE.md: \u001b[38;2;153;153;153m2.7k tokens\u001b[39m\n\n\u001b[1mSkills\u001b[22m\u001b[38;2;153;153;153m · /skills\u001b[39m\n\n\u001b[38;2;153;153;153mUser\u001b[39m\n└ sc:recommend: \u001b[38;2;153;153;153m33 tokens\u001b[39m\n└ sc:spec-panel: \u001b[38;2;153;153;153m31 tokens\u001b[39m\n└ sc:pm: \u001b[38;2;153;153;153m31 tokens\u001b[39m\n└ sc:index: \u001b[38;2;153;153;153m26 tokens\u001b[39m\n└ sc:design: \u001b[38;2;153;153;153m26 tokens\u001b[39m\n└ sc:analyze: \u001b[38;2;153;153;153m26 tokens\u001b[39m\n└ sc:implement: \u001b[38;2;153;153;153m25 tokens\u001b[39m\n└ sc:explain: \u001b[38;2;153;153;153m25 tokens\u001b[39m\n└ sc:estimate: \u001b[38;2;153;153;153m25 tokens\u001b[39m\n└ sc:brainstorm: \u001b[38;2;153;153;153m25 tokens\u001b[39m\n└ sc:select-tool: \u001b[38;2;153;153;153m24 tokens\u001b[39m\n└ sc:save: \u001b[38;2;153;153;153m24 tokens\u001b[39m\n└ sc:build: \u001b[38;2;153;153;153m24 tokens\u001b[39m\n└ sc:workflow: \u001b[38;2;153;153;153m23 tokens\u001b[39m\n└ sc:troubleshoot: \u001b[38;2;153;153;153m23 tokens\u001b[39m\n└ sc:sc: \u001b[38;2;153;153;153m23 tokens\u001b[39m\n└ sc:load: \u001b[38;2;153;153;153m23 tokens\u001b[39m\n└ sc:improve: \u001b[38;2;153;153;153m23 tokens\u001b[39m\n└ sc:document: \u001b[38;2;153;153;153m22 tokens\u001b[39m\n└ sc:cleanup: \u001b[38;2;153;153;153m22 tokens\u001b[39m\n└ sc:task: \u001b[38;2;153;153;153m20 tokens\u001b[39m\n└ sc:spawn: \u001b[38;2;153;153;153m20 tokens\u001b[39m\n└ sc:reflect: \u001b[38;2;153;153;153m20 tokens\u001b[39m\n└ sc:git: \u001b[38;2;153;153;153m20 tokens\u001b[39m\n└ sc:test: \u001b[38;2;153;153;153m19 tokens\u001b[39m\n└ sc:research: \u001b[38;2;153;153;153m19 tokens\u001b[39m\n└ sc:index-repo: \u001b[38;2;153;153;153m17 tokens\u001b[39m\n└ sc:business-panel: \u001b[38;2;153;153;153m17 tokens\u001b[39m\n└ sc:help: \u001b[38;2;153;153;153m16 tokens\u001b[39m\n└ sc:README: \u001b[38;2;153;153;153m8 tokens\u001b[39m\n└ sc:agent: \u001b[38;2;153;153;153m6 tokens\u001b[39m\n\n\u001b[38;2;153;153;153mPlugin\u001b[39m\n└ pay-via-agent-wallet: \u001b[38;2;153;153;153m287 tokens\u001b[39m\n└ create-toolset: \u001b[38;2;153;153;153m277 tokens\u001b[39m\n└ unreal-skill: \u001b[38;2;153;153;153m273 tokens\u001b[39m\n└ unreal-mcp: \u001b[38;2;153;153;153m263 tokens\u001b[39m\n└ ui-theme-designer-help: \u001b[38;2;153;153;153m263 tokens\u001b[39m\n└ ui5-best-practices-smart-controls: \u001b[38;2;153;153;153m260 tokens\u001b[39m\n└ hf-cli: \u001b[38;2;153;153;153m259 tokens\u001b[39m\n└ hf-cloud-serving-image-selection: \u001b[38;2;153;153;153m258 tokens\u001b[39m\n└ hf-cloud-sagemaker-deployment-planner: \u001b[38;2;153;153;153m252 tokens\u001b[39m\n└ modern-web-guidance: \u001b[38;2;153;153;153m252 tokens\u001b[39m\n└ ui5-best-practices-mdc: \u001b[38;2;153;153;153m250 tokens\u001b[39m\n└ unify-balance: \u001b[38;2;153;153;153m247 tokens\u001b[39m\n└ ui5-best-practices-accessibility: \u001b[38;2;153;153;153m244 tokens\u001b[39m\n└ confluent-cloud-cdc-tableflow: \u001b[38;2;153;153;153m237 tokens\u001b[39m\n└ stripe-projects: \u001b[38;2;153;153;153m235 tokens\u001b[39m\n└ project-artifact: \u001b[38;2;153;153;153m235 tokens\u001b[39m\n└ stripe-apps: \u001b[38;2;153;153;153m232 tokens\u001b[39m\n└ ui5-best-practices-tables: \u001b[38;2;153;153;153m230 tokens\u001b[39m\n└ huggingface-zerogpu: \u001b[38;2;153;153;153m227 tokens\u001b[39m\n└ bridge-stablecoin: \u001b[38;2;153;153;153m226 tokens\u001b[39m\n└ twilio-messaging-channel-advisor: \u001b[38;2;153;153;153m224 tokens\u001b[39m\n└ chrome-extensions: \u001b[38;2;153;153;153m224 tokens\u001b[39m\n└ paypal-routing: \u001b[38;2;153;153;153m222 tokens\u001b[39m\n└ confluent-skill-reviewer: \u001b[38;2;153;153;153m221 tokens\u001b[39m\n└ figma-generate-design: \u001b[38;2;153;153;153m220 tokens\u001b[39m\n└ ui5-best-practices: \u001b[38;2;153;153;153m220 tokens\u001b[39m\n└ supabase-postgres-best-practices: \u001b[38;2;153;153;153m219 tokens\u001b[39m\n└ connect-recommend: \u001b[38;2;153;153;153m207 tokens\u001b[39m\n└ flink-udf: \u001b[38;2;153;153;153m206 tokens\u001b[39m\n└ huggingface-vision-trainer: \u001b[38;2;153;153;153m205 tokens\u001b[39m\n└ hyperframes: \u001b[38;2;153;153;153m204 tokens\u001b[39m\n└ swap-tokens: \u001b[38;2;153;153;153m204 tokens\u001b[39m\n└ figma-generate-diagram: \u001b[38;2;153;153;153m202 tokens\u001b[39m\n└ supabase: \u001b[38;2;153;153;153m202 tokens\u001b[39m\n└ use-circle-cli: \u001b[38;2;153;153;153m202 tokens\u001b[39m\n└ qt-figma-component-generation: \u001b[38;2;153;153;153m201 tokens\u001b[39m\n└ huggingface-lora-space-builder: \u001b[38;2;153;153;153m200 tokens\u001b[39m\n└ confluent-skill-creator: \u001b[38;2;153;153;153m198 tokens\u001b[39m\n└ netlify-access-control: \u001b[38;2;153;153;153m196 tokens\u001b[39m\n└ hf-cloud-sagemaker-production-defaults: \u001b[38;2;153;153;153m195 tokens\u001b[39m\n└ msk-migration: \u001b[38;2;153;153;153m195 tokens\u001b[39m\n└ paypal-best-practices: \u001b[38;2;153;153;153m193 tokens\u001b[39m\n└ stripe-best-practices: \u001b[38;2;153;153;153m192 tokens\u001b[39m\n└ use-agent-wallet: \u001b[38;2;153;153;153m189 tokens\u001b[39m\n└ use-arc: \u001b[38;2;153;153;153m188 tokens\u001b[39m\n└ figma-generate-library: \u001b[38;2;153;153;153m187 tokens\u001b[39m\n└ use-modular-wallets: \u001b[38;2;153;153;153m186 tokens\u001b[39m\n└ ui5-best-practices-qunit: \u001b[38;2;153;153;153m182 tokens\u001b[39m\n└ netlify-config: \u001b[38;2;153;153;153m180 tokens\u001b[39m\n└ twilio-sendgrid-deliverability-advisor: \u001b[38;2;153;153;153m180 tokens\u001b[39m\n└ qt-qml-docs: \u001b[38;2;153;153;153m178 tokens\u001b[39m\n└ fund-agent-wallet: \u001b[38;2;153;153;153m178 tokens\u001b[39m\n└ qt-cpp-docs: \u001b[38;2;153;153;153m173 tokens\u001b[39m\n└ auth0: \u001b[38;2;153;153;153m171 tokens\u001b[39m\n└ redis-search: \u001b[38;2;153;153;153m171 tokens\u001b[39m\n└ twilio-account-setup: \u001b[38;2;153;153;153m168 tokens\u001b[39m\n└ hf-cloud-sagemaker-iam-preflight: \u001b[38;2;153;153;153m167 tokens\u001b[39m\n└ huggingface-llm-trainer: \u001b[38;2;153;153;153m167 tokens\u001b[39m\n└ fiftyone-app-playwright: \u001b[38;2;153;153;153m167 tokens\u001b[39m\n└ netlify-ai-gateway: \u001b[38;2;153;153;153m166 tokens\u001b[39m\n└ huggingface-best: \u001b[38;2;153;153;153m165 tokens\u001b[39m\n└ hyperframes-animation: \u001b[38;2;153;153;153m164 tokens\u001b[39m\n└ media-use: \u001b[38;2;153;153;153m164 tokens\u001b[39m\n└ twilio-migrate-messaging-to-verify: \u001b[38;2;153;153;153m164 tokens\u001b[39m\n└ qt-figma-token-extraction: \u001b[38;2;153;153;153m161 tokens\u001b[39m\n└ hf-cloud-aws-context-discovery: \u001b[38;2;153;153;153m159 tokens\u001b[39m\n└ netlify-mcp-servers: \u001b[38;2;153;153;153m159 tokens\u001b[39m\n└ figma-swiftui: \u001b[38;2;153;153;153m158 tokens\u001b[39m\n└ use-gateway: \u001b[38;2;153;153;153m158 tokens\u001b[39m\n└ hf-cloud-python-env-setup: \u001b[38;2;153;153;153m157 tokens\u001b[39m\n└ developing-kafka-java-client: \u001b[38;2;153;153;153m156 tokens\u001b[39m\n└ receipts: \u001b[38;2;153;153;153m156 tokens\u001b[39m\n└ eve: \u001b[38;2;153;153;153m154 tokens\u001b[39m\n└ netlify-deploy: \u001b[38;2;153;153;153m153 tokens\u001b[39m\n└ motion-graphics: \u001b[38;2;153;153;153m152 tokens\u001b[39m\n└ microfrontends: \u001b[38;2;153;153;153m152 tokens\u001b[39m\n└ train-sentence-transformers: \u001b[38;2;153;153;153m151 tokens\u001b[39m\n└ twilio-send-message: \u001b[38;2;153;153;153m149 tokens\u001b[39m\n└ embedded-captions: \u001b[38;2;153;153;153m147 tokens\u001b[39m\n└ hyperframes-cli: \u001b[38;2;153;153;153m145 tokens\u001b[39m\n└ use-developer-controlled-wallets: \u001b[38;2;153;153;153m145 tokens\u001b[39m\n└ agent-wallet-policy: \u001b[38;2;153;153;153m143 tokens\u001b[39m\n└ figma-use: \u001b[38;2;153;153;153m141 tokens\u001b[39m\n└ netlify-frameworks: \u001b[38;2;153;153;153m141 tokens\u001b[39m\n└ superdesign: \u001b[38;2;153;153;153m140 tokens\u001b[39m\n└ twilio-cli-reference: \u001b[38;2;153;153;153m139 tokens\u001b[39m\n└ use-user-controlled-wallets: \u001b[38;2;153;153;153m139 tokens\u001b[39m\n└ kafka-streams-programming: \u001b[38;2;153;153;153m138 tokens\u001b[39m\n└ hook-development: \u001b[38;2;153;153;153m138 tokens\u001b[39m\n└ qdrant-search-quality: \u001b[38;2;153;153;153m138 tokens\u001b[39m\n└ twilio-marketing-promotions-advisor: \u001b[38;2;153;153;153m137 tokens\u001b[39m\n└ ui-theme-designer-design-tokens: \u001b[38;2;153;153;153m137 tokens\u001b[39m\n└ figma-design-to-code: \u001b[38;2;153;153;153m135 tokens\u001b[39m\n└ twilio-sendgrid-engagement-quality: \u001b[38;2;153;153;153m133 tokens\u001b[39m\n└ redis-connections: \u001b[38;2;153;153;153m131 tokens\u001b[39m\n└ build-mcp-server: \u001b[38;2;153;153;153m130 tokens\u001b[39m\n└ command-development: \u001b[38;2;153;153;153m130 tokens\u001b[39m\n└ fiftyone-sdk-guidance: \u001b[38;2;153;153;153m130 tokens\u001b[39m\n└ redis-observability: \u001b[38;2;153;153;153m128 tokens\u001b[39m\n└ redis-semantic-cache: \u001b[38;2;153;153;153m128 tokens\u001b[39m\n└ qdrant-edge: \u001b[38;2;153;153;153m128 tokens\u001b[39m\n└ qdrant-multitenancy: \u001b[38;2;153;153;153m128 tokens\u001b[39m\n└ figma-create-new-file: \u001b[38;2;153;153;153m125 tokens\u001b[39m\n└ nvidia-skill-finder: \u001b[38;2;153;153;153m125 tokens\u001b[39m\n└ twilio-verify-send-otp: \u001b[38;2;153;153;153m125 tokens\u001b[39m\n└ ckeditor: \u001b[38;2;153;153;153m125 tokens\u001b[39m\n└ hyperframes-registry: \u001b[38;2;153;153;153m124 tokens\u001b[39m\n└ fiftyone-zoo-remote-model: \u001b[38;2;153;153;153m124 tokens\u001b[39m\n└ crowdsec: \u001b[38;2;153;153;153m123 tokens\u001b[39m\n└ talking-head-recut: \u001b[38;2;153;153;153m121 tokens\u001b[39m\n└ build-mcp-app: \u001b[38;2;153;153;153m121 tokens\u001b[39m\n└ qt-qml-profiler: \u001b[38;2;153;153;153m121 tokens\u001b[39m\n└ use-circle-wallets: \u001b[38;2;153;153;153m121 tokens\u001b[39m\n└ debug-optimize-lcp: \u001b[38;2;153;153;153m120 tokens\u001b[39m\n└ huggingface-spaces: \u001b[38;2;153;153;153m120 tokens\u001b[39m\n└ twilio-conversation-orchestrator: \u001b[38;2;153;153;153m119 tokens\u001b[39m\n└ twilio-sendgrid-email-send: \u001b[38;2;153;153;153m119 tokens\u001b[39m\n└ redis-security: \u001b[38;2;153;153;153m119 tokens\u001b[39m\n└ twilio-sendgrid-webhooks: \u001b[38;2;153;153;153m118 tokens\u001b[39m\n└ twilio-sendgrid-suppressions: \u001b[38;2;153;153;153m116 tokens\u001b[39m\n└ mcp-integration: \u001b[38;2;153;153;153m116 tokens\u001b[39m\n└ qt-qml-review: \u001b[38;2;153;153;153m116 tokens\u001b[39m\n└ transformers-js: \u001b[38;2;153;153;153m115 tokens\u001b[39m\n└ twilio-debugging-observability: \u001b[38;2;153;153;153m115 tokens\u001b[39m\n└ plugin-structure: \u001b[38;2;153;153;153m115 tokens\u001b[39m\n└ canva-edit-design: \u001b[38;2;153;153;153m115 tokens\u001b[39m\n└ general-video: \u001b[38;2;153;153;153m114 tokens\u001b[39m\n└ twilio-compliance-traffic: \u001b[38;2;153;153;153m114 tokens\u001b[39m\n└ twilio-email-send: \u001b[38;2;153;153;153m114 tokens\u001b[39m\n└ twilio-whatsapp-send-message: \u001b[38;2;153;153;153m114 tokens\u001b[39m\n└ marketplace: \u001b[38;2;153;153;153m114 tokens\u001b[39m\n└ twilio-voice-conversation-relay: \u001b[38;2;153;153;153m113 tokens\u001b[39m\n└ vercel-connect: \u001b[38;2;153;153;153m113 tokens\u001b[39m\n└ langfuse: \u001b[38;2;153;153;153m113 tokens\u001b[39m\n└ code-review: \u001b[38;2;153;153;153m112 tokens\u001b[39m\n└ twilio-studio-flows: \u001b[38;2;153;153;153m112 tokens\u001b[39m\n└ twilio-agent-augmentation-architect: \u001b[38;2;153;153;153m111 tokens\u001b[39m\n└ twilio-sms-send-message: \u001b[38;2;153;153;153m111 tokens\u001b[39m\n└ iris-development: \u001b[38;2;153;153;153m111 tokens\u001b[39m\n└ twilio-enterprise-knowledge: \u001b[38;2;153;153;153m110 tokens\u001b[39m\n└ twilio-messaging-webhooks: \u001b[38;2;153;153;153m110 tokens\u001b[39m\n└ cardputer-buddy: \u001b[38;2;153;153;153m110 tokens\u001b[39m\n└ kafka-schema-registry: \u001b[38;2;153;153;153m109 tokens\u001b[39m\n└ plugin-settings: \u001b[38;2;153;153;153m109 tokens\u001b[39m\n└ figma: \u001b[38;2;153;153;153m107 tokens\u001b[39m\n└ product-launch-video: \u001b[38;2;153;153;153m107 tokens\u001b[39m\n└ twilio-notifications-alerts-advisor: \u001b[38;2;153;153;153m107 tokens\u001b[39m\n└ build-mcpb: \u001b[38;2;153;153;153m107 tokens\u001b[39m\n└ redis-clustering: \u001b[38;2;153;153;153m107 tokens\u001b[39m\n└ qt-cpp-review: \u001b[38;2;153;153;153m107 tokens\u001b[39m\n└ use-smart-contract-platform: \u001b[38;2;153;153;153m107 tokens\u001b[39m\n└ twilio-ai-agent-architect: \u001b[38;2;153;153;153m106 tokens\u001b[39m\n└ twilio-security-compliance-hipaa: \u001b[38;2;153;153;153m106 tokens\u001b[39m\n└ twilio-sendgrid-email-settings: \u001b[38;2;153;153;153m106 tokens\u001b[39m\n└ twilio-sendgrid-account-setup: \u001b[38;2;153;153;153m106 tokens\u001b[39m\n└ faceless-explainer: \u001b[38;2;153;153;153m105 tokens\u001b[39m\n└ music-to-video: \u001b[38;2;153;153;153m105 tokens\u001b[39m\n└ twilio-webhook-architecture: \u001b[38;2;153;153;153m105 tokens\u001b[39m\n└ canva-bulk-create: \u001b[38;2;153;153;153m105 tokens\u001b[39m\n└ use-usdc: \u001b[38;2;153;153;153m105 tokens\u001b[39m\n└ qdrant-sizing: \u001b[38;2;153;153;153m105 tokens\u001b[39m\n└ ui5-best-practices-integration-cards: \u001b[38;2;153;153;153m104 tokens\u001b[39m\n└ slideshow: \u001b[38;2;153;153;153m104 tokens\u001b[39m\n└ qdrant-version-upgrade: \u001b[38;2;153;153;153m104 tokens\u001b[39m\n└ netlify-database: \u001b[38;2;153;153;153m103 tokens\u001b[39m\n└ twilio-organizations-setup: \u001b[38;2;153;153;153m103 tokens\u001b[39m\n└ twilio-isv-sms-best-practices: \u001b[38;2;153;153;153m103 tokens\u001b[39m\n└ canva-design-feedback: \u001b[38;2;153;153;153m103 tokens\u001b[39m\n└ netlify-image-cdn: \u001b[38;2;153;153;153m102 tokens\u001b[39m\n└ pr-to-video: \u001b[38;2;153;153;153m102 tokens\u001b[39m\n└ twilio-regulatory-compliance-bundles: \u001b[38;2;153;153;153m102 tokens\u001b[39m\n└ redis-core: \u001b[38;2;153;153;153m102 tokens\u001b[39m\n└ figma-implement-motion: \u001b[38;2;153;153;153m101 tokens\u001b[39m\n└ developing-kafka-python-client: \u001b[38;2;153;153;153m101 tokens\u001b[39m\n└ hyperframes-core: \u001b[38;2;153;153;153m101 tokens\u001b[39m\n└ claude-automation-recommender: \u001b[38;2;153;153;153m101 tokens\u001b[39m\n└ twilio-sendgrid-inbound-parse: \u001b[38;2;153;153;153m100 tokens\u001b[39m\n└ canva-implement-feedback: \u001b[38;2;153;153;153m100 tokens\u001b[39m\n└ accept-agent-payments: \u001b[38;2;153;153;153m100 tokens\u001b[39m\n└ twilio-security-hardening: \u001b[38;2;153;153;153m99 tokens\u001b[39m\n└ twilio-reliability-patterns: \u001b[38;2;153;153;153m98 tokens\u001b[39m\n└ stripe-directory: \u001b[38;2;153;153;153m97 tokens\u001b[39m\n└ twilio-compliance-onboarding: \u001b[38;2;153;153;153m97 tokens\u001b[39m\n└ agent-development: \u001b[38;2;153;153;153m97 tokens\u001b[39m\n└ building-pydantic-ai-agents: \u001b[38;2;153;153;153m97 tokens\u001b[39m\n└ qdrant-model-migration: \u001b[38;2;153;153;153m96 tokens\u001b[39m\n└ claude-md-improver: \u001b[38;2;153;153;153m95 tokens\u001b[39m\n└ twilio-numbers-senders: \u001b[38;2;153;153;153m95 tokens\u001b[39m\n└ twilio-voice-outbound-calls: \u001b[38;2;153;153;153m95 tokens\u001b[39m\n└ fiftyone-dataset-import: \u001b[38;2;153;153;153m95 tokens\u001b[39m\n└ qt-qml: \u001b[38;2;153;153;153m95 tokens\u001b[39m\n└ twilio-content-template-builder: \u001b[38;2;153;153;153m94 tokens\u001b[39m\n└ twilio-customer-support-architect: \u001b[38;2;153;153;153m94 tokens\u001b[39m\n└ twilio-call-recordings: \u001b[38;2;153;153;153m93 tokens\u001b[39m\n└ twilio-identity-verification-advisor: \u001b[38;2;153;153;153m93 tokens\u001b[39m\n└ remotion-to-hyperframes: \u001b[38;2;153;153;153m92 tokens\u001b[39m\n└ twilio-conversations-classic-api: \u001b[38;2;153;153;153m92 tokens\u001b[39m\n└ twilio-security-api-auth: \u001b[38;2;153;153;153m91 tokens\u001b[39m\n└ qdrant-monitoring: \u001b[38;2;153;153;153m91 tokens\u001b[39m\n└ configure-chapter-skip: \u001b[38;2;153;153;153m90 tokens\u001b[39m\n└ huggingface-papers: \u001b[38;2;153;153;153m89 tokens\u001b[39m\n└ twilio-conversation-memory: \u001b[38;2;153;153;153m89 tokens\u001b[39m\n└ twilio-messaging-overview: \u001b[38;2;153;153;153m89 tokens\u001b[39m\n└ canva-brand-check: \u001b[38;2;153;153;153m89 tokens\u001b[39m\n└ qdrant-performance-optimization: \u001b[38;2;153;153;153m89 tokens\u001b[39m\n└ huggingface-trackio: \u001b[38;2;153;153;153m88 tokens\u001b[39m\n└ netlify-caching: \u001b[38;2;153;153;153m88 tokens\u001b[39m\n└ netlify-functions: \u001b[38;2;153;153;153m88 tokens\u001b[39m\n└ hyperframes-keyframes: \u001b[38;2;153;153;153m88 tokens\u001b[39m\n└ twilio-conversation-intelligence: \u001b[38;2;153;153;153m88 tokens\u001b[39m\n└ twilio-email-deliverability-advisor: \u001b[38;2;153;153;153m88 tokens\u001b[39m\n└ twilio-lookup-phone-intelligence: \u001b[38;2;153;153;153m88 tokens\u001b[39m\n└ m5-onboard: \u001b[38;2;153;153;153m88 tokens\u001b[39m\n└ skill-creator: \u001b[38;2;153;153;153m87 tokens\u001b[39m\n└ huggingface-tool-builder: \u001b[38;2;153;153;153m87 tokens\u001b[39m\n└ huggingface-community-evals: \u001b[38;2;153;153;153m86 tokens\u001b[39m\n└ netlify-edge-functions: \u001b[38;2;153;153;153m86 tokens\u001b[39m\n└ hyperframes-creative: \u001b[38;2;153;153;153m86 tokens\u001b[39m\n└ twilio-messaging-services: \u001b[38;2;153;153;153m86 tokens\u001b[39m\n└ twilio-taskrouter-routing: \u001b[38;2;153;153;153m86 tokens\u001b[39m\n└ wizard: \u001b[38;2;153;153;153m85 tokens\u001b[39m\n└ netlify-blobs: \u001b[38;2;153;153;153m85 tokens\u001b[39m\n└ twilio-whatsapp-manage-senders: \u001b[38;2;153;153;153m85 tokens\u001b[39m\n└ canva-resize-for-social-media: \u001b[38;2;153;153;153m85 tokens\u001b[39m\n└ twilio-rcs-messaging: \u001b[38;2;153;153;153m84 tokens\u001b[39m\n└ shadcn: \u001b[38;2;153;153;153m84 tokens\u001b[39m\n└ fiftyone-generate-data-lens-connector: \u001b[38;2;153;153;153m84 tokens\u001b[39m\n└ qdrant-deployment-options: \u001b[38;2;153;153;153m84 tokens\u001b[39m\n└ ui5-best-practices-opa5: \u001b[38;2;153;153;153m83 tokens\u001b[39m\n└ vercel-firewall: \u001b[38;2;153;153;153m83 tokens\u001b[39m\n└ fiftyone-create-notebook: \u001b[38;2;153;153;153m83 tokens\u001b[39m\n└ fiftyone-eval-plugin: \u001b[38;2;153;153;153m83 tokens\u001b[39m\n└ miro-code-review: \u001b[38;2;153;153;153m83 tokens\u001b[39m\n└ netlify-identity: \u001b[38;2;153;153;153m82 tokens\u001b[39m\n└ twilio-voice-twiml: \u001b[38;2;153;153;153m82 tokens\u001b[39m\n└ netlify-forms: \u001b[38;2;153;153;153m80 tokens\u001b[39m\n└ mapbox-flutter-patterns: \u001b[38;2;153;153;153m80 tokens\u001b[39m\n└ twilio-conference-calls: \u001b[38;2;153;153;153m80 tokens\u001b[39m\n└ skill-development: \u001b[38;2;153;153;153m80 tokens\u001b[39m\n└ postman-context: \u001b[38;2;153;153;153m79 tokens\u001b[39m\n└ chrome-devtools: \u001b[38;2;153;153;153m78 tokens\u001b[39m\n└ save-to-spotify: \u001b[38;2;153;153;153m78 tokens\u001b[39m\n└ fiftyone-troubleshoot: \u001b[38;2;153;153;153m77 tokens\u001b[39m\n└ mapbox-style-patterns: \u001b[38;2;153;153;153m76 tokens\u001b[39m\n└ bootstrap: \u001b[38;2;153;153;153m76 tokens\u001b[39m\n└ chat-sdk: \u001b[38;2;153;153;153m76 tokens\u001b[39m\n└ miro-code-explain-on-board: \u001b[38;2;153;153;153m76 tokens\u001b[39m\n└ codebase-design: \u001b[38;2;153;153;153m75 tokens\u001b[39m\n└ vibe-prospecting: \u001b[38;2;153;153;153m74 tokens\u001b[39m\n└ playground: \u001b[38;2;153;153;153m73 tokens\u001b[39m\n└ mapbox-web-integration-patterns: \u001b[38;2;153;153;153m73 tokens\u001b[39m\n└ fiftyone-dataset-curation: \u001b[38;2;153;153;153m73 tokens\u001b[39m\n└ twilio-iam-auth-setup: \u001b[38;2;153;153;153m72 tokens\u001b[39m\n└ fiftyone-dataset-inference: \u001b[38;2;153;153;153m72 tokens\u001b[39m\n└ fiftyone-model-evaluation: \u001b[38;2;153;153;153m72 tokens\u001b[39m\n└ mapbox-mcp-devkit-patterns: \u001b[38;2;153;153;153m71 tokens\u001b[39m\n└ fiftyone-dataset-export: \u001b[38;2;153;153;153m71 tokens\u001b[39m\n└ preset-cli-mutations: \u001b[38;2;153;153;153m71 tokens\u001b[39m\n└ mapbox-cartography: \u001b[38;2;153;153;153m70 tokens\u001b[39m\n└ mapbox-mcp-runtime-patterns: \u001b[38;2;153;153;153m70 tokens\u001b[39m\n└ figma-use-motion: \u001b[38;2;153;153;153m69 tokens\u001b[39m\n└ figma-code-connect: \u001b[38;2;153;153;153m68 tokens\u001b[39m\n└ netlify-agent-runner: \u001b[38;2;153;153;153m68 tokens\u001b[39m\n└ next-cache-components: \u001b[38;2;153;153;153m68 tokens\u001b[39m\n└ nextjs: \u001b[38;2;153;153;153m68 tokens\u001b[39m\n└ receiving-code-review: \u001b[38;2;153;153;153m67 tokens\u001b[39m\n└ verification-before-completion: \u001b[38;2;153;153;153m67 tokens\u001b[39m\n└ huggingface-local-models: \u001b[38;2;153;153;153m67 tokens\u001b[39m\n└ qdrant-scaling: \u001b[38;2;153;153;153m67 tokens\u001b[39m\n└ knowledge-catalog-discovery: \u001b[38;2;153;153;153m67 tokens\u001b[39m\n└ memory-leak-debugging: \u001b[38;2;153;153;153m66 tokens\u001b[39m\n└ research: \u001b[38;2;153;153;153m66 tokens\u001b[39m\n└ mapbox-style-quality: \u001b[38;2;153;153;153m66 tokens\u001b[39m\n└ auth: \u001b[38;2;153;153;153m66 tokens\u001b[39m\n└ ai-sdk: \u001b[38;2;153;153;153m66 tokens\u001b[39m\n└ fiftyone-voodo-design: \u001b[38;2;153;153;153m66 tokens\u001b[39m\n└ mapbox-web-performance-patterns: \u001b[38;2;153;153;153m65 tokens\u001b[39m\n└ list-flows: \u001b[38;2;153;153;153m65 tokens\u001b[39m\n└ routing-middleware: \u001b[38;2;153;153;153m64 tokens\u001b[39m\n└ huggingface-paper-publisher: \u001b[38;2;153;153;153m63 tokens\u001b[39m\n└ domain-modeling: \u001b[38;2;153;153;153m63 tokens\u001b[39m\n└ searching-sourcegraph: \u001b[38;2;153;153;153m63 tokens\u001b[39m\n└ mapbox-android-patterns: \u001b[38;2;153;153;153m63 tokens\u001b[39m\n└ react-best-practices: \u001b[38;2;153;153;153m63 tokens\u001b[39m\n└ runtime-cache: \u001b[38;2;153;153;153m63 tokens\u001b[39m\n└ configure: \u001b[38;2;153;153;153m63 tokens\u001b[39m\n└ a11y-debugging: \u001b[38;2;153;153;153m62 tokens\u001b[39m\n└ miro-code-spec: \u001b[38;2;153;153;153m62 tokens\u001b[39m\n└ mapbox-ios-patterns: \u001b[38;2;153;153;153m61 tokens\u001b[39m\n└ mapbox-token-security: \u001b[38;2;153;153;153m61 tokens\u001b[39m\n└ vercel-functions: \u001b[38;2;153;153;153m61 tokens\u001b[39m\n└ workflow: \u001b[38;2;153;153;153m61 tokens\u001b[39m\n└ fiftyone-embeddings-visualization: \u001b[38;2;153;153;153m61 tokens\u001b[39m\n└ mapbox-data-visualization-patterns: \u001b[38;2;153;153;153m60 tokens\u001b[39m\n└ vercel-sandbox: \u001b[38;2;153;153;153m60 tokens\u001b[39m\n└ fiftyone-issue-triage: \u001b[38;2;153;153;153m60 tokens\u001b[39m\n└ preset-cli: \u001b[38;2;153;153;153m60 tokens\u001b[39m\n└ frontend-design: \u001b[38;2;153;153;153m59 tokens\u001b[39m\n└ troubleshooting: \u001b[38;2;153;153;153m59 tokens\u001b[39m\n└ mapbox-store-locator-patterns: \u001b[38;2;153;153;153m58 tokens\u001b[39m\n└ deploy-flow: \u001b[38;2;153;153;153m58 tokens\u001b[39m\n└ fiftyone-develop-plugin: \u001b[38;2;153;153;153m58 tokens\u001b[39m\n└ using-git-worktrees: \u001b[38;2;153;153;153m57 tokens\u001b[39m\n└ huggingface-datasets: \u001b[38;2;153;153;153m57 tokens\u001b[39m\n└ next-forge: \u001b[38;2;153;153;153m57 tokens\u001b[39m\n└ vercel-agent: \u001b[38;2;153;153;153m57 tokens\u001b[39m\n└ vercel-cli: \u001b[38;2;153;153;153m57 tokens\u001b[39m\n└ site-specification: \u001b[38;2;153;153;153m57 tokens\u001b[39m\n└ attorney-assist: \u001b[38;2;153;153;153m57 tokens\u001b[39m\n└ brainstorming: \u001b[38;2;153;153;153m56 tokens\u001b[39m\n└ verification: \u001b[38;2;153;153;153m56 tokens\u001b[39m\n└ fiftyone-find-duplicates: \u001b[38;2;153;153;153m55 tokens\u001b[39m\n└ access: \u001b[38;2;153;153;153m54 tokens\u001b[39m\n└ trigger-flow: \u001b[38;2;153;153;153m54 tokens\u001b[39m\n└ writing-hookify-rules: \u001b[38;2;153;153;153m53 tokens\u001b[39m\n└ mapbox-maplibre-migration: \u001b[38;2;153;153;153m53 tokens\u001b[39m\n└ trl-training: \u001b[38;2;153;153;153m52 tokens\u001b[39m\n└ prototype: \u001b[38;2;153;153;153m52 tokens\u001b[39m\n└ deployments-cicd: \u001b[38;2;153;153;153m52 tokens\u001b[39m\n└ vercel-storage: \u001b[38;2;153;153;153m52 tokens\u001b[39m\n└ generate-spec: \u001b[38;2;153;153;153m52 tokens\u001b[39m\n└ code-modernization:modernize-uplift: \u001b[38;2;153;153;153m51 tokens\u001b[39m\n└ fiftyone-code-style: \u001b[38;2;153;153;153m51 tokens\u001b[39m\n└ next-upgrade: \u001b[38;2;153;153;153m50 tokens\u001b[39m\n└ vercel:bootstrap: \u001b[38;2;153;153;153m49 tokens\u001b[39m\n└ get-flow-run: \u001b[38;2;153;153;153m49 tokens\u001b[39m\n└ figma-use-figjam: \u001b[38;2;153;153;153m48 tokens\u001b[39m\n└ figma-use-slides: \u001b[38;2;153;153;153m48 tokens\u001b[39m\n└ diagnosing-bugs: \u001b[38;2;153;153;153m48 tokens\u001b[39m\n└ vercel:env: \u001b[38;2;153;153;153m47 tokens\u001b[39m\n└ run-collection: \u001b[38;2;153;153;153m47 tokens\u001b[39m\n└ qt-qml-test-run: \u001b[38;2;153;153;153m47 tokens\u001b[39m\n└ commit-commands:clean_gone: \u001b[38;2;153;153;153m46 tokens\u001b[39m\n└ using-superpowers: \u001b[38;2;153;153;153m46 tokens\u001b[39m\n└ stripe-docs: \u001b[38;2;153;153;153m46 tokens\u001b[39m\n└ session-report: \u001b[38;2;153;153;153m46 tokens\u001b[39m\n└ mapbox-google-maps-migration: \u001b[38;2;153;153;153m46 tokens\u001b[39m\n└ qt-cmake-project: \u001b[38;2;153;153;153m46 tokens\u001b[39m\n└ grilling: \u001b[38;2;153;153;153m45 tokens\u001b[39m\n└ ai-gateway: \u001b[38;2;153;153;153m45 tokens\u001b[39m\n└ turbopack: \u001b[38;2;153;153;153m45 tokens\u001b[39m\n└ agent-ready-apis: \u001b[38;2;153;153;153m45 tokens\u001b[39m\n└ qt-ui-design: \u001b[38;2;153;153;153m45 tokens\u001b[39m\n└ postman:learn: \u001b[38;2;153;153;153m44 tokens\u001b[39m\n└ chrome-devtools-cli: \u001b[38;2;153;153;153m44 tokens\u001b[39m\n└ mapbox-search-integration: \u001b[38;2;153;153;153m44 tokens\u001b[39m\n└ env-vars: \u001b[38;2;153;153;153m44 tokens\u001b[39m\n└ postman-cli: \u001b[38;2;153;153;153m44 tokens\u001b[39m\n└ huggingface-gradio: \u001b[38;2;153;153;153m43 tokens\u001b[39m\n└ tdd: \u001b[38;2;153;153;153m43 tokens\u001b[39m\n└ postman-knowledge: \u001b[38;2;153;153;153m43 tokens\u001b[39m\n└ qt-qml-test: \u001b[38;2;153;153;153m43 tokens\u001b[39m\n└ build-with-wordpress:quick-build: \u001b[38;2;153;153;153m41 tokens\u001b[39m\n└ cdn-caching: \u001b[38;2;153;153;153m41 tokens\u001b[39m\n└ quickstart: \u001b[38;2;153;153;153m40 tokens\u001b[39m\n└ send-request: \u001b[38;2;153;153;153m40 tokens\u001b[39m\n└ hf-mem: \u001b[38;2;153;153;153m39 tokens\u001b[39m\n└ mapbox-geospatial-operations: \u001b[38;2;153;153;153m39 tokens\u001b[39m\n└ mapbox-search-patterns: \u001b[38;2;153;153;153m38 tokens\u001b[39m\n└ vercel:deploy: \u001b[38;2;153;153;153m37 tokens\u001b[39m\n└ code-modernization:modernize-reimagine: \u001b[38;2;153;153;153m37 tokens\u001b[39m\n└ dispatching-parallel-agents: \u001b[38;2;153;153;153m37 tokens\u001b[39m\n└ mapbox-location-grounding: \u001b[38;2;153;153;153m37 tokens\u001b[39m\n└ finishing-a-development-branch: \u001b[38;2;153;153;153m36 tokens\u001b[39m\n└ requesting-code-review: \u001b[38;2;153;153;153m36 tokens\u001b[39m\n└ remember:doctor: \u001b[38;2;153;153;153m35 tokens\u001b[39m\n└ code-modernization:modernize-brief: \u001b[38;2;153;153;153m35 tokens\u001b[39m\n└ code-modernization:modernize-preflight: \u001b[38;2;153;153;153m35 tokens\u001b[39m\n└ code-modernization:modernize-transform: \u001b[38;2;153;153;153m35 tokens\u001b[39m\n└ paypal:doctor: \u001b[38;2;153;153;153m35 tokens\u001b[39m\n└ writing-for-agents: \u001b[38;2;153;153;153m35 tokens\u001b[39m\n└ qdrant-clients-sdk: \u001b[38;2;153;153;153m35 tokens\u001b[39m\n└ postman:search: \u001b[38;2;153;153;153m34 tokens\u001b[39m\n└ code-modernization:modernize-assess: \u001b[38;2;153;153;153m34 tokens\u001b[39m\n└ code-modernization:modernize-harden: \u001b[38;2;153;153;153m34 tokens\u001b[39m\n└ code-modernization:modernize-map: \u001b[38;2;153;153;153m34 tokens\u001b[39m\n└ code-modernization:modernize-status: \u001b[38;2;153;153;153m34 tokens\u001b[39m\n└ knowledge-update: \u001b[38;2;153;153;153m34 tokens\u001b[39m\n└ executing-plans: \u001b[38;2;153;153;153m33 tokens\u001b[39m\n└ vercel:status: \u001b[38;2;153;153;153m32 tokens\u001b[39m\n└ postman:sync: \u001b[38;2;153;153;153m32 tokens\u001b[39m\n└ code-modernization:modernize-extract-rules: \u001b[38;2;153;153;153m32 tokens\u001b[39m\n└ postman:mock: \u001b[38;2;153;153;153m31 tokens\u001b[39m\n└ postman:security: \u001b[38;2;153;153;153m31 tokens\u001b[39m\n└ postman:trigger-flow: \u001b[38;2;153;153;153m31 tokens\u001b[39m\n└ subagent-driven-development: \u001b[38;2;153;153;153m31 tokens\u001b[39m\n└ systematic-debugging: \u001b[38;2;153;153;153m31 tokens\u001b[39m\n└ writing-skills: \u001b[38;2;153;153;153m31 tokens\u001b[39m\n└ plugin-dev:create-plugin: \u001b[38;2;153;153;153m30 tokens\u001b[39m\n└ paypal:setup: \u001b[38;2;153;153;153m29 tokens\u001b[39m\n└ test-driven-development: \u001b[38;2;153;153;153m29 tokens\u001b[39m\n└ resolving-merge-conflicts: \u001b[38;2;153;153;153m29 tokens\u001b[39m\n└ hookify:hookify: \u001b[38;2;153;153;153m28 tokens\u001b[39m\n└ postman:setup: \u001b[38;2;153;153;153m28 tokens\u001b[39m\n└ vpai:skip_sample: \u001b[38;2;153;153;153m28 tokens\u001b[39m\n└ writing-plans: \u001b[38;2;153;153;153m28 tokens\u001b[39m\n└ miro-doc: \u001b[38;2;153;153;153m28 tokens\u001b[39m\n└ postman:deploy-flow: \u001b[38;2;153;153;153m27 tokens\u001b[39m\n└ help: \u001b[38;2;153;153;153m27 tokens\u001b[39m\n└ legalzoom:review-contract: \u001b[38;2;153;153;153m27 tokens\u001b[39m\n└ postman:get-flow-run: \u001b[38;2;153;153;153m26 tokens\u001b[39m\n└ miro-browse: \u001b[38;2;153;153;153m26 tokens\u001b[39m\n└ feature-dev:feature-dev: \u001b[38;2;153;153;153m25 tokens\u001b[39m\n└ postman:list-flows: \u001b[38;2;153;153;153m25 tokens\u001b[39m\n└ postman:test: \u001b[38;2;153;153;153m24 tokens\u001b[39m\n└ paypal:explain-error: \u001b[38;2;153;153;153m24 tokens\u001b[39m\n└ miro-table: \u001b[38;2;153;153;153m24 tokens\u001b[39m\n└ build-with-wordpress:preview-designs: \u001b[38;2;153;153;153m23 tokens\u001b[39m\n└ claude-md-management:revise-claude-md: \u001b[38;2;153;153;153m22 tokens\u001b[39m\n└ stripe:explain-error: \u001b[38;2;153;153;153m22 tokens\u001b[39m\n└ postman:docs: \u001b[38;2;153;153;153m22 tokens\u001b[39m\n└ lovable:iterate: \u001b[38;2;153;153;153m22 tokens\u001b[39m\n└ paypal:sandbox: \u001b[38;2;153;153;153m22 tokens\u001b[39m\n└ paypal:test-accounts: \u001b[38;2;153;153;153m22 tokens\u001b[39m\n└ miro-diagram: \u001b[38;2;153;153;153m22 tokens\u001b[39m\n└ stripe:test-cards: \u001b[38;2;153;153;153m20 tokens\u001b[39m\n└ postman:generate-spec: \u001b[38;2;153;153;153m19 tokens\u001b[39m\n└ lovable:build: \u001b[38;2;153;153;153m19 tokens\u001b[39m\n└ lovable:db: \u001b[38;2;153;153;153m19 tokens\u001b[39m\n└ remember: \u001b[38;2;153;153;153m18 tokens\u001b[39m\n└ upgrade-stripe: \u001b[38;2;153;153;153m18 tokens\u001b[39m\n└ hookify:configure: \u001b[38;2;153;153;153m16 tokens\u001b[39m\n└ ralph-loop:help: \u001b[38;2;153;153;153m16 tokens\u001b[39m\n└ postman:run-collection: \u001b[38;2;153;153;153m16 tokens\u001b[39m\n└ commit-commands:commit-push-pr: \u001b[38;2;153;153;153m15 tokens\u001b[39m\n└ ralph-loop:ralph-loop: \u001b[38;2;153;153;153m14 tokens\u001b[39m\n└ postman:send-request: \u001b[38;2;153;153;153m14 tokens\u001b[39m\n└ hookify:list: \u001b[38;2;153;153;153m12 tokens\u001b[39m\n└ ralph-loop:cancel-ralph: \u001b[38;2;153;153;153m12 tokens\u001b[39m\n└ hookify:help: \u001b[38;2;153;153;153m11 tokens\u001b[39m\n└ commit-commands:commit: \u001b[38;2;153;153;153m11 tokens\u001b[39m"
+        }
+      ],
+      "subtype": "local_command",
+      "stream": "stdout",
+      "timestamp": "2026-08-13T23:06:03.152Z"
+    }
+  ]
+}
