@@ -13,8 +13,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   MASS_ORDO,
   stripStations,
+  stationAnchorFor,
   type Station,
 } from '../core/model/massOrdo.ts';
+import { readerAnchorsForDay, massTextsBySection } from '../core/data/liturgicalDay.ts';
 import { OFFICE_CURSUS, type Hour } from '../core/model/officeCursus.ts';
 import { STATION_INFO, HOUR_INFO } from '../core/model/stationLore.ts';
 import { stationIncipits, firstWords, type Incipit } from '../core/data/stationIncipits.ts';
@@ -46,7 +48,24 @@ export default function MapStrip({ db, day, view, activeStation, officeHour, onS
 
   const office = view === 'office';
   const season = (day?.season ?? 'Time after Pentecost') as Season;
-  const stations = office ? [] : stripStations(season);
+  // A strip stop appears exactly when the reader will render its anchor
+  // that day (D14: no dead clicks) — the chant switches and Sunday-only
+  // stations vary with the day, not just the season.
+  const anchors = useMemo(
+    () => (db && day ? readerAnchorsForDay(db, day) : new Set<string>()),
+    [db, day],
+  );
+  const textOf = useMemo(
+    () => (db && day ? massTextsBySection(db, day) : () => null),
+    [db, day],
+  );
+  const stations = useMemo(
+    () =>
+      office
+        ? []
+        : stripStations(season).filter((s) => stationAnchorFor(s, anchors, textOf) !== null),
+    [office, season, anchors, textOf],
+  );
 
   const incipits = useMemo(
     () => (db && day ? stationIncipits(db, day) : new Map<string, Incipit>()),

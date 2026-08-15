@@ -2384,5 +2384,6 @@ and recorded here with its citation.
 | Ordo/Ordo | Conclusio | `&Ultimaev` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Conclusio | `&itemissaest` | kept-as-rubric-marker | — | — | — |
 | Ordo/Ordo | Conclusio | `&Ultimaev` | kept-as-rubric-marker | — | — | — |
+| Ordo/Prayers | Ultima Evangelium | `!Joann. 1, 1-14` | filled-orphan-citation | Vulgata Clementina (VENDORED/vulgate-clementina) | Joann. 1, 1-14 | [In principio erat Verbum, et Verbum erat apud Deum, et Deus erat Verbum. Hoc erat in principio apud Deum. Omnia per ips |
 
-Total: 2377 fill(s).
+Total: 2378 fill(s).

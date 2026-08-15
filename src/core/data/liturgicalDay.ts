@@ -13,6 +13,7 @@
 
 import { parseISODate, getWeekKey, getSeason, seasonColor, transferKeys, isLeapYear } from '../calendar/computus.ts';
 import { scrubMacros } from '../text/scrubMacros.ts';
+import { MASS_ORDO, chantRenders } from '../model/massOrdo.ts';
 import { resolveWinner, type DayFileMeta } from '../calendar/precedence.ts';
 import type { CorpusDb } from './corpusDb.ts';
 import type { DayInfo, SectionText } from './types.ts';
@@ -80,6 +81,36 @@ function scrubMass(texts: SectionText[]): SectionText[] {
     latin: t.latin != null ? scrubMacros(t.latin) : t.latin,
     english: t.english != null ? scrubMacros(t.english) : t.english,
   }));
+}
+
+/**
+ * The anchors the Mass reader will actually render for this day — the
+ * subway map's clickability contract: a stop is tappable exactly when its
+ * anchor is in this set. Mirrors ReaderView's entry building: the day's
+ * Mass sections, the invariable Ordo/Missae, the Ordo/Prayers stations
+ * (the sprinkling rite is a Sunday station), and the seasonal chant
+ * switches filtered to the day's season.
+ */
+export function readerAnchorsForDay(db: CorpusDb, day: DayInfo): Set<string> {
+  const texts = massTextsForDay(db, day).texts;
+  const anchors = new Set<string>(texts.map((s) => s.section));
+  for (const [sec, t] of db.getOrdoTexts()) if (t.latin || t.english) anchors.add(`ordo:${sec}`);
+  for (const [sec, t] of db.getPrayersTexts()) if (t.latin || t.english) anchors.add(`prayers:${sec}`);
+  if (day.weekday !== 'Sunday') anchors.delete('prayers:Asperges me');
+  for (const st of MASS_ORDO) {
+    if (st.branch === 'chant' && st.sectionKey && !chantRenders(st.sectionKey, day.season as never, anchors)) {
+      anchors.delete(st.sectionKey);
+    }
+  }
+  return anchors;
+}
+
+/** Section text lookup for the day's Mass, paired with readerAnchorsForDay
+ *  for fallback `requires` gating (e.g. the Graduale carrying an alleluia
+ *  verse or not). */
+export function massTextsBySection(db: CorpusDb, day: DayInfo): (section: string) => string | null {
+  const by = new Map(massTextsForDay(db, day).texts.map((s) => [s.section, s.latin ?? s.english ?? '']));
+  return (section: string) => by.get(section) ?? null;
 }
 
 export function resolveDay(db: CorpusDb, iso: string): DayInfo {

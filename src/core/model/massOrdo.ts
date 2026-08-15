@@ -102,7 +102,6 @@ export const MASS_ORDO: Station[] = [
  * stations share one Ordo section (Kyrie+Gloria, Preface+Sanctus…).
  */
 export const ORDO_STATION_SECTION: Record<string, string> = {
-  asperges: 'Prelude',
   iudica: 'Incipit',
   confiteor: 'Incipit',
   kyrie: 'Kyrie',
@@ -120,10 +119,102 @@ export const ORDO_STATION_SECTION: Record<string, string> = {
 };
 
 /**
+ * Stations resolved from Ordo/Prayers (missa Ordo/Prayers.txt — DO
+ * propers.pl `prayer()`): the sprinkling rite lives there, not in
+ * Ordo/Missae. `Asperges me` Sundays, `Vidi aquam` in Paschaltide.
+ */
+export const PRAYERS_STATION_SECTION: Record<string, string> = {
+  asperges: 'Asperges me',
+};
+
+/**
+ * A station whose anchor is a LINE inside its resolved section rather than
+ * the section top: the foot-of-altar block carries Iudica, the Confiteor
+ * and the Absolution in one [Incipit]; and the per-annum Alleluia verse
+ * rides inside the [Graduale] block after the gradual ("… Allelúja,
+ * allelúja … Allelúja.").
+ */
+export const ORDO_STATION_ANCHOR_AT: Record<string, RegExp> = {
+  confiteor: /^\s*v\.\s*Confíteor Deo/i,
+  alleluia: /allel[uú](?:ia|ja)/i,
+};
+
+/**
+ * Anchor candidates beyond the primary section when the day's Mass carries
+ * the chant under another name — the feast-day "Alleluia" is the paschal
+ * gradual text (GradualeP) in most sanctoral files, and on Sundays it
+ * rides inside the Graduale block itself. A `requires` regex gates the
+ * fallback on the section actually containing the station's text (the
+ * ember/vigil Graduales carry no alleluia verse — those days have none).
+ */
+export const STATION_ANCHOR_FALLBACKS: Record<string, { section: string; requires?: RegExp }[]> = {
+  alleluia: [{ section: 'GradualeP' }, { section: 'Graduale', requires: /allel[uú](?:ia|ja)/i }],
+};
+
+/**
+ * The one rule that makes a subway stop honest: it is clickable exactly
+ * when the reader will render an anchor for it. `present` is the day's
+ * rendered reader anchors ("Introitus", "ordo:Canon", "prayers:Asperges
+ * me"…); `textOf` supplies section text for `requires` gating. A station
+ * with no home that day returns null and the map shows it disabled —
+ * never a dead click.
+ */
+export function stationAnchorFor(
+  s: Station,
+  present: Set<string>,
+  textOf?: (section: string) => string | null | undefined,
+): string | null {
+  if (s.sectionKey && present.has(s.sectionKey)) return s.sectionKey;
+  for (const fb of STATION_ANCHOR_FALLBACKS[s.id] ?? []) {
+    if (!present.has(fb.section)) continue;
+    if (fb.requires && !fb.requires.test(textOf?.(fb.section) ?? '')) continue;
+    return fb.section;
+  }
+  // Non-fallback homes (ordo/prayers sections, the bare id) need no gate.
+  const fallbackSecs = new Set((STATION_ANCHOR_FALLBACKS[s.id] ?? []).map((fb) => fb.section));
+  return stationAnchorCandidates(s.id).find((c) => present.has(c) && !fallbackSecs.has(c)) ?? null;
+}
+
+/**
+ * Anchor candidate list for a station id (or a raw section key, as
+ * deep-links pass): the reader's focus resolution and the map's
+ * enablement share this order — Ordo/Prayers home, Ordo/Missae home,
+ * proper section, chant fallbacks.
+ */
+export function stationAnchorCandidates(idOrKey: string): string[] {
+  const st = MASS_ORDO.find((s) => s.id === idOrKey);
+  if (!st) return [idOrKey];
+  const cands: string[] = [];
+  if (PRAYERS_STATION_SECTION[st.id]) cands.push(`prayers:${PRAYERS_STATION_SECTION[st.id]}`);
+  if (ORDO_STATION_SECTION[st.id]) cands.push(`ordo:${ORDO_STATION_SECTION[st.id]}`);
+  if (st.sectionKey) cands.push(st.sectionKey, ...(STATION_ANCHOR_FALLBACKS[st.id] ?? []).map((fb) => fb.section));
+  return cands.length ? cands : [st.id];
+}
+
+/**
+ * Does the reader render this chant-switch section today? Seasonal
+ * activity decides — with one rubric the season table alone can't express
+ * (DO propers.pl): the paschal-gradual section [GradualeP] carries the
+ * text of the per-annum SECOND CHANT ("Allelúia, allelúia. V. …"), so it
+ * renders as the Alleluia outside Paschaltide too whenever the day's
+ * propers carry no separate [Alleluia] section. `present` = the day's
+ * Mass section names.
+ */
+export function chantRenders(section: string, season: Season, present: Set<string>): boolean {
+  if (section === 'GradualeP') {
+    if (present.has('Alleluia')) return season === 'Paschaltide';
+    return true; // the day's own alleluia text, whatever the season
+  }
+  const sw = MASS_ORDO.find((st) => st.branch === 'chant' && st.sectionKey === section);
+  return sw ? stationActive(sw, season) : true;
+}
+
+/**
  * Canonical interleaving of the Ordinary (o:) and the day's propers (p:)
  * for the full-Mass reader. Ordinary entries reference Ordo/Missae sections.
  */
-export const READER_ORDER: { kind: 'ordo' | 'proper'; section: string; title?: string }[] = [
+export const READER_ORDER: { kind: 'ordo' | 'proper' | 'prayers'; section: string; title?: string }[] = [
+  { kind: 'prayers', section: 'Asperges me', title: 'Asperges me — Sprinkling Rite' },
   { kind: 'ordo', section: 'Incipit', title: 'Prayers at the Foot of the Altar' },
   { kind: 'proper', section: 'Introitus' },
   { kind: 'ordo', section: 'Kyrie', title: 'Kyrie · Gloria' },

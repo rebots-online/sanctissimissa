@@ -323,3 +323,41 @@ enumerated, not remediated.
   switching — the declared-unimplemented families; exercised only in
   seasons/conditions outside these probes.
 - Season-gated unverified: Triduum, Paschaltide, transfers, Quicumque.
+
+---
+
+# Phase 5 — D14 resolution: subway stops (same day, post-v1.32)
+
+**Root cause, from the vendored source:** the stations' text homes were never
+complete. `missa/Latin/Ordo/Prayers.txt` — the home of `[Asperges me]`,
+`[Vidi aquam]`, the Mass `[Alleluia]`, `[IteMissa]`, `[Ultima Evangelium]`
+(read by DO `propers.pl prayer()`/`Vidiaquam`) — was **never ingested**
+(only `Ordo/Ordo.txt` was, as `Ordo/Missae`); the Confiteor stop pointed at
+the merged foot-of-altar blob with no line anchor; the Alleluia stop had no
+section on most days (its text lives in `GradualeP` on sanctoral feasts and
+inside the `Graduale` block on Sundays — the ember/vigil days genuinely
+have none).
+
+**Fixes:** `Ordo/Prayers` ingested (51 sections, bilingual); Asperges
+resolves to its real home (Sundays, per DO `Vidiaquam`); line-level anchors
+(`ORDO_STATION_ANCHOR_AT`) land the Confiteor stop on the Confiteor itself
+and the Alleluia stop on the alleluia verse, in either reader layout;
+`STATION_ANCHOR_FALLBACKS` with `requires` text-gating resolves the
+Alleluia across its three homes and disables it on days that truly have
+none; `chantRenders` renders the GradualeP text as the per-annum "Alleluia"
+(fixing the regressed missing-alleluia display); and the maps' new
+tappability contract — a stop is clickable exactly when the reader will
+render its anchor that day — ends dead clicks in SubwayMap and MapStrip
+(`readerAnchorsForDay`).
+
+**Verification:** station census across all five probe day-types — zero
+unexpectedly dead stops, alleluia resolving or disabling per DO's own
+render; live browser check — Confiteor click lands on the Confiteor line
+(pair 25/53, in band), Alleluia click lands on the Alleluia block titled
+"Alleluia"; `npx tsc` clean; 283/283 tests.
+
+**Companion requirement recorded (operator):** `missal.db` must be
+semantically and version named — its contents are a function of the
+vendored snapshot + ingest, and today's silently-missing source file is
+the proof; a corpus artifact whose identity isn't in its name cannot be
+audited against the app version that serves it.

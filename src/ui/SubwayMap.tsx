@@ -11,8 +11,9 @@
  * reader at that section.
  */
 
-import { useMemo, useRef, useState } from 'react';
-import { MASS_ORDO, trunkOf, branchOf, stationActive, type Station } from '../core/model/massOrdo.ts';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { MASS_ORDO, trunkOf, branchOf, stationActive, stationAnchorFor, type Station } from '../core/model/massOrdo.ts';
+import { readerAnchorsForDay, massTextsBySection } from '../core/data/liturgicalDay.ts';
 import { STATION_INFO } from '../core/model/stationLore.ts';
 import { stationIncipits, type Incipit } from '../core/data/stationIncipits.ts';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
@@ -73,13 +74,13 @@ function StationRow({
 
 /** Indented fold-out branch (Ember insert, chant alternatives, spur). */
 function Branch({
-  title, color, stations, accent, season, onStation, defaultOpen,
+  title, color, stations, accent, season, tappable, onStation, defaultOpen,
 }: {
   title: string; color: string; stations: Station[]; accent: string;
-  season: string; onStation: (s: Station) => void; defaultOpen: boolean;
+  season: string; tappable: (s: Station) => boolean; onStation: (s: Station) => void; defaultOpen: boolean;
 }) {
   const [open, setOpen] = useState(defaultOpen);
-  const anyActive = stations.some((s) => stationActive(s, season as never));
+  const anyActive = stations.some((s) => tappable(s));
   return (
     <div className={`vbranch${anyActive ? '' : ' inactive'}`} style={{ ['--branch-color' as never]: color }}>
       <button className="vbranch-head" onClick={() => setOpen(!open)} aria-expanded={open}>
@@ -89,7 +90,7 @@ function Branch({
       {open && (
         <div className="vbranch-body">
           {stations.map((s) => (
-            <StationRow key={s.id} s={s} accent={accent} active={stationActive(s, season as never)} onStation={onStation} small />
+            <StationRow key={s.id} s={s} accent={accent} active={tappable(s)} onStation={onStation} small />
           ))}
           <div className="vreturn">└─ return</div>
         </div>
@@ -104,6 +105,21 @@ export default function SubwayMap({ db, day, onStation }: Props) {
   const [full, setFull] = useState(false);
   const [flyout, setFlyout] = useState<FlyoutData | null>(null);
   const hoverSid = useRef<string | null>(null);
+
+  // A stop is tappable exactly when the reader will render its anchor that
+  // day (D14: no dead clicks) — same set the reader builds its entries by.
+  const anchors = useMemo(
+    () => (db && day ? readerAnchorsForDay(db, day) : new Set<string>()),
+    [db, day],
+  );
+  const textOf = useMemo(
+    () => (db && day ? massTextsBySection(db, day) : () => null),
+    [db, day],
+  );
+  const tappable = useCallback(
+    (s: Station) => stationActive(s, season as never) && stationAnchorFor(s, anchors, textOf) !== null,
+    [season, anchors, textOf],
+  );
 
   const incipits = useMemo(
     () => (db && day ? stationIncipits(db, day) : new Map<string, Incipit>()),
@@ -147,7 +163,7 @@ export default function SubwayMap({ db, day, onStation }: Props) {
     <div className="vtrunk" style={{ ['--line-color' as never]: lineColor }}>
       {stations.map((s) => (
         <div key={s.id}>
-          <StationRow s={s} accent={accent} active={stationActive(s, season as never)} onStation={onStation} />
+          <StationRow s={s} accent={accent} active={tappable(s)} onStation={onStation} />
           {injectAfter[s.id]}
         </div>
       ))}
@@ -170,7 +186,7 @@ export default function SubwayMap({ db, day, onStation }: Props) {
 
       {full && asperges && (
         <div className="vtrunk" style={{ ['--line-color' as never]: 'var(--line-catechumens)' }}>
-          <StationRow s={asperges} accent={accent} active onStation={onStation} />
+          <StationRow s={asperges} accent={accent} active={tappable(asperges)} onStation={onStation} />
         </div>
       )}
 
@@ -183,6 +199,7 @@ export default function SubwayMap({ db, day, onStation }: Props) {
             stations={ember}
             accent={accent}
             season={season}
+            tappable={tappable}
             onStation={onStation}
             defaultOpen={emberActive && full}
           />
@@ -195,6 +212,7 @@ export default function SubwayMap({ db, day, onStation }: Props) {
             stations={chants}
             accent={accent}
             season={season}
+            tappable={tappable}
             onStation={onStation}
             defaultOpen
           />
@@ -214,6 +232,7 @@ export default function SubwayMap({ db, day, onStation }: Props) {
             stations={[superPopulum]}
             accent={accent}
             season={season}
+            tappable={tappable}
             onStation={onStation}
             defaultOpen={season === 'Lent'}
           />

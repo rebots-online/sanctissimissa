@@ -37,6 +37,7 @@ every kind of day.
 
 - The full divergence enumeration, root causes and the convergence evidence live in `DOCS/2026-08-15-0935-office-mass-differential-probe-v1.31.66058.md` (Phases 1–4).
 - The convergence sweep is `tests/.tmp/diffprobe/sweep.mjs` (working artifact): five day-types × eight hours compared structure-token by structure-token against the vendored Divinum Officium reference render.
+- **Release-ops record (2026-08-15):** the v1.32.80451 push initially failed because Forgejo (CT 130) was at 100% disk; the operator-directed record of the resulting 32 G rootfs resize is in the Admin-Manual (`SERVERS/pve-ct130-forgejo-rootfs-resize-2026-08-15.md`). The web release was mounted manually once (including one unnecessary nginx reload — a symlink swap alone suffices); that ad-hoc path is now prohibited. Mounting is being converted to the flag-only pattern: the release push itself is the "new release" flag (`version.json` + `dist/release-manifest-v<V>.json` + the web-pwa zip on Forgejo master), the agent never touches the server, and a **Forgejo Action** is the operator's preferred implementation for the mount step — see `SERVERS/standroid-automated-mount-proposal-2026-08-15.md` in the Admin-Manual.
 
 ## v1.26.60862 — 2026-08-02
 

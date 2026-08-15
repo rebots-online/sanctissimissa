@@ -201,6 +201,23 @@ export class CorpusDb {
     return map;
   }
 
+  /** Prayers of the missa Ordinary (Ordo/Prayers): Asperges/Vidi aquam,
+   *  the Mass Confiteor, Alleluia frame, IteMissa, Ultima Evangelium. */
+  getPrayersTexts(): Map<string, SectionText> {
+    const map = new Map<string, SectionText>();
+    for (const [section, t] of this.sectionsOf('Ordo/Prayers')) {
+      map.set(section, {
+        nodeKey: `section:Ordo/Prayers#${section}`,
+        section,
+        latin: t.latin,
+        english: t.english,
+        sourcePath: 'Ordo/Prayers',
+        fromCommune: false,
+      });
+    }
+    return map;
+  }
+
   /**
    * Public ordered section access for one corpus file (meta sections
    * excluded) — the office engine's window onto propers/psalter/specials.

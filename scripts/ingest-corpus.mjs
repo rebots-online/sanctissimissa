@@ -377,6 +377,36 @@ for (const src of SOURCES) {
   corpus.set(path, entry);
 }
 
+// Prayers of the missa Ordo (missa/<lang>/Ordo/Prayers.txt): the text home
+// of the Asperges/Vidi aquam sprinkling rite, the Mass Confiteor, the
+// Alleluia chant frame, IteMissa and Ultima Evangelium — the subway map's
+// stations resolve here (DO propers.pl `prayer()` reads this file).
+// Standard [Section] file: parse via the corpus tree (missa candidate
+// first), name-join Latin↔English, English-only sections still ingest.
+{
+  const path = 'Ordo/Prayers';
+  const latSections = realizeSections(trees.Latin.sections('Ordo/Prayers'));
+  const engSections = realizeSections(trees.English.sections('Ordo/Prayers'));
+  const engByName = new Map((engSections ?? []).map((s) => [s.name, s]));
+  const entry = {
+    title: 'Ordo Missae — Prayers of the Ordinary',
+    rankClass: null, rankNum: 0, color: null, vide: null, category: 'Ordo',
+    sections: new Map(),
+  };
+  for (const s of latSections ?? []) {
+    const eng = engByName.get(s.name);
+    const lr = resolveLang('Latin', path, 'Ordo/Prayers', s.name, s.content, null, null);
+    const er = eng ? resolveLang('English', path, 'Ordo/Prayers', s.name, eng.content, null, null) : { text: null, filled: false };
+    entry.sections.set(s.name, { latin: lr.text || null, english: er.text || null, filled: lr.filled || er.filled, qualifier: s.qualifier });
+  }
+  for (const s of engSections ?? []) {
+    if (entry.sections.has(s.name)) continue;
+    const er = resolveLang('English', path, 'Ordo/Prayers', s.name, s.content, null, null);
+    entry.sections.set(s.name, { latin: null, english: er.text || null, filled: er.filled, qualifier: s.qualifier });
+  }
+  corpus.set(path, entry);
+}
+
 /** Map a DO-relative include target back to a corpus path. */
 function normalizeTarget(target, src) {
   const [p, sec] = target.split('#');

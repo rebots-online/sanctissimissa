@@ -105,6 +105,12 @@ export function openAdapter(dbPath = 'assets/missal.db') {
           sourcePath: path, fromCommune: false,
         }));
     },
+    getOrdoTexts() {
+      return new Map(this.getFileSections('Ordo/Missae').map((s) => [s.section, s]));
+    },
+    getPrayersTexts() {
+      return new Map(this.getFileSections('Ordo/Prayers').map((s) => [s.section, s]));
+    },
     getPsalm(num) {
       return this.getSection(`Psalterium/Psalmorum/Psalm${num}`, 'Psalmus');
     },

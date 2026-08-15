@@ -14,7 +14,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 import type { DayInfo, SectionText } from '../core/data/types.ts';
-import { MASS_ORDO, READER_ORDER, ORDO_STATION_SECTION, stationActive } from '../core/model/massOrdo.ts';
+import { MASS_ORDO, READER_ORDER, ORDO_STATION_ANCHOR_AT, stationAnchorCandidates, chantRenders } from '../core/model/massOrdo.ts';
 import type { Season } from '../core/calendar/computus.ts';
 import type { SidecarDb } from '../core/accompaniment/store.ts';
 import { massTextsForDay } from '../core/data/liturgicalDay.ts';
@@ -74,20 +74,30 @@ export default function ReaderView({
   const entries: ReaderEntry[] = useMemo(() => {
     const propers = new Map(massTextsForDay(db, day).texts.map((s) => [s.section, s]));
     const ordo = db.getOrdoTexts();
+    const prayers = db.getPrayersTexts();
     const specialsCtx = massSpecialsContextFromDay(day, { solemn });
     const out: ReaderEntry[] = [];
     for (const slot of READER_ORDER) {
-      if (slot.kind === 'proper') {
+      if (slot.kind === 'prayers') {
+        // The sprinkling rite is a Sunday station (Vidi aquam in
+        // Paschaltide — same slot, seasonal text, DO `Vidiaquam`).
+        if (day.weekday !== 'Sunday') continue;
+        const s = prayers.get(slot.section)
+          ?? prayers.get(day.season === 'Paschaltide' ? 'Vidi aquam' : slot.section);
+        if (s && (s.latin || s.english)) {
+          out.push({ ...s, ordinary: true, displayTitle: slot.title ?? s.section, anchor: `prayers:${slot.section}` });
+        }
+      } else if (slot.kind === 'proper') {
         // Seasonal chant switch: a feast file may carry all four chant
         // alternatives (Graduale/Alleluia/Tractus/GradualeP for whenever the
-        // feast falls) — render only the season's own, per the rubric the
-        // subway map already encodes.
-        const sw = MASS_ORDO.find((st) => st.branch === 'chant' && st.sectionKey === slot.section);
-        if (sw && !stationActive(sw, day.season as Season)) continue;
+        // feast falls) — render the season's own per chantRenders (the
+        // GradualeP text is the per-annum Alleluia too).
+        if (!chantRenders(slot.section, day.season as Season, new Set(propers.keys()))) continue;
         const s = propers.get(slot.section);
         if (s) {
           const filtered = applyMassSpecialsBilingual(s.latin, s.english, specialsCtx);
-          out.push({ ...s, latin: filtered.latin || null, english: filtered.english || null, ordinary: false, displayTitle: s.section, anchor: s.section });
+          const title = slot.section === 'GradualeP' && day.season !== 'Paschaltide' ? 'Alleluia' : s.section;
+          out.push({ ...s, latin: filtered.latin || null, english: filtered.english || null, ordinary: false, displayTitle: title, anchor: s.section });
         }
       } else {
         const s = ordo.get(slot.section);
@@ -109,14 +119,30 @@ export default function ReaderView({
 
   useEffect(() => {
     if (focusSection && rootRef.current) {
-      // Accept a proper section key, an Ordo anchor, or an ordinary station id.
-      const anchor = ORDO_STATION_SECTION[focusSection]
-        ? `ordo:${ORDO_STATION_SECTION[focusSection]}`
-        : focusSection;
+      // Station → anchor candidates in the same order the map resolves them:
+      // Ordo/Prayers home, Ordo/Missae home, proper section, chant fallbacks.
+      // Focus arrives as a station id OR a proper sectionKey (and deep links
+      // pass raw keys) — resolve to the station first so the candidate and
+      // line-anchor tables apply.
+      const st = MASS_ORDO.find((x) => x.id === focusSection || x.sectionKey === focusSection);
+      const stationId = st?.id ?? focusSection;
+      const cands = stationAnchorCandidates(stationId);
       const root = rootRef.current;
-      const el =
-        root.querySelector(`[data-section="${CSS.escape(anchor)}"]`) ??
-        root.querySelector(`[data-section="${CSS.escape(focusSection)}"]`);
+      let el: HTMLElement | null = null;
+      for (const c of cands) {
+        el = root.querySelector(`[data-section="${CSS.escape(c)}"]`);
+        if (el) break;
+      }
+      // Line-level refinement: a station inside a multi-part section (the
+      // Confiteor within the foot-of-altar Incipit; the Alleluia verse inside
+      // a Sunday Graduale) scrolls to its own line, not the section top —
+      // in either reader layout (interleaved pairs / Latin column spans).
+      const at = ORDO_STATION_ANCHOR_AT[stationId];
+      if (el && at) {
+        const lines = el.querySelectorAll('.il-pair, .latin p > span');
+        const line = Array.from(lines).find((c) => at.test(c.textContent ?? ''));
+        if (line) el = line as HTMLElement;
+      }
       if (el) {
         // Navigating to a folded section unfolds it.
         setOpenAnchor((el as HTMLElement).dataset.section ?? null);
