@@ -177,3 +177,52 @@ Live serves v1.26.60862 (built 2026-08-02) while v1.31.66058 completed its full 
 ## Relation to the §11 program
 
 D2 (feast→Day0 schema selection) and the Laudes1/Laudes2 predicate are the already-architected **B1 / P-V stanza** (`DOCS/ARCHITECTURE.md` §11, decisions 22–26; `DayInfo.vigil` still absent from `types.ts`). D1 (nocturn interleaving), D3 (Benedictus number), D4 (Compline row + invariability), D6 (specials expansion) and D7 (commemoration fallback) are natural members of the same stanza's scope; D5 and the `Day1-6 Completorium` rows are ingest-side data repairs best landed with the next `npm run ingest`. No remediation was performed in this probe — this report is the enumeration and cause record for that work.
+
+---
+
+# Phase 2 — day-type coverage (same day-session, ~10:15 EDT)
+
+The Assumption probe exercised I-class-feast paths only. Phase 2 probes four further day-types, DO-vs-current-tree (live≈local equivalence was established in Phase 1): **2026-08-16** (Dominica XII, green Sunday), **2026-08-17** (S. Hyacinthi, III-class sanctoral), **2026-08-14** (Vigil of the Assumption), **2026-12-16** (Feria IV Quattuor Temporum in Adventu — Advent Ember Wednesday). Artifacts: `tests/.tmp/diffprobe/day-<date>/` (`do-*.html`, `local-*.txt`, `matrix.txt`, `condensed.txt`).
+
+## Controls that PASSED (validating the schema table itself)
+
+- **Sunday Laudes psalmody is correct**: 92/99/62/Canticum (210 = Trium Puerorum)/148 = DO exactly (`Day0 Laudes1` row ✓).
+- **III-class feast Matins/Laudes/minor psalmody follows the ferial day row** and matches DO (Hyacinth: 13/14/16…, 46/5/28/Cant(211)/116) — correct 1960 behavior for III-class.
+- **Ferial Compline day-rows match DO** (Monday 6/7(2-10)/7(11-18); Wednesday 33(2-11)/33(12-23)/60).
+- **Advent Ember Tertia matches** (53, 54(2-16), 54(17-24)).
+
+## New findings
+
+### D16 — CRITICAL — Sunday Matins renders ZERO lessons
+Green Sunday (2026-08-16): our Matins runs psalms → Oratio with **no Lectio/Responsorium at all** (0 entries); DO renders the Sunday homily lessons. **Cause:** `engine.ts:523` — `lessons()` iterates `Lectio${i}` from 1 with `if (!lec) break;`. DO's tempora files number Sunday Matins lessons **7–9** (the homily convention) — verified: `Tempora/Pent12-0` ingests `Lectio7/8/9` (+`Responsory8`) and nothing numbered 1–6. `Lectio1` misses → break → zero lessons. The contiguity assumption breaks every Sunday and any file using the 7–9 convention. Fix direction: collect all `Lectio n` sections present, sort, emit in order (and interleave per D1).
+
+### D17 — CRITICAL — `isFeria` is inverted; penitential Laudes2 is unreachable for ferias and vigils
+**Evidence 1 (Advent Ember Wednesday, 2026-12-16):** DO Laudes = **50**, 64, 100, Canticum Annæ, 145 (penitential arrangement); ours = **96**, 64, 100, Cant(213), 145 (Laudes1).
+**Evidence 2 (Vigil of the Assumption, 2026-08-14):** DO Laudes = **50**, 142, 84, Canticum Habacuc, 147; ours = **98**, … (Laudes1).
+**Cause:** `engine.ts:378` — `isFeria = !winner ‖ (/Feria|Dominica/i.test(rankClass) === false && rank ≤ 1.2)`. A day whose `rankClass` **is** "Feria" makes the regex match → `match === false` is false → `isFeria = false`. The predicate is true exactly when the day is *not* labeled a feria — backwards. Hence `penitential && isFeria` (line 380) never selects `Laudes2` for real ferias; vigils additionally fail the season list (`['Advent','Pre-Lent','Lent']` omits vigil penitentiality). **The schema data is already right:** `Day3 Laudes2 = 50 64 100 223 145` and `Day5 Laudes2 = 50 142 84 225 147` reproduce DO exactly (223/225 = the correct ferial canticles). This is the §11 B1 defect, now proven on two day-types; the fix belongs to the P-V stanza (`DayInfo.vigil` included).
+
+### D18 — MEDIUM — Commemorations are not hour-scoped
+DO renders *S. Eusebius* on 08-14/12-16 as **"Commemoratio ad Laudes tantum"** (and at Laudes shows the full commemoration block); on 08-16, *S. Joachim* similarly scoped. Our engine emits `Commemoratio: …` at **every hour** (Matins/Prima/Tertia/Compline on 08-14 and 08-16 all carry it). DO's kalendar data carries scope annotations (ad Laudes tantum / ad Laudes et Vesperas / ad Vesperas); our `day.commemorations` keeps only key/title/rank and `oratio()` appends it wherever the Oratio block renders. Fix direction: ingest the scope annotation and gate the commemoration rendering by hour.
+
+### D5 — REVISED by Sunday control (was: "Day0 Prima first ref 117 wrong")
+DO's Sunday Prime is **117, 118(1-16), 118(17-32)** — our `Day0 Prima` row is **correct for Sundays**. On **feasts** DO uses **53**, 118i, 118ii (the ferial invariable first psalm). So the actual defect is twofold: (a) the feast mapping must select the ferial-Prime set, not the Sunday row; (b) the `Day1–Day6 Prima` rows carry a **bogus 4th slot** — the day's Laudes psalm leaked in (Day1→46, Day3→96, Day5→98, Day6→149; DO renders three Prime psalms on every probed day). Ingest row repair + selection fix.
+
+### D4 — REFINED (Compline)
+Compline varies by day **character**, not weekday: ferias use the day rows (Day1/Day3 verified correct); Sundays, feasts, and vigils use the invariable **4/90/133** (DO on 08-14 vigil and 08-15 feast; our `Day0 Completorium` row). `Day6 Completorium = 87 102(1-12) 102(13-22)` remains garbage data. Fix: repair the Day6 row + select by character (feast→invariable row), same mapping family as D2.
+
+### D2 — REFINED (scope of the feast mapping)
+The feast→Day0/festal mapping applies to **Laudes, the minor hours, Prime, and Compline**, and only for **I/II-class feasts** (and Sundays by nature); III-class feasts and ferias keep their day-of-week rows (Hyacinth control passed). I-class **Matins** psalmody already works via the proper-file path (Phase 1's Assumption set was correct). Ember-Matins row nit (Day3 nocturn 3): ours `49(1-15) 49(16-23) 50` vs DO `49(1-6) 49(7-15) 49(16-23)` — a split-boundary data fix in the same family as D5's row repairs.
+
+### D6 — recurrence confirmed
+DO renders the **Pater noster** at Matins/Prime/Compline on all four Phase-2 days; ours is absent everywhere (the `![rubrica Pater secreto]` macro family, unchanged).
+
+## Phase-2 divergence table
+
+| Day | Type | Result |
+|---|---|---|
+| 2026-08-16 | Sunday | Laudes ✓ · **Matins lessons missing (D16)** · Prime row ✓ for Sunday · D3/D6 as Phase 1 |
+| 2026-08-17 | III-class feast | Matins/Laudes/minors ✓ · Prima 4-slot row (D5b) · D3/D6 persist |
+| 2026-08-14 | Vigil (I cl) | **Laudes2 not selected (D17)** · Compline should be 4/90/133 (D4) · commemoration hour-scoping (D18) · Matins psalmody ✓ |
+| 2026-12-16 | Advent Ember feria | **Laudes2 not selected (D17 — inverted isFeria proven)** · Matins nocturn-3 split row · Compline ✓ (ferial row) · D6 Pater noster |
+
+Phase 2 likewise performed no remediation; it extends the enumeration. The four CRITICAL engine defects are now D1 (nocturn interleave), D2+D4+D5 (schema selection/row data), D3 (Benedictus number), D16 (lesson numbering), D17 (inverted isFeria) — with D17 and the vigil cases mapping directly onto the §11 P-V stanza as designed.
