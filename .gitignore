@@ -1,5 +1,7 @@
 node_modules/
-VENDORED/divinum-officium/
+# Shared DO checkout symlink (authorized exception; trailing-slash patterns
+# do not match symlinks, hence the bare path here):
+VENDORED/divinum-officium
 public/missal.db
 !/dist/
 !/dist/**
@@ -28,3 +30,9 @@ msix-stage/
 # tsc -b incremental state — build output; tracking it makes the
 # pre-build gate fail on every build after the first.
 tsconfig.tsbuildinfo
+
+# Machine-local caches only (regenerated per workstation — never synced).
+# Everything else, including credential-bearing history, is either committed
+# or lives in the private synced Admin-Manual repo (Admin-Manual/LOGS/).
+.remember/
+.playwright-mcp/
