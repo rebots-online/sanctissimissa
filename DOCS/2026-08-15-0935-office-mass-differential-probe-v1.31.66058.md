@@ -269,3 +269,57 @@ DO vocabulary `Alleluia Duplex`, `Hymnus shifted`, `Hymnus merged`, and the `&Al
 Unrepresented-in-either-finding residual: **Triduum machinery** (DO `triduum_gloria_omitted` etc. — both engines' probes excluded the Triduum; §11 scope), **transfers** (`kalendar_transfer` ingested, engine untested), and **Quicumque** (seasonal, untestable outside its Sundays). These are enumerated as known-unverified rather than silent.
 
 **Verdict.** With Phase 3, the divergence report is exhaustive at the feature level for the ordinary-driven hours: every DO capability is now either (a) implemented, (b) enumerated as a finding D1–D23, or (c) explicitly listed as season-gated-unverified (Triduum, Paschaltide, transfers, Quicumque). Day-sampling (the Phase-2-style sweep) remains the *acceptance test* for the fixes, not the discovery instrument — discovery is now complete by construction.
+
+---
+
+# Phase 4 — remediation and convergence record (2026-08-15, same day)
+
+**Scope:** the CRITICAL/HIGH engine divergences (D1–D7, D10, D16–D19) fixed in
+`src/core/office/engine.ts`, `src/core/text/scrubMacros.ts` (new),
+`src/core/data/liturgicalDay.ts`, `scripts/db-adapter.mjs`. D9 (English gaps),
+D11/D12 (cosmetic), D20–D23 (Preces / Martyrologium / Absolutiones /
+doxology-switching — the self-declared unimplemented families) and the
+season-gated surfaces (Triduum, Paschaltide, transfers, Quicumque) remain
+enumerated, not remediated.
+
+## Fixes landed
+
+| Divergence | Fix |
+|---|---|
+| D1 nocturn interleaving | **Refined by DO evidence:** nine-lesson offices (I/II-class feasts, `majorFeast`) interleave 3 lessons per nocturn; three-lesson offices (Sundays, vigils, III-class, ferias) read ONE lesson block after the whole psalmody — both opened by the Pater noster. DO's pages prove both layouts (08-15 interleaved; 08-14/16/17 single block). |
+| D2/D5/D8 schema selection | Festal Day0 rows for Laudes/minors/Compline on Sundays + I/II-class feasts; festal Prime = 53+118i+118ii under the proper's first Laudes antiphon; minor-hour antiphons from the Laudes set (Tertia 2nd, Sexta 3rd, Nona 5th); bracketed pre-1960 Prime slots dropped. |
+| D3 | `CANTICLE_PSALM.Benedictus = '231'` (Zachariæ). |
+| D4 | Compline pinned to the invariable Day0 row on festal/first-Vespers evenings; ferias keep day rows (Monday/Wednesday controls pass). |
+| D6 specials | `prayer()` alias table (Pater, Dominus greeting, `oratio_Domine` literal-name lookup, Oratio X_ variants, Rubricae fallback); Compline confession block (`complineConfession()`); `scrubMacros()` renders `!Citation` markers parenthetically (numbered books, comma/semicolon verse forms) and drops DO comment/directive lines. **Zero `!` markers remain across all 5 probe days × 8 hours × Mass.** |
+| D7 | Commemoration collect falls back to the week's Sunday (`<week>-0`); commemorations render with real text. |
+| D10 | shared `scrubMacros` applied on both office and Mass paths. |
+| D16 | `lessons()` collects across gaps (Sunday 7–9 convention) and renumbers; feast numbering kept per-file in interleave mode. |
+| D17 | penitential predicate rewritten: feria-rank in Advent/Pre-Lent/Lent + vigils per annum → Laudes2 (Ps 50 first). Verified: 08-14 → 50/142/84/225/147; 12-16 → 50/64/100/223/145. |
+| D18 | commemorations gated to Laudes and Vespera. |
+| D19 | Compline confession block (examen + Confiteor/Misereatur/Indulgentiam/Converte nos). |
+| **new** I Vespers | vigil eve of a I/II-class feast: `Horas/<tomorrow-winner>` unshifted to the chain head for Vespera (antiphons 109/112/121/126/147 via the proper's `;;refs`, capitulum/hymn/Magnificat-antiphon/collect from the feast); Compline takes the Day0 arrangement without the chain (its collect stays its own). |
+| **new** penitential Wednesday | `Day31` schema (Ps 49 in three parts in place of 50) on Laudes-2 Wednesdays, never Dec 24 — DO `psalmi_matutinum` verbatim. Fixes the ember-Matins third-nocturn split (12-16 → 49(1-6)/49(7-15)/49(16-23)). |
+| **new** per-annum scripture | 3-lesson sanctoral offices read Lectio1–2 from the occurring scripture `Tempora/MMW-D` (month + 7-day-block + weekday), ahead of the commune; the 3rd diverges to the legend (Lectio4); Sundays diverge the 3rd to the homily (Lectio7); vigils keep their own lessons. DO `lectio`/`specmatins` order reproduced (08-17: Sap 3:1-6, Sap 3:7-11, then the Hyacinth legend). |
+
+## Verification
+
+- **Convergence sweep** (`tests/.tmp/diffprobe/sweep.mjs`, working artifact):
+  structure tokens (psalms/canticles/nocturns/lessons) extracted from the DO
+  HTML vs the live `buildHour` render — **ALL 5 probe days × 8 hours
+  converge** (2026-08-14 vigil, 08-15 I-class feast, 08-16 Sunday, 08-17
+  III-class, 12-16 Advent ember). Nocturn-heading placement is normalized
+  (DO's HTML anchors the heading mid-nocturn; ours leads it).
+- **Text identity spot checks:** feast Benedictus = Canticum Zachariæ Luc
+  1:68-79 verbatim; Assumption collect; proper antiphons — identical Latin.
+- `npm test` **283/283** · `npx tsc --noEmit` clean · zero residual `!`
+  markers in every generated hour and Mass.
+
+## Remaining (enumerated, not fixed here)
+
+- **D9** English gaps (e.g. `Ant. ad Benedictus` on 08-15) — ingest-side
+  English join, corpus-data work with the next `npm run ingest`.
+- **D11/D12** hymn `_` stanza separators / invitatory reprises — cosmetic.
+- **D20–D23** Preces, Martyrologium, Absolutiones+Benedictions, doxology
+  switching — the declared-unimplemented families; exercised only in
+  seasons/conditions outside these probes.
+- Season-gated unverified: Triduum, Paschaltide, transfers, Quicumque.

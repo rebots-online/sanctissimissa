@@ -8,6 +8,16 @@ import { DatabaseSync } from 'node:sqlite';
 
 const META = new Set(['Rank', 'Rule', 'Name', 'Officium', 'Missa', 'Prelude', 'Comment', 'Rank1960', 'RankNewcal']);
 
+// Mirror of MASS_SECTION_ORDER from src/core/model/massOrdo.ts (keep in sync).
+const MASS_SECTIONS = [
+  'Introitus', 'Oratio', 'Oratio 2', 'Oratio 3',
+  'LectioL1', 'GradualeL1', 'OratioL1',
+  'Lectio', 'Lectio 2', 'Graduale', 'GradualeP',
+  'Tractus', 'Alleluia', 'Evangelium', 'Offertorium',
+  'Secreta', 'Secreta 2', 'Secreta 3', 'Communio',
+  'Postcommunio', 'Postcommunio 2', 'Postcommunio 3', 'Missa', 'Super populum',
+];
+
 export function openAdapter(dbPath = 'assets/missal.db') {
   const raw = new DatabaseSync(dbPath, { readOnly: true });
 
@@ -52,6 +62,25 @@ export function openAdapter(dbPath = 'assets/missal.db') {
          WHERE e.rel = 'CROSS_REF' AND n1.key = ?`,
       ).get(`file:${path}`);
       return r ? String(r.k).replace(/^file:/, '') : null;
+    },
+    getMassTexts(path) {
+      const commune = this.communeOf(path);
+      const out = [];
+      for (const section of MASS_SECTIONS) {
+        const own = this.getSection(path, section);
+        const com = commune ? this.getSection(commune, section) : null;
+        const chosen = own ?? com;
+        if (!chosen || (!chosen.latin && !chosen.english)) continue;
+        out.push({
+          nodeKey: `section:${(!own && com) ? commune : path}#${section}`,
+          section,
+          latin: chosen.latin,
+          english: chosen.english,
+          sourcePath: (!own && com) ? commune : path,
+          fromCommune: !own && !!com,
+        });
+      }
+      return out;
     },
     getSection(path, section) {
       const r = raw.prepare(
@@ -247,3 +276,4 @@ export function openAdapter(dbPath = 'assets/missal.db') {
     },
   };
 }
+

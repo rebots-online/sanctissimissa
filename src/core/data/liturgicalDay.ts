@@ -12,6 +12,7 @@
  */
 
 import { parseISODate, getWeekKey, getSeason, seasonColor, transferKeys, isLeapYear } from '../calendar/computus.ts';
+import { scrubMacros } from '../text/scrubMacros.ts';
 import { resolveWinner, type DayFileMeta } from '../calendar/precedence.ts';
 import type { CorpusDb } from './corpusDb.ts';
 import type { DayInfo, SectionText } from './types.ts';
@@ -62,14 +63,23 @@ function yearTransfers(db: CorpusDb, year: number): Map<string, string> {
 export function massTextsForDay(db: CorpusDb, day: DayInfo): { texts: SectionText[]; sourcePath: string } {
   const primary = day.winner?.key ?? day.temporaPath;
   let texts = db.getMassTexts(primary);
-  if (texts.length > 0) return { texts, sourcePath: primary };
+  if (texts.length > 0) return { texts: scrubMass(texts), sourcePath: primary };
   const feria = primary.match(/^(Tempora\/.+)-[1-6]$/);
   if (feria) {
     const sunday = `${feria[1]}-0`;
     texts = db.getMassTexts(sunday);
-    if (texts.length > 0) return { texts, sourcePath: sunday };
+    if (texts.length > 0) return { texts: scrubMass(texts), sourcePath: sunday };
   }
   return { texts: [], sourcePath: primary };
+}
+
+/** DO `!Citation` markers render parenthetically on the Mass path too (D10). */
+function scrubMass(texts: SectionText[]): SectionText[] {
+  return texts.map((t) => ({
+    ...t,
+    latin: t.latin != null ? scrubMacros(t.latin) : t.latin,
+    english: t.english != null ? scrubMacros(t.english) : t.english,
+  }));
 }
 
 export function resolveDay(db: CorpusDb, iso: string): DayInfo {
