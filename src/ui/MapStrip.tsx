@@ -17,10 +17,10 @@ import {
   type Station,
 } from '../core/model/massOrdo.ts';
 import { readerAnchorsForDay, massTextsBySection } from '../core/data/liturgicalDay.ts';
-import { OFFICE_CURSUS, type Hour } from '../core/model/officeCursus.ts';
-import { STATION_INFO, HOUR_INFO } from '../core/model/stationLore.ts';
-import { stationIncipits, firstWords, type Incipit } from '../core/data/stationIncipits.ts';
+import { STATION_INFO } from '../core/model/stationLore.ts';
+import { stationIncipits, type Incipit } from '../core/data/stationIncipits.ts';
 import { buildHour } from '../core/office/engine.ts';
+import { officePartsOf } from './OfficeHourMap.tsx';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 import type { DayInfo } from '../core/data/types.ts';
 import type { Season } from '../core/calendar/computus.ts';
@@ -40,15 +40,17 @@ interface Props {
   bibleBook?: string | null;
   /** Scripture strip navigation: "Book/chapter" ref (e.g. "Gen/3"). */
   onBibleRef?: (ref: string) => void;
+  /** Office parts (strip variant): anchor under the reading band. */
+  activeOfficePart?: string | null;
+  /** Office parts (strip variant): scroll the office reader to a part. */
+  onOfficePart?: (anchor: string) => void;
 }
 
 const ordoIndex = (id: string) => MASS_ORDO.findIndex((s) => s.id === id);
 
-export default function MapStrip({ db, day, view, activeStation, officeHour, onStation, onHour, bibleBook, onBibleRef }: Props) {
+export default function MapStrip({ db, day, view, activeStation, officeHour, onStation, bibleBook, onBibleRef, activeOfficePart, onOfficePart }: Props) {
   const activeRef = useRef<HTMLButtonElement>(null);
   const [flyout, setFlyout] = useState<FlyoutData | null>(null);
-  /** Office incipits are built on first hover (buildHour is heavier). */
-  const hourIncipits = useRef(new Map<string, Incipit | null>());
 
   const office = view === 'office';
   /** Scripture view (decision 23): the strip IS the canonical books across,
@@ -81,7 +83,6 @@ export default function MapStrip({ db, day, view, activeStation, officeHour, onS
     [db, day],
   );
   useEffect(() => {
-    hourIncipits.current.clear();
     setFlyout(null);
   }, [day?.date]);
 
@@ -98,24 +99,6 @@ export default function MapStrip({ db, day, view, activeStation, officeHour, onS
       about: STATION_INFO[s.id]?.about ?? null,
       ...flyoutAt(el),
     });
-
-  const showHour = (h: Hour, el: HTMLElement) => {
-    if (!hourIncipits.current.has(h.id) && db && day) {
-      try {
-        const first = buildHour(db, day, h.id).find((e) => !e.rubric && e.latin);
-        hourIncipits.current.set(h.id, first ? { la: firstWords(first.latin), en: firstWords(first.english) } : null);
-      } catch {
-        hourIncipits.current.set(h.id, null);
-      }
-    }
-    setFlyout({
-      title: h.latin,
-      subtitle: `${h.english} · circa ${h.clock}`,
-      incipit: hourIncipits.current.get(h.id) ?? null,
-      about: HOUR_INFO[h.id]?.about ?? null,
-      ...flyoutAt(el),
-    });
-  };
 
   // Index-based journey state. When the active station isn't on the strip
   // (a fold-out branch or detail stop), light the nearest preceding stop.
@@ -140,7 +123,7 @@ export default function MapStrip({ db, day, view, activeStation, officeHour, onS
       left: el.offsetLeft - strip.clientWidth / 2 + el.clientWidth / 2,
       behavior: 'smooth',
     });
-  }, [activeStation, officeHour, view]);
+  }, [activeStation, activeOfficePart, officeHour, view]);
 
   // ── Scripture: the canonical books across, chapters as a dropdown ──
   if (scripture && onBibleRef) {
@@ -183,26 +166,34 @@ export default function MapStrip({ db, day, view, activeStation, officeHour, onS
   }
 
   if (office) {
+    // Decision 23, operator-refined 2026-08-16: the office view's strip is the
+    // selected hour's PARTS (the Mass-strip analog) — the eight hours live in
+    // the office rail's loop line alone, so the two maps are never identical.
+    const entries = (() => {
+      if (!db || !day) return [];
+      try {
+        return buildHour(db, day, officeHour);
+      } catch {
+        return [];
+      }
+    })();
+    const parts = officePartsOf(entries);
+    const activeIdx = parts.findIndex((p) => p.anchor === activeOfficePart);
     return (
-      <nav className="mapstrip office" aria-label="The eight canonical hours" onMouseLeave={() => setFlyout(null)}>
-        {OFFICE_CURSUS.map((h) => {
-          const active = h.id === officeHour;
-          return (
-            <button
-              key={h.id}
-              ref={active ? activeRef : undefined}
-              className={`mstation seg-office proper${active ? ' active' : ''}`}
-              onClick={() => onHour(h.id)}
-              onMouseEnter={(e) => showHour(h, e.currentTarget)}
-              onFocus={(e) => showHour(h, e.currentTarget)}
-              onBlur={() => setFlyout(null)}
-              aria-current={active ? 'step' : undefined}
-            >
-              <span className="mdot" />
-              <span className="mlabel">{h.latin}</span>
-            </button>
-          );
-        })}
+      <nav className="mapstrip office" aria-label="Parts of this hour" onMouseLeave={() => setFlyout(null)}>
+        {parts.map((p, i) => (
+          <button
+            key={p.anchor}
+            ref={i === activeIdx ? activeRef : undefined}
+            className={`mstation seg-office proper${i === activeIdx ? ' active' : ''}`}
+            onClick={() => onOfficePart?.(p.anchor)}
+            aria-current={i === activeIdx ? 'step' : undefined}
+            title={p.label}
+          >
+            <span className="mdot" />
+            <span className="mlabel">{p.label}</span>
+          </button>
+        ))}
         {flyout && <MapFlyout {...flyout} />}
       </nav>
     );

@@ -75,6 +75,7 @@ function renderLine(
   quotes: string[],
   lineKey: number,
   ranges?: { start: number; end: number }[],
+  opts?: { noVerseNum?: boolean },
 ): (string | ReactElement)[] {
   const out: (string | ReactElement)[] = [];
   let body = line;
@@ -83,11 +84,15 @@ function renderLine(
   // chapter/psalm number is shown ONCE in the section title, so here only the
   // verse number is rendered — as a superscript — and the chapter prefix is
   // dropped (fixes the "98:1 / 98:2 / 98:3 …" repetition). `shift` keeps
-  // annotation ranges aligned to the new, shorter body.
+  // annotation ranges aligned to the new, shorter body. In the interleaved
+  // layout the pair shows the number ONCE (Latin is normative): the English
+  // half consumes its prefix for coordinate parity but renders no <sup>.
   const verseM = line.match(/^(\d+):(\d+)(?=\s)/);
   if (verseM) {
-    out.push(<sup className="vnum" key={`vn-${lineKey}`}>{verseM[2]}</sup>);
-    out.push(' ');
+    if (!opts?.noVerseNum) {
+      out.push(<sup className="vnum" key={`vn-${lineKey}`}>{verseM[2]}</sup>);
+      out.push(' ');
+    }
     const consumed = verseM[0].length;
     body = line.slice(consumed).replace(/^\s/, '');
     shift += consumed + 1;
@@ -207,7 +212,7 @@ export function TextLines({
         }
 
         return (
-          <span key={i} data-line={i} className={echoed ? 'xlate-echo' : undefined}>
+          <span key={i} data-line={i} className={`${i % 2 ? 'v-odd' : 'v-even'}${echoed ? ' xlate-echo' : ''}`}>
             {content}
             {i < lines.length - 1 ? '\n' : ''}
           </span>
@@ -276,7 +281,7 @@ export default function BilingualText({
         const enMarks = rangesForLine(marks, 'english', i);
 
         return (
-          <p className="il-pair" key={i}>
+          <p className={`il-pair ${i % 2 ? 'v-odd' : 'v-even'}`} key={i}>
             {la !== undefined && laKind !== 'suppress' &&
               (laKind ? (
                 <span className={laKind}>{la.slice(1)}</span>
@@ -316,7 +321,7 @@ export default function BilingualText({
                       {en.slice(enSelectionEcho.end)}
                     </>
                   ) : (
-                    renderLine(en, q, i, enMarks)
+                    renderLine(en, q, i, enMarks, { noVerseNum: true })
                   )}
                 </span>
               ))}

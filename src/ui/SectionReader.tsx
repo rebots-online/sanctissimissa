@@ -168,6 +168,37 @@ function langOf(el: HTMLElement): 'latin' | 'english' | null {
  * capture for highlights, so a saved highlight and a live echo use identical
  * coordinates. `root` bounds the walk.
  */
+/** Non-word characters for selection snapping: anything but Unicode letters,
+ *  marks, and the straight/curly apostrophe (Latin elisions keep their word). */
+const NON_WORD = /[^\p{L}\p{M}'’]/u;
+
+/**
+ * Expand the selection's edges to whole-word boundaries within their own text
+ * nodes (the operator's word-at-a-time caret). Returns true when the range
+ * was adjusted (the caller lets the resulting selectionchange re-enter).
+ */
+function snapSelectionToWords(sel: Selection): boolean {
+  if (sel.rangeCount === 0 || sel.isCollapsed) return false;
+  const range = sel.getRangeAt(0);
+  const st = range.startContainer;
+  const en = range.endContainer;
+  if (st.nodeType !== Node.TEXT_NODE || en.nodeType !== Node.TEXT_NODE) return false;
+  const stText = st.textContent ?? '';
+  const enText = en.textContent ?? '';
+  let s = range.startOffset;
+  while (s > 0 && !NON_WORD.test(stText[s - 1] ?? '')) s--;
+  let e = range.endOffset;
+  while (e < enText.length && !NON_WORD.test(enText[e] ?? '')) e++;
+  if (s === range.startOffset && e === range.endOffset) return false;
+  try {
+    range.setStart(st, s);
+    range.setEnd(en, e);
+  } catch {
+    return false;
+  }
+  return true;
+}
+
 function lineInfoAt(
   root: HTMLElement | null,
   node: Node | null,
@@ -400,15 +431,25 @@ export default function SectionReader({
   }, [menu, noteFor]);
 
   /**
-   * Drag-selection echo. Both endpoints resolve to `data-line` spans; inside a
-   * single line the exact character range is aligned to its counterpart.
+   * Whole-word selection (operator directive 2026-08-16): while click-dragging,
+   * the caret proceeds word-at-a-time — each edge of the live selection
+   * expands to the nearest word boundary within its text node. The synthetic
+   * selectionchange the snap provokes passes through via the guard.
    */
+  const snapGuard = useRef(false);
   useEffect(() => {
     const onSel = () => {
       const sel = window.getSelection();
       if (!sel || sel.isCollapsed || sel.rangeCount === 0 || !root.current) {
+        snapGuard.current = false;
         setLivePhraseEcho(null);
         return;
+      }
+      if (snapGuard.current) {
+        snapGuard.current = false;
+      } else if (snapSelectionToWords(sel)) {
+        snapGuard.current = true;
+        return; // re-enter on the snapped selection
       }
       const range = sel.getRangeAt(0);
       const a = lineInfoAt(root.current, range.startContainer);

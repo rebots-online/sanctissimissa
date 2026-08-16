@@ -1695,3 +1695,49 @@ select.verse-jump {
   z-index: 1;
 }
 .hour-parts button.active .hp-dot { border-color: var(--accent); background: var(--accent); }
+
+/* Verse zebra (reader unification, operator refinement 2026-08-16): in the
+   interleaved layout Latin-English PAIRS alternate dark/light; in the
+   side-by-side layout VERSES alternate across both language columns. The
+   echo highlight always wins over the zebra shade. */
+:root { --zebra-line: color-mix(in srgb, var(--surface-2) 60%, transparent); }
+.il-pair.v-odd { background: var(--zebra-line); border-radius: 8px; padding: 3px 8px; margin: 0 -8px; }
+.bilingual .latin p span.v-odd,
+.bilingual .english p span.v-odd { background: var(--zebra-line); border-radius: 4px; }
+.bilingual .latin p span.v-odd.xlate-echo,
+.bilingual .english p span.v-odd.xlate-echo,
+.il-pair.v-odd .xlate-echo { background: transparent; }
+
+/* Scripture atlas mode switch — themed segmented control (operator 2026-08-16:
+   "skinned matching the theme, not 1995"): quiet vellum pill, active segment
+   lifts onto the parchment surface with the accent underline. */
+.atlas-mode-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0 0 16px;
+  padding: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+}
+.atlas-mode-switch button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: var(--serif);
+  font-size: 12.5px;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  padding: 5px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+.atlas-mode-switch button:hover { color: var(--ink); }
+.atlas-mode-switch button.active {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 4px rgba(61, 48, 28, 0.18), inset 0 -2px 0 var(--accent);
+}

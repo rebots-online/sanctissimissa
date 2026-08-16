@@ -72,6 +72,9 @@ export default function App() {
   // The map strip's you-are-here (station id) and the office strip's hour.
   const [activeStation, setActiveStation] = useState<string | null>(null);
   const [officeHour, setOfficeHour] = useState('laudes');
+  // The office strip's part-station (scroll-spy) and its jump command.
+  const [activeOfficePart, setActiveOfficePart] = useState<string | null>(null);
+  const [officeFocus, setOfficeFocus] = useState<{ anchor: string; nonce: number } | null>(null);
   // Bible deep-link focus ("Gen/1/5"); nonce bumps so re-navigating re-scrolls.
   const [bibleFocus, setBibleFocus] = useState<{ ref: string | null; nonce: number }>({ ref: null, nonce: 0 });
   const [sidecar, setSidecar] = useState<SidecarDb | null>(null);
@@ -366,6 +369,8 @@ export default function App() {
               setBibleFocus({ ref, nonce: Date.now() });
               setView('bible');
             }}
+            activeOfficePart={activeOfficePart}
+            onOfficePart={(anchor) => setOfficeFocus({ anchor, nonce: Date.now() })}
           />
         )}
 
@@ -402,6 +407,8 @@ export default function App() {
                   sidecar={sidecar}
                   onAction={openAction}
                   onCapture={openCapture}
+                  focusPart={officeFocus ?? undefined}
+                  onActivePart={setActiveOfficePart}
                 />
               )}
               {view === 'bible' && (
