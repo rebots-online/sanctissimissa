@@ -14,6 +14,16 @@ them one sentence each and written for a reader of the app, not of the diff.
 
 ---
 
+## v1.34.81270 — 2026-08-16
+
+Completes the stop-landing fix of v1.33.
+
+- A stop inside a multi-part section (the Confiteor within the prayers at the foot of the altar; the Alleluia verse within a Sunday Gradual) now lands on its own line even when that section started folded — the first release's landing worked only when the section was already open.
+
+### For maintainers
+
+- Root cause: a folded section renders no body, so the focus effect's line query ran before the unfold painted. Fix: retry the refinement after the unfold renders (double `requestAnimationFrame`) — `ReaderView` focus effect.
+
 ## v1.33.81185 — 2026-08-16
 
 The subway map's stops now lead somewhere, and the corpus names itself.
