@@ -28,7 +28,7 @@ import { useNarrow } from './ui/BilingualText.tsx';
 type View = 'map' | 'reader' | 'calendar' | 'office' | 'bible' | 'journal' | 'homily' | 'settings' | 'about';
 
 const NAV: { id: View; ico: string; label: string }[] = [
-  { id: 'map', ico: '🚇', label: 'Subway Map' },
+  { id: 'map', ico: '🗺️', label: 'Mass Map' },
   { id: 'reader', ico: '📖', label: 'Missal Reader' },
   { id: 'calendar', ico: '📅', label: 'Perpetual Calendar' },
   { id: 'office', ico: '🕰', label: 'Divine Office' },

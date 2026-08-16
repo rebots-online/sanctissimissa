@@ -45,7 +45,7 @@ export default function ShareLanding({ payload, onOpenApp }: Props) {
       </figure>
       <p className="share-lead">
         This passage lives inside St. Android&apos;s Missal — the Traditional
-        Latin Mass and Divine Office as a navigable subway map, with the full
+        Latin Mass and Divine Office as a navigable map, with the full
         liturgical corpus in Latin and English.
       </p>
       <button className="share-cta" onClick={onOpenApp}>
