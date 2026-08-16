@@ -1192,3 +1192,40 @@ numbering), each verified end-to-end in the running app. Rubric re-formation
 (`DOCS/TEST_RUBRIC.md`: office-fidelity D24 differential, station-anchor D25
 totality, exact-range D22) is the next architect action before any stanza-V
 CODE, per the architect→rubric→code rule.
+
+---
+
+## 11.6 Reader-unification landing and operator refinements (2026-08-16)
+
+§11.2's reserved P-V reader rows landed 2026-08-16, then were refined by
+operator direction the same day. Amendments binding on the entity table:
+
+| Entity | Amendment (2026-08-16) | St |
+|---|---|---|
+| Δ `renderLine` | signature gains `opts?: { noVerseNum?: boolean }` — in the interleaved layout the pair shows the verse number ONCE (Latin, normative): the English half consumes its `{chapter}:{verse} ` prefix for annotation-coordinate parity but renders no `<sup>` | ✅ |
+| Δ `TextLines` / `BilingualText` | line-parity zebra: every rendered line/pair carries `v-even`/`v-odd` by line index — interleaved PAIRS alternate dark/light (`--zebra-line`); column VERSES alternate across both language panes; the echo highlight always overrides the zebra | ✅ |
+| Δ `BibleView` | the book view mounts `ScriptureMap` as the view ROOT (header rides the reader toolbar); the single-chapter reader keeps the prefixed join + parity container (chapter→chapter flips the shade) | ✅ |
+| Δ `ScriptureMap` | landed shape: `props { db, book, psalms?, sidecar?, onAction, onCapture?, toolbar? }` — one `SectionReader` for the whole book, each chapter a `chapter-lite`/`chapter-shade` section, per-chapter verse `<select>` jumping to the verse line (verified: lands 149px in the band) | ✅ |
+| Δ `OfficeHourMap` | **supersedes the §11.2 row's "vertical station line in office-rail"** — the module now exports `officePartsOf(entries): OfficePart[]` (the shared part derivation); the parts render as the MapStrip's office variant. The operator ruling: the office view must not show two identical maps — the strip is the hour's PARTS; the eight hours live in the rail's loop line alone | ✅ |
+| Δ `MapStrip` | three view-true variants (decision 23): Mass stations (default) · office hour-PARTS (`officePartsOf(buildHour(db, day, officeHour))`, active part tracks the reading band, click scrolls) · scripture BOOKS across with a per-book chapter dropdown (`onBibleRef("Book/ch")` → App → `BibleView.focusRef`). Props gain `{ bibleBook?, onBibleRef?, activeOfficePart?, onOfficePart? }` | ✅ |
+| Δ `OfficeView` | props gain `focusPart?: { anchor; nonce }` (strip part-jump → deterministic container scroll) and `onActivePart?: (anchor \| null) => void` (scroll-spy, IntersectionObserver band identical to the Mass reader's); the rail keeps the hour loop + hour-meta only | ✅ |
+| Δ `SectionReader` | ＋ `snapSelectionToWords(sel)` (module scope, with a re-entrancy guard ref): every drag-selection edge expands to the nearest whole-word boundary within its text node (`NON_WORD = /[^\p{L}\p{M}'’]/u`) — the caret proceeds word-at-a-time, per operator directive. Verified live: a mid-word letter of *principio* selects the whole word | ✅ |
+| Δ `.atlas-mode-switch` | themed segmented control (vellum pill, italic serif, accent underline on the active segment; all three modes — Canonical/Imagery/Parallels — visible), replacing browser-default buttons | ✅ |
+
+Rubric rows for this wave: `DOCS/TEST_RUBRIC.md` § V-R (D22, D24, D25,
+V-R1..V-R5), landed 2026-08-16 before the code, per the
+architect→rubric→code rule.
+
+**Attestation (2026-08-16, sixth re-attestation).** The rows above were
+verified against the working tree via codegraph and against the running
+dev application on 2026-08-16 (probes: 62 verse superscripts in Gen 1 with
+the chapter in the title; 40-box Exodus stack alternating
+`chapter-lite`/`chapter-shade`; verse-dropdown jump landing at 149px in
+the reading band on the exact verse; the scripture strip listing 73 books
+with a working chapter dropdown; 19 office part-stations with Oratio
+click→active; one `sup.vnum` per interleaved pair (Latin); mid-word
+selection snapping to the whole word; the mode switch rendering as the
+themed pill). `npm test` 283/283 and `tsc -b` clean at commit `99669a55`.
+CHECKLIST stanza V-R records the same ✅ items with this evidence. Rows
+still marked P-V in §11.2 remain unlanded targets and are not claimed.
+— Attested by Claude (claude-fable-5, Claude Code session), 2026-08-16.

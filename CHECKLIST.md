@@ -988,3 +988,26 @@ Markers: `[ ]` not started · `[/]` in progress · `[X]` implemented · ✅ veri
 - Screencasts: `DOCS/BUGS/evidence/standroidsmissal-v1.26.60862-bugfix-demo-2026-08-02.gif` (29 frames, dev server) and `…-live-deploy-demo-2026-08-02.gif` (25 frames, against the deployed site).
 - Build state and the elevation blocker: `DOCS/standroidsmissal-v1.26.60862-build-state-note-2026-08-02.md`.
 - Corpus measurement: Ordo English coverage compared against the pre-ingest corpus preserved at `~/outbox/standroidsmissal-v1.26.60862-missal.db.pre-ordo-pairing-2026-08-02.bak`.
+
+## Stanza V-R — Reader unification & view-true maps (2026-08-16)
+
+Architected in ARCHITECTURE.md §11.2/§11.3 (decisions 22–26) + §11.6;
+rubric `DOCS/TEST_RUBRIC.md` § V-R landed before code.
+
+### Tasks
+
+- [X] **V-R.a `renderLine` verse superscripts everywhere** — `BibleView` chapter join prefixes `{chapter}:{verse} `; the shared `renderLine` renders `sup.vnum`, chapter once in the title. ✅ verified: 62 superscripts in Genesis 1, 44 in Exodus 3.
+- [X] **V-R.b chaptered containers** — `chapter-lite`/`chapter-shade` (`--surface`/`--surface-2`) on scripture chapters. ✅ verified: Exodus stack alternates lite/shade/lite across 40 boxes; chapter→chapter flips the shade.
+- [X] **V-R.c `ScriptureMap` chapter stack** — book view = one `SectionReader`, chapter boxes with per-chapter verse dropdowns. ✅ verified: Ex/2 v7 dropdown jumps to the verse line at 149px in the band.
+- [X] **V-R.d `OfficeHourMap` / `officePartsOf` part stations** — the office strip lists the hour's parts (the hours stay in the rail loop); click scrolls; active tracks the reading band. ✅ verified: 19 parts, Oratio click → active + scroll.
+- [X] **V-R.e scripture strip = books across + chapter dropdowns** — ✅ verified: 73 book chips; Exodus dropdown → Exodus 3 opens with superscripts.
+- [X] **V-R.f verse zebra** — interleaved pairs alternate dark/light; column verses alternate in both panes (`--zebra-line`). ✅ verified: pair classes even/odd alternating with background applied; echo overrides.
+- [X] **V-R.g verse number once per interleaved pair** — `renderLine` `noVerseNum` on the English half. ✅ verified: latin=1 sup, english=0 per pair.
+- [X] **V-R.h `snapSelectionToWords` whole-word caret** — every drag edge snaps to word boundaries. ✅ verified: mid-word letter of *principio* selects the whole word.
+- [X] **V-R.i `.atlas-mode-switch` themed segmented control** — ✅ verified: 999px vellum pill, italic serif, all three modes visible.
+- [ ] **V-R.j P-V remainder of stanza V** — `updateAnnotation` + mark popover, `AnnotationIndex`, `ConceptSearch`, rail pin/collapse split, `DayInfo.vigil` + `OfficeEngine.psalmody` vigil rule, `scripts/diff-office.mjs` (§11.2 rows still P-V).
+
+### Verification evidence
+
+- `npm test` 283/283 · `npx tsc -b` clean after every task (commits `08590733`, `38db9bbe`, `99669a55`, all pushed to origin + github).
+- Live dev-app probes 2026-08-16 (Playwright, localhost:5173): superscript counts, stack shades, verse-jump landing at 149px, office parts click/active, 73-book strip dropdown, pair zebra classes + computed background, single sup per pair, word snap, switch computed styles.
