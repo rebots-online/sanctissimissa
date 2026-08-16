@@ -72,3 +72,8 @@ export function addAnnotation(a: Omit<Annotation, 'id' | 'createdAt'>): Annotati
 export function removeAnnotation(id: string): void {
   writeAll(readAll().filter((a) => a.id !== id));
 }
+
+/** Edit an existing annotation's note/color in place (B5 — the index and the mark popover patch, never re-add). */
+export function updateAnnotation(id: string, patch: Partial<Pick<Annotation, 'note' | 'color'>>): void {
+  writeAll(readAll().map((a) => (a.id === id ? { ...a, ...patch } : a)));
+}

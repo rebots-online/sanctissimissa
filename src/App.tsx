@@ -13,6 +13,7 @@ import MeaningPanel from './ui/MeaningPanel.tsx';
 import CalendarView from './ui/CalendarView.tsx';
 import OfficeView from './ui/OfficeView.tsx';
 import BibleView from './ui/BibleView.tsx';
+import AnnotationIndex from './ui/AnnotationIndex.tsx';
 import { parseHashRoute, type SharePayload } from './core/share/shareLink.ts';
 import ShareLanding from './ui/ShareLanding.tsx';
 import { SidecarDb } from './core/accompaniment/store.ts';
@@ -25,11 +26,12 @@ import ResizableInspectorLayout from './ui/ResizableInspectorLayout.tsx';
 import TrayPanel from './ui/TrayPanel.tsx';
 import { useNarrow } from './ui/BilingualText.tsx';
 
-type View = 'map' | 'reader' | 'calendar' | 'office' | 'bible' | 'journal' | 'homily' | 'settings' | 'about';
+type View = 'map' | 'reader' | 'annotations' | 'calendar' | 'office' | 'bible' | 'journal' | 'homily' | 'settings' | 'about';
 
 const NAV: { id: View; ico: string; label: string }[] = [
   { id: 'map', ico: '🗺️', label: 'Mass Map' },
   { id: 'reader', ico: '📖', label: 'Missal Reader' },
+  { id: 'annotations', ico: '🔖', label: 'Annotations' },
   { id: 'calendar', ico: '📅', label: 'Perpetual Calendar' },
   { id: 'office', ico: '🕰', label: 'Divine Office' },
   { id: 'bible', ico: '📜', label: 'Sacred Scripture' },
@@ -384,7 +386,7 @@ export default function App() {
           </span>
         </header>
 
-        {view !== 'map' && (
+        {view !== 'map' && view !== 'annotations' && (
           <MapStrip
             db={db}
             day={day}
@@ -426,6 +428,9 @@ export default function App() {
               )}
               {view === 'calendar' && (
                 <CalendarView db={db} selected={date} onPick={(iso) => { setDate(iso); setView('reader'); setFocus({ section: null, nonce: 0 }); }} />
+              )}
+              {view === 'annotations' && (
+                <AnnotationIndex db={db} onOpenKey={onOpenKey} />
               )}
               {view === 'office' && (
                 <OfficeView

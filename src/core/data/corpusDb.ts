@@ -85,6 +85,12 @@ export class CorpusDb {
     return rows.length ? rowToNode(rows[0]) : null;
   }
 
+  /** Any node by its exact key ("section:…#…", "verse:Gen/1/5", "file:…") — the annotation index resolves titles this way. */
+  getNode(key: string): GraphNode | null {
+    const rows = this.all('SELECT * FROM nodes WHERE key = ?', [key]);
+    return rows.length ? rowToNode(rows[0]) : null;
+  }
+
   hasFile(path: string): boolean {
     return this.getFileNode(path) !== null;
   }

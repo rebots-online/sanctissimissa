@@ -1841,3 +1841,53 @@ button.active { background: var(--accent); color: #fff; border-color: var(--acce
    stage direction never runs into the spoken text — a full break before and
    breathing room after, in either layout. */
 .rubric-text { display: block; margin: 10px 0 4px; }
+
+/* ── Annotations ─────────────────────────────────────────────────── */
+
+/* The end-of-reading annotation list is TITLED (operator directive
+   2026-08-16): a small-caps ANNOTATIONS heading so the entries read as a
+   named appendix to the section, not anonymous boxes. */
+.ann-heading {
+  font: 700 10.5px var(--sans);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 10px 0 2px;
+}
+
+/* AnnotationIndex cards: one accent per annotation color — the swatch and
+   the left rail carry the color, the card itself stays parchment. */
+.annx-card {
+  position: relative;
+  background: var(--surface-2);
+  border-left: 3px solid var(--ann-accent, var(--gold));
+  padding: 8px 12px;
+  border-radius: 0 6px 6px 0;
+  margin: 4px 0 10px;
+  font: 14px var(--sans);
+}
+.annx-swatch {
+  display: inline-block;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--ann-accent, var(--gold));
+  margin-right: 6px;
+  vertical-align: baseline;
+}
+.annx-card.c-gold { --ann-accent: #d4a017; }
+.annx-card.c-rose { --ann-accent: #b0607a; }
+.annx-card.c-sky  { --ann-accent: #5f7fa8; }
+.annx-card.c-moss { --ann-accent: #6e7f4e; }
+.annx-quote { font-family: var(--serif); font-style: italic; color: var(--ink-soft); }
+.annx-note { margin-top: 4px; white-space: pre-wrap; }
+.annx-meta { margin-top: 6px; font-size: 12px; }
+.annx-edit textarea {
+  width: 100%;
+  font: 14px var(--serif);
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid #ffffff26;
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin-top: 6px;
+}

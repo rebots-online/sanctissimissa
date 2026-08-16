@@ -776,6 +776,7 @@ export default function SectionReader({
                 {s.afterText}
                 {anns.length > 0 && (
                   <div className="ann-list">
+                    <div className="ann-heading">ANNOTATIONS</div>
                     {anns.map((a: Annotation) => (
                       <div className={`ann-item${a.note ? '' : ' ann-highlight'}`} key={a.id}>
                         <button

@@ -6,7 +6,7 @@
 
 ## Verdict doctrine (GR-3/3a)
 
-Exactly two terminal verdicts: **SHIP-READY** (every row ✅) or **DEFECTIVE** (any ❌ at any severity; ⚠️ PARTIAL on BLOCKER/HIGH counts as ❌). Severity ranks fix urgency only — there is **no waiver state**. Agent subset all-✅ with OPERATOR rows un-run ⇒ **INCOMPLETE—pending-operator**, enumerating the remaining IDs. Nothing in the product spec is "out of scope" of this rubric: an app that renders the Mass but not the complete Divine Office is DEFECTIVE by construction (rows O-1…O-14).
+Exactly two terminal verdicts: **SHIP-READY** (every row ✅) or **DEFECTIVE** (any ❌ or ⚠️ PARTIAL, at any severity). Severity ranks fix urgency only — there is no BLOCKER tier and no separate escalation: every failed row returns to architecting by the same path — there is **no waiver state**. Agent subset all-✅ with OPERATOR rows un-run ⇒ **INCOMPLETE—pending-operator**, enumerating the remaining IDs. Nothing in the product spec is "out of scope" of this rubric: an app that renders the Mass but not the complete Divine Office is DEFECTIVE by construction (rows O-1…O-14).
 
 ## Driver discipline (GR-4/GR-7, TC11)
 
@@ -22,23 +22,23 @@ Exactly two terminal verdicts: **SHIP-READY** (every row ✅) or **DEFECTIVE** (
 
 | ID | Requirement | Driver | Steps / PASS criteria | Severity |
 |---|---|---|---|---|
-| S-1 | No build path leaves the repo | AUTO | `grep -rn '\.\./HelloWord\|http://\|https://' scripts/ src/` (excluding comments/README links shown in evidence) → zero runtime/build fetches outside repo; ingest runs with network disabled | BLOCKER |
-| S-2 | Ingest regenerates cleanly | AUTO | `npm run ingest` exits 0; summary counts ≥ legacy (files ≥ 1332, sections ≥ 12769); `DOCS/CORPUS-FILL-LOG.md` regenerated with per-fill directive/resolution/citation/source | BLOCKER |
-| S-3 | Office plane populated | AUTO | `missal.db` contains the office-generation tables (psalm schema rows for all 7 weekdays × hours; skeleton rows for all 8 hours; antiphon/invitatory/doxology sets incl. seasonal variants) — inspected via SQL, spot-checked against the vendored source tables | BLOCKER |
+| S-1 | No build path leaves the repo | AUTO | `grep -rn '\.\./HelloWord\|http://\|https://' scripts/ src/` (excluding comments/README links shown in evidence) → zero runtime/build fetches outside repo; ingest runs with network disabled | HIGH |
+| S-2 | Ingest regenerates cleanly | AUTO | `npm run ingest` exits 0; summary counts ≥ legacy (files ≥ 1332, sections ≥ 12769); `DOCS/CORPUS-FILL-LOG.md` regenerated with per-fill directive/resolution/citation/source | HIGH |
+| S-3 | Office plane populated | AUTO | `missal.db` contains the office-generation tables (psalm schema rows for all 7 weekdays × hours; skeleton rows for all 8 hours; antiphon/invitatory/doxology sets incl. seasonal variants) — inspected via SQL, spot-checked against the vendored source tables | HIGH |
 | S-4 | Provenance intact | AUTO | All three `VENDORED/*/PROVENANCE.md` present with pinned commit/date/license; any local `.txt` modification has a log entry | HIGH |
-| S-5 | Tests green | AUTO | `npm test` → 100% pass, including ingest, office-engine, computus, precedence suites | BLOCKER |
+| S-5 | Tests green | AUTO | `npm test` → 100% pass, including ingest, office-engine, computus, precedence suites | HIGH |
 
 ## M — Mass (map + reader)
 
 | ID | Requirement | Driver | Steps / PASS criteria | Severity |
 |---|---|---|---|---|
-| M-1 | Day resolution correct | AUTO | 2026-07-05 → *Dominica VI Post Pentecosten*, Semiduplex/II cl., green; 2026-04-05 → *Dominica Resurrectionis*, I cl., white; 2026-02-18 → *Feria IV Cinerum*, violet. Masthead + calendar agree | BLOCKER |
-| M-2 | Full-Mass reader: propers ⋈ Ordinary interleaved in canonical order | AUTO | For 2026-07-05: Incipit → Introitus (*Dóminus fortitúdo*) → Kyrie/Gloria → Oratio → Lectio → Graduale → Alleluia → Evangelium → Credo → Offertorium … → Canon → … → Ite → Last Gospel, each bilingual (Latin normative, English where stored) | BLOCKER |
+| M-1 | Day resolution correct | AUTO | 2026-07-05 → *Dominica VI Post Pentecosten*, Semiduplex/II cl., green; 2026-04-05 → *Dominica Resurrectionis*, I cl., white; 2026-02-18 → *Feria IV Cinerum*, violet. Masthead + calendar agree | HIGH |
+| M-2 | Full-Mass reader: propers ⋈ Ordinary interleaved in canonical order | AUTO | For 2026-07-05: Incipit → Introitus (*Dóminus fortitúdo*) → Kyrie/Gloria → Oratio → Lectio → Graduale → Alleluia → Evangelium → Credo → Offertorium … → Canon → … → Ite → Last Gospel, each bilingual (Latin normative, English where stored) | HIGH |
 | M-3 | Ember Day loop | AUTO | 2025-12-16 (Ember Wednesday of Advent): map shows ember loop active; reader carries the extra lesson group (LectioL1/GradualeL1/OratioL1) | HIGH |
 | M-4 | Seasonal chant switch | AUTO | 2026-02-22 (Lent): Tract present, Alleluia absent + faded on map; 2026-04-12 (Paschaltide): doubled Alleluia (GradualeP), Gradual absent; map routes match | HIGH |
 | M-5 | Commune gap-fill non-inverted | AUTO | 2026-01-21 (S. Agnetis): feast-file sections win; missing sections filled from its `vide` commune, labelled *ex communi* with source path | HIGH |
 | M-6 | Super populum spur | AUTO | A Lenten feria (2026-02-20): *Oratio super populum* present in reader, spur active on map | MEDIUM |
-| M-7 | Station click navigation (incl. re-click) | AUTO | Click `oratio` → reader scrolls to Oratio; click `canon` → Canon; re-click `oratio` → scrolls back (nonce retrigger). Reader scrollbar present and functional | BLOCKER |
+| M-7 | Station click navigation (incl. re-click) | AUTO | Click `oratio` → reader scrolls to Oratio; click `canon` → Canon; re-click `oratio` → scrolls back (nonce retrigger). Reader scrollbar present and functional | HIGH |
 | M-8 | Bilingual pane delineation | AUTO | Computed backgrounds of `.latin` vs `.english` differ (darker tint light modes, lighter tint dark modes) | LOW |
 
 ## O — Divine Office: complete generation (the product core)
@@ -47,12 +47,12 @@ Every row below must hold **for the named date AND for any spot-check date the o
 
 | ID | Requirement | Driver | Steps / PASS criteria | Severity |
 |---|---|---|---|---|
-| O-1 | All eight hours render for an ordinary Sunday | AUTO | 2026-07-05: Matutinum, Laudes, Prima, Tertia, Sexta, Nona, Vesperae, Completorium each render a complete hour — no empty hour, no "delegates to ferial" placeholder | BLOCKER |
-| O-2 | Sunday Lauds psalmody matches the psalter schema | AUTO | 2026-07-05 Laudes psalms = `Day0 Laudes1` group from `Psalmi major.txt` (Pss. 92, 99, 62, canticle *Trium puerorum* [210], 148) with their antiphons; Benedictus + its antiphon present; collect = the Sunday's Oratio | BLOCKER |
-| O-3 | Ferial weekday psalmody | AUTO | 2026-07-06 (feria II): Lauds = `Day1 Laudes1` group (46, 5, 28, canticle 211, 116); Vespers = `Day1 Vespera` (114, 115, 119, 120, 121); Matins psalms = `Psalmi matutinum.txt` Day1 set | BLOCKER |
-| O-4 | Hour skeletons complete | AUTO | Each hour carries its full skeleton per `Special/*.txt`: Deus in adjutórium; hymn (correct per hour/season); psalmody with antiphons; capitulum; responsory breve / versum (minor hours); lessons+responsories (Matins); Benedictus/Magnificat/Nunc dimittis with antiphons; preces when rubrics call them; oratio; conclusio | BLOCKER |
+| O-1 | All eight hours render for an ordinary Sunday | AUTO | 2026-07-05: Matutinum, Laudes, Prima, Tertia, Sexta, Nona, Vesperae, Completorium each render a complete hour — no empty hour, no "delegates to ferial" placeholder | HIGH |
+| O-2 | Sunday Lauds psalmody matches the psalter schema | AUTO | 2026-07-05 Laudes psalms = `Day0 Laudes1` group from `Psalmi major.txt` (Pss. 92, 99, 62, canticle *Trium puerorum* [210], 148) with their antiphons; Benedictus + its antiphon present; collect = the Sunday's Oratio | HIGH |
+| O-3 | Ferial weekday psalmody | AUTO | 2026-07-06 (feria II): Lauds = `Day1 Laudes1` group (46, 5, 28, canticle 211, 116); Vespers = `Day1 Vespera` (114, 115, 119, 120, 121); Matins psalms = `Psalmi matutinum.txt` Day1 set | HIGH |
+| O-4 | Hour skeletons complete | AUTO | Each hour carries its full skeleton per `Special/*.txt`: Deus in adjutórium; hymn (correct per hour/season); psalmody with antiphons; capitulum; responsory breve / versum (minor hours); lessons+responsories (Matins); Benedictus/Magnificat/Nunc dimittis with antiphons; preces when rubrics call them; oratio; conclusio | HIGH |
 | O-5 | Invitatory correct | AUTO | Matins invitatory: 2026-07-06 = feria II text (*Veníte, exsultémus…* per `Invitatorium.txt`/`Major Special`); Advent Sundays = *Regem ventúrum*; Paschaltide = *Surréxit Dóminus vere, Allelúja* | HIGH |
-| O-6 | I-class feast: propers override psalter | AUTO | 2025-12-25 (Nativitas): proper antiphons/psalms/lessons from `Horas/Sancti/12-25`; Te Deum present; proper hymns; 9 lessons | BLOCKER |
+| O-6 | I-class feast: propers override psalter | AUTO | 2025-12-25 (Nativitas): proper antiphons/psalms/lessons from `Horas/Sancti/12-25`; Te Deum present; proper hymns; 9 lessons | HIGH |
 | O-7 | First Vespers | AUTO | 2026-08-14 Vespers = **I Vespers of Assumptio** (1960: I cl. feasts only) — antiphons/capitulum/hymn/Magnificat ant. of the feast, not of the feria | HIGH |
 | O-8 | Commune supply for office | AUTO | 2026-01-21 (S. Agnetis, III cl.): sections missing from the Sancti file supplied from Commune Virginum via `vide`, labelled with source | HIGH |
 | O-9 | Lent: rubrical changes | AUTO | 2026-02-20 (Lent feria): no Te Deum at Matins; ferial preces at Lauds/Vespers; no Alleluia in openings (deo-gratias forms per `Rubricae`/skeleton conditionals) | HIGH |
@@ -64,7 +64,7 @@ Every row below must hold **for the named date AND for any spot-check date the o
 | O-13 | Commemorations | AUTO | A date with a commemoration (e.g. 2026-07-05 comm. of the occurring Sancti per resolver): commemorated collect(s) appear after the day's oratio at Lauds/Vespers with their antiphon/versicle | HIGH |
 | O-14 | Doxologies & seasonal hymn endings | AUTO | Hymn doxologies switch per season where `Doxologies.txt` mandates (e.g. Nativity/Epiphany/Paschal endings) | MEDIUM |
 | O-15 | Office ⋄ Mass station parity | AUTO | Office loop-line UI: every hour clickable → hour renders; subway/office navigation consistent with reader anchors | MEDIUM |
-| O-16 | No silent gaps | AUTO | For 14 consecutive days (2026-07-05…07-18), iterate all 8 hours: zero empty sections where the schema demands content; any `textus deest` placeholder appears ONLY if it is also in `DOCS/CORPUS-FILL-LOG.md` with its audit row | BLOCKER |
+| O-16 | No silent gaps | AUTO | For 14 consecutive days (2026-07-05…07-18), iterate all 8 hours: zero empty sections where the schema demands content; any `textus deest` placeholder appears ONLY if it is also in `DOCS/CORPUS-FILL-LOG.md` with its audit row | HIGH |
 
 ## L — Lore callouts
 
@@ -79,7 +79,7 @@ Every row below must hold **for the named date AND for any spot-check date the o
 
 | ID | Requirement | Driver | Steps / PASS criteria | Severity |
 |---|---|---|---|---|
-| P-1 | Sidecar persistence | AUTO | Create annotation + homily + theme span → hard-reload (web) / relaunch (desktop) → all present; localStorage annotations migrated once (flag set) | BLOCKER |
+| P-1 | Sidecar persistence | AUTO | Create annotation + homily + theme span → hard-reload (web) / relaunch (desktop) → all present; localStorage annotations migrated once (flag set) | HIGH |
 | P-2 | Calendar indicators | AUTO | Annotated day shows color-coded dot/glow; homily days show status chip (unstarted/in-progress/complete colors) | HIGH |
 | P-3 | Theme painting | AUTO | Drag-select a date range → labelled colored bar spans exactly those cells; span persisted; deletable | HIGH |
 | P-4 | Homily recycling (base vs year) | AUTO | Create base homily on a liturgical key; switch year tab, add year overlay; base text visible every year, overlay only in its year | HIGH |
@@ -101,12 +101,12 @@ Every row below must hold **for the named date AND for any spot-check date the o
 |---|---|---|---|---|
 | Y-1 | Slide-out tray | AUTO | Reader/Office/Map views expose a slide-out settings tray (edge handle or button); opens/closes with animation, keyboard accessible, state persists in sidecar settings | HIGH |
 | Y-2 | Theme + light/dark in tray | AUTO | Tray contains the theme family selector and light/dark toggle (T-1/T-2 driven from here) | HIGH |
-| Y-3 | Mass-form rubric toggle (DO-provided granularity) | AUTO | Tray offers the forms DO's own rubrics distinguish: **Missa lecta (privata)** / **Missa sollemnis** (Missa Cantata rendered as the sollemnis rubric layer minus sacred-minister rows, labelled "Cantata — derived"). Switching form swaps the displayed `!`-rubric layer per the `si est Missa sollemnis / si privata` conditionals extracted from `Ordo.txt`; reader re-renders; map legend reflects the form | BLOCKER |
-| Y-4 | Role lens — DO-provided roles | AUTO | Tray offers exactly the roles DO's rubric prose names: **Celebrans (Priest)** / **Diaconus** / **Subdiaconus** / **Ministri (Servers)**, plus a **Laity** lens defined as "all parts marked as responses (`R.`/Ministri respondent) + non-secreto texts". Selecting a lens highlights (never hides) that role's parts with a visible lens indicator | BLOCKER |
+| Y-3 | Mass-form rubric toggle (DO-provided granularity) | AUTO | Tray offers the forms DO's own rubrics distinguish: **Missa lecta (privata)** / **Missa sollemnis** (Missa Cantata rendered as the sollemnis rubric layer minus sacred-minister rows, labelled "Cantata — derived"). Switching form swaps the displayed `!`-rubric layer per the `si est Missa sollemnis / si privata` conditionals extracted from `Ordo.txt`; reader re-renders; map legend reflects the form | HIGH |
+| Y-4 | Role lens — DO-provided roles | AUTO | Tray offers exactly the roles DO's rubric prose names: **Celebrans (Priest)** / **Diaconus** / **Subdiaconus** / **Ministri (Servers)**, plus a **Laity** lens defined as "all parts marked as responses (`R.`/Ministri respondent) + non-secreto texts". Selecting a lens highlights (never hides) that role's parts with a visible lens indicator | HIGH |
 | Y-5 | Role rubric provenance | AUTO | Every role-tagged rubric row traces to its `Ordo.txt` (or horas skeleton) source line — spot-check 6 rows (e.g. Incensatio: Diaconus/Celebrans exchange at `Ordo.txt:61-68`; Gospel procession `:105-116`; paten `:152`). External-manual-derived lenses (M-C, detailed server choreography, laity postures) are **next-major**, not release-gating | HIGH |
 | Y-6 | Rubrics on/off | AUTO | Tray master toggle "[X] rubrics" shows/hides the red rubric layer entirely in reader and office views | HIGH |
 | Y-7 | Typeface + size | AUTO | Tray offers typeface selection (bundled families incl. a serif liturgical default, a sans, and a dyslexia-friendly option — all packaged locally, no remote fonts) and font-size control (range or stepped); both apply live to reader/office text and persist across reload | HIGH |
-| Y-8 | Settings round-trip | AUTO | All tray selections (form, lens, rubrics on/off, typeface, size, theme) persist in sidecar `settings` and restore on relaunch (web + desktop) | BLOCKER |
+| Y-8 | Settings round-trip | AUTO | All tray selections (form, lens, rubrics on/off, typeface, size, theme) persist in sidecar `settings` and restore on relaunch (web + desktop) | HIGH |
 
 ## X — Export, share, deep links
 
@@ -122,7 +122,7 @@ Every row below must hold **for the named date AND for any spot-check date the o
 | ID | Requirement | Driver | Steps / PASS criteria | Severity |
 |---|---|---|---|---|
 | E-1 | Ungated by default | AUTO | With no `VITE_REVENUECAT_API_KEY`, every feature reachable; `FEATURE_GATES` all-null | HIGH |
-| E-2 | No secret in artifacts | AUTO | `grep -r 'rcb_\|sk_' src/ dist/` (built bundles) → no key material | BLOCKER |
+| E-2 | No secret in artifacts | AUTO | `grep -r 'rcb_\|sk_' src/ dist/` (built bundles) → no key material | HIGH |
 | E-3 | Bridge spec complete | AUTO | `DOCS/ENTITLEMENT-SYNC.md` implementable without questions (HMAC, idempotency, grant flow, health, env) | MEDIUM |
 
 ## B — Builds & packaging (manual, per I-25 / BUILD_CONVENTIONS)
@@ -131,16 +131,16 @@ All artifacts staged in the canonical checkout's `dist/`; version bumped + stamp
 
 | ID | Requirement | Driver | Steps / PASS criteria | Severity |
 |---|---|---|---|---|
-| B-1 | Version identity | AUTO | One version string across package.json / tauri.conf.json / Cargo.toml; identifier `mba.robin.standroidsmissal` in all manifests | BLOCKER |
-| B-2 | Web bundle | AUTO | `npm run build` exit 0; `dist/` web bundle serves and passes M-1 smoke visually | BLOCKER |
-| B-3 | Linux deb + AppImage | AUTO | `tauri build` produces both; deb installs on this host; AppImage launches; app opens corpus and renders 2026-07-05 Mass + Laudes | BLOCKER |
-| B-4 | Android APK + AAB + debug-symbols zip | COND (Android SDK/NDK on host or CI runner) | `tauri android build` release: signed APK + AAB produced; native debug symbols zipped (`dist/…-native-debug-symbols.zip`); APK installs and passes M-1/O-1 on device/emulator | BLOCKER |
+| B-1 | Version identity | AUTO | One version string across package.json / tauri.conf.json / Cargo.toml; identifier `mba.robin.standroidsmissal` in all manifests | HIGH |
+| B-2 | Web bundle | AUTO | `npm run build` exit 0; `dist/` web bundle serves and passes M-1 smoke visually | HIGH |
+| B-3 | Linux deb + AppImage | AUTO | `tauri build` produces both; deb installs on this host; AppImage launches; app opens corpus and renders 2026-07-05 Mass + Laudes | HIGH |
+| B-4 | Android APK + AAB + debug-symbols zip | COND (Android SDK/NDK on host or CI runner) | `tauri android build` release: signed APK + AAB produced; native debug symbols zipped (`dist/…-native-debug-symbols.zip`); APK installs and passes M-1/O-1 on device/emulator | HIGH |
 | B-5 | Windows EXE (NSIS) | COND (windows cross toolchain or windows-x64-cross runner) | NSIS installer built; SHA256 recorded | HIGH |
 | B-6 | Windows MSI (WiX) | COND (Windows host/runner — WiX is Windows-only) | MSI built on the windows runner; SHA256 recorded | HIGH |
 | B-7 | Windows install-run | OPERATOR | Operator (or Windows runner with session) installs EXE and MSI on Windows 11, launches, verifies M-1 renders | HIGH |
 | B-8 | MSIX code-readiness attestation | AUTO | Documented attestation in the run report: tauri.conf/bundle config + identity are MSIX-complete; packaging MSIX requires **no further code edits** (config/tooling invocation only), citing the exact config keys inspected | MEDIUM |
-| B-9 | Android on-device pass | OPERATOR | Operator installs the signed APK on a physical device; verifies O-1 (all eight hours render) and P-1 (sidecar persists across app restarts) | BLOCKER |
-| B-10 | dist/ staging + stamped commit | AUTO | Complete artifact set (apk, aab, symbols zip, deb, AppImage, exe, msi, web bundle, rubric-run report+screencasts) in canonical `dist/`; `v{VERSION}: ` commit per I-25 | BLOCKER |
+| B-9 | Android on-device pass | OPERATOR | Operator installs the signed APK on a physical device; verifies O-1 (all eight hours render) and P-1 (sidecar persists across app restarts) | HIGH |
+| B-10 | dist/ staging + stamped commit | AUTO | Complete artifact set (apk, aab, symbols zip, deb, AppImage, exe, msi, web bundle, rubric-run report+screencasts) in canonical `dist/`; `v{VERSION}: ` commit per I-25 | HIGH |
 
 ## V — Platform parity (collinear rule)
 
@@ -152,7 +152,7 @@ All artifacts staged in the canonical checkout's `dist/`; version bumped + stamp
 
 | ID | Requirement | Driver | Steps / PASS criteria | Severity |
 |---|---|---|---|---|
-| SCR-1 | Whole run recorded | AUTO | Every AUTO row's driven sequence captured in chained segments; archived `dist/rubric-runs/v<VERSION>-<env>-<UTC>/NN-<ID>-<desc>.mp4`; report maps every verdict → segment/still | BLOCKER |
+| SCR-1 | Whole run recorded | AUTO | Every AUTO row's driven sequence captured in chained segments; archived `dist/rubric-runs/v<VERSION>-<env>-<UTC>/NN-<ID>-<desc>.mp4`; report maps every verdict → segment/still | HIGH |
 | SCR-2 | Operator rows recorded | OPERATOR | B-7/B-9 sessions screencast-recorded (device recorder / `adb screenrecord`) and archived in the same run folder | HIGH |
 
 ---
@@ -162,13 +162,13 @@ All artifacts staged in the canonical checkout's `dist/`; version bumped + stamp
 
 | ID | Requirement | Driver | Steps / PASS criteria | Severity |
 |---|---|---|---|---|
-| M-S1 | No raw DO specials in Incipit | AUTO | Working web/desktop artifact: Mass Incipit shows no `*&Introibo`, `*D`, `*S`, or bare control tokens; evidence still | BLOCKER |
-| M-S2 | Judica present ordinary Sunday Low | AUTO | Non-Passiontide non-Requiem day: Judica me block present after Introibo antiphon | BLOCKER |
-| M-S3 | Judica omitted Passiontide/Requiem | AUTO | Fixture Passiontide or Requiem day: Judica block absent; Confiteor path continues | BLOCKER |
+| M-S1 | No raw DO specials in Incipit | AUTO | Working web/desktop artifact: Mass Incipit shows no `*&Introibo`, `*D`, `*S`, or bare control tokens; evidence still | HIGH |
+| M-S2 | Judica present ordinary Sunday Low | AUTO | Non-Passiontide non-Requiem day: Judica me block present after Introibo antiphon | HIGH |
+| M-S3 | Judica omitted Passiontide/Requiem | AUTO | Fixture Passiontide or Requiem day: Judica block absent; Confiteor path continues | HIGH |
 | M-S4 | Solemn vs Low incense | AUTO | `mass.solemn=0` omits Incensatio; `mass.solemn=1` shows solemn incense block | HIGH |
 | M-S5 | Callout not on citation | AUTO | Hover/hold over `!Ps. 42` citation does not park callout on reading line; placement above/below anchor | HIGH |
 | M-S6 | Meaning pins Ordinary | AUTO | Select “Introíbo ad altáre Dei” → Meaning shows pinned “In the Ordinary of the Mass” / Incipit before distant Office lessons | HIGH |
-| M-S7 | Production Incipit | AUTO | https://standroid.robin.mba (or current host) after deploy of this version matches M-S1–M-S2 stills | BLOCKER |
+| M-S7 | Production Incipit | AUTO | https://standroid.robin.mba (or current host) after deploy of this version matches M-S1–M-S2 stills | HIGH |
 
 **Evidence:** stills + screencast under `dist/rubric-runs/v…/` from **working release artifacts**, not dev-server-only. Smoke tests are not part of this process.
 
@@ -184,10 +184,13 @@ All artifacts staged in the canonical checkout's `dist/`; version bumped + stamp
 | V-R3 | `ScriptureMap` chapter stack | AUTO | Book selected → all chapters stacked as `SectionReader` sections (alternating shades, per-chapter verse dropdown jumps to the verse line); selection/flyout/annotation work inside boxes | HIGH |
 | V-R4 | `OfficeHourMap` part stations | AUTO | Office view: the hour's rubric parts list in the rail; click scrolls the reader to that entry's anchor; active part tracks the reading position | MEDIUM |
 | V-R5 | Scripture strip = books across | AUTO | In the scripture view the ever-present strip lists the canonical books; a book opens its chapter dropdown; selection opens that chapter | MEDIUM |
+| V-R6 | `ANNOTATIONS` heading | AUTO | A section carrying annotations ends with a small-caps `ANNOTATIONS` heading above the ann-list — never anonymous boxes | LOW |
+| V-R7 | `AnnotationIndex` surface | AUTO | Rail 🔖 Annotations opens the index: every stored note AND bare highlight, grouped by anchor (title + jump-to opens the reader at it), inline note edit, color cycle, confirm-remove; empty state states the honest absence | HIGH |
+| V-R8 | `updateAnnotation` | AUTO | Editing a note / cycling a color in the index patches the stored record in place (anchor, quote, createdAt untouched) | HIGH |
 
 ## Verdict computation
 
-1. Any ❌ (or ⚠️ on BLOCKER/HIGH) ⇒ **DEFECTIVE** — named IDs return to ARCHITECT/CODE; gauntlet re-runs after fix.
+1. Any ❌ or ⚠️ PARTIAL, at any severity ⇒ **DEFECTIVE** — named IDs return to ARCHITECT/CODE like any other issue; gauntlet re-runs after fix.
 2. All AUTO/COND ✅ but any OPERATOR row un-run ⇒ **INCOMPLETE—pending-operator** (enumerate: currently B-7, B-9, SCR-2).
 3. Every row ✅ ⇒ **SHIP-READY**.
 

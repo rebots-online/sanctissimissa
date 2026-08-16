@@ -69,8 +69,8 @@ describe('workspaceNavigation (BX.5)', () => {
     assert(Array.isArray(UTIL_NAV), 'UTIL_NAV must be an array');
   });
 
-  test('NAV has seven primary entries', () => {
-    assert.equal(NAV.length, 7, 'NAV must have exactly 7 primary entries');
+  test('NAV has eight primary entries', () => {
+    assert.equal(NAV.length, 8, 'NAV must have exactly 8 primary entries (Annotations added 2026-08-16)');
   });
 
   test('UTIL_NAV has two utility entries', () => {
