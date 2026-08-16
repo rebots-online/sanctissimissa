@@ -14,6 +14,7 @@ import type { SidecarDb } from '../core/accompaniment/store.ts';
 import { verseHash } from '../core/share/shareLink.ts';
 import SectionReader, { type ReaderSection, type SelectionAction } from './SectionReader.tsx';
 import ScriptureAtlas, { type AtlasMode } from './ScriptureAtlas.tsx';
+import ScriptureMap from './ScriptureMap.tsx';
 
 interface Props {
   db: CorpusDb;
@@ -135,24 +136,27 @@ export default function BibleView({ db, focusRef, focusNonce, onAction, sidecar,
     );
   }
 
-  // ── Chapter grid ─────────────────────────────────────────────────
+  // ── Chapter stack (ScriptureMap, decision 23) ────────────────────
+  // The book's chapters as one continuous alternating-shade reading surface;
+  // per-chapter verse dropdowns jump within it. Deep links still open the
+  // single-chapter reader below (focusRef sets `chapter`).
   if (!chapter) {
     return (
-      <div className="content reader">
-        <section className="reader-section">
-          <div className="head">
+      <ScriptureMap
+        db={db}
+        book={book}
+        psalms={book === 'Psa'}
+        sidecar={sidecar}
+        onAction={onAction}
+        onCapture={onCapture}
+        toolbar={
+          <div className="export-bar">
             <button className="bible-back" onClick={() => setBook(null)}>‹ Libri</button>
-            <h3>{bookMeta?.title}</h3>
+            <span className="export-sep" />
+            <span className="export-label">{bookMeta?.title}</span>
           </div>
-          <div className="bible-chapter-grid">
-            {Array.from({ length: bookMeta?.chapters ?? 0 }, (_, i) => i + 1).map((n) => (
-              <button key={n} className="bible-chapter" onClick={() => { setChapter(n); setFocusVerse(null); }}>
-                {n}
-              </button>
-            ))}
-          </div>
-        </section>
-      </div>
+        }
+      />
     );
   }
 
@@ -163,14 +167,20 @@ export default function BibleView({ db, focusRef, focusNonce, onAction, sidecar,
   // scripture exactly as it does on the Mass. Annotations written against
   // individual verses keep rendering via `quoteKeys`.
   const chapterKey = `bible:${book}/${chapter}`;
+  /** `{chapter}:{verse} ` prefixes → `renderLine` superscripts the verse and
+   *  the chapter number appears once, in the title (B3 remainder, §11.2). */
+  const vno = (v: SectionText) => v.nodeKey.split('/').pop() ?? '';
   const sections: ReaderSection[] = [
     {
       anchor: chapterKey,
       nodeKey: chapterKey,
       quoteKeys: verses.map((v) => v.nodeKey),
       title: `${bookMeta?.title ?? book} ${chapter}`,
-      latin: verses.map((v) => v.latin ?? '').join('\n') || null,
-      english: verses.map((v) => v.english ?? '').join('\n') || null,
+      // Parity-shaded chapter container (decision 23): navigating chapter →
+      // chapter alternates the shade.
+      sectionClass: chapter % 2 ? 'chapter-lite' : 'chapter-shade',
+      latin: verses.map((v) => `${chapter}:${vno(v)} ${v.latin ?? ''}`.trimEnd()).join('\n') || null,
+      english: verses.map((v) => `${chapter}:${vno(v)} ${v.english ?? ''}`.trimEnd()).join('\n') || null,
       meta: (
         <span className="src">
           Vulgata Clementina · Douay-Rheims{bookMeta?.hasLatin ? '' : ' (English only)'}

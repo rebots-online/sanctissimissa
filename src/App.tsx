@@ -361,6 +361,11 @@ export default function App() {
             officeHour={officeHour}
             onStation={onStation}
             onHour={setOfficeHour}
+            bibleBook={bibleFocus.ref?.split('/')[0] ?? null}
+            onBibleRef={(ref) => {
+              setBibleFocus({ ref, nonce: Date.now() });
+              setView('bible');
+            }}
           />
         )}
 

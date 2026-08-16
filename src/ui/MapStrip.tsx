@@ -36,17 +36,26 @@ interface Props {
   officeHour: string;
   onStation: (s: Station) => void;
   onHour: (id: string) => void;
+  /** Open book when the scripture view is active (chip highlight). */
+  bibleBook?: string | null;
+  /** Scripture strip navigation: "Book/chapter" ref (e.g. "Gen/3"). */
+  onBibleRef?: (ref: string) => void;
 }
 
 const ordoIndex = (id: string) => MASS_ORDO.findIndex((s) => s.id === id);
 
-export default function MapStrip({ db, day, view, activeStation, officeHour, onStation, onHour }: Props) {
+export default function MapStrip({ db, day, view, activeStation, officeHour, onStation, onHour, bibleBook, onBibleRef }: Props) {
   const activeRef = useRef<HTMLButtonElement>(null);
   const [flyout, setFlyout] = useState<FlyoutData | null>(null);
   /** Office incipits are built on first hover (buildHour is heavier). */
   const hourIncipits = useRef(new Map<string, Incipit | null>());
 
   const office = view === 'office';
+  /** Scripture view (decision 23): the strip IS the canonical books across,
+   *  each opening its chapters — the Books→Chapters projection of the map. */
+  const scripture = view === 'bible';
+  const [openBook, setOpenBook] = useState<string | null>(null);
+  const books = useMemo(() => (db && scripture ? db.getBooks() : []), [db, scripture]);
   const season = (day?.season ?? 'Time after Pentecost') as Season;
   // A strip stop appears exactly when the reader will render its anchor
   // that day (D14: no dead clicks) — the chant switches and Sunday-only
@@ -61,10 +70,10 @@ export default function MapStrip({ db, day, view, activeStation, officeHour, onS
   );
   const stations = useMemo(
     () =>
-      office
+      office || scripture
         ? []
         : stripStations(season).filter((s) => stationAnchorFor(s, anchors, textOf) !== null),
-    [office, season, anchors, textOf],
+    [office, scripture, season, anchors, textOf],
   );
 
   const incipits = useMemo(
@@ -132,6 +141,46 @@ export default function MapStrip({ db, day, view, activeStation, officeHour, onS
       behavior: 'smooth',
     });
   }, [activeStation, officeHour, view]);
+
+  // ── Scripture: the canonical books across, chapters as a dropdown ──
+  if (scripture && onBibleRef) {
+    const openMeta = books.find((b) => b.key === openBook) ?? null;
+    return (
+      <nav className="mapstrip scripture" aria-label="The canonical books" onMouseLeave={() => setFlyout(null)}>
+        {books.map((b) => (
+          <span key={b.key} className="book-stop">
+            <button
+              ref={b.key === bibleBook ? activeRef : undefined}
+              className={`mstation book${b.key === openBook ? ' open' : ''}${b.key === bibleBook ? ' active' : ''}`}
+              onClick={() => setOpenBook(openBook === b.key ? null : b.key)}
+              aria-expanded={openBook === b.key}
+              title={`${b.title} — ${b.chapters} capitula`}
+            >
+              <span className="mdot" />
+              <span className="mlabel">{b.key}</span>
+            </button>
+          </span>
+        ))}
+        {openMeta && (
+          <div className="book-chapters" role="menu" aria-label={`${openMeta.title} — chapters`}>
+            {Array.from({ length: openMeta.chapters }, (_, i) => i + 1).map((n) => (
+              <button
+                key={n}
+                role="menuitem"
+                onClick={() => {
+                  setOpenBook(null);
+                  onBibleRef(`${openMeta.key}/${n}`);
+                }}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        )}
+        {flyout && <MapFlyout {...flyout} />}
+      </nav>
+    );
+  }
 
   if (office) {
     return (

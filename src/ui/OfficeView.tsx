@@ -6,13 +6,14 @@
  * canticles, orations — all real corpus rows, Latin normative).
  */
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { OFFICE_CURSUS } from '../core/model/officeCursus.ts';
 import { buildHour, type OfficeEntry } from '../core/office/engine.ts';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 import type { DayInfo } from '../core/data/types.ts';
 import type { SidecarDb } from '../core/accompaniment/store.ts';
 import SectionReader, { type ReaderSection, type SelectionAction } from './SectionReader.tsx';
+import OfficeHourMap from './OfficeHourMap.tsx';
 import { downloadExport, type ExportEntry } from '../core/export/exportFormats.ts';
 import { shareUrl } from '../core/share/shareLink.ts';
 
@@ -32,6 +33,11 @@ export default function OfficeView({ db, day, hour, onHour, sidecar, onAction, o
   const R = 92;
   const CX = 130;
   const CY = 130;
+  const rootRef = useRef<HTMLDivElement>(null);
+  /** Until this timestamp the scroll-spy stays quiet — programmatic part-jumps
+   *  must not fight their own scroll (same guard as the Mass reader's). */
+  const spyMuteUntil = useRef(0);
+  const [activeAnchor, setActiveAnchor] = useState<string | null>(null);
 
   const entries: OfficeEntry[] = useMemo(() => {
     if (!day) return [];
@@ -41,6 +47,38 @@ export default function OfficeView({ db, day, hour, onHour, sidecar, onAction, o
       return [];
     }
   }, [db, day, sel.id]);
+
+  // Scroll-spy over the hour's sections → the OfficeHourMap's you-are-here
+  // (the Mass strip's mechanism, decision 23's part-stations).
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || !entries.length) return;
+    const observer = new IntersectionObserver(
+      (hits) => {
+        for (const hit of hits) {
+          if (hit.isIntersecting && Date.now() > spyMuteUntil.current) {
+            const anchor = (hit.target as HTMLElement).dataset.section;
+            if (anchor) setActiveAnchor(anchor);
+          }
+        }
+      },
+      { root, rootMargin: '-20% 0px -65% 0px', threshold: 0 },
+    );
+    root.querySelectorAll('section[data-section]').forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [entries]);
+
+  /** OfficeHourMap part-jump: scroll the reader to that entry's section. */
+  const jumpTo = (anchor: string) => {
+    const root = rootRef.current;
+    if (!root) return;
+    const el = root.querySelector(`[data-section="${CSS.escape(anchor)}"]`) as HTMLElement | null;
+    if (!el) return;
+    spyMuteUntil.current = Date.now() + 900;
+    const top = el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - 6;
+    root.scrollTo({ top, behavior: 'smooth' });
+    setActiveAnchor(anchor);
+  };
 
   const rubricsOn = (sidecar?.getSetting('mass.rubrics') ?? '1') === '1';
   const roleLens = sidecar?.getSetting('mass.roleLens') ?? 'off';
@@ -113,6 +151,7 @@ export default function OfficeView({ db, day, hour, onHour, sidecar, onAction, o
             </div>
           )}
         </div>
+        <OfficeHourMap entries={entries} activeAnchor={activeAnchor} onJump={jumpTo} />
       </aside>
 
       <SectionReader
@@ -122,6 +161,7 @@ export default function OfficeView({ db, day, hour, onHour, sidecar, onAction, o
         sidecar={sidecar}
         onAction={onAction}
         onCapture={onCapture}
+        rootRef={rootRef}
         toolbar={
           <>
             {!day && <p>Choose a date to construct the office.</p>}
