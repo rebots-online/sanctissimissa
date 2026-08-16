@@ -196,3 +196,12 @@ All artifacts staged in the canonical checkout's `dist/`; version bumped + stamp
 > Run by: <agent/operator, model+version> · Date: <UTC ISO> · Build: v<VER> (<git sha>) · Env: <host/device>.
 > Verdict: <SHIP-READY | DEFECTIVE | INCOMPLETE—pending-operator>.
 > I attest every ✅ above was granted on direct semantic observation of the evidence file cited on its row, that no verdict rests on a grep, exit code, or log absence, and that the screencast archive covers every driven sequence. Nothing was waived.
+
+## V-S — Share-passage landing (ARCHITECTURE.md §11.7)
+
+| ID | Requirement | Driver | Steps / PASS criteria | Severity |
+|---|---|---|---|---|
+| V-S1 | Landing renders from a share URL | AUTO | Fresh load of `#/s/<payload>` → plaque with the shared quote (+ translation, attribution), lead-in, CTA, both store badges; app shell suppressed | HIGH |
+| V-S2 | CTA opens the app at the shared position | AUTO | Click → app boots on `payload.dest` (e.g. `#/verse/Gen/1/1` → Genesis 1 with the verse visible) | HIGH |
+| V-S3 | Badges are honest pre-publish | AUTO | With `STORE_LINKS.* = null` the badges render inert with a pending tooltip — no fabricated store links | MEDIUM |
+| V-S4 | Share passage from the reader | COND | Select text → context menu "⛓ Share passage" → copied URL opens the landing (V-S1) with that quote and its aligned counterpart | HIGH |

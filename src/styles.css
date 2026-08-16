@@ -1752,3 +1752,87 @@ button.active { background: var(--accent); color: #fff; border-color: var(--acce
 .atlas-mode-switch { display: inline-flex; gap: 4px; margin: 0 0 16px; padding: 0; background: none; border: none; border-radius: 0; }
 .atlas-mode-switch button { padding: 5px 16px; }
 .atlas-mode-switch button.active { box-shadow: none; }
+
+/* ── Share landing (operator directive 2026-08-16): a shared passage opens
+   a standalone souvenir-plaque page — the excerpt in large stylized letters,
+   an engraved panel, an invitation, and the app/store badges. */
+.share-landing {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 48px 20px;
+  background: linear-gradient(180deg, var(--surface-2), var(--surface) 30%, var(--surface-2));
+  text-align: center;
+}
+.share-rose { font-size: 30px; color: var(--accent); }
+.share-plaque {
+  max-width: 720px;
+  margin: 0;
+  padding: 44px 48px 30px;
+  background: var(--surface);
+  border: 1px solid var(--card-border);
+  outline: 4px double var(--card-border);
+  outline-offset: 6px;
+  border-radius: 4px;
+  box-shadow: 0 14px 40px rgba(61, 48, 28, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.share-plaque blockquote {
+  margin: 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(26px, 4.6vw, 40px);
+  line-height: 1.35;
+  color: var(--ink);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65), 0 -1px 1px rgba(61, 48, 28, 0.25);
+  letter-spacing: 0.01em;
+}
+.share-plaque blockquote.alt {
+  margin-top: 14px;
+  font-size: clamp(17px, 2.6vw, 22px);
+  color: var(--ink-soft);
+  text-shadow: none;
+}
+.share-plaque figcaption {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-family: var(--serif);
+  font-variant: small-caps;
+  letter-spacing: 0.09em;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+.plaque-source { color: var(--ink-faint); font-size: 12px; }
+.share-lead {
+  max-width: 560px;
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 16.5px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+.share-cta { font-size: 16px; padding: 10px 28px; }
+.store-badges { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.store-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--sans);
+  font-style: normal;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #fff;
+  padding: 9px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: none;
+}
+.store-badge.play { background: #1b1c17; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35); }
+.store-badge.ms { background: #0e5a2f; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35); }
+.store-badge.pending { opacity: 0.55; cursor: default; }
+.share-foot { font-family: var(--serif); font-variant: small-caps; letter-spacing: 0.12em; color: var(--ink-faint); font-size: 12px; }

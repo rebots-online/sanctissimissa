@@ -40,6 +40,7 @@ import {
   type Annotation,
   type AnnotationRange,
 } from '../core/annotations/store.ts';
+import { shareUrl, shareLandingHash } from '../core/share/shareLink.ts';
 import {
   alignSelection,
   alignPhrase,
@@ -834,6 +835,29 @@ export default function SectionReader({
           )}
           <button onClick={() => { void copyText(menu.term); setMenu(null); }}>
             ⧉ Copy
+          </button>
+          <button
+            onClick={() => {
+              // Share-passage landing (operator directive 2026-08-16): the
+              // copied link opens the plaque page, whose CTA opens the app
+              // here. Destination = the current app position (its hash when
+              // one exists, else today's reader).
+              const today = new Date();
+              const iso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+              const dest = /^#\/(day|verse|section|acc)\//.test(location.hash) ? location.hash : `#/day/${iso}`;
+              const section = menu.nodeKey ? sectionFor(menu.nodeKey) : null;
+              const url = shareUrl(shareLandingHash({
+                quote: menu.term,
+                quoteAlt: alignedAlt(menu) ?? undefined,
+                title: typeof section?.title === 'string' ? section.title : undefined,
+                source: section ? section.nodeKey.replace(/^section:/, '') : (menu.nodeKey ?? undefined),
+                dest,
+              }));
+              void copyText(url);
+              setMenu(null);
+            }}
+          >
+            ⛓ Share passage
           </button>
           <button onClick={() => { highlight(menu); setMenu(null); }}>
             ▮ Highlight

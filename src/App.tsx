@@ -13,7 +13,8 @@ import MeaningPanel from './ui/MeaningPanel.tsx';
 import CalendarView from './ui/CalendarView.tsx';
 import OfficeView from './ui/OfficeView.tsx';
 import BibleView from './ui/BibleView.tsx';
-import { parseHashRoute } from './core/share/shareLink.ts';
+import { parseHashRoute, type SharePayload } from './core/share/shareLink.ts';
+import ShareLanding from './ui/ShareLanding.tsx';
 import { SidecarDb } from './core/accompaniment/store.ts';
 import JournalSidecar from './ui/JournalSidecar.tsx';
 import JournalView from './ui/JournalView.tsx';
@@ -95,11 +96,18 @@ export default function App() {
     return () => { alive = false; };
   }, []);
 
-  // Hash-route deep links (#/verse/…, #/day/…, #/section/… — §7.6 BB.3):
+  // Hash-route deep links (#/verse/…, #/day/…, #/section/…, #/s/… — §7.6 BB.3):
   // resolved once on load; shares/widgets/companion all target this layer.
+  // #/s/… is the share LANDING (plaque page), which renders instead of the
+  // shell until its CTA opens the app at the shared position.
+  const [shareLanding, setShareLanding] = useState<SharePayload | null>(null);
   useEffect(() => {
     const link = parseHashRoute(location.hash);
     if (!link) return;
+    if (link.view === 'share' && link.share) {
+      setShareLanding(link.share);
+      return;
+    }
     if (link.view === 'bible' && link.verseRef) {
       setBibleFocus({ ref: link.verseRef, nonce: Date.now() });
       setView('bible');
@@ -224,6 +232,27 @@ export default function App() {
     const sid = stationForAnchor(section);
     if (sid) setActiveStation(sid);
     setView('reader');
+  }
+
+  // The share landing renders INSTEAD of the shell (no corpus needed — the
+  // plaque carries its own text). The CTA routes to the shared position and
+  // boots the app properly (reload resolves the destination deep link).
+  if (shareLanding) {
+    return (
+      <ShareLanding
+        payload={shareLanding}
+        onOpenApp={() => {
+          const dest = shareLanding.dest || '#/';
+          setShareLanding(null);
+          if (location.hash === dest) {
+            location.reload();
+          } else {
+            location.hash = dest;
+            location.reload();
+          }
+        }}
+      />
+    );
   }
 
   if (error) {

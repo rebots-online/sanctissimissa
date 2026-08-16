@@ -1229,3 +1229,29 @@ themed pill). `npm test` 283/283 and `tsc -b` clean at commit `99669a55`.
 CHECKLIST stanza V-R records the same ✅ items with this evidence. Rows
 still marked P-V in §11.2 remain unlanded targets and are not claimed.
 — Attested by Claude (claude-fable-5, Claude Code session), 2026-08-16.
+
+### 11.7 Share-passage landing (2026-08-16, operator directive)
+
+A shared passage opens a **standalone landing page**, not the raw app: the
+excerpt as a souvenir plaque (large stylized serif, engraved panel), the
+translation beneath, a small-caps attribution, a lead-in inviting the reader
+in, the CTA that opens the app at the shared position, and the store badges.
+
+| Entity | Type | File:line | St | Role | Key signatures / fields |
+|---|---|---|---|---|---|
+| ＋ `SharePayload` / `encodeShare` / `decodeShare` / `shareLandingHash` | type/fns | `src/core/share/shareLink.ts` | ✅ | `#/s/<base64url(JSON)>` codec; `dest` is the app hash the CTA opens | `{ quote; quoteAlt?; title?; source?; dest }` |
+| Δ `parseHashRoute` | fn | `src/core/share/shareLink.ts` | ✅ | gains the `#/s/…` branch → `DeepLink { view: 'share', share }` | — |
+| ＋ `ShareLanding` | comp | `src/ui/ShareLanding.tsx:1` | ✅ | the plaque page (renders INSTEAD of the shell; no corpus needed); CTA routes to `dest` and reboots the app on the deep link | props `{ payload: SharePayload; onOpenApp: () => void }` |
+| ＋ `STORE_LINKS` | const | `src/ui/ShareLanding.tsx` | ✅ | Play/Microsoft listing URLs — **null until the listings exist (TC14)**; badges then render inert with an honest tooltip, never a fabricated link | `{ play: string \| null; microsoft: string \| null }` |
+| Δ `SectionReader` selection menu | UI | `src/ui/SectionReader.tsx` | ✅ | gains "⛓ Share passage" — copies the LANDING url (quote + aligned alt + section title/source + current position as `dest`) | — |
+
+Provenance (INC-19): plaque text + attribution = `computed-fact`; the
+lead-in, CTA label, badges, and footer = `authored-static`. No
+generation-claiming copy. Rubric rows `DOCS/TEST_RUBRIC.md` § V-S.
+
+**Verified 2026-08-16** (dev app, Playwright): fresh load of a `#/s/…` URL
+renders the landing (plaque "In principio creavit Deus caelum et terram." +
+English + attribution; shell suppressed); the CTA opens the app at
+`#/verse/Gen/1/1` with Genesis 1 and the shared verse rendered; badges render
+inert (pending). `tsc -b` clean, 283/283 at the commit landing this section.
+The "Share passage" menu item uses the same verified codec + landing.
