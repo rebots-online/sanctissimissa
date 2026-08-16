@@ -172,6 +172,19 @@ All artifacts staged in the canonical checkout's `dist/`; version bumped + stamp
 
 **Evidence:** stills + screencast under `dist/rubric-runs/v…/` from **working release artifacts**, not dev-server-only. Smoke tests are not part of this process.
 
+## V-R — Reader unification & view-true maps (stanza V; ARCHITECTURE.md §11.2–11.3, decisions 22–26)
+
+| ID | Requirement | Driver | Steps / PASS criteria | Severity |
+|---|---|---|---|---|
+| D22 | Exact-range highlighting | COND | In any reader, highlight a phrase → `mark.ann` on the exact `{lang,line,start,end}` range in BOTH languages; reload → same range re-rendered (not content-matched) | HIGH |
+| D24 | Office fidelity differential | COND | The convergence sweep (`tests/.tmp/diffprobe/sweep.mjs`) passes structure-token comparison for all five day-types × eight hours against the vendored DO reference | HIGH |
+| D25 | Station-anchor totality | COND | Every `MASS_ORDO` station the day renders resolves via `stationAnchorFor`; no dead stop in the running app (ember/vigil Alleluia disabled, not clickable) | HIGH |
+| V-R1 | Scripture verse superscripts | AUTO | Open any Bible chapter: every verse line leads with its `vnum` superscript; chapter number in the chapter title, never repeated per line | HIGH |
+| V-R2 | Chaptered containers | AUTO | Scripture book view: consecutive chapter boxes alternate `--surface`/`--surface-2`; navigating chapter N→N+1 in the single-chapter reader flips the shade | MEDIUM |
+| V-R3 | `ScriptureMap` chapter stack | AUTO | Book selected → all chapters stacked as `SectionReader` sections (alternating shades, per-chapter verse dropdown jumps to the verse line); selection/flyout/annotation work inside boxes | HIGH |
+| V-R4 | `OfficeHourMap` part stations | AUTO | Office view: the hour's rubric parts list in the rail; click scrolls the reader to that entry's anchor; active part tracks the reading position | MEDIUM |
+| V-R5 | Scripture strip = books across | AUTO | In the scripture view the ever-present strip lists the canonical books; a book opens its chapter dropdown; selection opens that chapter | MEDIUM |
+
 ## Verdict computation
 
 1. Any ❌ (or ⚠️ on BLOCKER/HIGH) ⇒ **DEFECTIVE** — named IDs return to ARCHITECT/CODE; gauntlet re-runs after fix.
