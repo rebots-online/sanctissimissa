@@ -133,24 +133,34 @@ export default function ReaderView({
         el = root.querySelector(`[data-section="${CSS.escape(c)}"]`);
         if (el) break;
       }
-      // Line-level refinement: a station inside a multi-part section (the
-      // Confiteor within the foot-of-altar Incipit; the Alleluia verse inside
-      // a Sunday Graduale) scrolls to its own line, not the section top —
-      // in either reader layout (interleaved pairs / Latin column spans).
-      const at = ORDO_STATION_ANCHOR_AT[stationId];
-      if (el && at) {
-        const lines = el.querySelectorAll('.il-pair, .latin p > span');
-        const line = Array.from(lines).find((c) => at.test(c.textContent ?? ''));
-        if (line) el = line as HTMLElement;
-      }
       if (el) {
+        // Deterministic container scroll — never scrollIntoView, whose
+        // scroll-chain heuristics land inconsistently.
+        const scrollToEl = (target: HTMLElement) => {
+          const top = target.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - 6;
+          root.scrollTo({ top, behavior: 'smooth' });
+        };
+        // Line-level refinement: a station inside a multi-part section (the
+        // Confiteor within the foot-of-altar Incipit; the Alleluia verse
+        // inside a Sunday Graduale) scrolls to its own line, not the section
+        // top — in either reader layout (interleaved pairs / Latin column
+        // spans). A folded section renders no body, so the first pass runs
+        // before the unfold paints; retry once after the unfold renders.
+        const at = ORDO_STATION_ANCHOR_AT[stationId];
+        const tryLine = () => {
+          if (!at) return false;
+          const line = Array.from(el!.querySelectorAll('.il-pair, .latin p > span')).find((c) => at.test(c.textContent ?? ''));
+          if (!line) return false;
+          scrollToEl(line as HTMLElement);
+          return true;
+        };
         // Navigating to a folded section unfolds it.
         setOpenAnchor((el as HTMLElement).dataset.section ?? null);
         spyMuteUntil.current = Date.now() + 900;
-        // Scroll the reader container itself, deterministically — never
-        // scrollIntoView, whose scroll-chain heuristics land inconsistently.
-        const top = el.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - 6;
-        root.scrollTo({ top, behavior: 'smooth' });
+        if (!tryLine()) {
+          scrollToEl(el);
+          requestAnimationFrame(() => requestAnimationFrame(tryLine));
+        }
       }
     }
   }, [focusSection, focusNonce, day.date]);
