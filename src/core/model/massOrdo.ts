@@ -60,17 +60,17 @@ export const MASS_SECTION_ORDER = [
 export const MASS_ORDO: Station[] = [
   // ── Line 1: Mass of the Catechumens ─────────────────────────────
   { id: 'asperges', latin: 'Asperges me', english: 'Sprinkling Rite', kind: 'conditional', line: 'catechumens', branch: 'spur', note: 'Principal Sunday Mass; Vidi aquam in Paschaltide', detail: true },
-  { id: 'iudica', latin: 'Iudica me (Ps. 42)', english: 'Prayers at the Foot of the Altar', kind: 'ordinary', line: 'catechumens' },
+  { id: 'iudica', latin: 'Iudica me', english: 'Prayers at the Foot of the Altar', kind: 'ordinary', line: 'catechumens' },
   { id: 'confiteor', latin: 'Confiteor', english: 'Confession of Sin', kind: 'ordinary', line: 'catechumens' },
   { id: 'introitus', latin: 'Introitus', english: 'Introit', kind: 'proper', line: 'catechumens', sectionKey: 'Introitus' },
-  { id: 'kyrie', latin: 'Kyrie eleison', english: 'Kyrie', kind: 'ordinary', line: 'catechumens' },
-  { id: 'gloria', latin: 'Gloria in excelsis', english: 'Gloria', kind: 'conditional', line: 'catechumens', note: 'Omitted in Advent, Septuagesima–Lent ferias, Requiems' },
-  { id: 'oratio', latin: 'Oratio (Collecta)', english: 'Collect', kind: 'proper', line: 'catechumens', sectionKey: 'Oratio' },
+  { id: 'kyrie', latin: 'Kyrie', english: 'Kyrie', kind: 'ordinary', line: 'catechumens' },
+  { id: 'gloria', latin: 'Gloria', english: 'Gloria', kind: 'conditional', line: 'catechumens', note: 'Omitted in Advent, Septuagesima–Lent ferias, Requiems' },
+  { id: 'oratio', latin: 'Oratio', english: 'Collect', kind: 'proper', line: 'catechumens', sectionKey: 'Oratio' },
   // Ember-Day loop — between the Collect and the Epistle
   { id: 'lectio-l1', latin: 'Lectio prior', english: 'Ember Lesson', kind: 'proper', line: 'catechumens', sectionKey: 'LectioL1', branch: 'ember' },
   { id: 'graduale-l1', latin: 'Graduale I', english: 'Ember Gradual', kind: 'proper', line: 'catechumens', sectionKey: 'GradualeL1', branch: 'ember' },
   { id: 'oratio-l1', latin: 'Oratio altera', english: 'Ember Collect', kind: 'proper', line: 'catechumens', sectionKey: 'OratioL1', branch: 'ember' },
-  { id: 'lectio', latin: 'Lectio (Epistola)', english: 'Epistle', kind: 'proper', line: 'catechumens', sectionKey: 'Lectio' },
+  { id: 'lectio', latin: 'Lectio', english: 'Epistle', kind: 'proper', line: 'catechumens', sectionKey: 'Lectio' },
   // Seasonal chant switch — parallel tracks in the same slot
   { id: 'graduale', latin: 'Graduale', english: 'Gradual', kind: 'switch', line: 'catechumens', sectionKey: 'Graduale', branch: 'chant', activeIn: ['Advent', 'Christmastide', 'Time after Epiphany', 'Pre-Lent', 'Lent', 'Time after Pentecost'] },
   { id: 'alleluia', latin: 'Alleluia', english: 'Alleluia Verse', kind: 'switch', line: 'catechumens', sectionKey: 'Alleluia', branch: 'chant', activeIn: ['Advent', 'Christmastide', 'Time after Epiphany', 'Paschaltide', 'Time after Pentecost'] },
@@ -81,7 +81,7 @@ export const MASS_ORDO: Station[] = [
 
   // ── Line 2: Mass of the Faithful ────────────────────────────────
   { id: 'offertorium', latin: 'Offertorium', english: 'Offertory Antiphon', kind: 'proper', line: 'faithful', sectionKey: 'Offertorium' },
-  { id: 'lavabo', latin: 'Lavabo (Ps. 25)', english: 'Washing of Hands', kind: 'ordinary', line: 'faithful' },
+  { id: 'lavabo', latin: 'Lavabo', english: 'Washing of Hands', kind: 'ordinary', line: 'faithful' },
   { id: 'orate-fratres', latin: 'Orate, fratres', english: 'Pray, Brethren', kind: 'ordinary', line: 'faithful', detail: true },
   { id: 'secreta', latin: 'Secreta', english: 'Secret', kind: 'proper', line: 'faithful', sectionKey: 'Secreta' },
   { id: 'praefatio', latin: 'Praefatio', english: 'Preface', kind: 'ordinary', line: 'faithful', note: 'Common or seasonal/festal preface' },

@@ -1836,3 +1836,8 @@ button.active { background: var(--accent); color: #fff; border-color: var(--acce
 .store-badge.ms { background: #0e5a2f; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35); }
 .store-badge.pending { opacity: 0.55; cursor: default; }
 .share-foot { font-family: var(--serif); font-variant: small-caps; letter-spacing: 0.12em; color: var(--ink-faint); font-size: 12px; }
+
+/* A rubric is its own line, always (operator directive 2026-08-16): the red
+   stage direction never runs into the spoken text — a full break before and
+   breathing room after, in either layout. */
+.rubric-text { display: block; margin: 10px 0 4px; }

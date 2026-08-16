@@ -29,6 +29,22 @@ One entry per ingest, newest first:
 
 ## Entries
 
+### corpus-2026.08.16-1459 — `#` sub-heading markers stripped from section text
+
+- **Fixed:** DO's `#` sub-heading lines inside `[Section]` bodies
+  (`# Asperges me`, `#Vidi aquam`, …) leaked into `text_blocks` as literal
+  leading-`#` body lines — 85 sections rendered a `# …` line in the reader
+  (operator report 2026-08-16). `resolveLang` now strips `^\s*#` lines at
+  resolve time, both languages; the reader already shows each section's own
+  heading, so the marker duplicated it. Verified post-ingest: 0 text blocks
+  carry `#` lines (was 85); `Ordo/Prayers#Asperges me` now opens directly
+  with `Ant. Aspérges me…`.
+- Section count unchanged (32,126): no sections were added or removed —
+  this is a text-content-only rebuild.
+- Vendored Divinum Officium commit: `db7d02896e78`.
+- Scale: 2,451 files / 32,126 sections. Ingest script sha `077b8986fdb9`.
+- First shipped in: the release built after this stamp.
+
 ### corpus-2026.08.16-0902 — Ordo/Prayers ingested; subway stops gain their text homes
 
 - **Added:** `Ordo/Prayers` file — the 51 sections of

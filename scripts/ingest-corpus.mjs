@@ -190,8 +190,25 @@ function resolveLang(lang, filePath, treePath, sectionName, content, videPath, e
     videPath,
     edges: edgeSink,
   };
-  const res = resolveContent(content, ctx);
-  return fillOrphanCitations(res, lang, filePath, sectionName);
+  const res = fillOrphanCitations(resolveContent(content, ctx), lang, filePath, sectionName);
+  return { text: stripSubheads(res.text), filled: res.filled };
+}
+
+/**
+ * `#` lines inside a [Section] are DO sub-heading markers (a title for a
+ * run of body text — "# Asperges me", "#Vidi aquam"), never body text
+ * themselves. They leaked into 85 sections' text_blocks as literal leading
+ * "# …" lines rendered by the reader (operator report 2026-08-16); the
+ * reader already shows the section's own heading, so the marker is dropped
+ * here at resolve time, both languages.
+ */
+function stripSubheads(text) {
+  return text
+    .split('\n')
+    .filter((l) => !/^\s*#/.test(l))
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/^\n+/, '');
 }
 
 /** Insert scripture for citations that have no following text. */
