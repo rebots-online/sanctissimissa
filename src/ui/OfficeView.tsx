@@ -52,10 +52,15 @@ export default function OfficeView({ db, day, hour, onHour, sidecar, onAction, o
     }
   }, [db, day, sel.id]);
 
+  // The real scroll container is the OUTER `.content` wrapper (SectionReader's
+  // own root sits inside it and never scrolls) — resolve it from the reader
+  // root rather than assuming, or part-jumps scroll nothing.
+  const scrollerOf = () => (rootRef.current?.closest('.content') as HTMLElement | null) ?? rootRef.current;
+
   // Scroll-spy over the hour's sections → the strip's you-are-here part
   // (the Mass strip's mechanism, decision 23's part-stations).
   useEffect(() => {
-    const root = rootRef.current;
+    const root = scrollerOf();
     if (!root || !entries.length) return;
     const observer = new IntersectionObserver(
       (hits) => {
@@ -74,7 +79,7 @@ export default function OfficeView({ db, day, hour, onHour, sidecar, onAction, o
 
   /** Part-jump: scroll the reader to that entry's section. */
   const jumpTo = (anchor: string) => {
-    const root = rootRef.current;
+    const root = scrollerOf();
     if (!root) return;
     const el = root.querySelector(`[data-section="${CSS.escape(anchor)}"]`) as HTMLElement | null;
     if (!el) return;

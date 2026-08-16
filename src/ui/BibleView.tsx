@@ -37,14 +37,22 @@ export default function BibleView({ db, focusRef, focusNonce, onAction, sidecar,
   const [atlasMode, setAtlasMode] = useState<AtlasMode>('canonical');
   const rootRef = useRef<HTMLDivElement>(null);
 
-  // Deep-link navigation ("Gen/1" or "Gen/1/5").
+  // Deep-link navigation ("Gen" → book stack, "Gen/1" → chapter, "Gen/1/5" → verse).
   useEffect(() => {
     if (!focusRef) return;
     const m = focusRef.match(/^([A-Za-z0-9]+)\/(\d+)(?:\/(\d+))?$/);
-    if (!m) return;
-    setBook(m[1]);
-    setChapter(Number(m[2]));
-    setFocusVerse(m[3] ? Number(m[3]) : null);
+    if (m) {
+      setBook(m[1]);
+      setChapter(Number(m[2]));
+      setFocusVerse(m[3] ? Number(m[3]) : null);
+      return;
+    }
+    const b = focusRef.match(/^([A-Za-z0-9]+)$/);
+    if (b) {
+      setBook(b[1]);
+      setChapter(null);
+      setFocusVerse(null);
+    }
   }, [focusRef, focusNonce]);
 
   const bookMeta = useMemo(() => books.find((b) => b.key === book) ?? null, [books, book]);

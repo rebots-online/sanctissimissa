@@ -146,6 +146,15 @@ export default function MapStrip({ db, day, view, activeStation, officeHour, onS
         ))}
         {openMeta && (
           <div className="book-chapters" role="menu" aria-label={`${openMeta.title} — chapters`}>
+            <button
+              role="menuitem"
+              onClick={() => {
+                setOpenBook(null);
+                onBibleRef(openMeta.key);
+              }}
+            >
+              〈{openMeta.title}〉
+            </button>
             {Array.from({ length: openMeta.chapters }, (_, i) => i + 1).map((n) => (
               <button
                 key={n}
