@@ -14,6 +14,17 @@ them one sentence each and written for a reader of the app, not of the diff.
 
 ---
 
+## v1.35.81558 — 2026-08-16
+
+The reading experience matures: cleaner text, shorter map labels, and your annotations gain an index.
+
+- Corrupt `#` heading lines no longer leak into the displayed text of 85 sections (the sprinkling rites now open directly with their antiphon).
+- Rubrics (the red stage directions) always break onto their own line instead of running into the spoken text.
+- Map station labels are the short liturgical names — Kyrie, Gloria, Oratio, Lectio — not essay-length titles.
+- The map is now the Mass Map on every user surface, and a new 🔖 Annotations view indexes every highlight and margin note with jump-back-to-text, note editing, and colors.
+- Sections carrying your annotations end with a titled ANNOTATIONS list instead of anonymous boxes.
+- Selecting text moves a whole word at a time; shared passages open as a souvenir-plaque landing page with store badges.
+
 ## v1.34.81270 — 2026-08-16
 
 Completes the stop-landing fix of v1.33.
