@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<release schema="mba.robin.release-manifest.v1" version="1.34.81270" versionCode="100034">
+  <change_notes source="DOCS/CHANGELOG.md" present="true">
+    <highlight>A stop inside a multi-part section (the Confiteor within the prayers at the foot of the altar; the Alleluia verse within a Sunday Gradual) now lands on its own line even when that section started folded — the first release's landing worked only when the section was already open.</highlight>
+  </change_notes>
+  <artifact id="web-pwa" platform="web" kind="pwa-zip"><filename>standroidsmissal-v1.34.81270-web-pwa.zip</filename><size_bytes>64420965</size_bytes><sha256>7250a1d2750591161fa48e9ce1a08bd79cacb493223c3210bee008d7dfd62e36</sha256></artifact>
+  <artifact id="linux-deb" platform="linux" kind="deb"><filename>standroidsmissal-v1.34.81270-linux-amd64.deb</filename><size_bytes>117305898</size_bytes><sha256>af4bbbfd6416f07ce3a644538cf8f9c9d09201751c2093a822bf784f336ce70f</sha256></artifact>
+  <artifact id="linux-appimage" platform="linux" kind="appimage"><filename>standroidsmissal-v1.34.81270-linux-amd64.AppImage</filename><size_bytes>187714040</size_bytes><sha256>bdf89f101ca926a671a940dbd595ec459e99a023fe941d4c7093111b34733038</sha256></artifact>
+  <artifact id="windows-standalone" platform="windows" kind="exe"><filename>standroidsmissal-v1.34.81270-windows-x64-standalone.exe</filename><size_bytes>248146944</size_bytes><sha256>95e44abbd2bbb629f811fec75945549df94c2e71083d09ee2d82c808312f17e9</sha256></artifact>
+  <artifact id="android-apk-debug" platform="android" kind="apk-debug"><filename>standroidsmissal-v1.34.81270-android-universal-debug.apk</filename><size_bytes>1454115105</size_bytes><sha256>5e4ade9b3074eaabe84dbf28a5dcdf190c78f68e6606d6daf9b18cd830a66f75</sha256></artifact>
+  <artifact id="android-apk-release" platform="android" kind="apk-release"><filename>standroidsmissal-v1.34.81270-android-universal-release.apk</filename><size_bytes>1011745805</size_bytes><sha256>5465d9b8ead43c8f1ecf3d76682c02eb268b3f20c8ea8046c4c07d7ee1f8c16e</sha256></artifact>
+  <artifact id="android-aab-release" platform="android" kind="aab-release"><filename>standroidsmissal-v1.34.81270-android-universal-release.aab</filename><size_bytes>475417333</size_bytes><sha256>9231542f624a34ab71678f429c99e60b9a6cb3db22bc7376c7f1ce55defa03f5</sha256></artifact>
+  <artifact id="android-native-debug-symbols" platform="android" kind="native-debug-symbols"><filename>standroidsmissal-v1.34.81270-android-native-debug-symbols.zip</filename><size_bytes>471975439</size_bytes><sha256>6e86e8bf80795592ebda6ad5948b26263f767eae8a04c33d8a5b9a88e5f5decc</sha256></artifact>
+</release>
