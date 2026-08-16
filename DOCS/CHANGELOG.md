@@ -25,6 +25,7 @@ The subway map's stops now lead somewhere, and the corpus names itself.
 
 ### For maintainers
 
+- **Web mounting is now flag-only:** the release push itself is the flag, and `.forgejo/workflows/mount-web-release.yml` mounts it (idempotent, fail-closed, additive — symlink swap only, no nginx interaction, rollback on failed public verification). Operator-side prerequisites and the current runner blocker are recorded in the Admin-Manual (`SERVERS/standroid-automated-mount-proposal-2026-08-15.md`, status IMPLEMENTED). Until the runner is reachable, pushes queue the mount rather than performing it manually.
 - Root cause and fix record: `DOCS/2026-08-15-0935-office-mass-differential-probe-v1.31.66058.md` Phase 5 (D14) and `DOCS/MISSAL-DB-VERSIONS.md` (corpus ledger, entry `corpus-2026.08.16-0902`).
 - The stops' tappability contract: a stop is clickable exactly when the reader will render its anchor that day (`readerAnchorsForDay` + `stationAnchorFor`); any future station must resolve through it.
 

@@ -1,0 +1,153 @@
+# Mount the web release to https://standroid.robin.mba — flag-only.
+#
+# The push of a release to master IS the flag that a new release exists
+# (version.json + dist/release-manifest-v<V>.json + the web-pwa zip).
+# This action mounts it; the agent never touches the server. Idempotent,
+# fail-closed, additive: previous release keeps serving unless every gate
+# passes, no nginx interaction (a symlink swap alone suffices — verified
+# 2026-08-15), nothing on the server is deleted.
+#
+# Prerequisites (operator-side, one time): Actions unit enabled on the
+# repo; a runner with the `linux-amd64` label registered against
+# forgejo.robin.mba (CT 124 — blocked on the 192.168.1.x subnet repair
+# as of 2026-08-16); repo secret PVE_DEPLOY_KEY = private key whose
+# public half is authorized for root@192.168.0.214 (the documented
+# deploy access path; see Admin-Manual
+# SERVERS/standroid-automated-mount-proposal-2026-08-15.md).
+
+name: mount-web-release
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+env:
+  PVE_HOST: 192.168.0.214
+  CT: "123"
+  SITE: standroid
+
+jobs:
+  mount:
+    runs-on: linux-amd64
+    steps:
+      - name: Read the release flag
+        id: flag
+        env:
+          GIT_LFS_SKIP_SMUDGE: "1"
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eu
+          for tool in git jq curl unzip ssh tar sha256sum; do
+            command -v "$tool" >/dev/null || { echo "missing tool: $tool"; exit 1; }
+          done
+          if ! command -v git-lfs >/dev/null; then
+            (sudo apt-get update -qq && sudo apt-get install -y -qq git-lfs) \
+              || (apt-get update -qq && apt-get install -y -qq git-lfs)
+          fi
+          git clone --depth 1 "https://x-access-token:${TOKEN}@forgejo.robin.mba/${GITHUB_REPOSITORY}.git" repo
+          cd repo
+          VERSION="$(jq -r .version version.json)"
+          MANIFEST="dist/release-manifest-v${VERSION}.json"
+          if [ ! -f "$MANIFEST" ]; then
+            echo "version.json=${VERSION} has no release manifest on this push — not a release; nothing to mount."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          ZIP="$(jq -r '.artifacts[] | select(.id=="web-pwa") | .filename' "$MANIFEST")"
+          SHA="$(jq -r '.artifacts[] | select(.id=="web-pwa") | .sha256'  "$MANIFEST")"
+          [ -n "$ZIP" ] && [ "$ZIP" != null ] || { echo "manifest has no web-pwa artifact"; exit 1; }
+          git lfs pull -I "dist/${ZIP}"
+          echo "$SHA  dist/${ZIP}" | sha256sum -c -
+          STAGE="${RUNNER_TEMP:-/tmp}/web-release"
+          mkdir -p "$STAGE" && unzip -q -o "dist/${ZIP}" -d "$STAGE"
+          ASSET="$(grep -o 'assets/index-[^"]*\.js' "$STAGE/index.html" | head -1)"
+          [ -n "$ASSET" ] || { echo "staged index.html has no hashed asset ref"; exit 1; }
+          [ -f "$STAGE/manifest.webmanifest" ] || { echo "staged release missing manifest.webmanifest"; exit 1; }
+          [ -f "$STAGE/missal.db" ]            || { echo "staged release missing missal.db"; exit 1; }
+          LIVE="$(curl -fsS https://standroid.robin.mba/ | grep -o 'assets/index-[^"]*\.js' | head -1 || true)"
+          if [ "$LIVE" = "$ASSET" ]; then
+            echo "live site already serves ${VERSION} (${ASSET}) — nothing to do."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          {
+            echo "version=${VERSION}"
+            echo "sha=${SHA}"
+            echo "asset=${ASSET}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Mount to CT 123 (fail-closed)
+        if: steps.flag.outputs.skip != 'true'
+        env:
+          PVE_DEPLOY_KEY: ${{ secrets.PVE_DEPLOY_KEY }}
+        run: |
+          set -eu
+          V="${{ steps.flag.outputs.version }}"
+          SHA="${{ steps.flag.outputs.sha }}"
+          ASSET="${{ steps.flag.outputs.asset }}"
+          ASSET_FILE="${ASSET##*/}"
+          STAGE="${RUNNER_TEMP:-/tmp}/web-release"
+          SSH="ssh -i $HOME/.pve_deploy_key -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.pve_known_hosts root@${{ env.PVE_HOST }}"
+          mkdir -p "$HOME" && chmod 700 "$HOME"
+          printf '%s\n' "$PVE_DEPLOY_KEY" > "$HOME/.pve_deploy_key" && chmod 600 "$HOME/.pve_deploy_key"
+          ssh-keyscan -H "${{ env.PVE_HOST }}" > "$HOME/.pve_known_hosts" 2>/dev/null
+
+          REL="/var/www/${{ env.SITE }}/releases/${V}"
+          CUR="/var/www/${{ env.SITE }}/current"
+          BK="/var/www/${{ env.SITE }}/backups"
+
+          # Existing target dir: either a complete prior extract (proceed to
+          # swap) or a partial/interrupted one — refuse to guess, fail loud.
+          # Nothing is ever deleted server-side.
+          if $SSH "pct exec ${{ env.CT }} -- test -d ${REL}"; then
+            $SSH "pct exec ${{ env.CT }} -- test -f ${REL}/index.html" \
+              || { echo "REFUSING: ${REL} exists but is incomplete (interrupted extract?). Resolve manually."; exit 1; }
+          else
+            $SSH "pct exec ${{ env.CT }} -- mkdir -p ${REL}"
+            tar czf - -C "$STAGE" . | $SSH "pct exec ${{ env.CT }} -- tar xzf - -C ${REL}/"
+            $SSH "pct exec ${{ env.CT }} -- chown -R 1000:1000 ${REL}"
+          fi
+
+          # Validate the staged release before any live-site mutation.
+          $SSH "pct exec ${{ env.CT }} -- test -f ${REL}/manifest.webmanifest" || { echo "validation failed (manifest.webmanifest); current untouched"; exit 1; }
+          $SSH "pct exec ${{ env.CT }} -- test -f ${REL}/missal.db"            || { echo "validation failed (missal.db); current untouched"; exit 1; }
+          $SSH "pct exec ${{ env.CT }} -- grep -q ${ASSET_FILE} ${REL}/index.html" || { echo "validation failed (asset ref); current untouched"; exit 1; }
+
+          OLD="$($SSH "pct exec ${{ env.CT }} -- readlink ${CUR}" || true)"
+          echo "outgoing current -> ${OLD:-none}"
+          OLDD="${OLD%/*}"; OLDB="${OLD##*/}"
+
+          # Compound part (backup outgoing + atomic swap + deploy log) as ONE
+          # script: every value is substituted locally before the heredoc is
+          # piped, so the remote shell performs no substitution of its own.
+          TS="$(date -u +%Y%m%dT%H%M%SZ)"
+          NOW="$(date -u +%FT%TZ)"
+          $SSH "pct exec ${{ env.CT }} -- bash -s" <<REMOTE
+          set -eu
+          REL="${REL}"
+          CUR="${CUR}"
+          BK="${BK}"
+          OLD="${OLD:-}"
+          OLDD="${OLDD:-}"
+          OLDB="${OLDB:-}"
+          if [ -n "\$OLD" ] && [ "\$OLD" != "\$REL" ] && [ -n "\$OLDB" ]; then
+            mkdir -p "\$BK"
+            tar czf "\$BK/standroid.robin.mba-v\$OLDB-asdeployed-${TS}.tar.gz" -C "\$OLDD" "\$OLDB"
+          fi
+          ln -sfn "\$REL" "\$CUR"
+          echo "${NOW} forgejo-action mounted ${V} sha256=${SHA} asset=${ASSET_FILE}" >> "/var/www/${{ env.SITE }}/deploy.log"
+          REMOTE
+
+          # Public verification; on failure roll the symlink back, fail loudly.
+          sleep 2
+          LIVE="$(curl -fsS https://standroid.robin.mba/ | grep -o 'assets/index-[^"]*\.js' | head -1 || true)"
+          if [ "$LIVE" != "$ASSET" ]; then
+            echo "public verification FAILED (live=${LIVE:-unreachable}, expected=${ASSET})"
+            if [ -n "$OLD" ] && [ "$OLD" != "$REL" ]; then
+              $SSH "pct exec ${{ env.CT }} -- ln -sfn ${OLD} ${CUR}"
+              echo "rolled back current -> ${OLD}"
+            fi
+            exit 1
+          fi
+          echo "mounted ${V} live at https://standroid.robin.mba (${ASSET})"
