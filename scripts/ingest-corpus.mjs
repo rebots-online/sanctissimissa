@@ -23,7 +23,10 @@
 
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync, copyFileSync, readdirSync, readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { dirname, resolve, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { embedText, cosine, EMBED_DIM, normalizeText } from '../src/core/vector/embed.ts';
 import { applyConditionals, vero, RUBRICS_1960 } from '../src/core/liturgy/conditionals.ts';
 import { parseDOFile, parseRank, ruleVide, CorpusTree, loadPrayers, resolveContent, FillLog, firstCitation } from './do-parse.mjs';
@@ -727,6 +730,35 @@ try {
 }
 
 out.exec('VACUUM');
+
+// ── Corpus identity (version history ledger: DOCS/MISSAL-DB-VERSIONS.md) ─
+// The db self-describes: corpus_version is queryable at runtime, the
+// vendored commit pins the exact source snapshot, and the description
+// states what changed. Set CORPUS_DESC for the entry's one-liner.
+{
+  const vendored = resolve('VENDORED/divinum-officium');
+  let sha = 'unknown';
+  try {
+    sha = execFileSync('git', ['-C', vendored, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim().slice(0, 12);
+  } catch { /* shared checkout may lack .git */ }
+  const now = new Date();
+  const stamp = `${now.toISOString().slice(0, 10).replace(/-/g, '.')}-${String(now.getUTCHours()).padStart(2, '0')}${String(now.getUTCMinutes()).padStart(2, '0')}`;
+  const corpusVersion = `corpus-${stamp}`;
+  const desc = process.env.CORPUS_DESC || '(no description given — set CORPUS_DESC at ingest)';
+  const meta = {
+    corpus_version: corpusVersion,
+    built_at: now.toISOString(),
+    vendored_commit: sha,
+    ingest_script_sha: createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex').slice(0, 12),
+    files: String(corpus.size),
+    sections: String(sectionCount),
+    description: desc,
+  };
+  out.exec("CREATE TABLE IF NOT EXISTS corpus_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)");
+  const insMeta = out.prepare('INSERT OR REPLACE INTO corpus_meta (key, value) VALUES (?,?)');
+  for (const [k, v] of Object.entries(meta)) insMeta.run(k, v);
+  console.log('corpus identity:', JSON.stringify(meta));
+}
 
 // ── Fill log + summary ──────────────────────────────────────────────
 mkdirSync(dirname(resolve(FILL_LOG_PATH)), { recursive: true });
