@@ -1,0 +1,17 @@
+{
+  "version": "1.36.82292",
+  "sourceHead": "1fa9735bec8654d67573e507216903b390b5cdd5",
+  "startedAt": "2026-08-17T03:32:53.546Z",
+  "completedStages": [
+    "test",
+    "web",
+    "linux",
+    "windows",
+    "windows-msi",
+    "windows-msix",
+    "android-debug",
+    "android-release",
+    "symbols",
+    "collect"
+  ]
+}
