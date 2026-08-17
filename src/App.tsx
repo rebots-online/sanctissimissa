@@ -6,7 +6,7 @@ import { dateForWeekKey } from './core/calendar/computus.ts';
 import versionInfo from '../version.json';
 import type { DayInfo } from './core/data/types.ts';
 import { stationForAnchor, type Station } from './core/model/massOrdo.ts';
-import SubwayMap from './ui/SubwayMap.tsx';
+import SubwayMap, { type MapMode } from './ui/SubwayMap.tsx';
 import MapStrip from './ui/MapStrip.tsx';
 import ReaderView, { type SelectionAction } from './ui/ReaderView.tsx';
 import MeaningPanel from './ui/MeaningPanel.tsx';
@@ -29,14 +29,14 @@ import { useNarrow } from './ui/BilingualText.tsx';
 type View = 'map' | 'reader' | 'annotations' | 'calendar' | 'office' | 'bible' | 'journal' | 'homily' | 'settings' | 'about';
 
 const NAV: { id: View; ico: string; label: string }[] = [
-  { id: 'map', ico: '🗺️', label: 'Mass Map' },
+  { id: 'map', ico: '✠', label: 'Holy Mass' },
   { id: 'reader', ico: '📖', label: 'Missal Reader' },
-  { id: 'annotations', ico: '🔖', label: 'Annotations' },
   { id: 'calendar', ico: '📅', label: 'Perpetual Calendar' },
   { id: 'office', ico: '🕰', label: 'Divine Office' },
   { id: 'bible', ico: '📜', label: 'Sacred Scripture' },
   { id: 'journal', ico: '✎', label: 'Journal' },
   { id: 'homily', ico: '✍', label: 'Homily Writer' },
+  { id: 'annotations', ico: '🔖', label: 'Annotations' },
 ];
 
 const UTIL_NAV: { id: View; ico: string; label: string }[] = [
@@ -80,6 +80,8 @@ export default function App() {
   const [officeFocus, setOfficeFocus] = useState<{ anchor: string; nonce: number } | null>(null);
   // Bible deep-link focus ("Gen/1/5"); nonce bumps so re-navigating re-scrolls.
   const [bibleFocus, setBibleFocus] = useState<{ ref: string | null; nonce: number }>({ ref: null, nonce: 0 });
+  // Map view content type (App-owned so it survives view switches).
+  const [mapMode, setMapMode] = useState<MapMode>('missa');
   const [sidecar, setSidecar] = useState<SidecarDb | null>(null);
   const [pendingAccId, setPendingAccId] = useState<string | null>(null);
   const [capture, setCapture] = useState<{ quote: string; quoteAlt?: string; anchor: string | null } | null>(null);
@@ -411,7 +413,16 @@ export default function App() {
             <>
               {view === 'map' && (
                 <div className="content map-wrap">
-                  <SubwayMap db={db} day={day} onStation={onStation} />
+                  <SubwayMap
+                    db={db}
+                    day={day}
+                    onStation={onStation}
+                    onOpenBibleRef={(ref) => { setBibleFocus({ ref, nonce: Date.now() }); setView('bible'); }}
+                    onOpenHour={(h) => { setOfficeHour(h); setView('office'); }}
+                    activeHour={officeHour}
+                    mode={mapMode}
+                    onMode={setMapMode}
+                  />
                 </div>
               )}
               {view === 'reader' && day && (

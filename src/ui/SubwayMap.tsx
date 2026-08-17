@@ -16,14 +16,31 @@ import { MASS_ORDO, trunkOf, branchOf, stationActive, stationAnchorFor, type Sta
 import { readerAnchorsForDay, massTextsBySection } from '../core/data/liturgicalDay.ts';
 import { STATION_INFO } from '../core/model/stationLore.ts';
 import { stationIncipits, type Incipit } from '../core/data/stationIncipits.ts';
+import { OFFICE_CURSUS } from '../core/model/officeCursus.ts';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 import type { DayInfo } from '../core/data/types.ts';
 import MapFlyout, { type FlyoutData } from './MapFlyout.tsx';
+
+/** Y.3 — the map view is content-type aware: Missa (the Mass line),
+ *  Scriptura (the canon as two lines, chapter menus ON the book stops),
+ *  Horæ (the day's hours as one line). The mode lives in App state so the
+ *  map remembers its content type across view switches (operator report
+ *  2026-08-17: returning to the map kept landing on the wrong type). */
+export type MapMode = 'missa' | 'scriptura' | 'horae';
 
 interface Props {
   db: CorpusDb | null;
   day: DayInfo | null;
   onStation: (station: Station) => void;
+  /** Scripture mode: open Sacred Scripture at "Book" or "Book/chapter". */
+  onOpenBibleRef?: (ref: string) => void;
+  /** Breviary mode: open the Divine Office at an hour id. */
+  onOpenHour?: (hour: string) => void;
+  /** Currently selected hour (breviary stop highlight). */
+  activeHour?: string;
+  /** Persisted content type (App-owned so it survives view switches). */
+  mode?: MapMode;
+  onMode?: (m: MapMode) => void;
 }
 
 const ACCENTS: Record<string, string> = {
@@ -103,11 +120,14 @@ function Branch({
   );
 }
 
-export default function SubwayMap({ db, day, onStation }: Props) {
+export default function SubwayMap({ db, day, onStation, onOpenBibleRef, onOpenHour, activeHour, mode, onMode }: Props) {
   const accent = ACCENTS[String(day?.color ?? 'green')] ?? '#3f7a52';
   const season = day?.season ?? 'Time after Pentecost';
   const [full, setFull] = useState(false);
   const [flyout, setFlyout] = useState<FlyoutData | null>(null);
+  const [localMode, setLocalMode] = useState<MapMode>('missa');
+  const mapMode = mode ?? localMode;
+  const setMapMode = onMode ?? setLocalMode;
   const hoverSid = useRef<string | null>(null);
 
   // A stop is tappable exactly when the reader will render its anchor that
@@ -174,15 +194,48 @@ export default function SubwayMap({ db, day, onStation }: Props) {
     </div>
   );
 
-  return (
-    <div className="vmap" onMouseOver={onOver} onMouseLeave={() => { hoverSid.current = null; setFlyout(null); }}>
-      {flyout && <MapFlyout {...flyout} />}
-      <div className="vmap-toolbar">
-        <span className="vmap-hint">the whole Mass, one line, top to bottom</span>
+  const hints: Record<MapMode, string> = {
+    missa: 'the whole Mass, one line, top to bottom',
+    scriptura: 'the canon, two lines — hover a book stop for its chapters',
+    horae: 'the day’s hours, one line — hover a stop for its parts',
+  };
+  const toolbar = (
+    <div className="vmap-toolbar">
+      <span className="vmap-hint">{hints[mapMode]}</span>
+      <div className="vmap-modes" role="tablist" aria-label="Map content type">
+        <button className={mapMode === 'missa' ? 'active' : ''} onClick={() => setMapMode('missa')}>✠ Missa</button>
+        <button className={mapMode === 'scriptura' ? 'active' : ''} onClick={() => setMapMode('scriptura')}>📜 Scriptura</button>
+        <button className={mapMode === 'horae' ? 'active' : ''} onClick={() => setMapMode('horae')}>🕤 Horæ</button>
+      </div>
+      {mapMode === 'missa' && (
         <button className="vmap-toggle" onClick={() => setFull(!full)}>
           {full ? '⊖ fold to skeleton' : '⊕ unfold full detail'}
         </button>
+      )}
+    </div>
+  );
+
+  if (mapMode === 'scriptura' && db && onOpenBibleRef) {
+    return (
+      <div className="vmap">
+        {toolbar}
+        <ScriptureSubway db={db} onOpen={onOpenBibleRef} />
       </div>
+    );
+  }
+  if (mapMode === 'horae' && onOpenHour) {
+    return (
+      <div className="vmap">
+        {toolbar}
+        <OfficeSubway onOpen={onOpenHour} activeHour={activeHour} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="vmap" onMouseOver={onOver} onMouseLeave={() => { hoverSid.current = null; setFlyout(null); }}>
+      {flyout && <MapFlyout {...flyout} />}
+      {toolbar}
 
       <div className="vline-header" style={{ color: 'var(--line-catechumens)' }}>
         ① Missa Catechumenorum <span>Mass of the Catechumens</span>
@@ -249,6 +302,129 @@ export default function SubwayMap({ db, day, onStation }: Props) {
         <span><svg viewBox="0 0 34 34" className="vdot"><circle cx={17} cy={17} r={14.5} fill="none" stroke="#4a4034" strokeWidth={1.2} strokeDasharray="3 3" /><circle cx={17} cy={17} r={8.5} fill="#fff" stroke="#4a4034" strokeWidth={3} /></svg> Conditional by rubric</span>
         <span className="faded">Faded = not travelled in {season}</span>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Y.3 — the canon as two subway lines (Vetus / Novum Testamentum). Book stops
+ * carry their chapter menu ON the stop: hovering reveals the chapters right
+ * there (operator directive 2026-08-16 — "dropdowns for books are on the
+ * subway map stops themselves on mouseover", never a native <select>).
+ */
+function ScriptureSubway({ db, onOpen }: { db: CorpusDb; onOpen: (ref: string) => void }) {
+  const books = useMemo(() => db.getBooks(), [db]);
+  const ot = books.filter((b) => b.testament === 'OT');
+  const nt = books.filter((b) => b.testament === 'NT');
+  const [hover, setHover] = useState<{ key: string; title: string; chapters: number; x: number; y: number } | null>(null);
+  const hoverKey = useRef<string | null>(null);
+
+  function onOver(e: React.MouseEvent) {
+    const btn = (e.target as HTMLElement).closest('button.sbook') as HTMLElement | null;
+    const key = btn?.dataset.bkey ?? null;
+    if (key === hoverKey.current) return;
+    hoverKey.current = key;
+    if (!key || !btn) {
+      setHover(null);
+      return;
+    }
+    const b = books.find((x) => x.key === key);
+    if (!b) return;
+    const r = btn.getBoundingClientRect();
+    setHover({ key: b.key, title: b.title, chapters: b.chapters, x: Math.min(r.left + 60, window.innerWidth - 330), y: r.bottom + 6 });
+  }
+
+  const trunk = (label: string, sub: string, line: string, list: typeof ot) => (
+    <>
+      <div className="vline-header" style={{ color: line }}>{label} <span>{sub}</span></div>
+      <div className="vtrunk" style={{ ['--line-color' as never]: line }}>
+        {list.map((b) => (
+          <button key={b.key} className="vstation sbook" data-bkey={b.key} onClick={() => onOpen(b.key)}>
+            <svg className="vdot" viewBox="0 0 34 34" aria-hidden="true">
+              <circle className="vdot-pulse-halo" cx={17} cy={17} r={13} fill="currentColor" />
+              <circle className="vdot-pulse-ring" cx={17} cy={17} r={12} fill="none" stroke="currentColor" strokeWidth={2} />
+              <circle cx={17} cy={17} r={10.5} fill="#fff" stroke="currentColor" strokeWidth={4} />
+              <circle cx={17} cy={17} r={4.5} fill="currentColor" />
+            </svg>
+            <span className="vlabels">
+              <span className="vlatin">{b.title}</span>
+              <span className="veng">{b.key}{!b.hasLatin ? ' · English only' : ''}</span>
+            </span>
+            <span className="vnote">{b.chapters} chapters</span>
+          </button>
+        ))}
+      </div>
+    </>
+  );
+
+  return (
+    <div className="vmap scripture-subway" onMouseOver={onOver} onMouseLeave={() => { hoverKey.current = null; setHover(null); }}>
+      {hover && (
+        <div className="chapter-flyout" style={{ left: hover.x, top: hover.y }}>
+          <div className="cf-head">{hover.title}</div>
+          <div className="cf-grid" role="menu" aria-label={`${hover.title} — chapters`}>
+            <button onClick={() => { setHover(null); onOpen(hover.key); }}>〈whole book〉</button>
+            {Array.from({ length: hover.chapters }, (_, i) => i + 1).map((n) => (
+              <button key={n} onClick={() => { setHover(null); onOpen(`${hover.key}/${n}`); }}>{n}</button>
+            ))}
+          </div>
+        </div>
+      )}
+      {trunk('① Vetus Testamentum', 'the Law, the Prophets, the Writings', 'var(--line-catechumens)', ot)}
+      {trunk('② Novum Testamentum', 'the Gospel and the Apostles', 'var(--line-faithful)', nt)}
+      <div className="vlegend"><span className="faded">Hover a book stop to open its chapters on the stop; click to read the book.</span></div>
+    </div>
+  );
+}
+
+/**
+ * Y.3 — the breviary subway line: the eight hours as stops on the office
+ * line. Hover previews the hour's parts (via the shared MapFlyout); click
+ * opens the Divine Office at that hour.
+ */
+function OfficeSubway({ onOpen, activeHour }: { onOpen: (hour: string) => void; activeHour?: string }) {
+  const [fly, setFly] = useState<{ title: string; subtitle: string; about: string; x: number; y: number } | null>(null);
+  return (
+    <div className="vmap office-subway" onMouseLeave={() => setFly(null)}>
+      {fly && <MapFlyout title={fly.title} subtitle={fly.subtitle} incipit={null} about={fly.about} x={fly.x} y={fly.y} />}
+      <div className="vline-header" style={{ color: 'var(--line-office)' }}>① Horæ Diurnæ <span>the day’s hours, from Matins to Compline</span></div>
+      <div className="vtrunk" style={{ ['--line-color' as never]: 'var(--line-office)' }}>
+        {OFFICE_CURSUS.map((h) => (
+          <button
+            key={h.id}
+            className={`vstation shour${h.id === activeHour ? ' active-hour' : ''}`}
+            onClick={() => onOpen(h.id)}
+            onMouseEnter={(e) => {
+              const r = e.currentTarget.getBoundingClientRect();
+              setFly({
+                title: h.latin,
+                subtitle: `${h.english} · ${h.clock}`,
+                about: h.parts.join(' · '),
+                x: Math.min(r.left + 60, window.innerWidth - 340),
+                y: r.bottom + 6,
+              });
+            }}
+            onFocus={(e) => {
+              const r = e.currentTarget.getBoundingClientRect();
+              setFly({ title: h.latin, subtitle: `${h.english} · ${h.clock}`, about: h.parts.join(' · '), x: Math.min(r.left + 60, window.innerWidth - 340), y: r.bottom + 6 });
+            }}
+            onBlur={() => setFly(null)}
+          >
+            <svg className="vdot" viewBox="0 0 34 34" aria-hidden="true">
+              <circle className="vdot-pulse-halo" cx={17} cy={17} r={13} fill="currentColor" />
+              <circle className="vdot-pulse-ring" cx={17} cy={17} r={12} fill="none" stroke="currentColor" strokeWidth={2} />
+              <circle cx={17} cy={17} r={10.5} fill="#fff" stroke="currentColor" strokeWidth={4} />
+              <circle cx={17} cy={17} r={4.5} fill="currentColor" />
+            </svg>
+            <span className="vlabels">
+              <span className="vlatin">{h.latin}</span>
+              <span className="veng">{h.english} — {h.parts.length} parts</span>
+            </span>
+            <span className="vnote">{h.clock}</span>
+          </button>
+        ))}
+      </div>
+      <div className="vlegend"><span className="faded">Click an hour to open the Divine Office there. The office line carries the breviary.</span></div>
     </div>
   );
 }

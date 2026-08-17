@@ -125,17 +125,22 @@ export default function MapStrip({ db, day, view, activeStation, officeHour, onS
     });
   }, [activeStation, activeOfficePart, officeHour, view]);
 
-  // ── Scripture: the canonical books across, chapters as a dropdown ──
+  // ── Scripture: the canonical books across; the chapter menu opens ON the
+  // stop itself on mouseover (operator directive 2026-08-16 — no native
+  // selects, no separate click-then-menu dance; click still toggles for
+  // touch). The menu pins itself while hovered, clears with the strip. ──
   if (scripture && onBibleRef) {
     const openMeta = books.find((b) => b.key === openBook) ?? null;
     return (
-      <nav className="mapstrip scripture" aria-label="The canonical books" onMouseLeave={() => setFlyout(null)}>
+      <nav className="mapstrip scripture" aria-label="The canonical books" onMouseLeave={() => { setFlyout(null); setOpenBook(null); }}>
         {books.map((b) => (
           <span key={b.key} className="book-stop">
             <button
               ref={b.key === bibleBook ? activeRef : undefined}
               className={`mstation book${b.key === openBook ? ' open' : ''}${b.key === bibleBook ? ' active' : ''}`}
               onClick={() => setOpenBook(openBook === b.key ? null : b.key)}
+              onMouseEnter={() => setOpenBook(b.key)}
+              onFocus={() => setOpenBook(b.key)}
               aria-expanded={openBook === b.key}
               title={`${b.title} — ${b.chapters} capitula`}
             >
@@ -145,7 +150,13 @@ export default function MapStrip({ db, day, view, activeStation, officeHour, onS
           </span>
         ))}
         {openMeta && (
-          <div className="book-chapters" role="menu" aria-label={`${openMeta.title} — chapters`}>
+          <div
+            className="book-chapters"
+            role="menu"
+            aria-label={`${openMeta.title} — chapters`}
+            onMouseEnter={() => setOpenBook(openMeta.key)}
+            onMouseLeave={() => setOpenBook(null)}
+          >
             <button
               role="menuitem"
               onClick={() => {

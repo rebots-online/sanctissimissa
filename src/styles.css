@@ -545,6 +545,24 @@ body {
 .vlegend .vdot { width: 22px; height: 22px; }
 .vlegend .faded { font-style: italic; color: var(--ink-faint); }
 
+/* ── Y.3: content-type subway maps (Scriptura · Horæ) ─────────── */
+.vmap-modes { display: inline-flex; gap: 4px; }
+.vmap-modes button { padding: 4px 12px; }
+/* stops take their line's colour (currentColor in the dot svgs) */
+.scripture-subway .vstation, .office-subway .vstation { color: var(--line-color, var(--accent)); }
+.office-subway .vstation.active-hour .vlatin { color: var(--accent); font-weight: 700; }
+.office-subway .vstation.active-hour .vnote { color: var(--accent); }
+/* the chapter menu that opens ON the book stop (hover) — no native selects */
+.chapter-flyout {
+  position: fixed; z-index: 70; width: 308px; max-height: 46vh; overflow: auto;
+  background: var(--surface-2); border: 1px solid var(--card-border);
+  border-top: 3px solid var(--accent); border-radius: 10px;
+  box-shadow: 0 12px 32px #0003; padding: 10px 12px; font-family: var(--sans);
+}
+.chapter-flyout .cf-head { font: italic 700 14px var(--serif); color: var(--ink); margin-bottom: 8px; }
+.chapter-flyout .cf-grid { display: flex; flex-wrap: wrap; gap: 4px; }
+.chapter-flyout .cf-grid button { padding: 3px 9px; font-family: var(--sans); font-style: normal; font-size: 12px; }
+
 /* ── Reader ────────────────────────────────────────────────── */
 .reader-section { margin: 0 0 30px; }
 .reader-section .head {
@@ -1772,6 +1790,14 @@ button {
 button:hover { color: var(--ink); border-color: var(--accent); }
 button:disabled { opacity: 0.45; cursor: default; }
 button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* Map stations are their own surface (M2 idiom): the global button skin's
+   accent fill on `button.active` was painting a loud pill behind active
+   strip stops, masking the subtle ping (operator report 2026-08-17). These
+   overrides sit after the global skin so equal specificity loses to them. */
+button.mstation, button.mstation.active, button.mstation.open {
+  background: none; border: 0; border-radius: 0;
+}
 
 /* The atlas mode switch now consumes the global skin — grouping only. */
 .atlas-mode-switch { display: inline-flex; gap: 4px; margin: 0 0 16px; padding: 0; background: none; border: none; border-radius: 0; }
