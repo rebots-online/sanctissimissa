@@ -494,6 +494,31 @@ body {
 .vstation.small .vlatin { font-size: 13.5px; }
 .vstation.small .vdot { width: 26px; height: 26px; flex-basis: 26px; }
 
+/* Y.1 — the subway map's subtle pulsating, restored: the day's proper
+   stations breathe (layered low-opacity halo + expanding ring behind the
+   dot, after the captured SanctissiMissa reference). Subtle is the
+   contract: low opacity, slow, no layout shift, reduced-motion off. */
+.vdot .vdot-pulse-halo {
+  animation: vdot-breathe 4.2s ease-in-out infinite;
+  transform-box: fill-box; transform-origin: center;
+}
+.vdot .vdot-pulse-ring {
+  animation: vdot-ping 3.2s ease-out infinite;
+  transform-box: fill-box; transform-origin: center;
+}
+@keyframes vdot-breathe {
+  0%, 100% { opacity: 0.07; transform: scale(1); }
+  50% { opacity: 0.22; transform: scale(1.16); }
+}
+@keyframes vdot-ping {
+  0% { opacity: 0.18; transform: scale(0.92); }
+  75% { opacity: 0; transform: scale(1.34); }
+  100% { opacity: 0; transform: scale(1.34); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vdot .vdot-pulse-halo, .vdot .vdot-pulse-ring { animation: none; opacity: 0; }
+}
+
 .vbranch { position: relative; margin: 2px 0 6px 40px; }
 .vbranch::before {
   content: ''; position: absolute; left: -24px; top: -6px; bottom: 8px; width: 22px;

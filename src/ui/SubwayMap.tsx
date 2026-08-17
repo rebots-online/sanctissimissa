@@ -40,6 +40,10 @@ function Dot({ s, accent }: { s: Station; accent: string }) {
       )}
       {isProper ? (
         <>
+          {/* Y.1 — the day's stations breathe: layered low-opacity halo + */}
+          {/* expanding ring behind the dot (subtle is the contract). */}
+          <circle className="vdot-pulse-halo" cx={17} cy={17} r={13} fill={accent} />
+          <circle className="vdot-pulse-ring" cx={17} cy={17} r={12} fill="none" stroke={accent} strokeWidth={2} />
           <circle cx={17} cy={17} r={10.5} fill="#fff" stroke={accent} strokeWidth={4} />
           <circle cx={17} cy={17} r={4.5} fill={accent} />
         </>
