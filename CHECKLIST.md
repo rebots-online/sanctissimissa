@@ -1012,3 +1012,43 @@ rubric `DOCS/TEST_RUBRIC.md` § V-R landed before code.
 
 - `npm test` 283/283 · `npx tsc -b` clean after every task (commits `08590733`, `38db9bbe`, `99669a55`, all pushed to origin + github).
 - Live dev-app probes 2026-08-16 (Playwright, localhost:5173): superscript counts, stack shades, verse-jump landing at 149px, office parts click/active, 73-book strip dropdown, pair zebra classes + computed background, single sup per pair, word snap, switch computed styles.
+
+## Stanza Y — Overdue UX restores (2026-08-16) — HIGHEST PRIORITY / OVERDUE
+
+Operator directives 2026-08-16, verbatim-in-substance: these were asked for before and
+never landed; they outrank Stanza W. Y.1 is also implemented immediately (this session)
+rather than queued.
+
+- [ ] **Y.1 RESTORE the subway map's subtle pulsating (regression; "restore that")** — files: `src/styles.css`, `src/ui/SubwayMap.tsx` — entities: current-station pulse layers.
+  The `vmap` rewrite (`SubwayMap.tsx` → `.vstation`/`.vbranch`, styles.css:465–511) dropped ALL animation from the big map; only the strip retains `strip-ping` (styles.css:254). Restore the subtle pulsating on the map's current/active station marker per the captured reference (operator-authorized one-time inspection of https://sanctissimissa-app.robin.mba/, bundle saved at `~/outbox/standroidsmissal-ref/`): a small glow-shadowed core with a layered low-opacity halo behind it — breathing halo (≈`animate-pulse`, opacity ~0.4) + expanding ring (≈`animate-ping`, opacity ~0.2), slow (≥2s), `prefers-reduced-motion` disables. SUBTLE is the contract — low opacity, no layout shift, no loud accent fill.
+- [ ] **Y.2 Rail: "Mass Map" → "Holy Mass" + cruciform icon** — files: `src/App.tsx` — entities: `NAV`.
+  `App.tsx:32` `{ id: 'map', ico: '🗺️', label: 'Mass Map' }` → label `'Holy Mass'`, ico `'✠'` (the cruciform the splash already uses, App.tsx:275). Sweep any other "Mass Map" strings (index.html title, AboutView, ShareLanding got the earlier "map" rename — check for stragglers).
+- [ ] **Y.3 Scripture + breviary subway map fix (un-blocks #9)** — files: `src/ui/SubwayMap.tsx` (or its scripture/breviary modes), `src/ui/ScriptureMap.tsx`, `src/ui/MapStrip.tsx`, `src/styles.css` — entities: mode-aware map, stop-hover chapter flyout.
+  The map projects the ACTIVE surface (CHECKLIST #9, formerly "Blocked on design" — operator gave the design 2026-08-16): in scripture mode the BOOK STOPS ARE the navigation — hovering a book stop reveals its chapter menu ON THE STOP ITSELF (custom hover flyout in the app's design language; the current native `<select>` dropdowns are a hard no — "1996-era dropdowns"); in breviary mode the map projects the hour's shape (OfficeHourMap/V-R.d lineage). The existing per-chapter verse `<select>`s (ScriptureMap) and MapStrip book-chip chapter dropdowns (MapStrip.tsx:135–149) are replaced by the stop-hover pattern.
+- [ ] **Y.4 Context menu farther from the selection** — files: `src/ui/SectionReader.tsx` — entities: `openMenuAt`, menu placement.
+  The ctx-menu currently renders at the cursor (`openMenuAt(e.clientX, e.clientY, …)`, `.ctx-menu { left: menu.x; top: menu.y }`) — on top of the selected text. Place it offset AWAY from the selection rect (above/below the selection with a clear gap, viewport-clamped, never covering the quote); mouse-release, right-click, and touch paths all take the new placement.
+- [ ] **Y.5 Cross-references returns a nonsensical office empty state** — files: `src/ui/MeaningPanel.tsx` — entities: crossrefs tab rendering (:623).
+  Selecting e.g. "Glória Patri, et Fílio, et Spirítui Sancto" → Cross-references returns "This office carries no vide/ex commune directive — its propers are entirely its own." (MeaningPanel.tsx:623) — accurate only for a day-propers query, nonsense for a text selection. For arbitrary selections the tab must return REAL cross-references (where the text occurs across the corpus — concordance / CITES / concept graph) and otherwise an honest generic empty state; the vide/ex message is reserved for actual office-propers anchors.
+
+## Stanza W — Share deep-link URLs + .env namespace strategy (2026-08-16) — HIGH PRIORITY
+
+Operator directives recorded 2026-08-16 (verbatim-in-substance). Both tasks are HIGH
+priority. W.1 is subject to W.2 — the absolute base of every copied URL comes from the
+env config, and the base URL set in `.env` defines the deep-link target for the OTHER
+platforms too (desktop/Android builds must not copy their own unshareable
+`tauri://localhost` origin).
+
+- [ ] **W.1 "Copy URL to Selection" on all shares (HIGH)** — files: `src/ui/SectionReader.tsx`, `src/ui/ReaderView.tsx`, `src/ui/OfficeView.tsx`, `src/ui/BibleView.tsx`, `src/core/share/shareLink.ts` — entities: selection deep-link route, `shareUrl` env base.
+  Every share surface gains a **Copy URL to Selection** action that copies to the clipboard a URL linking to the **web-app deep link** for the current selection. Surfaces today (all route through `shareUrl()`, `src/core/share/shareLink.ts:95`, which hardcodes `location.origin + location.pathname`): the unified SectionReader context menu (Mass/Bible/Office since SR.1–SR.3 — `⛓ Share passage` at `SectionReader.tsx:850`), `ReaderView.tsx:196` and `OfficeView.tsx:197` (`#/day/…`), and `BibleView.tsx:263` (`menuExtras` verse link). The new action is DISTINCT from `⛓ Share passage` (the `#/s/…` landing plaque): it copies a direct link that boots the web app AT the selection — verse-level for scripture (`#/verse/…`), day/section route at line granularity for liturgical text (exact route shape is an architecture decision at expansion).
+- [ ] **W.2 Namespace + web-app URL → `.env`; three-fork deployment (HIGH; W.1 depends on it)** — files: `.env` + `.env.example` (new), `src-tauri/tauri.conf.json`, Android gradle (`src-tauri/gen/android/`), `src/core/share/shareLink.ts`, stamp/build tooling — entities: `NAMESPACE`, web-app base-URL env var, templated Tauri identifier / Gradle `applicationId`.
+  Move the project namespace (Tauri `identifier`, hardcoded `mba.robin.standroidsmissal` at `tauri.conf.json:5`; Gradle `applicationId`) and the web-app base URL (deep-link target for every platform) into `.env` (Vite `VITE_*` variables; Tauri/Gradle consume at build time via templating). No `.env` exists yet; zero `import.meta.env` usage in `src/` today.
+  **Fork strategy (operator directive 2026-08-16): three forks, at first ALL THE SAME code, differing only by `.env`:**
+  1. `NAMESPACE=mba.robin.helloword` — **helloword.robin.mba and the current Google-Play-registered namespace for Hello, Word become this project** (this codebase continues Hello, Word under its existing listing).
+  2. `NAMESPACE=mba.robin.standroidsmissal` — this project stays the same (standroid.robin.mba; no behavior change beyond config sourcing).
+  3. `NAMESPACE=online.sanctissimissa.app` — deployed to **sanctissimissa.online**, replacing Hello, Word there. **sanctissimissa.com is the main marketing site and iframes sanctissimissa.online in a device-decorated iframe.** Namespace rationale: `com.sanctissimissa.app` is already registered on Play Console but the private key was lost (updates impossible), so the app id is the reverse-DNS of `app.sanctissimissa.online` — a subdomain we control.
+
+_Status: Stanza Y tasks Y.2–Y.5 and both Stanza W tasks scoped; expand to self-contained
+coder tasks per TC13 (Y.3 needs the stop-hover flyout designed against the app's token
+system; W.2 needs env var names, Tauri/Gradle templating mechanism, fork repos/remotes,
+sanctissimissa.online mount + sanctissimissa.com iframe deployment). Y.1 is implemented
+immediately this session._
