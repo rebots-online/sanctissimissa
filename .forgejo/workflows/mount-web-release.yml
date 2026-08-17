@@ -38,7 +38,10 @@ jobs:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -eu
-          for tool in git jq curl unzip ssh tar sha256sum; do
+          # node-image-native: parse JSON with `node -p` — the linux-amd64 label
+          # maps to docker://node:20-bookworm, which ships node but not jq
+          # (verified 2026-08-17: "missing tool: jq" killed runs 18/19).
+          for tool in git curl unzip ssh tar sha256sum node; do
             command -v "$tool" >/dev/null || { echo "missing tool: $tool"; exit 1; }
           done
           if ! command -v git-lfs >/dev/null; then
@@ -47,15 +50,15 @@ jobs:
           fi
           git clone --depth 1 "https://x-access-token:${TOKEN}@forgejo.robin.mba/${GITHUB_REPOSITORY}.git" repo
           cd repo
-          VERSION="$(jq -r .version version.json)"
+          VERSION="$(node -p "require('./version.json').version")"
           MANIFEST="dist/release-manifest-v${VERSION}.json"
           if [ ! -f "$MANIFEST" ]; then
             echo "version.json=${VERSION} has no release manifest on this push — not a release; nothing to mount."
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          ZIP="$(jq -r '.artifacts[] | select(.id=="web-pwa") | .filename' "$MANIFEST")"
-          SHA="$(jq -r '.artifacts[] | select(.id=="web-pwa") | .sha256'  "$MANIFEST")"
+          ZIP="$(node -p "((require('./${MANIFEST}').artifacts||[]).find(x=>x.id==='web-pwa')||{}).filename||''")"
+          SHA="$(node -p "((require('./${MANIFEST}').artifacts||[]).find(x=>x.id==='web-pwa')||{}).sha256||''")"
           [ -n "$ZIP" ] && [ "$ZIP" != null ] || { echo "manifest has no web-pwa artifact"; exit 1; }
           git lfs pull -I "dist/${ZIP}"
           echo "$SHA  dist/${ZIP}" | sha256sum -c -
