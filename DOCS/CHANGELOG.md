@@ -14,6 +14,12 @@ them one sentence each and written for a reader of the app, not of the diff.
 
 ---
 
+## v1.36.82292 — 2026-08-16
+
+The Mass Map breathes again.
+
+- The day's proper stations on the Mass Map carry their subtle pulsating glow once more — a soft breathing halo and expanding ring in the day's liturgical color (still, calm, and off entirely under reduced-motion).
+
 ## v1.35.81558 — 2026-08-16
 
 The reading experience matures: cleaner text, shorter map labels, and your annotations gain an index.
