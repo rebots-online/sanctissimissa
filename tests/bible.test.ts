@@ -56,15 +56,30 @@ test('psalms use Vulgate/LXX numbering in both languages', { skip: !present }, (
   assert.match(String(r.english), /Lord ruleth me/);
 });
 
-test('deuterocanonicals absent from vul.tsv are honestly English-only', { skip: !present }, () => {
-  for (const book of ['Tob', 'Judith', 'Sap', 'Eccli', 'Bar']) {
+test('deuterocanonicals carry Latin from the vendored supplement (2026-08-17)', { skip: !present }, () => {
+  // Tob/Sap/Bar align 1:1 with the Clementine supplement — fully bilingual.
+  // Judith/Eccli diverge mid-book (the vendored DR JSON numbers chapters
+  // differently from the Clementine tradition past Judith 10:21 and
+  // Eccli 27:34); the aligned prefix carries Latin, the tail stays
+  // honestly English-only until the seam is content-aligned (CHECKLIST Y.8).
+  const complete = ['Tob', 'Sap', 'Bar'];
+  const floors: Record<string, number> = { Judith: 231, Eccli: 1504 };
+  for (const book of complete) {
     const r = one(
       `SELECT COUNT(*) c, COUNT(tb.latin) lat FROM text_blocks tb JOIN nodes n ON n.id = tb.node_id
        WHERE n.key LIKE ?`,
       `verse:${book}/%`,
     );
     assert.ok(Number(r.c) > 0, `${book} has verses`);
-    assert.equal(Number(r.lat), 0, `${book} latin must be NULL (missing upstream)`);
+    assert.equal(Number(r.lat), Number(r.c), `${book} latin must be complete (vul-deutero.tsv)`);
+  }
+  for (const [book, floor] of Object.entries(floors)) {
+    const r = one(
+      `SELECT COUNT(tb.latin) lat FROM text_blocks tb JOIN nodes n ON n.id = tb.node_id
+       WHERE n.key LIKE ?`,
+      `verse:${book}/%`,
+    );
+    assert.ok(Number(r.lat) >= floor, `${book} aligned-prefix Latin ≥ ${floor} (got ${r.lat})`);
   }
   // and a control: a vul-backed book has Latin throughout
   const gen = one(
@@ -107,13 +122,14 @@ import type { CorpusDb } from '../src/core/data/corpusDb.ts';
 
 const adapter = () => openAdapter(DB) as unknown as CorpusDb;
 
-test('getBooks: 73 books in canon order, deutero flagged Latin-less', { skip: !present }, () => {
+test('getBooks: 73 books in canon order, supplement books flagged Latin', { skip: !present }, () => {
   const a = adapter();
   const books = a.getBooks();
   assert.equal(books.length, 73);
   assert.equal(books[0].key, 'Gen');
   assert.equal(books[72].key, 'Apoc');
-  assert.equal(books.find((b) => b.key === 'Sap')?.hasLatin, false);
+  // Since the vul-deutero supplement (2026-08-17) the aligned books carry Latin.
+  assert.equal(books.find((b) => b.key === 'Sap')?.hasLatin, true);
   assert.equal(books.find((b) => b.key === 'Ps')?.chapters, 150);
 });
 

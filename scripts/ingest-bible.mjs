@@ -17,8 +17,9 @@
  * boundary).
  *
  * Canon note: vul.tsv carries 68 books — Tobias, Judith, Wisdom,
- * Ecclesiasticus and Baruch are absent upstream, so their Latin is honestly
- * NULL (English from DR) until a complete Clementine source is vendored.
+ * Ecclesiasticus and Baruch were absent from the original snapshot — since
+ * 2026-08-17 their Latin comes from the vendored deuterocanonical supplement
+ * (vul-deutero.tsv, same Clementine Text Project lineage; see PROVENANCE).
  * Psalm numbering is Vulgate/LXX in BOTH sources (verified: Ps 22 = "Dominus
  * regit me" / "The Lord ruleth me").
  */
@@ -29,6 +30,11 @@ import { embedText, EMBED_DIM, normalizeText } from '../src/core/vector/embed.ts
 import { parseCitation } from './scripture.mjs';
 
 const VUL_TSV = 'VENDORED/vulgate-clementina/vul.tsv';
+/** Deuterocanonical supplement (2026-08-17): the five books the LukeSmith
+ *  snapshot lacks, extracted verbatim (deduped — upstream triples every row)
+ *  from theunpleasantowl/vul-complete, same Clementine Text Project lineage.
+ *  Same 6-column format; abbrevs Tob/Jdt/Sap/Sir/Bar. */
+const VUL_DEUTERO_TSV = 'VENDORED/vulgate-clementina/vul-deutero.tsv';
 const DR_JSON = 'VENDORED/douay-rheims/EntireBible-DR.json';
 
 /**
@@ -54,20 +60,20 @@ export const BOOK_MAP = [
   { key: '2Par', dr: '2 Paralipomenon', vul: '2Chr', nt: false },
   { key: '1Esdr', dr: '1 Esdras', vul: 'Ezra', nt: false },
   { key: '2Esdr', dr: '2 Esdras', vul: 'Neh', nt: false },
-  { key: 'Tob', dr: 'Tobias', vul: null, nt: false },
-  { key: 'Judith', dr: 'Judith', vul: null, nt: false },
+  { key: 'Tob', dr: 'Tobias', vul: 'Tob', nt: false },
+  { key: 'Judith', dr: 'Judith', vul: 'Jdt', nt: false },
   { key: 'Esth', dr: 'Esther', vul: 'Est', nt: false },
   { key: 'Job', dr: 'Job', vul: 'Job', nt: false },
   { key: 'Ps', dr: 'Psalms', vul: 'Psa', nt: false },
   { key: 'Prov', dr: 'Proverbs', vul: 'Prv', nt: false },
   { key: 'Eccle', dr: 'Ecclesiastes', vul: 'Eccl', nt: false },
   { key: 'Cant', dr: 'Canticles', vul: 'SSol', nt: false },
-  { key: 'Sap', dr: 'Wisdom', vul: null, nt: false },
-  { key: 'Eccli', dr: 'Ecclesiasticus', vul: null, nt: false },
+  { key: 'Sap', dr: 'Wisdom', vul: 'Sap', nt: false },
+  { key: 'Eccli', dr: 'Ecclesiasticus', vul: 'Sir', nt: false },
   { key: 'Is', dr: 'Isaias', vul: 'Isa', nt: false },
   { key: 'Jer', dr: 'Jeremias', vul: 'Jer', nt: false },
   { key: 'Thren', dr: 'Lamentations', vul: 'Lam', nt: false },
-  { key: 'Bar', dr: 'Baruch', vul: null, nt: false },
+  { key: 'Bar', dr: 'Baruch', vul: 'Bar', nt: false },
   { key: 'Ezech', dr: 'Ezechiel', vul: 'Eze', nt: false },
   { key: 'Dan', dr: 'Daniel', vul: 'Dan', nt: false },
   { key: 'Os', dr: 'Osee', vul: 'Hos', nt: false },
@@ -118,7 +124,8 @@ const byDrName = new Map(BOOK_MAP.map((b) => [b.dr, b]));
 /** vul.tsv → abbrev → chapter → verse → Latin text. */
 function loadVul() {
   const map = new Map();
-  for (const line of readFileSync(resolve(VUL_TSV), 'utf8').split('\n')) {
+  for (const line of readFileSync(resolve(VUL_TSV), 'utf8').split('\n')
+    .concat(readFileSync(resolve(VUL_DEUTERO_TSV), 'utf8').split('\n'))) {
     const f = line.split('\t');
     if (f.length < 6) continue;
     const [, abbrev, , ch, v, text] = f;
