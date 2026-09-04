@@ -1791,6 +1791,12 @@ button:hover { color: var(--ink); border-color: var(--accent); }
 button:disabled { opacity: 0.45; cursor: default; }
 button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
+/* Primary action variant — the single accent-filled CTA in a button row
+   ("Save draft" in the journal editor). Hover brightens in place instead of
+   re-coloring, so it reads as one step beyond the plain pills. */
+button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+button.primary:hover { color: #fff; filter: brightness(1.1); }
+
 /* Map stations are their own surface (M2 idiom): the global button skin's
    accent fill on `button.active` was painting a loud pill behind active
    strip stops, masking the subtle ping (operator report 2026-08-17). These

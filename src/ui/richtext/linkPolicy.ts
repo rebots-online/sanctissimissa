@@ -20,6 +20,11 @@ export class LinkPolicy extends Plugin {
     return 'LinkPolicy' as const;
   }
 
+  static get requires() {
+    // Notification is only retrievable when its plugin is loaded; declare it.
+    return [Notification] as const;
+  }
+
   init(): void {
     const linkCommand = this.editor.commands.get('link');
     if (!linkCommand) return;
