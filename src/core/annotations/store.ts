@@ -19,6 +19,8 @@ export interface AnnotationRange {
   end: number;
 }
 
+export type AnnotationColor = 'gold' | 'rose' | 'sky' | 'moss';
+
 export interface Annotation {
   id: string;
   /** Section node key the annotation anchors to, e.g. "section:Tempora/Quad1-3#Introitus". */
@@ -32,7 +34,7 @@ export interface Annotation {
   /** Aligned counterpart range, so the highlight renders in both languages at the right span. */
   rangeAlt?: AnnotationRange;
   note: string;
-  color: 'gold' | 'rose' | 'sky' | 'moss';
+  color: AnnotationColor;
   createdAt: string;
 }
 

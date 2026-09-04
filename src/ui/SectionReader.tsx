@@ -50,7 +50,7 @@ import {
   type WordEchoResult,
   type PhraseSelectionInput,
 } from '../core/text/align.ts';
-import BilingualText, { TextLines, useNarrow, type SelectionEcho } from './BilingualText.tsx';
+import BilingualText, { TextLines, useNarrow, type NoteCallout, type SelectionEcho } from './BilingualText.tsx';
 import {
   placeFloatingCallout,
   reconcileCallout,
@@ -694,6 +694,15 @@ export default function SectionReader({
         const annMarks: AnnotationRange[] = anns.flatMap((a) =>
           [a.range, a.rangeAlt].filter((r): r is AnnotationRange => Boolean(r)),
         );
+        // Noted annotations render as margin-callouts just below their line
+        // (both layouts); rangeless legacy notes stay in the section list.
+        const noteCallouts: NoteCallout[] = anns.flatMap((a) => {
+          if (!a.note) return [];
+          const out: NoteCallout[] = [];
+          if (a.range) out.push({ key: a.id, lang: 'latin', line: a.range.line, html: a.note, color: a.color });
+          if (a.rangeAlt) out.push({ key: a.id, lang: 'english', line: a.rangeAlt.line, html: a.note, color: a.color });
+          return out;
+        });
         // Content-string matching only for sidecar highlights and rangeless
         // annotations (legacy/fallback) — keeps ranged highlights from
         // re-lighting every identical word.
@@ -737,6 +746,7 @@ export default function SectionReader({
                     echoTo={echoRange?.to}
                     selectionEcho={sectionEcho ?? undefined}
                     marks={annMarks}
+                    notes={noteCallouts}
                   />
                 ) : (
                   <div className="bilingual">
@@ -751,6 +761,7 @@ export default function SectionReader({
                           selectionEcho={sectionEcho?.lang === 'latin' ? sectionEcho : undefined}
                           lang="latin"
                           marks={annMarks}
+                          notes={noteCallouts}
                         />
                       ) : (
                         <p style={{ opacity: 0.5 }}>—</p>
@@ -767,6 +778,7 @@ export default function SectionReader({
                           selectionEcho={sectionEcho?.lang === 'english' ? sectionEcho : undefined}
                           lang="english"
                           marks={annMarks}
+                          notes={noteCallouts}
                         />
                       ) : (
                         <p style={{ opacity: 0.5 }}>—</p>

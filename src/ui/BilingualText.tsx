@@ -21,10 +21,24 @@
  * for sidecar highlights and rangeless legacy annotations.
  */
 
-import { useEffect, useState, type ReactElement } from 'react';
+import { Fragment, useEffect, useState, type ReactElement } from 'react';
 import { dialogueClass } from '../core/text/dialogue.ts';
 import { isScriptureCitationLine, isSpecialsControlLine } from '../core/liturgy/massSpecials.ts';
-import type { AnnotationRange } from '../core/annotations/store.ts';
+import type { AnnotationColor, AnnotationRange } from '../core/annotations/store.ts';
+
+/**
+ * A margin-note callout rendered just BELOW the line carrying its highlight
+ * (in flow — never overlays surrounding text), tied to it with a ✎
+ * reference mark. `key` dedupes the Latin/English pair of one annotation in
+ * interleaved layout.
+ */
+export interface NoteCallout {
+  key: string;
+  lang: 'latin' | 'english';
+  line: number;
+  html: string;
+  color: AnnotationColor;
+}
 
 /** Classify a leading-! line for display (controls already stripped by specials). */
 function bangLineClass(line: string): 'suppress' | 'verse-ref' | 'rubric-text' {
@@ -165,6 +179,7 @@ export function TextLines({
   selectionEcho,
   lang,
   marks,
+  notes,
 }: {
   text: string;
   quotes: string[];
@@ -175,6 +190,8 @@ export function TextLines({
   lang?: 'latin' | 'english';
   /** Exact-range annotation marks to render (authoritative highlight anchor). */
   marks?: AnnotationRange[];
+  /** Margin-note callouts, rendered in flow just below their line. */
+  notes?: NoteCallout[];
 }) {
   const lines = text.split('\n');
   return (
@@ -191,6 +208,7 @@ export function TextLines({
         }
         const echoed = inRange(i, echoLine, echoTo);
         const hasSelectionEcho = selectionEcho?.line === i;
+        const lineNotes = lang ? (notes ?? []).filter((n) => n.lang === lang && n.line === i) : [];
 
         // If there's a selection echo, split the line and wrap the selected portion
         let content: (string | ReactElement)[];
@@ -212,10 +230,20 @@ export function TextLines({
         }
 
         return (
-          <span key={i} data-line={i} className={`${i % 2 ? 'v-odd' : 'v-even'}${echoed ? ' xlate-echo' : ''}`}>
-            {content}
-            {i < lines.length - 1 ? '\n' : ''}
-          </span>
+          <Fragment key={i}>
+            <span data-line={i} className={`${i % 2 ? 'v-odd' : 'v-even'}${echoed ? ' xlate-echo' : ''}`}>
+              {content}
+              {lineNotes.length > 0 && <sup className="ann-ref" title="Margin note below">✎</sup>}
+              {i < lines.length - 1 ? '\n' : ''}
+            </span>
+            {lineNotes.map((n) => (
+              <span
+                key={n.key}
+                className={`ann-callout ck-content c-${n.color}`}
+                dangerouslySetInnerHTML={{ __html: n.html }}
+              />
+            ))}
+          </Fragment>
         );
       })}
     </p>
@@ -231,6 +259,7 @@ export default function BilingualText({
   layout,
   selectionEcho,
   marks,
+  notes,
 }: {
   latin: string | null;
   english: string | null;
@@ -242,6 +271,8 @@ export default function BilingualText({
   selectionEcho?: SelectionEcho;
   /** Exact-range annotation marks, rendered in whichever language/line they fall on. */
   marks?: AnnotationRange[];
+  /** Margin-note callouts, rendered in flow just below their line. */
+  notes?: NoteCallout[];
 }) {
   const q = quotes ?? [];
 
@@ -250,11 +281,11 @@ export default function BilingualText({
       <div className="bilingual">
         <div className="latin" lang="la">
           <span className="lang-tag">Latine</span>
-          {latin ? <TextLines text={latin} quotes={q} echoLine={echoLine} echoTo={echoTo} selectionEcho={selectionEcho?.lang === 'latin' ? selectionEcho : undefined} lang="latin" marks={marks} /> : <p style={{ opacity: 0.5 }}>—</p>}
+          {latin ? <TextLines text={latin} quotes={q} echoLine={echoLine} echoTo={echoTo} selectionEcho={selectionEcho?.lang === 'latin' ? selectionEcho : undefined} lang="latin" marks={marks} notes={notes} /> : <p style={{ opacity: 0.5 }}>—</p>}
         </div>
         <div className="english" lang="en">
           <span className="lang-tag">English</span>
-          {english ? <TextLines text={english} quotes={q} echoLine={echoLine} echoTo={echoTo} selectionEcho={selectionEcho?.lang === 'english' ? selectionEcho : undefined} lang="english" marks={marks} /> : <p style={{ opacity: 0.5 }}>—</p>}
+          {english ? <TextLines text={english} quotes={q} echoLine={echoLine} echoTo={echoTo} selectionEcho={selectionEcho?.lang === 'english' ? selectionEcho : undefined} lang="english" marks={marks} notes={notes} /> : <p style={{ opacity: 0.5 }}>—</p>}
         </div>
       </div>
     );
@@ -279,6 +310,15 @@ export default function BilingualText({
         const enSelectionEcho = selectionEcho?.lang === 'english' && selectionEcho.line === i ? selectionEcho : undefined;
         const laMarks = rangesForLine(marks, 'latin', i);
         const enMarks = rangesForLine(marks, 'english', i);
+        // One callout per annotation even when the pair carries both the
+        // Latin range and its English counterpart.
+        const rowNotes: NoteCallout[] = [];
+        let rowKey: string | null = null;
+        for (const n of notes ?? []) {
+          if (n.line !== i || n.key === rowKey) continue;
+          rowKey = n.key;
+          rowNotes.push(n);
+        }
 
         return (
           <p className={`il-pair ${i % 2 ? 'v-odd' : 'v-even'}`} key={i}>
@@ -301,6 +341,7 @@ export default function BilingualText({
                   ) : (
                     renderLine(la, q, i, laMarks)
                   )}
+                  {rowNotes.some((n) => n.lang === 'latin') && <sup className="ann-ref" title="Margin note below">✎</sup>}
                 </span>
               ))}
             {en !== undefined && enKind !== 'suppress' &&
@@ -323,8 +364,16 @@ export default function BilingualText({
                   ) : (
                     renderLine(en, q, i, enMarks, { noVerseNum: true })
                   )}
+                  {rowNotes.some((n) => n.lang === 'english') && <sup className="ann-ref" title="Margin note below">✎</sup>}
                 </span>
               ))}
+            {rowNotes.map((n) => (
+              <span
+                key={n.key}
+                className={`ann-callout ck-content c-${n.color}`}
+                dangerouslySetInnerHTML={{ __html: n.html }}
+              />
+            ))}
           </p>
         );
       })}
