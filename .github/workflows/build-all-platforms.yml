@@ -1,14 +1,12 @@
 name: build-all-platforms
 
+# Dormant until public release: builds are local for now.
+# Re-enable push/tag/pull_request triggers when CI runners are ready.
 on:
-  push:
-    branches: [master]
-    tags: ['v*']
-  pull_request:
   workflow_dispatch:
 
 jobs:
-  # ── Web + tests: every push and PR ────────────────────────────────
+  # ── Web + tests ───────────────────────────────────────────────────
   test-and-web:
     runs-on: ubuntu-latest
     steps:
