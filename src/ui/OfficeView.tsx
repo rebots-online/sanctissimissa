@@ -149,7 +149,7 @@ export default function OfficeView({ db, day, hour, onHour, sidecar, onAction, o
             return (
               <g className="hour-node" key={h.id} onClick={() => onHour(h.id)}>
                 <circle cx={x} cy={y} r={18} fill="transparent" stroke="none" />
-                <circle cx={x} cy={y} r={active ? 10 : 7} fill="#fff" stroke={active ? 'var(--accent)' : 'var(--line-office)'} strokeWidth={active ? 4 : 3} />
+                <circle cx={x} cy={y} r={active ? 10 : 7} fill="var(--card)" stroke={active ? 'var(--accent)' : 'var(--line-office)'} strokeWidth={active ? 4 : 3} />
                 <text x={lx} y={ly + 3} textAnchor="middle" fontSize={10} fontFamily="var(--serif)" fontStyle="italic" fill="var(--ink)">
                   {h.latin}
                 </text>

@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import {
   THEME_FAMILIES,
   DEFAULT_FAMILY,
+  normalizeFamily,
   applyTheme,
   systemMode,
   type ThemeFamily,
@@ -29,7 +30,6 @@ interface Props {
 type ModePref = 'light' | 'dark' | 'system';
 
 const LS_KEY = 'sam.theme.v1';
-const FAMILY_IDS: string[] = THEME_FAMILIES.map((f) => f.id);
 
 function readPersisted(sidecar: SettingsStore | null): { family: ThemeFamily; mode: ModePref } {
   let family: string | null = null;
@@ -50,7 +50,8 @@ function readPersisted(sidecar: SettingsStore | null): { family: ThemeFamily; mo
     }
   }
   return {
-    family: family !== null && FAMILY_IDS.includes(family) ? (family as ThemeFamily) : DEFAULT_FAMILY,
+    // normalizeFamily also migrates renamed ids (e.g. persisted 'neo-brutalist')
+    family: family !== null ? normalizeFamily(family) : DEFAULT_FAMILY,
     mode: mode === 'light' || mode === 'dark' || mode === 'system' ? mode : 'system',
   };
 }
@@ -69,8 +70,8 @@ export default function ThemePicker({ sidecar }: Props) {
 
     const storedFamily = sidecar.getSetting('theme.family');
     const storedMode = sidecar.getSetting('theme.mode');
-    if (storedFamily !== null && FAMILY_IDS.includes(storedFamily)) {
-      setFamily(storedFamily as ThemeFamily);
+    if (storedFamily !== null) {
+      setFamily(normalizeFamily(storedFamily));
     }
     if (storedMode === 'light' || storedMode === 'dark' || storedMode === 'system') {
       setMode(storedMode);

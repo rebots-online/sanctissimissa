@@ -1835,14 +1835,13 @@ select.verse-jump {
 
 /* The scripture strip: canonical books across (MapStrip scripture variant). */
 .mapstrip.scripture { position: relative; }
-.mapstrip .book-stop { display: inline-flex; }
 .mapstrip .mstation.book .mlabel { font-style: italic; }
+/* The chapters band pins fixed under the strip (coords from MapStrip): the
+   strip scrolls horizontally, and overflow-y: hidden would otherwise clip
+   an absolutely-positioned band out of sight. Same escape as MapFlyout. */
 .mapstrip .book-chapters {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 40;
+  position: fixed;
+  z-index: 70;
   display: flex;
   flex-wrap: wrap;
   gap: 2px 6px;

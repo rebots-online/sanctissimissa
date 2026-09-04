@@ -53,7 +53,7 @@ function Dot({ s, accent }: { s: Station; accent: string }) {
   return (
     <svg className="vdot" viewBox="0 0 34 34" aria-hidden="true">
       {s.kind === 'conditional' && (
-        <circle cx={17} cy={17} r={14.5} fill="none" stroke="#4a4034" strokeWidth={1.2} strokeDasharray="3 3" />
+        <circle cx={17} cy={17} r={14.5} fill="none" stroke="var(--ink-soft)" strokeWidth={1.2} strokeDasharray="3 3" />
       )}
       {isProper ? (
         <>
@@ -61,11 +61,11 @@ function Dot({ s, accent }: { s: Station; accent: string }) {
           {/* expanding ring behind the dot (subtle is the contract). */}
           <circle className="vdot-pulse-halo" cx={17} cy={17} r={13} fill={accent} />
           <circle className="vdot-pulse-ring" cx={17} cy={17} r={12} fill="none" stroke={accent} strokeWidth={2} />
-          <circle cx={17} cy={17} r={10.5} fill="#fff" stroke={accent} strokeWidth={4} />
+          <circle cx={17} cy={17} r={10.5} fill="var(--card)" stroke={accent} strokeWidth={4} />
           <circle cx={17} cy={17} r={4.5} fill={accent} />
         </>
       ) : (
-        <circle cx={17} cy={17} r={8.5} fill="#fff" stroke="#4a4034" strokeWidth={3} />
+        <circle cx={17} cy={17} r={8.5} fill="var(--card)" stroke="var(--ink-soft)" strokeWidth={3} />
       )}
     </svg>
   );
@@ -297,9 +297,9 @@ export default function SubwayMap({ db, day, onStation, onOpenBibleRef, onOpenHo
       })}
 
       <div className="vlegend">
-        <span><svg viewBox="0 0 34 34" className="vdot"><circle cx={17} cy={17} r={10.5} fill="#fff" stroke={accent} strokeWidth={4} /><circle cx={17} cy={17} r={4.5} fill={accent} /></svg> Proper of the day — in the day's color ({String(day?.color ?? '')})</span>
-        <span><svg viewBox="0 0 34 34" className="vdot"><circle cx={17} cy={17} r={8.5} fill="#fff" stroke="#4a4034" strokeWidth={3} /></svg> Ordinary (invariable)</span>
-        <span><svg viewBox="0 0 34 34" className="vdot"><circle cx={17} cy={17} r={14.5} fill="none" stroke="#4a4034" strokeWidth={1.2} strokeDasharray="3 3" /><circle cx={17} cy={17} r={8.5} fill="#fff" stroke="#4a4034" strokeWidth={3} /></svg> Conditional by rubric</span>
+        <span><svg viewBox="0 0 34 34" className="vdot"><circle cx={17} cy={17} r={10.5} fill="var(--card)" stroke={accent} strokeWidth={4} /><circle cx={17} cy={17} r={4.5} fill={accent} /></svg> Proper of the day — in the day's color ({String(day?.color ?? '')})</span>
+        <span><svg viewBox="0 0 34 34" className="vdot"><circle cx={17} cy={17} r={8.5} fill="var(--card)" stroke="var(--ink-soft)" strokeWidth={3} /></svg> Ordinary (invariable)</span>
+        <span><svg viewBox="0 0 34 34" className="vdot"><circle cx={17} cy={17} r={14.5} fill="none" stroke="var(--ink-soft)" strokeWidth={1.2} strokeDasharray="3 3" /><circle cx={17} cy={17} r={8.5} fill="var(--card)" stroke="var(--ink-soft)" strokeWidth={3} /></svg> Conditional by rubric</span>
         <span className="faded">Faded = not travelled in {season}</span>
       </div>
     </div>
@@ -343,7 +343,7 @@ function ScriptureSubway({ db, onOpen }: { db: CorpusDb; onOpen: (ref: string) =
             <svg className="vdot" viewBox="0 0 34 34" aria-hidden="true">
               <circle className="vdot-pulse-halo" cx={17} cy={17} r={13} fill="currentColor" />
               <circle className="vdot-pulse-ring" cx={17} cy={17} r={12} fill="none" stroke="currentColor" strokeWidth={2} />
-              <circle cx={17} cy={17} r={10.5} fill="#fff" stroke="currentColor" strokeWidth={4} />
+              <circle cx={17} cy={17} r={10.5} fill="var(--card)" stroke="currentColor" strokeWidth={4} />
               <circle cx={17} cy={17} r={4.5} fill="currentColor" />
             </svg>
             <span className="vlabels">
@@ -413,7 +413,7 @@ function OfficeSubway({ onOpen, activeHour }: { onOpen: (hour: string) => void; 
             <svg className="vdot" viewBox="0 0 34 34" aria-hidden="true">
               <circle className="vdot-pulse-halo" cx={17} cy={17} r={13} fill="currentColor" />
               <circle className="vdot-pulse-ring" cx={17} cy={17} r={12} fill="none" stroke="currentColor" strokeWidth={2} />
-              <circle cx={17} cy={17} r={10.5} fill="#fff" stroke="currentColor" strokeWidth={4} />
+              <circle cx={17} cy={17} r={10.5} fill="var(--card)" stroke="currentColor" strokeWidth={4} />
               <circle cx={17} cy={17} r={4.5} fill="currentColor" />
             </svg>
             <span className="vlabels">
