@@ -30,6 +30,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-react": "^11.2.0",
     "@tauri-apps/api": "^2.4.0",
     "@tiptap/extension-highlight": "^3.27.4",
     "@tiptap/extension-image": "^3.27.4",
@@ -43,6 +44,7 @@
     "@tiptap/extension-underline": "^3.27.4",
     "@tiptap/react": "^3.27.4",
     "@tiptap/starter-kit": "^3.27.4",
+    "ckeditor5": "^48.5.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "sql.js": "^1.12.0"
