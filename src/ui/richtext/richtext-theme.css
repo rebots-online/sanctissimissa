@@ -1,0 +1,97 @@
+/*
+ * richtext-theme.css — maps CKEditor 5 chrome onto the app's semantic tokens
+ * (styles.css §7.7). Imported immediately after ckeditor5/ckeditor5.css so the
+ * :root overrides below win the cascade. Because every value is an indirect
+ * var() into --surface/--card/--accent/..., the editor automatically follows
+ * all theme families × light/dark × seasonal accents.
+ */
+
+:root {
+  /* Content typography = the reader's serif conventions. */
+  --ck-content-font-family: var(--serif);
+  --ck-content-font-size: 16px;
+  --ck-content-font-color: var(--ink);
+  --ck-content-line-height: 1.55;
+
+  /* Chrome = the app's sans UI skin. */
+  --ck-font-face: var(--sans);
+  --ck-border-radius: 8px;
+
+  --ck-color-base-background: var(--card);
+  --ck-color-base-border: var(--card-border);
+  --ck-color-base-text: var(--ink);
+  --ck-color-base-foreground: var(--surface-2);
+  --ck-color-base-action: var(--accent);
+  --ck-color-base-focus: var(--accent);
+  --ck-color-base-error: var(--rubric);
+  --ck-color-text: var(--ink);
+
+  --ck-color-focus-border: var(--accent);
+  --ck-color-focus-outer-shadow: var(--accent-soft);
+
+  --ck-color-toolbar-background: var(--surface-2);
+  --ck-color-toolbar-border: var(--card-border);
+  --ck-color-panel-background: var(--surface-2);
+  --ck-color-panel-border: var(--card-border);
+  --ck-color-dropdown-panel-background: var(--surface-2);
+  --ck-color-dropdown-panel-border: var(--card-border);
+
+  --ck-color-button-default-background: transparent;
+  --ck-color-button-default-hover-background: var(--accent-soft);
+  --ck-color-button-default-active-background: var(--accent-soft);
+  --ck-color-button-on-background: var(--accent);
+  --ck-color-button-on-color: #fff;
+  --ck-color-button-on-hover-background: var(--accent);
+  --ck-color-button-on-active-background: var(--accent);
+
+  --ck-color-list-background: var(--surface-2);
+  --ck-color-list-button-hover-background: var(--accent-soft);
+  --ck-color-list-button-on-background: var(--accent);
+  --ck-color-list-button-on-text: #fff;
+
+  --ck-color-input-background: var(--card);
+  --ck-color-input-border: var(--card-border);
+  --ck-color-input-text: var(--ink);
+  --ck-color-tooltip-background: var(--rail);
+  --ck-color-tooltip-text: var(--rail-text);
+
+  --ck-color-widget-blurred-border: var(--card-border);
+  --ck-color-widget-hover-border: var(--accent);
+  --ck-color-shadow-drop: var(--card-shadow, rgba(0, 0, 0, 0.18));
+  --ck-color-shadow-inner: transparent;
+}
+
+/* Pill toolbar buttons — the app's global button skin. */
+.ck.ck-button,
+a.ck.ck-button {
+  border-radius: 999px;
+}
+
+/* Toolbar/menu-bar text inherits the chrome font (CKEditor sets its own). */
+.ck.ck-toolbar,
+.ck.ck-menubar {
+  font-family: var(--sans);
+}
+
+/*
+ * Highlight colors — retint CKEditor's default markers as liturgical tints so
+ * `<mark class="marker-*">` (incl. normalized TipTap bare <mark>) reads like
+ * the rest of the parchment.
+ */
+.ck-content .marker-yellow { background-color: rgba(212, 160, 23, 0.28); }
+.ck-content .marker-green  { background-color: rgba(63, 122, 82, 0.24); }
+.ck-content .marker-pink   { background-color: rgba(156, 39, 51, 0.18); }
+.ck-content .marker-blue   { background-color: rgba(39, 75, 105, 0.20); }
+
+/* Content conventions shared with the reader. */
+.ck-content blockquote {
+  border-left: 3px solid var(--accent);
+  font-style: italic;
+  color: var(--ink-soft);
+}
+.ck-content a { color: var(--accent); }
+.ck-content hr {
+  border: none;
+  border-top: 1px solid var(--card-border);
+  margin: 1em 0;
+}
