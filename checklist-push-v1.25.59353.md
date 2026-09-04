@@ -5,19 +5,19 @@ States: `[ ]` not started · `[/]` in progress · `[X]` implemented · ✅ verif
 ## Applicable conventions (adapted from ~/Admin-Manual/)
 
 - **CC13 — Forgejo-authoritative remotes**: `origin` = Forgejo (LFS store), `github` = code-only mirror. Push `origin` first, `github` second. Never GitHub LFS.
-- **CC13 — Auth**: HTTPS-only (no SSH on forgejo.robin.mba). Auth is `rcheung:<token>` via `~/.git-credentials`. Token in `~/Admin-Manual/CREDENTIALS/forgejo-robin-mba-v15.md`.
-- **CC13 — .lfsconfig**: Already committed at repo root, pointing LFS to `https://forgejo.robin.mba/rcheung/StAndroidsMissal.git/info/lfs`. This governs both fetch and push — LFS objects upload to Forgejo even when pushing to `github` remote.
-- **CC13 — remote.github.lfsurl**: Must be set to Forgejo LFS URL so `git push github` resolves LFS against Forgejo, never uploads to GitHub.
+- **CC13 — Auth**: HTTPS-only (no SSH on `$FORGEJO_URL`). Auth is `rcheung:<token>` via `~/.git-credentials`. Token in `~/Admin-Manual/CREDENTIALS/forgejo-robin-mba-v15.md`.
+- **CC13 — .lfsconfig**: Was committed at repo root, pointing LFS to `$FORGEJO_URL/rcheung/StAndroidsMissal.git/info/lfs`. Preserved as `.lfsconfig.forgejo-backup` in the checkpoint repo.
+- **CC13 — remote.github.lfsurl**: Was set to Forgejo LFS URL so `git push github` resolved LFS against Forgejo, never uploaded to GitHub.
 - **CC17 — Evidentiary support**: Verify each step with command output. Don't claim "pushed" without evidence.
 - **CC18 — Follow the checklist**: Execute step by step, don't ad-hoc.
 
 ## Pre-flight
 - ✅ **P.1** Verify remote configuration: `origin` = Forgejo, `github` = GitHub
-  Evidence: `git remote -v` → origin=forgejo.robin.mba, github=github.com ✓
+  Evidence: `git remote -v` → origin=$FORGEJO_URL, github=github.com ✓
 - ✅ **P.2** Verify `.lfsconfig` exists and points to Forgejo LFS
-  Evidence: `cat .lfsconfig` → `[lfs] url = https://forgejo.robin.mba/rcheung/StAndroidsMissal.git/info/lfs` ✓
+  Evidence: `cat .lfsconfig.forgejo-backup` → `[lfs] url = $FORGEJO_URL/rcheung/StAndroidsMissal.git/info/lfs` ✓
 - ✅ **P.3** Verify `remote.github.lfsurl` is set to Forgejo
-  Evidence: `git config --get remote.github.lfsurl` → `https://forgejo.robin.mba/rcheung/StAndroidsMissal.git/info/lfs` ✓
+  Evidence: `git config --get remote.github.lfsurl` → `$FORGEJO_URL/rcheung/StAndroidsMissal.git/info/lfs` ✓
 - ✅ **P.4** Set up `~/.git-credentials` with Forgejo token from credential file
   Evidence: `~/.git-credentials` written with token from `~/Admin-Manual/CREDENTIALS/forgejo-robin-mba-v15.md` ✓
 - ✅ **P.5** Verify token works against Forgejo API

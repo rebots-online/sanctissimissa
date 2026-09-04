@@ -1,11 +1,15 @@
 node_modules/
-# Shared DO checkout symlink (authorized exception; trailing-slash patterns
-# do not match symlinks, hence the bare path here):
+# divinum-officium is too large (626MB) — clone separately if needed:
+# https://github.com/DivinumOfficium/divinum-officium
 VENDORED/divinum-officium
 public/missal.db
-!/dist/
-!/dist/**
+# dist/ is build output — excluded entirely from this source-only repo.
+# Rebuild with: npm run build
+dist/
 dist-*/
+# assets/missal.db is a symlink to the original repo (183MB, too large for GitHub free LFS).
+# If missing, run `npm run ingest` to rebuild from VENDORED/.
+assets/missal.db
 src-tauri/target/
 src-tauri/gen/android/app/build/
 src-tauri/gen/android/tauri.properties
@@ -31,8 +35,18 @@ msix-stage/
 # pre-build gate fail on every build after the first.
 tsconfig.tsbuildinfo
 
+# Logs live in ~/Admin-Manual/LOGS/standroidsmissal/ (private synced repo).
+LOGS/
+.tmp/
+
+# Forgejo-specific CI (server down as of 2026-09-04; preserved in original repo).
+.forgejo/
+
+# LFS config preserved as backup (Forgejo LFS endpoint, now inactive).
+.lfsconfig
+.lfsconfig.forgejo-backup
+
 # Machine-local caches only (regenerated per workstation — never synced).
-# Everything else, including credential-bearing history, is either committed
-# or lives in the private synced Admin-Manual repo (Admin-Manual/LOGS/).
 .remember/
 .playwright-mcp/
+.codegraph/

@@ -361,7 +361,7 @@ LFS objects to Forgejo. GitHub receives commits and LFS pointers only.
 ## Web deployment
 
 The web/PWA build is deployed to `https://standroid.robin.mba` on a self-hosted
-nginx-ui LXC container (Proxmox CT 123, IP `192.168.0.126`).
+nginx-ui LXC container (Proxmox CT `$CT_ID`, IP `$PVE_HOST` — see `~/Admin-Manual`).
 
 ### Architecture
 
@@ -388,16 +388,16 @@ cd ~/outbox/standroidsmissal/web-deploy
 rm -rf *
 unzip ~/CascadeProjects/StAndroidsMissal/dist/standroidsmissal-v<version>-web-pwa.zip
 
-# 2. Create the new release directory on CT 123
-ssh root@192.168.0.214 "pct exec 123 -- mkdir -p /var/www/standroid/releases/<version>"
+# 2. Create the new release directory on CT $CT_ID
+ssh root@$PVE_HOST "pct exec $CT_ID -- mkdir -p /var/www/standroid/releases/<version>"
 
 # 3. Push files into the LXC via tar pipe
 tar czf - -C ~/outbox/standroidsmissal/web-deploy . | 
-  ssh root@192.168.0.214 "pct exec 123 -- tar xzf - -C /var/www/standroid/releases/<version>/"
-ssh root@192.168.0.214 "pct exec 123 -- chown -R 1000:1000 /var/www/standroid/releases/<version>"
+  ssh root@$PVE_HOST "pct exec $CT_ID -- tar xzf - -C /var/www/standroid/releases/<version>/"
+ssh root@$PVE_HOST "pct exec $CT_ID -- chown -R 1000:1000 /var/www/standroid/releases/<version>"
 
 # 4. Atomic symlink swap
-ssh root@192.168.0.214 "pct exec 123 -- ln -sfn /var/www/standroid/releases/<version> /var/www/standroid/current"
+ssh root@$PVE_HOST "pct exec $CT_ID -- ln -sfn /var/www/standroid/releases/<version> /var/www/standroid/current"
 
 # 5. Verify
 curl -sI https://standroid.robin.mba            # expect: 200 OK
@@ -409,7 +409,7 @@ curl -s https://standroid.robin.mba | grep index-  # confirm new asset hash
 Old releases remain in `/var/www/standroid/releases/`. To roll back:
 
 ```bash
-ssh root@192.168.0.214 "pct exec 123 -- ln -sfn /var/www/standroid/releases/<old-version> /var/www/standroid/current"
+ssh root@$PVE_HOST "pct exec $CT_ID -- ln -sfn /var/www/standroid/releases/<old-version> /var/www/standroid/current"
 ```
 
 Operator-specific access paths and credential locations are documented in
@@ -563,7 +563,7 @@ jobs:
       - name: Commit and push dist
         run: |
           git config user.name "forgejo-actions"
-          git config user.email "actions@forgejo.robin.mba"
+          git config user.email "actions@${CI_HOST}"
           git add dist/ version.txt version.json package.json package-lock.json
           git commit -m "v$(cat version.txt): CI release artifacts"
           git push origin master

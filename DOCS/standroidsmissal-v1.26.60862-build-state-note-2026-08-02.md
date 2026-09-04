@@ -95,7 +95,7 @@ provision it — Play signing credentials are the operator's call, not mine.
 
 - Deploy the web PWA to `https://standroid.robin.mba` (runbook "Web deployment":
   zip `dist-web/`, create `/var/www/standroid/releases/<version>` on CT 123 via
-  `ssh root@192.168.0.214 "pct exec 123 -- ..."`, chown 1000:1000, swap the
+  `ssh root@$PVE_HOST "pct exec $CT_ID -- ..."` (see `~/Admin-Manual` for values), chown 1000:1000, swap the
   `current` symlink, verify with `curl -sI`). `dist-web/` on the Windows
   checkout is ready and carries the corpus and all six fixes.
 - Install-verify both installers once elevation is available.
