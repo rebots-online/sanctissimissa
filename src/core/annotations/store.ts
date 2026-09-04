@@ -38,17 +38,38 @@ export interface Annotation {
 
 const KEY = 'standroidsmissal.annotations.v1';
 
+/**
+ * Notes are HTML (CKEditor 5 compact-preset output) since the 2026-09 editor
+ * swap. Every path through the store normalizes: notes that don't start with
+ * a block tag are legacy plain text and get escaped + wrapped, so the UI can
+ * always render `.ck-content` HTML. Whitespace-only markup (an empty editor
+ * serializes to `<p>&nbsp;</p>`) normalizes to ''.
+ */
+const BLOCK_HTML_RE = /^\s*<(p|div|ul|ol|h[1-6]|blockquote|pre|figure|table)\b/i;
+
+export function escapeHtml(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+export function ensureNoteHtml(note: string): string {
+  const visible = note.replace(/<[^>]+>/g, '').replace(/&nbsp;/gi, ' ').trim();
+  if (!visible) return '';
+  const t = note.trim();
+  return BLOCK_HTML_RE.test(t) ? t : `<p>${escapeHtml(t)}</p>`;
+}
+
 function readAll(): Annotation[] {
   try {
     const raw = localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as Annotation[]) : [];
+    const list = raw ? (JSON.parse(raw) as Annotation[]) : [];
+    return list.map((a) => ({ ...a, note: ensureNoteHtml(a.note ?? '') }));
   } catch {
     return [];
   }
 }
 
 function writeAll(list: Annotation[]): void {
-  localStorage.setItem(KEY, JSON.stringify(list));
+  localStorage.setItem(KEY, JSON.stringify(list.map((a) => ({ ...a, note: ensureNoteHtml(a.note ?? '') }))));
 }
 
 export function annotationsFor(nodeKey: string): Annotation[] {
@@ -62,6 +83,7 @@ export function allAnnotations(): Annotation[] {
 export function addAnnotation(a: Omit<Annotation, 'id' | 'createdAt'>): Annotation {
   const full: Annotation = {
     ...a,
+    note: ensureNoteHtml(a.note ?? ''),
     id: `ann-${Math.random().toString(36).slice(2, 10)}`,
     createdAt: new Date().toISOString(),
   };
@@ -75,5 +97,5 @@ export function removeAnnotation(id: string): void {
 
 /** Edit an existing annotation's note/color in place (B5 — the index and the mark popover patch, never re-add). */
 export function updateAnnotation(id: string, patch: Partial<Pick<Annotation, 'note' | 'color'>>): void {
-  writeAll(readAll().map((a) => (a.id === id ? { ...a, ...patch } : a)));
+  writeAll(readAll().map((a) => (a.id === id ? { ...a, ...patch, note: patch.note !== undefined ? ensureNoteHtml(patch.note) : a.note } : a)));
 }

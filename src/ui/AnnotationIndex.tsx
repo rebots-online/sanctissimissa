@@ -11,6 +11,7 @@
 import { useMemo, useState } from 'react';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 import { allAnnotations, removeAnnotation, updateAnnotation, type Annotation } from '../core/annotations/store.ts';
+import { RichTextEditor } from './richtext/index.ts';
 
 /** Compact human form of an anchor node key (same scheme as JournalView's deep-link buttons). */
 function anchorShort(k: string): string {
@@ -83,17 +84,17 @@ export default function AnnotationIndex({ db, onOpenKey }: Props) {
               <div className="annx-quote">“{a.quote.slice(0, 200)}{a.quote.length > 200 ? '…' : ''}”</div>
               {editingId === a.id ? (
                 <div className="annx-edit">
-                  <textarea
-                    value={draft}
-                    onChange={(e) => setDraft(e.target.value)}
-                    rows={3}
+                  <RichTextEditor
+                    preset="compact"
+                    data={a.note}
                     placeholder="Margin note"
-                    aria-label="Annotation note"
-                    autoFocus
+                    onReady={(editor) => editor.editing.view.focus()}
+                    onChange={setDraft}
                   />
                   <div className="jsc-toolbar">
                     <button
                       type="button"
+                      className="primary"
                       onClick={() => {
                         updateAnnotation(a.id, { note: draft });
                         setEditingId(null);
@@ -107,7 +108,12 @@ export default function AnnotationIndex({ db, onOpenKey }: Props) {
                 </div>
               ) : (
                 <>
-                  {a.note && <div className="annx-note">{a.note}</div>}
+                  {a.note && (
+                    <div
+                      className="annx-note ck-content"
+                      dangerouslySetInnerHTML={{ __html: a.note }}
+                    />
+                  )}
                   <div className="jsc-toolbar">
                     <button
                       type="button"

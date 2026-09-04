@@ -95,3 +95,15 @@ a.ck.ck-button {
   border-top: 1px solid var(--card-border);
   margin: 1em 0;
 }
+
+/* Editor sizing inside app surfaces (replaces the old .jsc-editor box). */
+.jsc-editor-wrap .ck.ck-editor__editable {
+  min-height: 180px;
+}
+.annx-edit .ck.ck-editor__editable {
+  min-height: 72px;
+}
+/* .annx-note is pre-wrap for legacy plain text; HTML notes flow normally. */
+.annx-note.ck-content {
+  white-space: normal;
+}

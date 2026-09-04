@@ -9,6 +9,7 @@
 import type { Database } from 'sql.js';
 import { isTauri } from '../data/loadCorpus.ts';
 import { embedText, cosine, EMBED_DIM } from '../vector/embed.ts';
+import { ensureNoteHtml } from '../annotations/store.ts';
 import type { Accompaniment, Exposure, OccurrenceSelector } from './types.ts';
 
 /**
@@ -124,15 +125,6 @@ function plainText(html: string): string {
     .replace(/&nbsp;/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
 }
 
 function parseAnchors(raw: unknown): string[] {
@@ -425,7 +417,7 @@ export async function migrateLocalStorageAnnotations(sdb: SidecarDb): Promise<nu
         exposure: 'journal',
         provenance: 'authored',
         title: '',
-        bodyHtml: ann.note ? `<p>${escapeHtml(ann.note)}</p>` : '',
+        bodyHtml: ensureNoteHtml(ann.note ?? ''),
         anchors: [ann.nodeKey],
         quote: ann.quote ?? null,
         quoteAlt: ann.quoteAlt ?? null,

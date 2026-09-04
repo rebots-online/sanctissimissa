@@ -33,6 +33,7 @@ import {
 } from 'react';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 import type { SidecarDb } from '../core/accompaniment/store.ts';
+import { RichTextEditor } from './richtext/index.ts';
 import {
   annotationsFor,
   addAnnotation,
@@ -786,7 +787,7 @@ export default function SectionReader({
                           ×
                         </button>
                         <span className="quote">“{a.quote.slice(0, 90)}”</span>
-                        {a.note && <div>{a.note}</div>}
+                        {a.note && <div className="ck-content" dangerouslySetInnerHTML={{ __html: a.note }} />}
                       </div>
                     ))}
                   </div>
@@ -883,34 +884,36 @@ export default function SectionReader({
       {noteFor && (
         <div className="ctx-menu" ref={menuElRef} style={{ left: noteFor.x, top: noteFor.y }}>
           <div className="sel">“{noteFor.term.slice(0, 60)}…”</div>
-          <div style={{ padding: '4px 8px' }}>
-            <textarea
-              autoFocus
+          <div style={{ padding: '4px 8px', width: 320 }}>
+            <RichTextEditor
+              preset="compact"
               placeholder="Margin note…"
-              value={noteText}
-              onChange={(e) => setNoteText(e.target.value)}
-              style={{ width: '100%', minHeight: 56 }}
+              onReady={(editor) => editor.editing.view.focus()}
+              onChange={setNoteText}
             />
-            <button
-              onClick={() => {
-                if (noteFor.nodeKey) {
-                  addAnnotation({
-                    nodeKey: noteFor.nodeKey,
-                    quote: noteFor.term,
-                    quoteAlt: alignedAlt(noteFor),
-                    range: noteFor.range?.src,
-                    rangeAlt: noteFor.range?.alt,
-                    note: noteText,
-                    color: 'gold',
-                  });
-                  setAnnVersion((v) => v + 1);
-                }
-                setNoteFor(null);
-              }}
-            >
-              Save annotation
-            </button>
-            <button onClick={() => setNoteFor(null)}>Cancel</button>
+            <div className="jsc-toolbar">
+              <button
+                className="primary"
+                onClick={() => {
+                  if (noteFor.nodeKey) {
+                    addAnnotation({
+                      nodeKey: noteFor.nodeKey,
+                      quote: noteFor.term,
+                      quoteAlt: alignedAlt(noteFor),
+                      range: noteFor.range?.src,
+                      rangeAlt: noteFor.range?.alt,
+                      note: noteText,
+                      color: 'gold',
+                    });
+                    setAnnVersion((v) => v + 1);
+                  }
+                  setNoteFor(null);
+                }}
+              >
+                Save annotation
+              </button>
+              <button onClick={() => setNoteFor(null)}>Cancel</button>
+            </div>
           </div>
         </div>
       )}
