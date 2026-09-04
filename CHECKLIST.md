@@ -1063,3 +1063,46 @@ coder tasks per TC13 (Y.3 needs the stop-hover flyout designed against the app's
 system; W.2 needs env var names, Tauri/Gradle templating mechanism, fork repos/remotes,
 sanctissimissa.online mount + sanctissimissa.com iframe deployment). Y.1 is implemented
 immediately this session._
+
+---
+
+## Stanza CK — Rich-text editor swap: CKEditor 5 (2026-09-04)
+
+Operator directive: replace the TipTap-based editor ("ugly and nonstandard" toolbar +
+`window.prompt` link/image dialogs) and the plain-textarea annotation editors with
+CKEditor 5 (free GPL build; badge accepted; commercial key is a one-line swap later).
+Design pass done in-repo (dev-only `/editor-preview.html` gallery + browser screenshots)
+in lieu of Figma MCP. Baseline back-out point: commit `c56bbd07` (fresh fork, zero
+changes before it). Each step pushed separately.
+
+- [X] **CK.1 Install + shared module** — `ckeditor5@48.5.0` + `@ckeditor/ckeditor5-react@11.2.0`;
+  `src/ui/richtext/` = `RichTextEditor.tsx` (official wrapper, StrictMode-safe), `presets.ts`
+  (main/compact, free plugins only — v48 gates Base64UploadAdapter/PasteFromOffice/
+  RemoveFormat/TableProperties as premium), `linkPolicy.ts` (https + `#/verse|section|day|acc`
+  allow-list, replicating `isAllowedHref`), `base64UploadAdapter.ts` (custom free adapter →
+  `data:` URIs, offline-first), `markCompat.ts` (TipTap bare `<mark>` → highlight classes).
+- [X] **CK.2 Token-mapped theming** — `richtext-theme.css` maps `--ck-*` onto semantic tokens
+  (`--surface/--card/--accent/--ink…`); follows all theme families × modes × seasonal colors.
+  Validated via gallery screenshots (skeuomorphic light, sanctissimissa dark, glass, brutalist).
+- [X] **CK.3 Surface swap** — `AccompanimentEditor` (main preset; API + 400 ms BC.3 debounce
+  preserved; `body_html` source of truth, `body_pm` written `''` — legacy column stays in DDL),
+  `AnnotationIndex` + `SectionReader` annotate popup (compact preset). Annotation notes are
+  HTML now: `ensureNoteHtml` normalizes legacy plain text (escaped + wrapped) at the store
+  boundary; sidecar migration no longer double-wraps.
+- [X] **CK.4 Reader margin-note callouts** — noted annotations render as in-flow callout cards
+  just below their highlighted line (both bilingual layouts, deduped in interleaved) with a ✎
+  ref mark — never overlaying text (operator direction 2026-09-04).
+- [X] **CK.5 Selection management in AnnotationIndex** — checkbox column + sticky bulk bar
+  (color / delete-with-confirm / clear) + right-click context menu (edit note / color / remove);
+  per-card button rows removed (operator direction 2026-09-04).
+- [X] **CK.6 Deprecate TipTap** — 12 `@tiptap/*` packages removed; schema/tests keep `body_pm`
+  as a legacy column.
+- [ ] ✅ **CK.7 Runtime verification** — `npm test` + `npm run build:vite` green; in-app:
+  journal save/load round-trip, annotation edit via compact editor, callouts in reader,
+  console clean. (Partially exercised live by the operator during the session; flip to ✅
+  after a deliberate full pass.)
+
+Known pre-existing issue surfaced (not introduced, not fixed here): generic
+`html[data-mode='dark']` tokens (styles.css) are clobbered by the later family blocks for 7 of
+8 families — dark mode truly works only for `sanctissimissa` (explicit family×dark block).
+The editor follows tokens, so it inherits whatever the theme system decides.
