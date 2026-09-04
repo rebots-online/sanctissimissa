@@ -47,6 +47,7 @@ import {
   alignPhrase,
   wordEcho,
   wordAtPoint,
+  caretRectAtPoint,
   type WordEchoResult,
   type PhraseSelectionInput,
 } from '../core/text/align.ts';
@@ -57,6 +58,15 @@ import {
   type DOMRectLike,
   type FloatingCalloutPlacement,
 } from '../core/ui/calloutPlacement.ts';
+
+/** Opening distance the menu keeps below/above the text it acts on. */
+const MENU_GAP = 48;
+/** Force field: pointer proximity the popup retreats to hold while a selection drag approaches. */
+const POINTER_CLEARANCE = 72;
+/** Horizontal half-width of the force field beyond the popup's own edges. */
+const POINTER_BAND = 48;
+/** Same viewport inset the placement utility clamps to. */
+const VIEWPORT_MARGIN = 8;
 
 /** Exegesis request raised from the context menu; the host routes it. */
 export interface SelectionAction {
@@ -128,13 +138,39 @@ interface Props {
 }
 
 interface Menu {
-  x: number;
-  y: number;
+  /**
+   * What the menu must not cover: the live selection's rectangle, else the
+   * caret/word rect under the opening point. Placed above/below this by
+   * `placeFloatingCallout`, never on top of it.
+   */
+  anchor: DOMRectLike;
+  /** Assigned after the menu is measured; render hidden until then. */
+  placement?: FloatingCalloutPlacement;
   term: string;
   nodeKey: string | null;
   line: number | null;
   /** Resolved exact range of the selection that opened this menu (absent for word-under-cursor). */
   range?: { src: AnnotationRange; alt?: AnnotationRange };
+}
+
+/**
+ * What the context menu must not cover. With a live selection that is the
+ * whole selection rectangle; otherwise the text box under the point — so the
+ * menu opens above/below the passage of interest, never on top of it.
+ */
+function menuAnchorAt(clientX: number, clientY: number): DOMRectLike {
+  const sel = window.getSelection();
+  if (sel && sel.rangeCount > 0 && sel.toString().trim().length > 0) {
+    const r = sel.getRangeAt(0).getBoundingClientRect();
+    if (r.right > r.left || r.bottom > r.top) {
+      return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height };
+    }
+  }
+  const r = caretRectAtPoint(clientX, clientY);
+  if (r) {
+    return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height };
+  }
+  return { left: clientX, top: clientY, right: clientX, bottom: clientY, width: 0, height: 0 };
 }
 
 /** Find the section node key containing the current selection anchor. */
@@ -282,6 +318,13 @@ export default function SectionReader({
   } | null>(null);
   const echoCache = useRef(new Map<string, WordEchoResult | null>());
   const lastWord = useRef<string | null>(null);
+  /**
+   * Pointer type of the gesture in flight, read by the mouseup menu path:
+   * touch taps fire compatibility mouse events, so without this a scroll
+   * bounce or dismissal tap carrying a stale selection would pop the menu.
+   * On touch the menu is long-press (contextmenu) only.
+   */
+  const lastPointerType = useRef<string>('');
   const calloutElRef = useRef<HTMLDivElement>(null);
   const anchorElRef = useRef<HTMLElement | null>(null);
 
@@ -375,6 +418,81 @@ export default function SectionReader({
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, [callout?.echo]);
+
+  /**
+   * Measure the open menu (or annotate popover), then place it a generous
+   * distance above/below its anchor — never covering the passage it acts on.
+   * Re-placed through a ResizeObserver because the popover grows as its
+   * editor mounts. Keyed on WHICH surface is open (not on the menu object),
+   * so force-field nudges below don't re-trigger placement.
+   */
+  const openMenuKey = menu ? 'menu' : noteFor ? 'note' : 'none';
+  useLayoutEffect(() => {
+    const open = menu ?? noteFor;
+    const el = menuElRef.current;
+    if (!open || !el) return;
+    const place = () => {
+      const box = { width: el.offsetWidth, height: el.offsetHeight };
+      const viewport = {
+        left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight,
+        width: window.innerWidth, height: window.innerHeight,
+      };
+      const placement = placeFloatingCallout(open.anchor, box, viewport, MENU_GAP, 'below');
+      const settle = (prev: Menu | null) => (prev ? reconcileCallout(prev, open.anchor, placement) : null);
+      if (menu) setMenu(settle);
+      else setNoteFor(settle);
+    };
+    place();
+    const ro = new ResizeObserver(place);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [openMenuKey]);
+
+  /**
+   * Force field: while a selection drag (any pressed pointer) approaches the
+   * open popup, it retreats vertically so the text under the drag stays
+   * readable. Idle cursor movement never repels — the menu must be easy to
+   * reach and click — and a pointer over the popup itself is exempt. The
+   * retreat is clamped so the popup never slides back onto its anchor.
+   * All popup state is read inside the updaters: this effect runs once per
+   * open/close, so closure copies would go stale after the first placement.
+   */
+  useEffect(() => {
+    if (!menu && !noteFor) return;
+    const onMove = (e: PointerEvent) => {
+      if (e.buttons === 0) return;
+      const el = menuElRef.current;
+      if (!el) return;
+      const t = e.target as HTMLElement | null;
+      if (t?.closest?.('.ctx-menu')) return;
+      const box = el.getBoundingClientRect();
+      if (e.clientX < box.left - POINTER_BAND || e.clientX > box.right + POINTER_BAND) return;
+      const push = (prev: Menu | null): Menu | null => {
+        if (!prev || !prev.placement) return prev;
+        let top: number | null = null;
+        if (e.clientY < box.top) {
+          if (box.top - e.clientY < POINTER_CLEARANCE) top = e.clientY + POINTER_CLEARANCE;
+        } else if (e.clientY > box.bottom) {
+          if (e.clientY - box.bottom < POINTER_CLEARANCE) top = e.clientY - POINTER_CLEARANCE - box.height;
+        } else {
+          return prev;
+        }
+        if (top === null) return prev;
+        // Never retreat onto the anchor text, nor off the viewport.
+        const floor = prev.placement.side === 'below' ? prev.anchor.bottom + MENU_GAP : VIEWPORT_MARGIN;
+        const ceiling = prev.placement.side === 'below'
+          ? window.innerHeight - VIEWPORT_MARGIN - box.height
+          : prev.anchor.top - MENU_GAP - box.height;
+        top = Math.max(floor, Math.min(ceiling, top));
+        if (Math.abs(top - box.top) < 1) return prev;
+        return { ...prev, placement: { ...prev.placement, top } };
+      };
+      setMenu(push);
+      setNoteFor(push);
+    };
+    window.addEventListener('pointermove', onMove);
+    return () => window.removeEventListener('pointermove', onMove);
+  }, [menu !== null, noteFor !== null]);
 
   const toggleSection = (anchor: string) =>
     setCollapsed((prev) => {
@@ -553,8 +671,7 @@ export default function SectionReader({
     range?: { src: AnnotationRange; alt?: AnnotationRange },
   ) => {
     setMenu({
-      x: Math.min(clientX, window.innerWidth - 270),
-      y: Math.min(clientY + 6, window.innerHeight - 260),
+      anchor: menuAnchorAt(clientX, clientY),
       term: term.slice(0, 300),
       nodeKey,
       line,
@@ -644,8 +761,12 @@ export default function SectionReader({
       {...rootData}
       onContextMenu={onContextMenu}
       onMouseUp={(e) => {
-        // Left-release with a selection also offers the menu (touch-friendly).
-        if (e.button === 0) {
+        // Left-release with a selection also offers the menu — real mouse
+        // only. Touch taps fire compatibility mouse events, and on touch the
+        // menu belongs to long-press (contextmenu): whole-word selection via
+        // the platform, then drag the handles. Touch selection never runs
+        // through here, so scrolling bounces and dismissal taps can't pop it.
+        if (e.button === 0 && (lastPointerType.current === '' || lastPointerType.current === 'mouse')) {
           const sel = window.getSelection()?.toString().trim();
           if (sel && sel.length > 1) {
             e.preventDefault();
@@ -660,12 +781,14 @@ export default function SectionReader({
         if (e.pointerType === 'mouse' && window.matchMedia('(hover: hover)').matches) showCallout(e);
       }}
       onPointerDown={(e) => {
+        lastPointerType.current = e.pointerType;
         if (e.pointerType !== 'mouse') {
           echoFromEvent(e);
           showCallout(e);
         }
       }}
       onPointerUp={(e) => {
+        lastPointerType.current = e.pointerType;
         if (e.pointerType !== 'mouse') {
           lastWord.current = null;
           setCallout(null);
@@ -830,7 +953,12 @@ export default function SectionReader({
         <div
           className="ctx-menu"
           ref={menuElRef}
-          style={{ left: menu.x, top: menu.y }}
+          style={{
+            left: menu.placement ? menu.placement.left : menu.anchor.left,
+            top: menu.placement ? menu.placement.top : menu.anchor.top,
+            visibility: menu.placement ? 'visible' : 'hidden',
+          }}
+          data-side={menu.placement?.side}
           onMouseUp={(e) => e.stopPropagation()}
         >
           <div className="sel">“{menu.term.slice(0, 80)}{menu.term.length > 80 ? '…' : ''}”</div>
@@ -894,7 +1022,16 @@ export default function SectionReader({
       )}
 
       {noteFor && (
-        <div className="ctx-menu" ref={menuElRef} style={{ left: noteFor.x, top: noteFor.y }}>
+        <div
+          className="ctx-menu"
+          ref={menuElRef}
+          style={{
+            left: noteFor.placement ? noteFor.placement.left : noteFor.anchor.left,
+            top: noteFor.placement ? noteFor.placement.top : noteFor.anchor.top,
+            visibility: noteFor.placement ? 'visible' : 'hidden',
+          }}
+          data-side={noteFor.placement?.side}
+        >
           <div className="sel">“{noteFor.term.slice(0, 60)}…”</div>
           <div style={{ padding: '4px 8px', width: 320 }}>
             <RichTextEditor

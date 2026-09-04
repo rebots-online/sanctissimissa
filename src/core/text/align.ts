@@ -344,30 +344,27 @@ export function alignPhrase(
   };
 }
 
-export function wordAtPoint(x: number, y: number): string | null {
+/** Caret (node, offset) at a viewport point, across the two caret APIs. */
+function caretAtPoint(x: number, y: number): { node: Node; offset: number } | null {
   type CaretPos = { offsetNode: Node; offset: number };
   const doc = document as Document & {
     caretPositionFromPoint?: (x: number, y: number) => CaretPos | null;
     caretRangeFromPoint?: (x: number, y: number) => Range | null;
   };
-  let node: Node | null = null;
-  let offset = 0;
   if (doc.caretPositionFromPoint) {
     const p = doc.caretPositionFromPoint(x, y);
-    if (p) {
-      node = p.offsetNode;
-      offset = p.offset;
-    }
-  } else if (doc.caretRangeFromPoint) {
-    const r = doc.caretRangeFromPoint(x, y);
-    if (r) {
-      node = r.startContainer;
-      offset = r.startOffset;
-    }
+    return p ? { node: p.offsetNode, offset: p.offset } : null;
   }
-  if (!node || node.nodeType !== Node.TEXT_NODE) return null;
-  const text = node.textContent ?? '';
+  const r = doc.caretRangeFromPoint?.(x, y);
+  return r ? { node: r.startContainer, offset: r.startOffset } : null;
+}
+
+export function wordAtPoint(x: number, y: number): string | null {
+  const p = caretAtPoint(x, y);
+  if (!p || p.node.nodeType !== Node.TEXT_NODE) return null;
+  const text = p.node.textContent ?? '';
   const isWord = (ch: string) => /[\p{L}\p{M}]/u.test(ch);
+  const { offset } = p;
   if (!isWord(text[offset] ?? '') && !isWord(text[offset - 1] ?? '')) return null;
   let a = offset;
   let b = offset;
@@ -375,4 +372,23 @@ export function wordAtPoint(x: number, y: number): string | null {
   while (b < text.length && isWord(text[b])) b++;
   const word = text.slice(a, b);
   return word.length >= 2 ? word : null;
+}
+
+/**
+ * The text rectangle at a viewport point — the box of the character the
+ * pointer is on, with the line's height. Anchors popups to the text under
+ * the cursor so they can open clear of it. Null off-text.
+ */
+export function caretRectAtPoint(x: number, y: number): DOMRect | null {
+  const p = caretAtPoint(x, y);
+  if (!p) return null;
+  const range = document.createRange();
+  try {
+    range.setStart(p.node, p.offset);
+    range.setEnd(p.node, p.offset);
+  } catch {
+    return null;
+  }
+  const rect = range.getBoundingClientRect();
+  return rect.width > 0 || rect.height > 0 ? rect : null;
 }

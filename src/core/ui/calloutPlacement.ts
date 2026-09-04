@@ -1,10 +1,11 @@
 /**
  * calloutPlacement — anchor-rect based floating callout positioning.
  *
- * Prefer above when it fits, otherwise below; if neither fully fits choose
- * the side with more room. Clamp to an 8px viewport inset and guarantee the
- * final callout rectangle does not intersect the anchor rectangle whenever
- * either side has room.
+ * Prefer above when it fits (or `prefer: 'below'` for native-menu behavior),
+ * otherwise the other side; if neither fully fits choose the side with more
+ * room. Clamp to an 8px viewport inset and guarantee the final callout
+ * rectangle does not intersect the anchor rectangle whenever either side has
+ * room.
  */
 
 export interface DOMRectLike {
@@ -37,7 +38,8 @@ export function placeFloatingCallout(
   anchor: DOMRectLike,
   box: Size,
   viewport: DOMRectLike,
-  gap: number = 28
+  gap: number = 28,
+  prefer: 'above' | 'below' = 'above'
 ): FloatingCalloutPlacement {
   const safeViewport: DOMRectLike = {
     left: viewport.left + VIEWPORT_INSET,
@@ -50,8 +52,6 @@ export function placeFloatingCallout(
 
   const roomAbove = anchor.top - safeViewport.top;
   const roomBelow = safeViewport.bottom - anchor.bottom;
-  const aboveHasRoom = roomAbove >= box.height + gap;
-  const belowHasRoom = roomBelow >= box.height + gap;
 
   const calloutAbove: DOMRectLike = {
     left: anchor.left,
@@ -74,17 +74,23 @@ export function placeFloatingCallout(
   const fitsAbove = rectContains(safeViewport, calloutAbove);
   const fitsBelow = rectContains(safeViewport, calloutBelow);
 
-  let placement: FloatingCalloutPlacement;
+  let placement: FloatingCalloutPlacement | undefined;
 
-  if (fitsAbove) {
+  if (prefer === 'below') {
+    if (fitsBelow) {
+      placement = { left: calloutBelow.left, top: calloutBelow.top, side: 'below' };
+    } else if (fitsAbove) {
+      placement = { left: calloutAbove.left, top: calloutAbove.top, side: 'above' };
+    }
+  } else if (fitsAbove) {
     placement = { left: calloutAbove.left, top: calloutAbove.top, side: 'above' };
   } else if (fitsBelow) {
     placement = { left: calloutBelow.left, top: calloutBelow.top, side: 'below' };
-  } else if (aboveHasRoom || belowHasRoom) {
-    placement = roomAbove >= roomBelow
-      ? { left: calloutAbove.left, top: calloutAbove.top, side: 'above' }
-      : { left: calloutBelow.left, top: calloutBelow.top, side: 'below' };
-  } else {
+  }
+
+  // Neither side fully fits — take the roomier side; the clamp below keeps
+  // the chosen rectangle inside the viewport.
+  if (!placement) {
     placement = roomAbove >= roomBelow
       ? { left: calloutAbove.left, top: calloutAbove.top, side: 'above' }
       : { left: calloutBelow.left, top: calloutBelow.top, side: 'below' };

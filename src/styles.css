@@ -639,6 +639,8 @@ mark.ann { background: var(--mark-ann); border-radius: 2px; padding: 0 1px; }
   box-shadow: 0 10px 30px var(--shadow-strong); padding: 6px;
   font-family: var(--sans); font-size: 13px;
   backdrop-filter: blur(4px);
+  /* vertical glide: the force-field retreat and the open placement */
+  transition: top 120ms ease-out;
 }
 .ctx-menu .sel { padding: 6px 10px 8px; font-family: var(--serif); font-style: italic; color: var(--gold-bright); border-bottom: 1px solid var(--menu-divider); margin-bottom: 4px; max-height: 60px; overflow: hidden; }
 .ctx-menu button { display: block; width: 100%; text-align: left; background: none; border: 0; color: inherit; padding: 7px 10px; border-radius: 6px; cursor: pointer; font: inherit; }

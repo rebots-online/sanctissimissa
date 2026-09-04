@@ -13,9 +13,10 @@
  * never sample prose.
  */
 
-import { useMemo, useState, type MouseEvent } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 import { allAnnotations, removeAnnotation, updateAnnotation, type Annotation } from '../core/annotations/store.ts';
+import { placeFloatingCallout, reconcileCallout, type DOMRectLike, type FloatingCalloutPlacement } from '../core/ui/calloutPlacement.ts';
 import { RichTextEditor } from './richtext/index.ts';
 
 /** Compact human form of an anchor node key (same scheme as JournalView's deep-link buttons). */
@@ -41,7 +42,21 @@ export default function AnnotationIndex({ db, onOpenKey }: Props) {
   const [draft, setDraft] = useState('');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkConfirm, setBulkConfirm] = useState(false);
-  const [menu, setMenu] = useState<{ x: number; y: number; id: string } | null>(null);
+  const [menu, setMenu] = useState<{ anchor: DOMRectLike; placement?: FloatingCalloutPlacement; id: string } | null>(null);
+  const menuElRef = useRef<HTMLDivElement>(null);
+
+  /** Place the card menu a clear distance above/below the card it acts on. */
+  useLayoutEffect(() => {
+    const el = menuElRef.current;
+    if (!menu || !el) return;
+    const box = { width: el.offsetWidth, height: el.offsetHeight };
+    const viewport = {
+      left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight,
+      width: window.innerWidth, height: window.innerHeight,
+    };
+    const placement = placeFloatingCallout(menu.anchor, box, viewport, 48, 'below');
+    setMenu((prev) => (prev ? reconcileCallout(prev, prev.anchor, placement) : null));
+  }, [menu]);
   const bump = () => setTick((t) => t + 1);
 
   /** Newest first, grouped by anchor node (store order = append order, reversed). */
@@ -141,7 +156,11 @@ export default function AnnotationIndex({ db, onOpenKey }: Props) {
               onClick={(e) => cardClick(e, a.id)}
               onContextMenu={(e) => {
                 e.preventDefault();
-                setMenu({ x: e.clientX, y: e.clientY, id: a.id });
+                const r = e.currentTarget.getBoundingClientRect();
+                setMenu({
+                  anchor: { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height },
+                  id: a.id,
+                });
               }}
             >
               <label className="annx-check" title="Select for bulk actions">
@@ -200,7 +219,17 @@ export default function AnnotationIndex({ db, onOpenKey }: Props) {
         return (
           <>
             <div className="annx-menu-scrim" onClick={() => setMenu(null)} onContextMenu={(e) => { e.preventDefault(); setMenu(null); }} />
-            <div className="ctx-menu annx-menu" style={{ left: menu.x, top: menu.y }} onMouseUp={(e) => e.stopPropagation()}>
+            <div
+              className="ctx-menu annx-menu"
+              ref={menuElRef}
+              style={{
+                left: menu.placement ? menu.placement.left : menu.anchor.left,
+                top: menu.placement ? menu.placement.top : menu.anchor.top,
+                visibility: menu.placement ? 'visible' : 'hidden',
+              }}
+              data-side={menu.placement?.side}
+              onMouseUp={(e) => e.stopPropagation()}
+            >
               <div className="sel">“{a.quote.slice(0, 60)}{a.quote.length > 60 ? '…' : ''}”</div>
               <button
                 onClick={() => {
