@@ -54,9 +54,12 @@ export default function MapStrip({ db, day, view, activeStation, officeHour, onS
 
   const office = view === 'office';
   /** Scripture view (decision 23): the strip IS the canonical books across,
-   *  each opening its chapters — the Books→Chapters projection of the map. */
+   *  each opening its chapters — the Books→Chapters projection of the map.
+   *  The chapters band must escape the strip's overflow clip, so open state
+   *  carries the strip's viewport rect (fixed pinning, MapFlyout-style). */
   const scripture = view === 'bible';
-  const [openBook, setOpenBook] = useState<string | null>(null);
+  const [openBook, setOpenBook] = useState<{ key: string; left: number; top: number; width: number } | null>(null);
+  const stripRef = useRef<HTMLElement>(null);
   const books = useMemo(() => (db && scripture ? db.getBooks() : []), [db, scripture]);
   const season = (day?.season ?? 'Time after Pentecost') as Season;
   // A strip stop appears exactly when the reader will render its anchor
@@ -128,33 +131,37 @@ export default function MapStrip({ db, day, view, activeStation, officeHour, onS
   // ── Scripture: the canonical books across; the chapter menu opens ON the
   // stop itself on mouseover (operator directive 2026-08-16 — no native
   // selects, no separate click-then-menu dance; click still toggles for
-  // touch). The menu pins itself while hovered, clears with the strip. ──
+  // touch). The band pins fixed under the strip — the strip's own
+  // overflow-y: hidden would otherwise clip it out of existence. ──
   if (scripture && onBibleRef) {
-    const openMeta = books.find((b) => b.key === openBook) ?? null;
+    const openMeta = books.find((b) => b.key === openBook?.key) ?? null;
+    const pinChapters = (key: string) => {
+      const r = stripRef.current?.getBoundingClientRect();
+      if (r) setOpenBook({ key, left: r.left, top: r.bottom, width: r.width });
+    };
     return (
-      <nav className="mapstrip scripture" aria-label="The canonical books" onMouseLeave={() => { setFlyout(null); setOpenBook(null); }}>
+      <nav ref={stripRef} className="mapstrip scripture" aria-label="The canonical books" onMouseLeave={() => { setFlyout(null); setOpenBook(null); }}>
         {books.map((b) => (
-          <span key={b.key} className="book-stop">
-            <button
-              ref={b.key === bibleBook ? activeRef : undefined}
-              className={`mstation book${b.key === openBook ? ' open' : ''}${b.key === bibleBook ? ' active' : ''}`}
-              onClick={() => setOpenBook(openBook === b.key ? null : b.key)}
-              onMouseEnter={() => setOpenBook(b.key)}
-              onFocus={() => setOpenBook(b.key)}
-              aria-expanded={openBook === b.key}
-              title={`${b.title} — ${b.chapters} capitula`}
-            >
-              <span className="mdot" />
-              <span className="mlabel">{b.key}</span>
-            </button>
-          </span>
+          <button
+            key={b.key}
+            ref={b.key === bibleBook ? activeRef : undefined}
+            className={`mstation book${b.key === openBook?.key ? ' open' : ''}${b.key === bibleBook ? ' active' : ''}${b.testament === 'NT' ? ' seg-faithful' : ''}`}
+            onClick={() => (openBook?.key === b.key ? setOpenBook(null) : pinChapters(b.key))}
+            onMouseEnter={() => pinChapters(b.key)}
+            onFocus={() => pinChapters(b.key)}
+            aria-expanded={openBook?.key === b.key}
+            title={`${b.title} — ${b.chapters} capitula`}
+          >
+            <span className="mdot" />
+            <span className="mlabel">{b.key}</span>
+          </button>
         ))}
-        {openMeta && (
+        {openMeta && openBook && (
           <div
             className="book-chapters"
             role="menu"
             aria-label={`${openMeta.title} — chapters`}
-            onMouseEnter={() => setOpenBook(openMeta.key)}
+            style={{ left: openBook.left, top: openBook.top, width: openBook.width }}
             onMouseLeave={() => setOpenBook(null)}
           >
             <button
