@@ -22,13 +22,16 @@
  * (HomilyPlanner BD.2 "New note for this day").
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import type { ClassicEditor } from 'ckeditor5';
-import { HtmlDataProcessor } from 'ckeditor5';
 import type { SidecarDb } from '../core/accompaniment/store.ts';
 import type { Accompaniment, Exposure, OccurrenceSelector } from '../core/accompaniment/types.ts';
 import type { DayInfo } from '../core/data/types.ts';
-import { RichTextEditor } from './richtext/index.ts';
+
+// CKEditor is the heaviest dependency in the app; it loads only when an
+// editing surface actually mounts, keeping it out of the bundle every
+// reading view ships (React.lazy + Suspense at each mount site).
+const RichTextEditor = lazy(() => import('./richtext/index.ts').then((m) => ({ default: m.RichTextEditor })));
 
 export const EXPOSURE_LABELS: Record<Exposure, string> = {
   journal: 'Journal entry',
@@ -152,8 +155,10 @@ export default function AccompanimentEditor({
     editorRef.current = editor;
     if (!onReady) return;
     onReady({
-      insertSource: (html) => {
-        // Canonical v48 HTML insert (docs: getting-and-setting-data).
+      insertSource: async (html) => {
+        // Canonical v48 HTML insert (docs: getting-and-setting-data). The
+        // processor import resolves from the already-loaded editor chunk.
+        const { HtmlDataProcessor } = await import('ckeditor5');
         const viewFragment = new HtmlDataProcessor(editor.data.viewDocument).toView(html);
         const modelFragment = editor.data.toModel(viewFragment);
         editor.model.change((writer) => {
@@ -195,12 +200,14 @@ export default function AccompanimentEditor({
         aria-label="Title"
         style={{ width: '100%', boxSizing: 'border-box', margin: '6px 0' }}
       />
-      <RichTextEditor
-        preset="main"
-        data={acc?.bodyHtml ?? ''}
-        onReady={handleReady}
-        onChange={() => scheduleSave()}
-      />
+      <Suspense fallback={<div aria-busy="true" style={{ minHeight: 200 }} />}>
+        <RichTextEditor
+          preset="main"
+          data={acc?.bodyHtml ?? ''}
+          onReady={handleReady}
+          onChange={() => scheduleSave()}
+        />
+      </Suspense>
       {themeSuggestions.length > 0 && (
         <div className="jsc-evidence" aria-label="Suggested themes" style={{ margin: '8px 0 0' }}>
           {themeSuggestions.map((suggestion) => {

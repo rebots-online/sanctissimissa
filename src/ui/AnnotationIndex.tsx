@@ -13,12 +13,14 @@
  * never sample prose.
  */
 
-import { useLayoutEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { lazy, Suspense, useLayoutEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 import { allAnnotations, removeAnnotation, updateAnnotation, type Annotation } from '../core/annotations/store.ts';
 import { placeFloatingCallout, reconcileCallout, type DOMRectLike, type FloatingCalloutPlacement } from '../core/ui/calloutPlacement.ts';
 import { sanitizeHtml } from '../core/ui/sanitizeHtml.ts';
-import { RichTextEditor } from './richtext/index.ts';
+
+// Loads with the editor chunk only when a note is actually edited.
+const RichTextEditor = lazy(() => import('./richtext/index.ts').then((m) => ({ default: m.RichTextEditor })));
 
 /** Compact human form of an anchor node key (same scheme as JournalView's deep-link buttons). */
 function anchorShort(k: string): string {
@@ -177,13 +179,15 @@ export default function AnnotationIndex({ db, onOpenKey }: Props) {
                 <div className="annx-quote">“{a.quote.slice(0, 200)}{a.quote.length > 200 ? '…' : ''}”</div>
                 {editingId === a.id ? (
                   <div className="annx-edit">
-                    <RichTextEditor
-                      preset="compact"
-                      data={a.note}
-                      placeholder="Margin note"
-                      onReady={(editor) => editor.editing.view.focus()}
-                      onChange={setDraft}
-                    />
+                    <Suspense fallback={<div aria-busy="true" style={{ minHeight: 96 }} />}>
+                      <RichTextEditor
+                        preset="compact"
+                        data={a.note}
+                        placeholder="Margin note"
+                        onReady={(editor) => editor.editing.view.focus()}
+                        onChange={setDraft}
+                      />
+                    </Suspense>
                     <div className="jsc-toolbar">
                       <button
                         type="button"

@@ -24,6 +24,8 @@
  */
 
 import {
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -34,7 +36,9 @@ import {
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 import type { SidecarDb } from '../core/accompaniment/store.ts';
 import { sanitizeHtml } from '../core/ui/sanitizeHtml.ts';
-import { RichTextEditor } from './richtext/index.ts';
+
+// Loads with the editor chunk only when the annotate popover opens.
+const RichTextEditor = lazy(() => import('./richtext/index.ts').then((m) => ({ default: m.RichTextEditor })));
 import {
   annotationsFor,
   addAnnotation,
@@ -1035,12 +1039,14 @@ export default function SectionReader({
         >
           <div className="sel">“{noteFor.term.slice(0, 60)}…”</div>
           <div style={{ padding: '4px 8px', width: 320 }}>
-            <RichTextEditor
-              preset="compact"
-              placeholder="Margin note…"
-              onReady={(editor) => editor.editing.view.focus()}
-              onChange={setNoteText}
-            />
+            <Suspense fallback={<div aria-busy="true" style={{ minHeight: 96 }} />}>
+              <RichTextEditor
+                preset="compact"
+                placeholder="Margin note…"
+                onReady={(editor) => editor.editing.view.focus()}
+                onChange={setNoteText}
+              />
+            </Suspense>
             <div className="jsc-toolbar">
               <button
                 className="primary"
