@@ -17,6 +17,7 @@ import { useLayoutEffect, useMemo, useRef, useState, type MouseEvent } from 'rea
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 import { allAnnotations, removeAnnotation, updateAnnotation, type Annotation } from '../core/annotations/store.ts';
 import { placeFloatingCallout, reconcileCallout, type DOMRectLike, type FloatingCalloutPlacement } from '../core/ui/calloutPlacement.ts';
+import { sanitizeHtml } from '../core/ui/sanitizeHtml.ts';
 import { RichTextEditor } from './richtext/index.ts';
 
 /** Compact human form of an anchor node key (same scheme as JournalView's deep-link buttons). */
@@ -202,7 +203,7 @@ export default function AnnotationIndex({ db, onOpenKey }: Props) {
                   a.note && (
                     <div
                       className="annx-note ck-content"
-                      dangerouslySetInnerHTML={{ __html: a.note }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(a.note) }}
                     />
                   )
                 )}

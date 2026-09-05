@@ -33,6 +33,7 @@ import {
 } from 'react';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 import type { SidecarDb } from '../core/accompaniment/store.ts';
+import { sanitizeHtml } from '../core/ui/sanitizeHtml.ts';
 import { RichTextEditor } from './richtext/index.ts';
 import {
   annotationsFor,
@@ -922,7 +923,7 @@ export default function SectionReader({
                           ×
                         </button>
                         <span className="quote">“{a.quote.slice(0, 90)}”</span>
-                        {a.note && <div className="ck-content" dangerouslySetInnerHTML={{ __html: a.note }} />}
+                        {a.note && <div className="ck-content" dangerouslySetInnerHTML={{ __html: sanitizeHtml(a.note) }} />}
                       </div>
                     ))}
                   </div>

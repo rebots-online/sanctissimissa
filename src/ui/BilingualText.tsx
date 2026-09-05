@@ -25,6 +25,7 @@ import { Fragment, useEffect, useState, type ReactElement } from 'react';
 import { dialogueClass } from '../core/text/dialogue.ts';
 import { isScriptureCitationLine, isSpecialsControlLine } from '../core/liturgy/massSpecials.ts';
 import type { AnnotationColor, AnnotationRange } from '../core/annotations/store.ts';
+import { sanitizeHtml } from '../core/ui/sanitizeHtml.ts';
 
 /**
  * A margin-note callout rendered just BELOW the line carrying its highlight
@@ -240,7 +241,7 @@ export function TextLines({
               <span
                 key={n.key}
                 className={`ann-callout ck-content c-${n.color}`}
-                dangerouslySetInnerHTML={{ __html: n.html }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(n.html) }}
               />
             ))}
           </Fragment>
@@ -371,7 +372,7 @@ export default function BilingualText({
               <span
                 key={n.key}
                 className={`ann-callout ck-content c-${n.color}`}
-                dangerouslySetInnerHTML={{ __html: n.html }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(n.html) }}
               />
             ))}
           </p>
