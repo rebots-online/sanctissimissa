@@ -137,7 +137,8 @@ export function vero(condition: string, ctx: ConditionContext): Verdict {
       const clause = raw.trim().replace(/\s+/g, ' ');
       if (!clause) continue;
 
-      let [subject, ...rest] = clause.split(' ');
+      const [firstWord, ...rest] = clause.split(' ');
+      let subject = firstWord;
       let predicate = rest.join(' ');
       if (!predicate) {
         predicate = subject;

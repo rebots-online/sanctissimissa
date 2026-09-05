@@ -1,0 +1,15 @@
+node_modules
+build
+dist
+dist-web
+VENDORED
+LIBS
+assets
+public
+content
+src-tauri
+store-assets
+DOCS
+LOGS
+package-lock.json
+*.md
