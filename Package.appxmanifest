@@ -14,7 +14,7 @@
   <Identity
     Name="mba.robin.standroidsmissal"
     Publisher="CN=Robin Cheung"
-    Version="1.37.0.0" />
+    Version="1.38.0.0" />
 
   <Properties>
     <DisplayName>St. Android's Missal</DisplayName>
