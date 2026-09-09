@@ -1,9 +1,9 @@
 {
-  "version": "1.38.15360",
-  "versionBase": "1.38",
-  "buildNumber": "15360",
-  "versionCode": 100038,
-  "buildDate": "2026-09-09T02:40:57.057Z",
+  "version": "1.39.15371",
+  "versionBase": "1.39",
+  "buildNumber": "15371",
+  "versionCode": 100039,
+  "buildDate": "2026-09-09T02:51:02.133Z",
   "productName": "St. Android's Missal",
   "internalName": "st-androids-missal",
   "packageName": "mba.robin.standroidsmissal"
