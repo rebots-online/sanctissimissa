@@ -227,3 +227,41 @@ export function isScriptureCitationLine(line: string): boolean {
     ) || /\d+[,:]\s*\d/.test(body)
   );
 }
+
+/** Display classification for a leading-! line after specials are applied. */
+export type BangLineKind = 'suppress' | 'verse-ref' | 'rubric-text';
+
+/**
+ * Classify display markup without making any claim that two language lines
+ * are duplicates. The leading ! is presentation syntax, not identity.
+ */
+export function classifyBangLine(line: string): BangLineKind | null {
+  if (!line.startsWith('!')) return null;
+  if (isSpecialsControlLine(line)) return 'suppress';
+  if (isScriptureCitationLine(line)) return 'verse-ref';
+  return 'rubric-text';
+}
+
+function normalizedBangLineBody(line: string): string {
+  return line
+    .slice(1)
+    .normalize('NFC')
+    .trim()
+    .replace(/\s+/gu, ' ')
+    .toLocaleLowerCase('en-US');
+}
+
+/**
+ * Preserve a translated rubric/reference unless its visible body genuinely
+ * duplicates the paired line. Controls and non-bang lines are never rendered
+ * through the bang-line branch.
+ */
+export function shouldRenderPairedBangLine(line: string, counterpart?: string): boolean {
+  const kind = classifyBangLine(line);
+  if (!kind || kind === 'suppress') return false;
+
+  const counterpartKind = counterpart === undefined ? null : classifyBangLine(counterpart);
+  if (!counterpartKind || counterpartKind === 'suppress') return true;
+
+  return normalizedBangLineBody(line) !== normalizedBangLineBody(counterpart!);
+}

@@ -169,6 +169,7 @@ All artifacts staged in the canonical checkout's `dist/`; version bumped + stamp
 | M-S5 | Callout not on citation | AUTO | Hover/hold over `!Ps. 42` citation does not park callout on reading line; placement above/below anchor | HIGH |
 | M-S6 | Meaning pins Ordinary | AUTO | Select “Introíbo ad altáre Dei” → Meaning shows pinned “In the Ordinary of the Mass” / Incipit before distant Office lessons | HIGH |
 | M-S7 | Production Incipit | AUTO | https://standroid.robin.mba (or current host) after deploy of this version matches M-S1–M-S2 stills | HIGH |
+| M-S8 | Narrow bilingual rubrics | AUTO | At a viewport below 1100 CSS px, open Mass Incipit: every distinct Latin leading-`!` rubric is immediately followed by its English translation (including `Sacerdos paratus…` and `Deinde, junctis…`); identical visible bang-lines render once; no `!*`/`!&` controls appear | HIGH |
 
 **Evidence:** stills + screencast under `dist/rubric-runs/v…/` from **working release artifacts**, not dev-server-only. Smoke tests are not part of this process.
 

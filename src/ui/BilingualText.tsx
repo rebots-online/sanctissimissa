@@ -23,7 +23,7 @@
 
 import { Fragment, useEffect, useState, type ReactElement } from 'react';
 import { dialogueClass } from '../core/text/dialogue.ts';
-import { isScriptureCitationLine, isSpecialsControlLine } from '../core/liturgy/massSpecials.ts';
+import { classifyBangLine, shouldRenderPairedBangLine } from '../core/liturgy/massSpecials.ts';
 import type { AnnotationColor, AnnotationRange } from '../core/annotations/store.ts';
 import { sanitizeHtml } from '../core/ui/sanitizeHtml.ts';
 
@@ -39,13 +39,6 @@ export interface NoteCallout {
   line: number;
   html: string;
   color: AnnotationColor;
-}
-
-/** Classify a leading-! line for display (controls already stripped by specials). */
-function bangLineClass(line: string): 'suppress' | 'verse-ref' | 'rubric-text' {
-  if (isSpecialsControlLine(line)) return 'suppress';
-  if (isScriptureCitationLine(line)) return 'verse-ref';
-  return 'rubric-text';
 }
 
 export interface SelectionEcho {
@@ -199,7 +192,7 @@ export function TextLines({
     <p>
       {lines.map((line, i) => {
         if (line.startsWith('!')) {
-          const kind = bangLineClass(line);
+          const kind = classifyBangLine(line)!;
           if (kind === 'suppress') return null;
           return (
             <span className={kind} key={i}>
@@ -301,8 +294,8 @@ export default function BilingualText({
       {Array.from({ length: count }, (_, i) => {
         const la = laLines[i];
         const en = enLines[i];
-        const laKind = la !== undefined && la.startsWith('!') ? bangLineClass(la) : null;
-        const enKind = en !== undefined && en.startsWith('!') ? bangLineClass(en) : null;
+        const laKind = la !== undefined ? classifyBangLine(la) : null;
+        const enKind = en !== undefined ? classifyBangLine(en) : null;
         if (laKind === 'suppress' && (enKind === 'suppress' || enKind === null) && (en === undefined || en.startsWith('!'))) {
           return null;
         }
@@ -346,9 +339,12 @@ export default function BilingualText({
                 </span>
               ))}
             {en !== undefined && enKind !== 'suppress' &&
-              // A bang-line paired with the same Latin bang renders once when both are refs/rubrics.
+              // Markup parity is not semantic duplication: translated rubrics
+              // render; only equal normalized visible bodies render once.
               (enKind ? (
-                laKind ? null : <span className={enKind}>{en.slice(1)}</span>
+                shouldRenderPairedBangLine(en, la)
+                  ? <span className={enKind}>{en.slice(1)}</span>
+                  : null
               ) : (
                 <span
                   className={`il-en${echoed ? ' xlate-echo' : ''}`}

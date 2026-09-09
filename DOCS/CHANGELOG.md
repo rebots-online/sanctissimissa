@@ -14,6 +14,13 @@ them one sentence each and written for a reader of the app, not of the diff.
 
 ---
 
+## v1.38.03717 — 2026-09-01
+
+English stage directions return to the narrow bilingual reader.
+
+- Red rubrics in the interleaved phone/tablet layout now show their English translation directly beneath the Latin instead of mistaking both marked language lines for one duplicate.
+- Genuine identical reference lines still render once, and Divinum Officium control markers remain hidden.
+
 ## v1.37.82443 — 2026-08-17
 
 The map becomes three maps — Mass, Scripture, and the Hours — and the lost Latin of the deuterocanonical books returns.

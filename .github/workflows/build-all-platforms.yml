@@ -1,12 +1,12 @@
 name: build-all-platforms
 
-# Dormant until public release: builds are local for now.
-# Re-enable push/tag/pull_request triggers when CI runners are ready.
+# Builds are local until public release (TC14). Keep CI available only by
+# deliberate operator dispatch; ordinary mirror pushes must not consume Actions.
 on:
   workflow_dispatch:
 
 jobs:
-  # ── Web + tests ───────────────────────────────────────────────────
+  # ── Web + tests: every push and PR ────────────────────────────────
   test-and-web:
     runs-on: ubuntu-latest
     steps:

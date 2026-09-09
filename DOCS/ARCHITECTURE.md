@@ -1258,3 +1258,70 @@ English + attribution; shell suppressed); the CTA opens the app at
 `#/verse/Gen/1/1` with Genesis 1 and the shared verse rendered; badges render
 inert (pending). `tsc -b` clean, 283/283 at the commit landing this section.
 The "Share passage" menu item uses the same verified codec + landing.
+
+---
+
+## 12. Bilingual rubric preservation in narrow readers (v1.38.03717)
+
+**Incident UUID:** `urn:uuid:6a39f30e-ee25-46b2-9afa-a621ea6dc87c`
+
+**Incident record:**
+`DOCS/standroidsmissal-v1.38.03717-bilingual-rubric-loss-incident.md`
+
+**Repository identity:** Forgejo authority
+`https://forgejo.robin.mba/rcheung/StAndroidsMissal.git`; GitHub code mirror
+`https://github.com/rebots-online/StAndroidsMissal` (repository name includes
+the plural possessive stem `StAndroids`; do not substitute
+`rebots-online/StAndroidMissal`).
+
+### 12.1 Diagnosis of record
+
+`BilingualText`'s interleaved path classified every leading-`!` display line
+as a control, scripture reference, or rubric. When both sides were classified,
+the English branch returned `null` solely because `laKind` was truthy. It did
+not compare content and therefore treated translated rubrics as duplicates.
+The corpus was exonerated: the paired English Ordo rubric exists and the column
+layout renders it. The defect is presentation-only and activates at the
+`useNarrow(1100)` interleaved breakpoint.
+
+### 12.2 Binding invariant and entities
+
+**Invariant BR-1 — distinct paired display lines survive.** A leading `!` is
+markup, not evidence of semantic duplication. Specials controls remain
+suppressed. A paired English scripture reference or rubric renders whenever
+its normalized visible body differs from the Latin body. Only byte-semantic
+duplicates after Unicode normalization, trim, whitespace collapse, and
+case-folding may render once. Missing English remains honestly absent.
+
+| Entity | Type | File | St | Role | Key signature |
+|---|---|---|---|---|---|
+| ＋ `BangLineKind` | type | `src/core/liturgy/massSpecials.ts` | ✅ | shared display classification for leading-`!` lines | `'suppress' \| 'verse-ref' \| 'rubric-text'` |
+| ＋ `classifyBangLine` | fn | `src/core/liturgy/massSpecials.ts` | ✅ | classifies controls/references/rubrics without conflating translation identity | `(line: string) => BangLineKind \| null` |
+| ＋ `shouldRenderPairedBangLine` | fn | `src/core/liturgy/massSpecials.ts` | ✅ | preserves a distinct translated bang-line and deduplicates only equal visible bodies | `(line: string, counterpart?: string) => boolean` |
+| Δ `BilingualText` interleaved branch | UI | `src/ui/BilingualText.tsx` | ✅ / M-S8 | renders Latin first and the distinct English rubric/reference directly beneath it | `shouldRenderPairedBangLine(en, la)` |
+| ＋ bilingual-rubric regression | test | `tests/bilingualRubrics.test.ts` | ✅ | proves translated rubrics survive, identical references deduplicate, and controls never leak | Node test |
+
+### 12.3 Decision 27 — semantic deduplication, never marker deduplication
+
+Formatting/control syntax determines presentation class only. Deduplication
+requires equality of normalized visible content; the existence of matching
+markup on two language planes is never sufficient. This applies to rubrics and
+scripture citations and is deliberately implemented as a pure tested policy,
+not an inline JSX shortcut.
+
+### 12.4 Verification gate
+
+`DOCS/TEST_RUBRIC.md` row `M-S8` is binding. Unit tests must cover the two
+reported Ordo rubrics, identical and distinct citation pairs, control-line
+suppression, and the actual renderer's use of the policy. A working narrow
+artifact must show each Latin rubric followed by its English translation with
+no raw `!*`/`!&` controls. Architecture and rubric are amended before code;
+the working-artifact observation remains an explicit release gate.
+
+**Implementation verification (2026-09-01).** Focused regression 5/5; strict
+TypeScript project build clean; all tests not requiring LFS corpus bytes
+246/246 with 3 declared skips; production `vite build` passed. The full corpus
+suite cannot execute from the GitHub mirror while Forgejo is offline because
+`assets/missal.db` is intentionally a Git LFS pointer there; its failures are
+uniform `file is not a database`, not assertions in this change. M-S8 remains
+pending direct observation on a working artifact containing the real corpus.
