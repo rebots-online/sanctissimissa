@@ -19,6 +19,10 @@ TAURI=./node_modules/.bin/tauri
 
 test -d node_modules || npm ci
 
+# Materialize build-local secret files from their Admin-Manual pointers
+# (Admin-Manual is the only secrets repository — .env carries pointers only).
+node scripts/provision-secrets.mjs
+
 # Automatic version bump — the stamper owns the version; never set it manually.
 # The pre-build gate requires the stamp to be recorded source, so commit it.
 npm run stamp

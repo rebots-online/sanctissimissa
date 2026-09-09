@@ -1,54 +1,43 @@
-import { test, beforeEach, afterEach } from 'node:test';
+import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
   appNamespace,
   configuredScope,
   orgNamespace,
+  resolveStorage,
   storageRootName,
+  type BuildStorage,
 } from '../src/core/storage/root.ts';
 
-const KEYS = ['VITE_APP_NAMESPACE', 'VITE_STORAGE_SCOPE'] as const;
-
-beforeEach(() => {
-  for (const k of KEYS) delete process.env[k];
-});
-
-afterEach(() => {
-  for (const k of KEYS) delete process.env[k];
-});
-
-test('defaults: app namespace is the packaged identifier, scope common, root org-shared', () => {
+test('build-time defaults: app namespace, common scope, org-shared root', () => {
   assert.equal(appNamespace(), 'mba.robin.sanctissimissa');
   assert.equal(configuredScope(), 'common');
   assert.equal(storageRootName(), 'mba.robin');
 });
 
-test('org namespace derives from the first two labels of the app namespace', () => {
-  assert.equal(orgNamespace('mba.robin.sanctissimissa'), 'mba.robin');
+test('resolveStorage: common scope stores under the derived org root', () => {
+  const build: BuildStorage = { namespace: 'mba.robin.helloword', scope: 'common' };
+  assert.deepEqual(resolveStorage(build), {
+    namespace: 'mba.robin.helloword',
+    scope: 'common',
+    org: 'mba.robin',
+    root: 'mba.robin',
+  });
+});
+
+test('resolveStorage: app scope stores app-private under the namespace', () => {
+  const build: BuildStorage = { namespace: 'mba.robin.sanctissimissa', scope: 'app' };
+  assert.equal(resolveStorage(build).root, 'mba.robin.sanctissimissa');
+});
+
+test('org root derives from the first two labels for other identifier families', () => {
   assert.equal(orgNamespace('com.rochemediaservices.someapp'), 'com.rochemediaservices');
+  assert.equal(resolveStorage({ namespace: 'com.rochemediaservices.someapp', scope: 'common' }).root, 'com.rochemediaservices');
 });
 
-test('scope common stores under the org root for any sibling app', () => {
-  process.env.VITE_APP_NAMESPACE = 'mba.robin.helloword';
-  assert.equal(configuredScope(), 'common');
-  assert.equal(storageRootName(), 'mba.robin');
+test('empty namespace falls through to the packaged default', () => {
+  assert.equal(resolveStorage({ namespace: '', scope: 'common' }).namespace, 'mba.robin.sanctissimissa');
 });
-
-test('scope app stores app-private under the app namespace', () => {
-  process.env.VITE_STORAGE_SCOPE = 'app';
-  assert.equal(configuredScope(), 'app');
-  assert.equal(storageRootName(), 'mba.robin.sanctissimissa');
-});
-
-test('empty env values fall through to defaults', () => {
-  process.env.VITE_APP_NAMESPACE = '';
-  process.env.VITE_STORAGE_SCOPE = '';
-  assert.equal(appNamespace(), 'mba.robin.sanctissimissa');
-  assert.equal(storageRootName(), 'mba.robin');
-});
-
-test('non-`app` scope values resolve to common (permissive default)', () => {
-  process.env.VITE_STORAGE_SCOPE = 'shared';
-  assert.equal(configuredScope(), 'common');
-});
+// (Unknown VITE_STORAGE_SCOPE values are normalized in vite.config.ts before
+// they can reach BuildStorage — the type makes an invalid scope unexpressible.)

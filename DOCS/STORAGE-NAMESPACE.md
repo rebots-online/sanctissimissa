@@ -11,6 +11,14 @@ on-device engine, §7.6) and corpus/module caches (decision 19's versioned
 downloads). One org-wide root holds them once; a `.env` toggle opts an app
 out where sharing is impossible.
 
+**Why the fallback exists (operator, 2026-09-09):** Google's response to
+abuse — Play Store sandboxing and per-developer-account restrictions —
+degrades capability on devices we own, in ways that do not exist on F-Droid
+or sideload distribution. An `app`-scoped namespace that cannot share
+(because a store's rules or a joint-production-key requirement stand in the
+way) must degrade cleanly, not break; the toggle exists so such namespaces
+need no code change.
+
 ## The `.env` contract
 
 | Key | Default | Meaning |
@@ -24,14 +32,20 @@ as applicable.
 
 ## Resolution
 
+**BUILD-TIME choice, not runtime discretion.** `vite.config.ts` reads `.env`
+when the bundle is built and freezes the pair into literals via `define`
+(`__SAM_BUILD_STORAGE__`); `src/core/storage/root.ts` derives everything from
+that constant. Nothing at runtime can flip the scope — only the platform's
+structural capability caps it, and those caps are compile-time facts in the
+platform layers (web origin-scoping; Rust `cfg!(mobile)`).
+
 ```
 orgNamespace()  = first two labels of appNamespace()        → 'mba.robin'
 storageRootName() = scope === 'common' ? orgNamespace() : appNamespace()
 ```
 
-`src/core/storage/root.ts` is the only place this resolves. Capability caps
-the setting — the storage root is **requested**, and the platform layer
-degrades where sharing is impossible:
+The storage root is **requested**, and the platform layer degrades where
+sharing is impossible:
 
 | Platform | Storage reality | Effective scope |
 |---|---|---|

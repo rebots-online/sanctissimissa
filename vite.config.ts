@@ -1,9 +1,21 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // Tauri expects a fixed dev port; `clearScreen: false` keeps Rust errors visible.
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  // The org namespace + storage scope are a BUILD-TIME choice (decision 22):
+  // read once here, frozen into the bundle as literals via `define`. There is
+  // no runtime discretion — see DOCS/STORAGE-NAMESPACE.md.
+  const env = loadEnv(mode, process.cwd(), ['VITE_', 'TAURI_']);
+  const buildStorage = {
+    namespace: env.VITE_APP_NAMESPACE || 'mba.robin.sanctissimissa',
+    scope: env.VITE_STORAGE_SCOPE === 'app' ? 'app' : 'common',
+  };
+  return {
+  define: {
+    __SAM_BUILD_STORAGE__: JSON.stringify(buildStorage),
+  },
   plugins: [
     react(),
     VitePWA({
@@ -76,4 +88,5 @@ export default defineConfig({
     sourcemap: false,
     chunkSizeWarningLimit: 1600,
   },
+  };
 });
