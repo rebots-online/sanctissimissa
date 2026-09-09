@@ -8,6 +8,7 @@
 
 import type { Database } from 'sql.js';
 import { isTauri } from '../data/loadCorpus.ts';
+import { storageRootName } from '../storage/root.ts';
 import { embedText, cosine, EMBED_DIM } from '../vector/embed.ts';
 import { ensureNoteHtml } from '../annotations/store.ts';
 import type { Accompaniment, Exposure, OccurrenceSelector } from './types.ts';
@@ -153,7 +154,7 @@ export class SidecarDb {
     let bytes: Uint8Array | null = null;
     if (isTauri()) {
       const { invoke } = await import('@tauri-apps/api/core');
-      const b = await invoke<number[] | null>('load_sidecar');
+      const b = await invoke<number[] | null>('load_sidecar', { scopeDir: storageRootName() });
       if (b && b.length > 0) bytes = Uint8Array.from(b);
     } else if (typeof indexedDB !== 'undefined') {
       bytes = await idbGet();
@@ -172,7 +173,7 @@ export class SidecarDb {
     const bytes = this.db.export();
     if (isTauri()) {
       const { invoke } = await import('@tauri-apps/api/core');
-      await invoke('save_sidecar', { bytes: Array.from(bytes) });
+      await invoke('save_sidecar', { bytes: Array.from(bytes), scopeDir: storageRootName() });
     } else if (typeof indexedDB !== 'undefined') {
       await idbPut(bytes);
     }

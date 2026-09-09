@@ -19,6 +19,8 @@ src-tauri/gen/apple/build/
 *.log
 .env
 .env.*
+# The documented template is tracked — it carries keys, never values.
+!.env.example
 src-tauri/gen/schemas/
 **/*.keystore
 **/*.jks
