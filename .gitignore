@@ -3,9 +3,10 @@ node_modules/
 # https://github.com/DivinumOfficium/divinum-officium
 VENDORED/divinum-officium
 public/missal.db
-# dist/ is build output — excluded entirely from this source-only repo.
-# Rebuild with: npm run build
-dist/
+# Root dist/ is the tracked, durable release artifact home (CC12/CC14).
+# Web bundler output remains disposable and separate.
+!/dist/
+!/dist/**
 dist-*/
 # assets/missal.db is a symlink to the original repo (183MB, too large for GitHub free LFS).
 # If missing, run `npm run ingest` to rebuild from VENDORED/.
@@ -27,7 +28,7 @@ src-tauri/gen/schemas/
 **/*.p12
 release.lock
 build-logs/
-standroidsmissal-release-state.json
+sanctissimissa-release-state.json
 tests/.tmp/
 # MSIX build artifacts (winapp CLI)
 devcert.pfx
@@ -37,15 +38,14 @@ msix-stage/
 # pre-build gate fail on every build after the first.
 tsconfig.tsbuildinfo
 
-# Logs live in ~/Admin-Manual/LOGS/standroidsmissal/ (private synced repo).
+# Logs live in ~/Admin-Manual/LOGS/sanctissimissa/ (private synced repo).
 LOGS/
 .tmp/
 
-# Forgejo-specific CI (server down as of 2026-09-04; preserved in original repo).
+# CI remains dormant; release builds are invoked manually.
 .forgejo/
 
-# LFS config preserved as backup (Forgejo LFS endpoint, now inactive).
-.lfsconfig
+# Portable .lfsconfig is tracked and points all clones to authoritative Forgejo.
 .lfsconfig.forgejo-backup
 
 # Machine-local caches only (regenerated per workstation — never synced).
