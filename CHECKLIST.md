@@ -1,5 +1,12 @@
 # CHECKLIST — SanctissiMissa
 
+> **Active request: Stanza LS — Library, Bookstore, Chant and Mass Reference (2026-09-13).**
+> GLM starts at [the complete LS contract below](#stanza-ls--library-bookstore-chant-and-mass-reference).
+> Read its common contracts and assigned task, then only that task's named files.
+> LS is dependency-ordered; the old “one parallel wave”, “grep-only verification”,
+> historical BQ/BU.2 gates and missing-key unlock instructions do not apply to LS.
+> All 21 LS/BS-S/CH tasks are pending. Design/research delivery is not app delivery.
+
 **Identity boundary:** SanctissiMissa is the distinct active fork from `009aedd8`
 (2026-09-04), with slug `sanctissimissa` and identifier `mba.robin.sanctissimissa`.
 StAndroidsMissal is frozen. Pre-fork observations, artifact names and legacy
@@ -1278,3 +1285,798 @@ All ten LFS objects are available from Forgejo with matching lengths. Initial
 local Btrfs cache read failures were preserved and the cache regenerated from
 verified artifacts; full LFS fsck passed before the successful origin push.
 The underlying filesystem issue remains unresolved and is recorded in evidence.
+
+
+---
+
+# Stanza LS — Library, Bookstore, Chant and Mass Reference
+
+Adopted 2026-09-13. **Active GLM build contract; all application work pending.**
+Authority: the user's request to extend Stitch and architect/checklist the build.
+The complete common type/behavior contracts and each Do/Verify/Accept are here;
+a coder need not read architecture files or reconstruct designs from screenshots.
+Sections numbered inside the backend annex refer to that annex only.
+
+## Dispatch order and acceptance
+
+Use this safe serial order on the shared checkout:
+`LS.01 → LS.02 → LS.03 → BS-S1 → BS-S2 → BS-S3 → BS-S4 → BS-S5 → LS.04 → LS.05 → LS.08 → LS.09 → LS.06 → LS.07 → CH1 → CH2 → CH3 → CH4 → CH5 → CH6 → LS.10`.
+Independent service and library foundation tasks may run concurrently in isolated
+worktrees, but integrate dependencies before dependent verification. Never run
+writers to shared files concurrently. CH6 follows LS.07 because both adapt the
+same scoped stylesheet. LS.10 alone performs final shared-shell integration.
+
+- Each task below is `[ ]`; use `[/]` while active, `[X]` after implementation,
+  and ✅ only after observing its idempotent assertions. No implementation test
+  has been run by this architecture handoff.
+- The assigned task authorizes its listed source/assets and dependency interfaces;
+  common contracts are copied below. Escalate a real contradiction with exact
+  symbols and evidence; do not invent another API, store or product identifier.
+- Preserve concurrent edits and existing public API. One integrator handles
+  reviewed handbacks and scoped commits/pushes; Git operations are not acceptance
+  clauses. No commit step belongs inside a Do block.
+- Run focused meaningful tests once per changed module. The final `npm test` and
+  TypeScript compilation occur at LS.10. Node24 is required for backend tests;
+  no live payment, LAN service, corpus download, microphone or manual UI action
+  is an automated acceptance assertion.
+- Real UI, platform permissions, editorial/rights review, merchant activation and
+  service operation are the separately recorded LS operator protocol in
+  `DOCS/TEST_RUBRIC.md`. Fixture success never implies those passed.
+- No app/store deployment, CI activation, paid product publication or corpus
+  release is performed merely by completing this architecture/checklist.
+
+## LS common architecture and interfaces (read with the assigned task)
+
+Date: 2026-09-13. Architecture revision LS-1. Target application: SanctissiMissa,
+`mba.robin.sanctissimissa`. This is a build contract, not a statement of shipped
+functionality. Implementation markers live in CHECKLIST.md, stanza LS.
+The operator requested the Stitch extension and then an architecture/checklist
+for GLM in this session. That is the authority for this scope.
+
+## Current-state audit and supersessions
+
+Audited application baseline `e3b83e00`; research committed as `aa63ada4`.
+Admin-Manual was fetched; its HEAD matched upstream, with concurrent local policy
+edits preserved. `/sesh resume` completed in architect role. CodeGraph verified
+142 files, 1,749 nodes, 5,333 edges, SQLite quick_check=ok. PROJECT_INDEX.md is
+absent. Graph queries supplied the App routes, shared reader and sidecar APIs.
+Markdown and package.json are demonstrated graph parser gaps: targeted reads of
+the named architecture, checklist, rubric, proposals and package.json were used.
+
+| Area | Observed evidence | Meaning |
+|---|---|---|
+| Haydock | master decision 19 and section 9.3; graph `parseHaydock`, `COMMENTARY_SOURCES` | Included commentary exists; permanently free remains binding. |
+| Purchased reference modules | BQ.1–3 and BU.2 are pending; graph has no EntitlementController or Bookstore symbol | A planned module/purchase system, not a working sale/download path. |
+| Sidebar | `src/App.tsx:30` View union has map/reader/annotations/calendar/office/bible/journal/homily/settings/about | No Library, Bookstore, Chant or Reference routes at the audit baseline. |
+| Shared reading | `SectionReader:285`; current ReaderSection is at `src/ui/SectionReader.tsx:84` | Reuse real range highlighting, annotation and context menu machinery. |
+| User data | `src/core/accompaniment/store.ts` SidecarDb.open(), persist(), list(), save(), getSetting(), setSetting() | This is the current sidecar; the master's older `core/data/sidecarDb.ts` rows are historical. |
+| Bookmarks/recording | focused graph queries found no bookmark/MediaRecorder implementation | Do not claim these as already shipped across readers. Add and verify them in LS. |
+| Mass lore | station/route lore exists | A foundation, not a practical chant planner or comprehensive Mass Reference section. |
+
+For LS scope this document supersedes the master's decision 19 `study_library`
+single gate, section 9.3 outbound copy/paste/export restrictions, and the P-G
+missing-key-means-ungated rule. Core text, personal annotations/recordings and
+their export remain free. Paid managed editions fail closed when commerce is
+unconfigured. Haydock remains free. The stable commercial vocabulary is
+`reference_<editionId>` and `study_library_all`. These are not two independent
+controllers. Existing unrelated entitlements keep their identifiers.
+
+The old mandatory SQLite split/attach work in BQ is superseded for standalone
+books by the portable edition package below. Existing Haydock graph commentary
+stays in the working corpus; no corpus rebuild or physical split is required to
+start the Library. Global semantic search over unindexed purchased books is excluded from LS;
+existing term lookup continues to use the installed corpus.
+
+## Frozen design source
+
+Root: `LIBS/UI/STITCH/sanctissimissa-library-20260913/` (called UI_ROOT below).
+Stitch project: https://stitch.withgoogle.com/projects/7192660594233084032 .
+Original Bookstore: project `9785949261255837034`, screen
+`7a06011f96cf4ae19f44d207cbbc9dbb`, preserved in `original/bookstore.html`.
+Original baseline DESIGN.md is preserved verbatim; its obsolete product name
+and multiple breakpoints are historical. LS uses the current 1100px breakpoint.
+
+| Export | Screen ID | Actual addressable elements | Target component |
+|---|---|---|---|
+| `bookstore.html` | `eeb7643f00314991ab7a325c9daa2216` | `#catalogue-search`, `#category-filter`, `#author-filter`, `#catalogue-grid`, `#book-detail`, `#edition-provenance`, `#purchase-options` | BookstoreView |
+| `library.html` | `83d9c89c5d0f42d29707648c9a4b1acd` | `#library-search`, `#library-grid`, `#download-manager` | LibraryView |
+| `reader.html` | `0918fcd8e0174446b17b14df6611830b` | `#book-toc`, `#book-reader-host`, `#reader-tools`, `#notebook-panel`, `#recording-panel` | LibraryReader |
+| `chant.html` | `a8f2b5d39410445b91178636a97824a2` | `#chant-profile`, `#chant-plan-slots .slot-card`, `#ordinary-selector`, `#rehearsal-panel`, `#chant-learning` | ChantView |
+| `mass-reference.html` | `f6cc5e4c8df3462f96aa7806aa60624a` | `#mass-reference-search`, `#mass-order`, `#reference-article`, `#rite-profile`, `#reference-sources` | MassReferenceView |
+
+Exports contain executable prototype interactions. Sample ownership, dates,
+prices, progress, prose, melody diagrams and file counts are design specimens,
+not production evidence. Implementers mechanically adapt their markup and CSS
+to React, retain these selectors and layout, and replace sample data/events with
+the contracts below. Do not create a second visual interpretation, an iframe
+reader, a runtime CDN dependency, or a parallel annotation editor. The single
+app rail supplies navigation; omit each export's duplicate rail. Scope imported
+CSS under `.library-surface` and map colours to existing semantic tokens. Preserve
+the 1100px responsive behavior and existing sixteen theme combinations.
+
+## Closed product scope
+
+1. My Library: included/acquired editions, search/filter by author/category,
+   resume reading, bookmarks, notebook/recordings, downloads and removal of
+   downloaded text without removing personal work. No cloud sync claim.
+2. Bookstore: all 61 preliminary works, eight collection proposals and seven
+   versioned bundle proposals; exact edition/source inspection and previews;
+   localized offers only when a publication is ready and its channel configured.
+3. Books and prayer collections use SectionReader, including monolingual English
+   without a fictitious Latin column. Highlights, comments, bookmarks and local
+   voice recordings are usable with the same toolbar in books, Missal, Office,
+   Scripture and Mass Reference. Export of one's own work is never paywalled.
+4. Gregorian Chant: 1962 general Roman calendar; director plans, sourced optional
+   choices, separate rehearsal order, learning, score/text/audio when cleared,
+   and quiet during-Mass mode. Local calendars require an explicitly sourced
+   manual plan when not covered. No claim of automatic support for every diocese.
+5. Mass Reference: complete 31-stage Mass navigation plus six introductory
+   articles, with sourced explanations, role distinctions and local custom.
+   Current-rite materials are link-only comparison; its selector cannot silently
+   change the 1962 planner or offer an unsupported current-rite calendar.
+6. Initial checkout: RevenueCat Web Billing for web/direct desktop and sideload;
+   RevenueCat with Play Billing for Play distribution. WooCommerce/Gumroad remain
+   evaluated alternatives, not launch adapters. Bidlr is unidentified and excluded.
+   No publication of merchant products or deployment is performed by this handoff.
+
+## Catalogue and package model
+
+`content/library/catalogue.seed.json` contains exactly C001–C061, eight collections
+and seven bundles; all are candidates, with null editionId/price/productId.
+Its author strings and source notes are research evidence, not parsed rights
+clearances. Haydock is C002; retain its free policy even in a bundle. A bundle
+must not charge again for its free component. Primary research and per-work URLs
+live in `DOCS/PROPOSALS/library-catalogue-2026-09-13.md`.
+
+Types below live in `src/core/library/types.ts:1` (new files use :1 as their
+insertion anchor; it is not a claim that those files exist already).
+
+```ts
+type Publication = 'candidate' | 'reviewed' | 'ready' | 'withdrawn';
+type AssetKind = 'text' | 'score' | 'audio' | 'cover';
+interface RightsEvidence {
+  assetId: string; kind: AssetKind; sourceUrl: string; sourceEdition: string;
+  translator: string | null; publicationYear: number | null;
+  basis: string; territories: string[]; commercial: boolean;
+  redistribution: boolean; attribution: string; reviewedBy: string | null;
+  reviewedAt: string | null; sha256: string;
+}
+interface EditionRecord {
+  id: string; workId: string; title: string; author: string; category: string;
+  revision: number; publication: Publication; languages: string[];
+  rights: RightsEvidence[]; territories: string[]; free: boolean;
+  entitlementId: string | null; previewBlockIds: string[];
+  packagePath: string | null; packageSha256: string | null;
+}
+interface EditionBlock {
+  id: string; sectionId: string; sectionTitle: string; sourceLocator: string;
+  latin: string | null; english: string | null;
+}
+interface EditionContent {
+  schemaVersion: 1; editionId: string; revision: number;
+  blocks: EditionBlock[]; sourceUrls: string[];
+  redirects: Record<string, string[]>;
+}
+interface EditionBundle {
+  id: string; revision: number; title: string; editionIds: string[];
+  publication: Publication; territories: string[];
+}
+interface ReadingAnchor {
+  documentId: string; revision: number; blockId: string;
+  language: 'la' | 'en'; line: number; start: number; end: number;
+  quote: string; prefix: string; suffix: string;
+}
+type RecordKind = 'bookmark' | 'progress' | 'recording' | 'chant-plan' | 'practice';
+interface UserRecord {
+  id: string; deviceId: string; createdAt: string; updatedAt: string;
+  deletedAt: string | null;
+}
+interface BookmarkRecord extends UserRecord { anchor: ReadingAnchor; label: string }
+interface ProgressRecord extends UserRecord { documentId: string; anchor: ReadingAnchor }
+interface RecordingRecord extends UserRecord {
+  anchor: ReadingAnchor; blobId: string; mimeType: string; bytes: number;
+  durationMs: number; title: string; visibility: 'private';
+}
+type LibraryDestination =
+  | {view:'library'|'bookstore'}
+  | {view:'chant';planId?:string}
+  | {view:'mass-reference';articleId?:string;blockId?:string}
+  | {view:'book-reader'; editionId:string; blockId?:string};
+```
+
+Edition IDs are ASCII kebab-case, immutable and independent of title spelling;
+edition revisions are positive integers. Ready bundles use EditionBundle and
+`content/library/bundles.json` (`{schemaVersion:1,bundles:EditionBundle[]}`);
+all edition IDs must resolve to ready editions in the intersection of allowed
+territories. Keep candidate work-level bundle proposals separate. IDs `haydock-1883-en` and
+`imitation-benham-1886-en` are reserved; the latter is only published if the exact
+edition review establishes that lineage. Haydock 1883 must be independently
+substantiated by the existing VENDORED/haydock provenance/source; C002’s 1859
+research lead is not that evidence. A verified 1859 source uses a separate
+`haydock-1859-en` ID. Both Haydock editions are free. No ingest silently substitutes a modern
+translation. Work IDs stay `work-c001` etc. Bundle composition is an explicit
+ordered edition-ID snapshot, never an implicit promise of all future titles.
+Paid offers grant edition-specific entitlements; all-library subscription access
+is a separate reason for access, with expiry. Lifetime ownership must survive
+expiration of another access reason. Currency/price is never inferred from locale.
+
+Package text is plain Unicode, never executable HTML. EditionContent is UTF-8
+JSON; paragraph/block IDs are assigned in a committed ingest map, not generated
+from page position or paragraph text. Corrections retain IDs; merged/split blocks
+use redirects plus quote/prefix/suffix matching. Ambiguous relocations remain
+visible as unresolved annotations; they are never silently attached elsewhere.
+Catalogues/signed package envelopes must conform to the service contract annex.
+Its cryptographic wire types supersede local transport field shorthand here.
+ReadingAnchor line/start/end use zero-based UTF-16 offsets in the rendered raw
+language text, matching AnnotationRange; ingest-map source ranges alone use
+Unicode code points. Resolve a split only across its explicit ordered successor
+IDs; exactly one quote/prefix/suffix match relocates, zero or multiple remains
+unresolved. With no text selection, bookmark/record attaches to the visible block
+with line/start/end=0, empty quote/prefix/suffix. No fabricated quotation.
+
+Before `ready`, every distributed asset needs source hash, exact edition,
+commercial/redistribution determination, named reviewer and allowed territories;
+both publication readiness and a real offer are required for Buy. US public domain
+does not establish Canadian or worldwide eligibility. Historical indulgence
+claims in The Raccolta are explicitly historical, not current promises. Modern
+translations, engravings and recordings require independent rights evidence.
+All candidate rows remain browsable with source links and a non-purchase state.
+
+## Entities and boundaries
+
+| Exact entity | Target file:line | Interface and responsibility |
+|---|---|---|
+| CatalogueSeed, CatalogueWork, CatalogueCollection, CatalogueBundle | `src/core/library/types.ts:1` | Mirror the committed seed JSON fields without dropping evidence/source notes; do not confuse work IDs with edition IDs. |
+| validateCatalogue, filterCatalogue, canPublishEdition | `src/core/library/catalogue.ts:1` | `(input:unknown):CatalogueSeed` throws structured validation errors; `(works, {query,author,category}):CatalogueWork[]`; `(edition:EditionRecord,territory:string):boolean`. Accent-insensitive search, stable title/id ordering. |
+| LibraryStore | `src/core/library/store.ts:1` | `constructor(sidecar:SidecarDb)`; `getRecord<T>(kind:RecordKind,id:string):T|null`, `listRecords<T>(kind):T[]`, `putRecord(kind,id,value):Promise<void>`, `removeRecord(kind,id):Promise<void>`. |
+| LibraryMediaStore | `src/core/library/media.ts:1` | `put(blob:Blob):Promise<{blobId,bytes,mimeType}>`, `get(blobId):Promise<Blob|null>`, `remove(blobId):Promise<void>`. Per-app persistent binary store, never public corpus cache. |
+| validateEditionContent, editionSections, resolveReadingAnchor | `src/core/library/content.ts:1` | `(unknown):EditionContent`; `(content):ReaderSection[]`; `(anchor,oldContent,newContent):{state:'exact'|'relocated'|'unresolved',anchor:ReadingAnchor}`. |
+| EditionInstaller | `src/core/library/download.ts:1` | `install(editionId,signal,onProgress):Promise<EditionContent>`, `load(editionId):Promise<EditionContent|null>`, `remove(editionId):Promise<void>`. Uses verified Bearer-authenticated service manifest/content routes and signed envelope and atomic active-revision switch. |
+| RecordingController | `src/core/library/recording.ts:1` | `constructor({store,media,adapter?:RecordingMediaAdapter})`; `subscribe(listener:()=>void):()=>void`; `start(anchor:ReadingAnchor):Promise<void>`, `stop():Promise<RecordingRecord>`, `cancel():Promise<void>`, `state:'idle'|'requesting'|'recording'|'saving'|'error'`; dependencies LibraryStore/LibraryMediaStore and an injectable media-device adapter. |
+| RecordingMediaAdapter | `src/core/library/recording.ts:1` | `{supports(mimeType:string):boolean,requestStream():Promise<MediaStream>,createRecorder(stream:MediaStream,mimeType:string):MediaRecorder,now():number}`; browser implementation uses isTypeSupported/getUserMedia/audio-only/MediaRecorder/performance.now; tests inject controlled event-capable objects. |
+| StudyTools, RecordingPanel | `src/ui/library/StudyTools.tsx:1`, `src/ui/library/RecordingPanel.tsx:1` | Shared controls `{store,media,controller,anchor}`. Bookmark, notes link, record/stop/play/download/delete, busy/error state, keyboard and permission handling. |
+| EntitlementController, useEntitlement | `src/core/entitlements/index.ts:1` | `has(entitlementId):boolean`, `refresh():Promise<void>`, `subscribe(listener):()=>void`, `accessFor(editionId):{state:'free'|'owned'|'subscription'|'locked'|'unavailable',expiresAt:string|null}`; exactly one authority. |
+| PurchaseController | `src/core/entitlements/purchases.ts:1` | `offers(editionId):Promise<PurchaseOffer[]>`, `purchase(offerId):Promise<void>`, `restore():Promise<void>`; normalized channel-specific SDK adapter. PurchaseOffer fields id/title/priceText/currency/kind('lifetime'|'subscription')/terms. |
+| LibraryView, BookstoreView, LibraryReader | `src/ui/library/{LibraryView,BookstoreView,LibraryReader}.tsx:1` | Shared `LibraryViewProps` below; exact frozen selectors above. No processor/receipt reads in components. |
+| LibraryViewProps | `src/ui/library/viewTypes.ts:1` | `{db:CorpusDb,sidecar:SidecarDb,store:LibraryStore,media:LibraryMediaStore,installer:EditionInstaller,entitlements:EntitlementController,purchases:PurchaseController,recording:RecordingController,onNavigate:(d:LibraryDestination)=>void,editionId?:string,blockId?:string}`. |
+| Library route state and rail entries | `src/App.tsx:30` | Extend View with library/bookstore/book-reader/chant/mass-reference; add destinations after Scripture, retain all current entries. One shared service lifetime per app session. |
+| Library deep links | `src/core/share/shareLink.ts:1` | `#/library/<encodedEditionId>/<encodedBlockId>`; malformed encoding returns a visible invalid-link state, never throws. Books use view-true TOC/progress in MapStrip rather than an unrelated Mass strip. |
+| IdentityController | `src/core/entitlements/identity.ts:1` | `signIn(),finishSignIn(),signOut():Promise<void>`, `token():Promise<string|null>`, state anonymous/loading/authenticated/error; OIDC PKCE + mapped RC identity. |
+| AccessTokenProvider | `src/core/entitlements/api.ts:1` | `{token():Promise<string\|null>,refreshToken():Promise<string\|null>}` injected interface; LS.04 uses fixtures, LS.08 binds IdentityController. |
+| BookstoreApi | `src/core/entitlements/api.ts:1` | `identity(),entitlements(),reconcile(),license(),manifest(editionId,revision),content(editionId,revision,range?,etag?,signal?)`; exact wire types and routes in service annex. |
+| PlayPurchaseAdapter, CommercePlugin | `src/core/entitlements/play.ts:1`, `src-tauri/gen/android/app/src/main/java/mba/robin/sanctissimissa/CommercePlugin.kt:1` | PurchaseController adapter; configure(accountId,apiKey), offers(offeringId), purchase(packageId), restore() through RC Android SDK. |
+| commerce_configure / commerce_offers / commerce_purchase / commerce_restore | `src-tauri/src/commerce.rs:1` | Tauri Android IPC matching Kotlin operations; no web adapter compiled into Play distribution. |
+| ingest-edition / validate-editions | `scripts/library/ingest-edition.mjs:1`, `scripts/library/validate-editions.mjs:1` | Exact range-map CLI and readiness validation in LS.03; output edition.json, never ZIP. |
+| Public offer mapping | `content/library/offers.json:1` | Actual RC internal IDs mapped to stable lookup keys and SDK offering/package/store-product IDs; exact schema in LS.08. |
+| included editions | `content/library/included.json:1` | `{schemaVersion:1,editions:{record:EditionRecord,content:EditionContent}[]}`; validated free, ready content statically imported, no OIDC dependency. |
+| libraryActionState, parseLibraryDestination | `src/core/library/viewState.ts:1` | `(edition,access,installed:boolean,online:boolean):{canRead:boolean,canBuy:boolean,canDownload:boolean,reason:string\|null}`; `(hash:string):LibraryDestination\|null`; pure selectors/parser used by UI and LS tests. |
+| compareVersionTriples | `src/core/library/versions.ts:1` | `(left:string,right:string):number`; same numeric MAJOR.MINOR.BUILD contract as the backend, tested across numeric digit boundaries. |
+| LS tests | `tests/{libraryCatalogue,libraryContent,libraryStore,libraryDownloads,libraryRecording,libraryEntitlements,libraryRoutes}.test.ts:1` | Behavioral fixture assertions described in CHECKLIST LS, no live provider calls or microphone. |
+
+`LibraryStore` stores schemaVersion=1 and typed per-kind records in the existing
+sidecar setting `library.state.v1` using getSetting/setSetting/persist. JSON parsing
+is caught and validated; malformed state is preserved as a recovery value before
+starting an empty state, with a visible recovery notice. Writes serialize,
+rollback the in-memory setting on persist failure, and propagate errors. Existing
+sidecar namespace/migration semantics stay intact. Tombstones include timestamps;
+no user-data rows are erased by uninstall, refund, logout or expired entitlement.
+
+Binary storage uses IndexedDB `sanctissimissa.library.media.v1` store `blobs` on
+web and on native WebViews for this wave; user backups include actual audio bytes
+and an index. The native WebView durability/permissions must be verified on each
+release platform. Quota failure is reported before creating dangling metadata.
+Package storage is a separate IndexedDB `sanctissimissa.library.packages.v1` with
+stores `staging`, `packages`, `active`, scoped to the app origin. A portable JSON
+package avoids assuming external filesystem access or SQL ATTACH from bytes.
+This app-private user-data policy never follows the optional org-shared corpus
+cache toggle. Downloads verify signature, compatibility, size/hash and content
+schema before atomic activation; failed/resumed downloads retain the previous
+active revision. Remove download affects package bytes only. Startup recovers
+or discards incomplete staging entries without treating them as installed.
+
+`editionSections` emits one ReaderSection per stable block, anchor/nodeKey
+`book:<editionId>#<blockId>`, title only at section boundaries, sourceLocator in
+meta; preserve source line breaks. Missing language stays null. The shared reader
+receives the real app CorpusDb for existing term lookup; book anchors do not get
+misinterpreted as Bible refs or Mass dates. New optional `documentContext:{documentId:string,revision:number,blockIdForSection:(anchor:string)=>string}` and `studyTools:{store:LibraryStore,media:LibraryMediaStore,controller:RecordingController}` props in
+SectionReader map selection ranges to ReadingAnchor and expose StudyTools;
+existing annotation APIs remain backward-compatible. Personal annotations remain
+in the existing annotation/accompaniment pipeline, never duplicated in LibraryStore.
+Annotation gains optional `documentAnchor:ReadingAnchor`; its current localStorage
+store preserves that object alongside range/rangeAlt. This audit does not claim
+that live highlights already use SQLite. Accompaniment gains optional
+`documentAnchor:ReadingAnchor|null`; add nullable `document_anchor TEXT` to
+accompaniments after PRAGMA table_info inspection, and map guarded JSON in
+rowToAccompaniment/save. Legacy rows are null. These exact fields and redirects
+make edition correction auditable; never create a second annotation table. Notebook entries use SidecarDb.save({exposure:'study',anchors,...}).
+
+Recording starts only on an explicit user gesture. Feature-detect MediaRecorder
+and the first supported MIME of audio/webm;codecs=opus, audio/webm, audio/mp4;
+denial/unsupported hardware gives an actionable error, never a fabricated file.
+Stop releases every track, saves a nonempty Blob before metadata, and records
+elapsed monotonic duration. Cancel and route-unmount release tracks; no automatic
+upload or transcription. User can export/delete their own recording independently
+of book access. Delete is an explicit user action with a recoverable metadata
+tombstone; retain the blob until an explicit permanent cleanup.
+
+## Service and chant annexes
+
+[Bookstore service contract](DOCS/ARCHITECTURE/bookstore-service-20260913.md) and
+[chant and reference contract](DOCS/ARCHITECTURE/chant-reference-20260913.md) are adopted annexes. Their schemas, exact file/entity tables and test cases are
+binding for LS. CHECKLIST LS reproduces execution instructions so a GLM coder
+does not need to read architecture documents. Research proposals remain evidence;
+they do not override the selected architecture. No placeholder provider adapters
+or unsupported calendar claims are accepted.
+
+## Verification and handoff
+
+Automated task acceptance uses deterministic fixtures and controlled clocks,
+existing node:test conventions, fake-indexeddb, and real state transitions; no
+grep count can establish payment, liturgical or annotation correctness. Run only
+the assigned task's tests during a module handoff; run `npm test` and `npx tsc -b`
+once after integration. Production build/version/packaging follow the existing
+release contract, not this architecture task. Merchant/device tests belong to
+the LS operator verification protocol in TEST_RUBRIC.md. Missing merchant config
+does not authorize a success claim or fabricate saleable catalogue entries.
+
+For included free editions, LS.03 writes `content/library/included.json` with
+`{schemaVersion:1,editions:[{record:EditionRecord,content:EditionContent}]}`; start
+with an empty editions array when no complete edition has passed rights review.
+`EditionInstaller.load` reads this statically imported included content first,
+verifies its deterministic serialized SHA256 against record.packageSha256, and
+requires matching free/ready edition and revision. This path never contacts OIDC
+or RevenueCat. The existing Haydock corpus commentary stays available regardless
+of whether a complete standalone Haydock edition has been ingested. Paid packages
+are never embedded in this public file. Remote free downloads through the private
+service still require identity, so the UI labels their sign-in requirement.
+
+LibraryViewProps includes the one shared `recording:RecordingController`.
+IdentityController also exports `refreshToken():Promise<string|null>` and
+implements AccessTokenProvider; LS.04 depends on that interface alone, eliminating
+a construction cycle with LS.08. The App composition injects a fixture-free token
+provider after identity initialization.
+
+Existing Mass/Office/Scripture readers use documentId `corpus:<readerKind>`
+(readerKind is `mass`, `office`, or `bible`), revision 1 and the complete existing
+section anchor as blockId. This is the explicit initial corpus anchor revision;
+corpus text changes must preserve IDs or adopt a documented revision/relocation
+map. Book documentIds are `book:<editionId>`, reference IDs `reference:<articleId>`.
+Do not derive revisions from the current date or silently relabel old annotations.
+
+The authoring handoff verifies source availability and contract closure only.
+All LS implementation tasks start pending. It does not certify a new working
+application, merchant setup, liturgical editorial approval or purchasable books.
+
+
+## LS application execution tasks
+
+These tasks execute the LS shared contract reproduced in CHECKLIST.md. A coder
+reads that common contract and its one task, then only the files explicitly
+authorized below. Dependencies' named public interfaces are input contracts, not
+permission to inspect unrelated modules. Do not execute historical BQ/BU tasks
+in parallel with LS. All new implementation tasks begin pending.
+
+Shared imports are read-only unless the task explicitly describes their amendment. LS.01 owns types; LS.02 owns store/media; LS.03 owns content; LS.04 owns download/api/license; LS.05 owns recording and the explicitly described shared-reader amendments. Serialize any two tasks editing the same file; dependency completion includes review/integration. Owner boundaries: LS.01–05 core/data; LS.06–07 UI; LS.08 commerce client;
+LS.09 platform adapter; chant tasks CH1–CH6; backend tasks BS-S*; LS.10 shell
+integration is the sole App/shareLink/MapStrip owner after module tasks finish.
+One integrator commits and pushes each reviewed handback. Workers never race Git.
+Root verification commands below run at the repository root. New Node-tested TypeScript uses erasable syntax (no enums/parameter properties), type-only TSX imports and .ts module extensions. SDK installation work may read the named official API docs: https://www.revenuecat.com/docs/getting-started/installation/web-sdk, https://www.revenuecat.com/docs/getting-started/installation/android, https://v2.tauri.app/develop/plugins/develop-mobile/, https://v2.tauri.app/plugin/deep-link/, https://v2.tauri.app/plugin/opener/, https://authts.github.io/oidc-client-ts/.
+Fixtures are
+committed, deterministic, and use no live merchant, corpus website or microphone.
+Failing a task reports evidence; it does not authorize changing its contract.
+
+- [ ] **LS.01 — Catalogue and publication domain.** Depends: none. Files allowed: `content/library/catalogue.seed.json`, `src/core/library/types.ts` (new), `src/core/library/catalogue.ts` (new), `tests/libraryCatalogue.test.ts` (new). Do: define every LS common domain type with explicit exports, including the exact seed shape; runtime validators reject invalid enums, IDs, duplicate work/edition/block IDs, non-positive revisions, malformed URLs/hashes, broken bundle work references, unexpected fields in security-sensitive records, and invalid Unicode. `filterCatalogue` normalizes accents/case and filters query/author/category conjunctively; return stable title then ID ordering without mutating input. `canPublishEdition` returns true only for ready records with nonempty allowed territory, a non-null verified package path/hash and every distributed asset's positive commercial/redistribution review; free is not a rights bypass. Reserve Haydock free independently of edition readiness. Keep C001–C061, eight collections, seven bundles and evidence/source strings verbatim; do not populate null products/prices with examples. Verify: `node --experimental-strip-types --test tests/libraryCatalogue.test.ts`. Accept: 61 unique sequential works; all seed candidates fail publication; valid reviewed fixture publishes only in allowed territory; absent rights/reviewer/hash fails; accents and combined filters return expected IDs; no fabricated price/product.
+
+- [ ] **LS.02 — Sidecar library records and audio bytes.** Depends LS.01. Files allowed: `src/core/library/{types,store,media}.ts`, `src/core/accompaniment/store.ts` (read existing getSetting/setSetting/persist only), `src/core/storage/root.ts` (read), `tests/libraryStore.test.ts`, `package.json`, `package-lock.json`. Do: retain the existing fake-indexeddb 6.2.5 dev dependency (install only if absent) and its lockfile; implement LibraryStore and LibraryMediaStore to the common APIs, retaining all arbitrary typed payload fields plus required UserRecord timestamps/device IDs. JSON setting `library.state.v1` stores `{schemaVersion:1,records:{bookmark:{},progress:{},recording:{},'chant-plan':{},practice:{}}}`; map values are typed records indexed by id. Use sidecar device identity `getSetting('device.id')`, generating/storing a UUID once if absent; creation preserves supplied IDs/times, updates only updatedAt, delete sets deletedAt. Expose only non-tombstoned records by default. Serialize writes and persist before resolve; on failure restore prior setting and throw. Corrupt state is copied to `library.recovery.<ISO timestamp>` and a `library.recovery.notice` setting, then a fresh valid state is persisted; failed backup/persist aborts recovery without replacing old value. Binary IDB database `sanctissimissa.library.media.v1`, version1, object store `blobs` keyed by generated UUID; commit Blob before returning, reject zero bytes and quota errors. No auth logout hook may clear personal data. Tests use fake-indexeddb and a small real Sidecar-like in-memory settings adapter with injected persist failure; no monkey-patched production success. Verify: `node --experimental-strip-types --test tests/libraryStore.test.ts`. Accept: bookmark/progress/recording/plan round-trip, reopen, tombstone, serialized writes, malformed JSON recovery, rollback on persist/quota failure and namespace separation all assert correct end states; no dangling recording metadata.
+
+- [ ] **LS.03 — Edition ingestion and stable reader anchors.** Depends LS.01. Files allowed: `src/core/library/{types,content}.ts`, `src/ui/SectionReader.tsx` (ReaderSection type read only), `scripts/library/{ingest-edition,validate-editions}.mjs` (new), `content/library/{catalogue.seed.json,editions.json,bundles.json,included.json,ingest-maps/,packages/}` (latter two new), `VENDORED/haydock/` (provenance and source only), `DOCS/PROPOSALS/library-catalogue-2026-09-13.md`, `VENDORED/library/` (new exact-source archives), `tests/libraryContent.test.ts`, `tests/fixtures/library/` (new). Do: ingestion CLI `node scripts/library/ingest-edition.mjs --map <path> --source <path> --out <dir>` consumes committed map `{editionId,revision,sourceSha256,sourceUrls,blocks:[{id,sectionId,sectionTitle,sourceLocator,latinRange:null|[start,end],englishRange:null|[start,end]}],redirects:Record<string,string[]>}`. Ranges are Unicode code-point offsets into the verified UTF-8 source, end-exclusive, never automatic guessed chapter cuts. Reject changed source hash/ranges; output exact EditionContent JSON, no fabricated translation. Serialize deterministic canonical JSON compatible with BS signing; output under `content/library/packages/<editionId>/<revision>/edition.json`. Do not overwrite an existing different revision payload. Implement common validation, ReaderSection mapping, anchor resolution exact first then explicit redirect+unique quote/prefix/suffix match; unresolved stays unresolved. Obtain/download source inputs only from catalogue sourceUrls, retain source URL/hash/date/licence evidence; eligible incomplete text stays candidate. Create included.json exactly as the common free-edition contract specifies; never embed a paid edition. `bundles.json` starts `{schemaVersion:1,bundles:[]}` and uses the common EditionBundle schema for actual ready bundles. `editions.json` schema `{schemaVersion:1,editions:EditionRecord[]}` contains only real reviewed edition records; empty is legal until editorial review. Haydock's existing 1883 commentary provenance is the first source to assess; do not replace it with the design's invented 1859 metadata. Verify: `node --experimental-strip-types --test tests/libraryContent.test.ts` and `node scripts/library/validate-editions.mjs content/library/editions.json`. Accept: deterministic small fixture ingest, monolingual null Latin, paragraph ID preservation, changed source/hash rejection, malicious HTML treated as plain text, exact/unique-relocated/ambiguous anchors, and ready-only edition validation pass; no claim that candidate text is sale-ready.
+
+- [ ] **LS.04 — Verified package installation and offline access.** Depends LS.01–03 and BS-S1/BS-S4 wire/signing contracts. Files allowed: `src/core/library/{types,content,download}.ts`, `src/core/entitlements/{api,license}.ts` (new), `services/bookstore/src/{types,signing,versions}.ts` read only, `content/library/{editions.json,included.json}`, `src/core/library/versions.ts` (new), `tests/libraryDownloads.test.ts`, `tests/fixtures/library/`. Do: Export AccessTokenProvider {token():Promise<string|null>,refreshToken():Promise<string|null>}; BookstoreApi receives {baseUrl,identity:AccessTokenProvider,fetcher?:typeof fetch}. Tests inject this interface; no LS.08 import is permitted until integration. API client uses its injected access token and service base URL; implement `BookstoreApi.identity(),entitlements(),reconcile(),license(),manifest(editionId,revision),content(editionId,revision,range?,etag?,signal?)` with exact BS routes and error body, 10-second timeout, one token refresh on401, no retry for denied403/corrupt data. Manifest and license verifier uses WebCrypto Ed25519 and the BS canonical byte contract, rejects unknown keys/wrong type/account/environment/older license revision/tamper. EditionInstaller receives `{api,publicKeys,accountId,environment,catalog,readerVersion,clock}`; IDB `sanctissimissa.library.packages.v1` version1 stores staging(pack key with bytes/hash/ETag), packages(key editionId/revision), active(key editionId). Resume via authenticated range and If-Range; a200 discards stale partial bytes,206 appends only matching Content-Range,416 restarts once. Enforce maximum package size from signed bytes before allocating. Verify complete hash/signature/minimum reader version/content schema before one atomic transaction switches active revision. Old active content remains on failure/cancel; recover staging on restart. Implement free included.json loading and hash checks exactly as the common contract; client src/core/library/versions.ts exports compareVersionTriples matching the BS algorithm. Test anonymous offline included loading with merchant values absent. Free included content works without merchant config; a paid package needs verified current/cached evidence. Never interpret network failure as refund. Newer reconciled license replaces grant set; owned beats subscription, expired sub locks managed text but never personal records. Verify: `node --experimental-strip-types --test tests/libraryDownloads.test.ts`. Accept: actual generated Ed25519 fixture verification, truncated/tampered/wrong-account/wrong-environment rejection, resume200/206/416, cancel, offline permanent access, expired subscription, refund at newer revision and unchanged personal records pass; package remove does not touch sidecar/media.
+
+- [ ] **LS.05 — Shared bookmarks and voice notes.** Depends LS.02–03. Files allowed: `src/core/library/{types,store,media,recording}.ts`, `src/ui/library/{StudyTools,RecordingPanel}.tsx` (new), `src/ui/SectionReader.tsx`, `src/core/annotations/store.ts`, `src/core/accompaniment/{store,types}.ts`, `LIBS/UI/STITCH/sanctissimissa-library-20260913/reader.html`, `tests/libraryRecording.test.ts`, `tests/libraryContent.test.ts`. Do: implement RecordingController/StudyTools/RecordingPanel common APIs; native MediaRecorder via dependency-injected browser adapter, not a second transcription service. Add optional `documentContext:{documentId,revision,blockIdForSection:(anchor:string)=>string}` and `studyTools?:{store,media,controller}` to SectionReader Props; default absent preserves all existing readers. MenuContext adds optional `readingAnchor:ReadingAnchor`; derive actual selected text/range without adjusting existing highlight storage. Annotation interface gains optional `documentAnchor:ReadingAnchor` preserved by its current localStorage read/write spreads. Accompaniment gains `documentAnchor?:ReadingAnchor|null`; add exact nullable `document_anchor TEXT` column to existing accompaniments after PRAGMA table_info, map JSON.stringify in save and guarded JSON.parse in rowToAccompaniment, preserve null on legacy rows. No new annotation table. Reader callback records selected AnnotationRange line/start/end as UTF-16 offsets; without selection use the visible block and empty quote with line/start/end=0. Bookmarks store ReadingAnchor in LibraryStore; comments/notes use existing rich editor and SidecarDb.save exposure study, avoiding a new comment store. Recording start requests permission only by button; stop waits on final dataavailable, stores Blob then metadata; cancel releases tracks; busy state disables duplicate start/stop; close/unmount stops tracks and preserves completed data. User audio download uses Blob URL with original recorded MIME, revokes URL after use; no automatic recording during Mass. Adapt the exported reader-tools/recording-panel DOM and existing theme tokens; do not copy the prototype's in-memory note data. Verify: `node --experimental-strip-types --test tests/libraryRecording.test.ts tests/libraryContent.test.ts`. Accept: injected media adapter proves permission rejection, unsupported MIME, zero-byte recording, stop/cancel/release, persist failure rollback, bookmark toggle, revisioned anchor round-trip; personal export is permitted without any entitlement.
+
+- [ ] **LS.06 — Library and Bookstore UI.** Depends LS.01–04/LS.08. Files allowed: `src/ui/library/viewTypes.ts`, `src/ui/library/{LibraryView,BookstoreView}.tsx`, `src/core/library/viewState.ts` (new pure view/action selectors), `src/ui/library/library.css` (new), `src/core/library/{types,catalogue,store,download}.ts` (imports/read only), `src/core/entitlements/{index,purchases}.ts` (imports/read only), `content/library/{catalogue.seed.json,editions.json}`, `LIBS/UI/STITCH/sanctissimissa-library-20260913/{bookstore,library}.html`, `src/styles.css` (tokens read only), `tests/libraryRoutes.test.ts`. Do: export libraryActionState(edition,access,installed,online):{canRead:boolean,canBuy:boolean,canDownload:boolean,reason:string|null} and parseLibraryDestination(hash:string):LibraryDestination|null from src/core/library/viewState.ts; tests import these pure functions without TSX. Mechanically adapt exported markup/CSS into components with exact LibraryViewProps and frozen DOM IDs. Preserve literary typesetting/cards/drawers; scope styles, remove prototype data/scripts/duplicate rails, replace event handlers with React calls. Browse all61 candidate works plus collection/bundle tabs, filter author/category and statuses, real reading progress/bookmark/record counts. Detail separates source/edition/rights/preview/offer; candidate buy control disabled with reason, no fake user ownership. An installed edition with free, owned, or unexpired subscription access exposes Read; existing source link remains accessible. Localized offers from PurchaseController must show lifetime/subscription period and terms; no invented prices. Download manager reports actual bytes/progress/state; retry/cancel/remove package retains user work. Loading/error/empty states and keyboard focus trap/Escape/return focus in drawer; use semantic labels and 44px touch targets. Verify: `node --experimental-strip-types --test tests/libraryRoutes.test.ts` (pure route/filter/action-state assertions; integration UI observation is rubric LS-UI). Accept: action-state tests distinguish candidate/ready/free/owned/subscription/locked/offline/error and assert canRead=true for an installed active subscription, forbid checkout on candidate, preserve original selectors; no runtime Google-font/Tailwind CDN needed (system font fallbacks and scoped exported CSS acceptable).
+
+- [ ] **LS.07 — Book reader and notebook integration.** Depends LS.03–06. Files allowed: `src/ui/library/viewTypes.ts`, `src/ui/library/{LibraryReader,StudyTools,RecordingPanel}.tsx`, `src/ui/library/library.css`, `src/core/library/{types,content,store,download}.ts`, `src/ui/{SectionReader,AccompanimentEditor}.tsx` (public API read only), `src/core/accompaniment/store.ts` (public API read only), `LIBS/UI/STITCH/sanctissimissa-library-20260913/reader.html`, `tests/libraryContent.test.ts`. Do: adapt book-toc/notebook chrome and mount the real SectionReader inside `#book-reader-host`, preserving shared highlight/menu/range code. Load installer content, editionSections, display exact source title and provenance; TOC links open block and increment nonce, restore progress once after load, persist updates without scroll loops. Annotation drawer shows existing sidecar study entries filtered by current book prefix and their original anchors; selecting unresolved anchor explains it without guessing. Mount RecordingPanel shared component; missing translation stays absent. Locked/missing package state offers the appropriate download/restore action and always lets the user open/export their personal notebook. Remove specimen paragraphs and authoritative-looking sample claims. Verify: `node --experimental-strip-types --test tests/libraryContent.test.ts tests/libraryRoutes.test.ts`. Accept: real blocks map to correct book anchors, progress/TOC route remains stable across revisions, English-only content does not acquire fake Latin, and all annotation actions still use SectionReader. Interactive paragraph highlight persistence is directly observed in rubric LS-READER.
+
+- [ ] **LS.08 — OIDC identity, RevenueCat web checkout and one controller.** Depends BS-S1–S5; LS.01–04. Files allowed: `src/core/entitlements/{index,purchases,identity,api,license}.ts`, `src/ui/library/viewTypes.ts`, `package.json,package-lock.json,.env.example,content/library/offers.json`, `tests/libraryEntitlements.test.ts`. Do: install `@revenuecat/purchases-js` and `oidc-client-ts`, commit resolved versions in lockfile. `IdentityController` exports `signIn():Promise<void>`, `finishSignIn():Promise<void>`, `token():Promise<string|null>`, `refreshToken():Promise<string|null>`, `signOut():Promise<void>`, `state:'anonymous'|'loading'|'authenticated'|'error'`; use UserManager authorization-code PKCE S256, exact issuer/client ID/API scope/audience, state+nonce verification, no client secret; no own password/magic-link endpoint. Token remains in session memory/sessionStorage managed by the library, never query links/logs. Call GET identity with API access token; configure Purchases with returned rcAppUserId before displaying offers or purchasing. `PurchaseController` uses RC offerings for configured edition IDs; handles pending/cancel/failure distinctly; after success/restore force service reconcile then license, never grant from UI receipt/result. Native adapter dispatch comes from LS.09. `EntitlementController` exposes only common stable lookup keys; map BS internal RC IDs explicitly through public `content/library/offers.json` `{schemaVersion:1,globalLibraryEntitlement:null|{lookupKey,rcEntitlementId},products:[{editionIds:string[],lookupKeys:string[],rcEntitlementIds:string[],rcProductId:string,storeProductId:string,offeringId:string,packageId:string,channel:'web'|'play',kind:'lifetime'|'subscription'}]}`; no guessed SKU->internal ID conversion. Missing real config means free routes work, commerce unavailable; env absence must never unlock paid content. Add `.env.example` keys `VITE_BOOKSTORE_API_URL,VITE_OIDC_AUTHORITY,VITE_OIDC_CLIENT_ID,VITE_OIDC_SCOPE,VITE_OIDC_REDIRECT_URI,VITE_REVENUECAT_WEB_API_KEY,VITE_REVENUECAT_ANDROID_API_KEY,VITE_COMMERCE_CHANNEL,VITE_BOOKSTORE_PUBLIC_KEYS_JSON`; blank provider values, channel defaults disabled. Create offers.json with empty real mappings, no fake IDs; merchant activation populates it. Verify: `node --experimental-strip-types --test tests/libraryEntitlements.test.ts`. Accept: injected SDK/identity fixtures assert identity-before-purchase, correct mapping, localized terms, cancel/pending no-grant, failed reconcile no new license, restore/overlap/expiry semantics, state mismatch rejection, no-key paid denial and always-free Haydock/personal notes. Real provider flows are operator verification, not fixture success claims.
+
+- [ ] **LS.09 — Distribution adapter and microphone permissions.** Depends LS.08. Files allowed: `src/core/entitlements/{purchases,identity,play}.ts`, `src-tauri/src/{lib,commerce}.rs`, `src-tauri/{Cargo.toml,Cargo.lock}`, `src-tauri/tauri.conf.json`, `src-tauri/capabilities/default.json`, `src-tauri/gen/android/app/{build.gradle.kts,src/main/AndroidManifest.xml,src/main/java/mba/robin/sanctissimissa/MainActivity.kt,src/main/java/mba/robin/sanctissimissa/CommercePlugin.kt}`, `package.json,package-lock.json`, `tests/libraryEntitlements.test.ts`. Do: implement `PlayPurchaseAdapter` satisfying PurchaseController via real RevenueCat Android SDK non-consumable-capable version >=7.11, pin its resolved version in Gradle. Tauri mobile `CommercePlugin` commands `configure(accountId,apiKey)`, `offers(offeringId)`, `purchase(packageId)`, `restore()` normalize success/pending/cancel/error, use actual current Activity and lifecycle, never return canned customer state. Rust mobile plugin bridge `commerce_offers,commerce_purchase,commerce_restore,commerce_configure` only compiles on Android; web/direct route uses Web Billing. Play build excludes web checkout imports/links using compile-time `VITE_COMMERCE_CHANNEL=play`; unknown/disabled channel offers no paid action. OIDC uses system browser + app-link/deep-link PKCE return, exact configured callback `mba.robin.sanctissimissa://auth/callback` on native, registered web callback from env on web; install @tauri-apps/plugin-opener and @tauri-apps/plugin-deep-link JS dependencies and tauri-plugin-opener and tauri-plugin-deep-link Rust crates compatible with existing Tauri 2; pin resolved lockfile versions and register plugins with capabilities scoped to that purpose. Validate callback state in IdentityController, never authenticate from the URL alone. Android RECORD_AUDIO permission only requested following shared RecordingController gesture; preserve existing MainActivity/WebView integrations. Do not alter bundle ID or activate dormant CI. Verify: `node --experimental-strip-types --test tests/libraryEntitlements.test.ts` plus `(cd src-tauri/gen/android && ./gradlew :app:compileDebugKotlin)`. Accept: tests prove Play adapter selection/no external pay link and cancellation semantics; Kotlin BUILD SUCCESSFUL; plugin interface exists and invokes RC SDK. Actual store purchase, deep-link return and mic behavior require LS platform operator rubric and are not claimed by compilation.
+
+- [ ] **LS.10 — Shell wiring and whole-wave regression.** Depends LS.01–09, CH1–CH6 and BS-S1–S5. Sole shared-shell owner. Files allowed: `src/App.tsx`, `src/ui/MapStrip.tsx`, `src/core/share/shareLink.ts`, `src/core/storage/root.ts` (read only), `src/ui/{ReaderView,OfficeView,BibleView,ScriptureMap,SectionReader}.tsx`, `src/ui/library/`, `src/ui/{ChantView,MassReferenceView}.tsx`, `src/core/{library,chant,entitlements}/`, `content/library/offers.json` (read only), `tests/{libraryRoutes,libraryEntitlements,libraryContent}.test.ts`, `DOCS/TEST_RUBRIC.md` LS rows. Do: add five View variants; rail order preserves all current destinations and inserts My Library/Bookstore/Gregorian Chant/Mass Reference after Scripture. Book reader is reached from Library rather than a redundant rail item. Create one persistent sidecar-backed LibraryStore/media/installer/controller set, loading/errors handled; pass identical StudyTools dependencies into every shared reader, with the common explicit corpus/book/reference documentId, numeric revision, and full existing block anchors. Include recording in LibraryViewProps. Implement `#/library/<edition>/<block>` strict decode and `#/reference/<article>/<block>` and `#/chant/<planId>`; malformed IDs show recoverable error. Existing mass/office/Bible/journal/share links unchanged. Shared book/reference navigation uses its own TOC/context; suppress unrelated Mass strip on these views, preserve it for chant's selected Mass. Route changes stop active recording cleanly. Shared annotation export remains ungated; edition paid access checked centrally. Verify: `npm test` and `npx tsc -b`. Accept: zero failed tests and typecheck exit0, tests cover old and new deep links, menus dispatch correctly, no processor-specific feature gate in a view. Run LS operator protocol separately for actual UI/platform behavior; record precise unverified states rather than marking LS shipped.
+
+
+## LS backend common contract and BS-S tasks
+
+2026-09-13. Status: **binding architecture contract; implementation and deployment pending**. Adopted as `DOCS/ARCHITECTURE/bookstore-service-20260913.md`; complete execution text is reproduced in CHECKLIST stanza LS. All paths below are repository-relative. It specifies one independent backend; it does not authorize edits to existing UI code.
+
+## 1. Fixed scope and ownership
+
+Launch checkout: RevenueCat Web Billing using Stripe as its gateway, and native store purchases through RevenueCat. WooCommerce, Gumroad, Bidlr, direct Stripe, and promotional entitlement grants are excluded from launch implementation. One non-consumable edition or versioned bundle grants permanent edition entitlements; subscriptions may grant temporary edition access, `study_library_all` access, or services. Purchases remain in RevenueCat; this service verifies and records their state, signs evidence, and delivers immutable packages. It never invents a successful payment.
+
+Account sign-in uses an operator-configured existing OIDC issuer. The backend validates access JWTs; the client implements the issuer's standard authorization-code/PKCE flow in its separate task. There is no project-owned magic-link or password service. Native and web SDKs must log in using the server-returned `rcAppUserId` before purchasing. Anonymous purchases and account transfers are outside launch scope; restore must use the same authenticated account.
+
+Single-process service root: `services/bookstore/`; Node **24.x**, ESM TypeScript, `node:http`, `node:crypto`, `node:sqlite`, native fetch, and `jose` 6.x. No framework, Redis, or hidden external database requirement. All entities below are new exports at line 1 of their target file initially; subsequent line changes do not rename entities. Coder ownership is restricted to this directory.
+
+`package.json`: name `@sanctissimissa/bookstore-service`, private true, type module, engines `node >=24 <25`; runtime dependency `jose:^6.0.0`; dev dependencies `typescript:^5.9.0`, `@types/node:^24.0.0`; commit resolved `package-lock.json`. `tsconfig.json`: target ES2023, module/moduleResolution NodeNext, strict true, rootDir `.`, outDir `dist`, include `src/**/*.ts,test/**/*.ts`, skipLibCheck true. Scripts: `build=tsc && node scripts/copy-schema.mjs`, `test=npm run build && node --test dist/test/*.test.js`, `start=node dist/src/main.js`, `activate:check=npm run build && node dist/src/activate.js`, `sign:edition=npm run build && node dist/src/publish.js`. Copy-schema copies `src/schema.sql` to `dist/src/schema.sql`. `.gitignore`: `.env`, `dist/`, `node_modules/`, `.test-state/`, `var/`.
+
+## 2. Entity table and complete wire types
+
+All structures reject missing required fields, unexpected fields in app-owned signed/configuration documents, unsafe integers, invalid UTF-16 surrogate strings, and non-finite numbers. All times are integer epoch **milliseconds**, unless explicitly called JWT seconds. `Id` matches `[a-z0-9][a-z0-9._-]{0,99}`; SHA256 is 64 lowercase hexadecimal characters. All lists are explicit ordered arrays, never fractional ordering keys.
+
+| Exact exported entity | Target | Signature / fields / purpose |
+|---|---|---|
+| `BookstoreConfig`, `BookstorePublishConfig`, `loadConfig`, `loadPublishConfig` | `src/config.ts:1` | `loadConfig(env:NodeJS.ProcessEnv):{config:BookstoreConfig|null;missing:string[];invalid:string[]}`; exact config fields in §3; `BookstorePublishConfig=Pick<BookstoreConfig,'signingKeyId'|'signingPrivateKeyFile'|'signingPublicKeysFile'|'catalogFile'|'packageRoot'|'deploymentTerritories'>`; `loadPublishConfig(env:NodeJS.ProcessEnv):BookstorePublishConfig` validates only those required signing inputs or throws BookstoreError; no secret logs |
+| `AccountIdentity`, `verifyAccessToken`, `deriveRcAppUserId` | `src/identity.ts:1` | `AccountIdentity={rcAppUserId:string}`; `verifyAccessToken(token:string,config:BookstoreConfig):Promise<AccountIdentity>`; `deriveRcAppUserId(issuer:string,subject:string):string` |
+| `BookstoreCatalog`, `CatalogEdition`, `CatalogService`, `CatalogProduct`, `EditionContent`, `RightsEvidence`, `EditionReview`, `PublishEditionArgs`, `PackageManifest`, `OfflineLicense`, `SignedEnvelope`, `VerifiedSource`, `AccessSnapshot`, `ApiErrorBody`, `Clock` | `src/types.ts:1` | Exact definitions immediately below; `Clock={now():number}`; `ApiErrorBody={error:{code:string;message:string;requestId:string}}` |
+| `validateCatalog`, `loadCatalog`, `validateManifest` | `src/catalog.ts:1` | `validateCatalog(value:unknown):BookstoreCatalog`; `loadCatalog(path:string):Promise<BookstoreCatalog>`; `validateManifest(value:unknown):PackageManifest`; throw typed `BookstoreError` on invalid input |
+| `canonicalJson`, `signEnvelope`, `verifyEnvelope` | `src/signing.ts:1` | `canonicalJson(value:unknown):Uint8Array`; `signEnvelope<T>(type:'manifest'|'license',payload:T,kid:string,privateKey:KeyObject):SignedEnvelope<T>`; `verifyEnvelope<T>(type:'manifest'|'license',envelope:SignedEnvelope<T>,publicKeys:Record<string,KeyObject>):T` |
+| `RevenueCatAdapter`, `HttpRevenueCatAdapter` | `src/revenuecat.ts:1` | interface `fetchState(rcAppUserId:string):Promise<{active:Map<string,number|null>;sources:VerifiedSource[]}>`; class constructor `(config:BookstoreConfig,catalog:BookstoreCatalog,fetcher:typeof fetch=fetch)`; implementation §5 |
+| `BookstoreRepository` | `src/repository.ts:1` | constructor `(dbPath:string)`; `registerAccount(id:string,now:number):void`; `accountExists(id:string):boolean`; `enqueueEvent(eventId:string,bodySha256:string,targets:string[],now:number):'new'|'duplicate'|'conflict'`; `getSnapshot(id:string):AccessSnapshot|null`; `replaceSnapshot(id:string,sources:VerifiedSource[],grants:AccessSnapshot['grants'],now:number):AccessSnapshot`; `dueAccounts(now:number,limit:number):string[]`; `markRetry(id:string,now:number):void`; `markEventsDone(id:string):void`; `metrics():{pending:number;oldestPendingAt:number|null;failures:number}`; `close():void` |
+| `EntitlementSyncBridge` | `src/bridge.ts:1` | constructor `(repository:BookstoreRepository,adapter:RevenueCatAdapter,catalog:BookstoreCatalog,clock:Clock)`; `reconcile(id:string):Promise<AccessSnapshot>`; `freshSnapshot(id:string):Promise<AccessSnapshot>`; `tick():Promise<void>`; per-account serialization and behavior §5 |
+| `verifyRevenueCatWebhook`, `parseRevenueCatWebhook` | `src/webhook.ts:1` | `verifyRevenueCatWebhook(raw:Uint8Array,header:string|undefined,secret:string,now:number):void`; `parseRevenueCatWebhook(raw:Uint8Array,config:BookstoreConfig):{eventId:string;targets:string[];ignored:boolean}`; verification §6 |
+| `authorizeEdition`, `issueOfflineLicense` | `src/access.ts:1` | `authorizeEdition(snapshot:AccessSnapshot,edition:CatalogEdition,catalog:BookstoreCatalog,deploymentTerritories:string[],now:number):void`; `issueOfflineLicense(snapshot:AccessSnapshot,clock:Clock):OfflineLicense`; behavior §7 |
+| `PackageStore`, `parseRange` | `src/packages.ts:1` | constructor `(root:string,catalog:BookstoreCatalog,keys:Record<string,KeyObject>,deploymentTerritories:string[])`; `inspect(editionId:string,revision:number):Promise<{manifest:SignedEnvelope<PackageManifest>;path:string}>`; `parseRange(value:string|undefined,size:number):{start:number;end:number;partial:boolean}`; behavior §8 |
+| `publishEdition`, `compareVersionTriples` | `src/publish.ts:1`, `src/versions.ts:1` | `publishEdition(args:PublishEditionArgs,config:BookstorePublishConfig):Promise<{editionId:string;revision:number;directory:string;sha256:string}>`; `compareVersionTriples(left:string,right:string):number`; CLI and validation §8a |
+| `BookstoreError`, `writeError` | `src/errors.ts:1` | class extends Error, constructor `(status:number,code:string,message:string)`; `writeError(res:ServerResponse,error:unknown,requestId:string):void`; unknown errors map to generic 500 |
+| `BookstoreDependencies`, `createBookstoreServer` | `src/server.ts:1` | `BookstoreDependencies={config:BookstoreConfig|null;configIssues:string[];repository:BookstoreRepository|null;bridge:EntitlementSyncBridge|null;catalog:BookstoreCatalog|null;packages:PackageStore|null;clock:Clock;privateKey:KeyObject|null;publicKeys:Record<string,KeyObject>}`; `createBookstoreServer(deps:BookstoreDependencies):Server`; routes §9 |
+| `runActivationCheck` | `src/activate.ts:1` | `runActivationCheck(config:BookstoreConfig):Promise<void>`; operator-only check §11; CLI prints redacted result and exits 0/1 |
+| production composition | `src/main.ts:1` | construct only real `HttpRevenueCatAdapter`; bind server; tick every 30 seconds with no overlapping ticks; SIGTERM stops timer, finishes in-flight HTTP up to 10 seconds, closes DB |
+| systemd service definition | `systemd/sanctissimissa-bookstore.service:1` | Exact unit in §11a; BS-S5 writes the file, operator owns installation/activation |
+
+```ts
+type BookstoreCatalog={schemaVersion:1;editions:CatalogEdition[];services:CatalogService[];products:CatalogProduct[];globalLibraryEntitlement:{lookupKey:'study_library_all';rcEntitlementId:string}|null};
+type CatalogEdition={editionId:string;title:string;entitlementId:string|null;rcEntitlementId:string|null;access:'free'|'paid';publication:'candidate'|'reviewed'|'ready'|'withdrawn';territories:string[];revisions:number[]};
+type CatalogService={serviceId:string;entitlementId:string;rcEntitlementId:string};
+type CatalogProduct={rcProductId:string;kind:'permanent'|'subscription';entitlementIds:string[]};
+type VerifiedSource={sourceId:string;productId:string;kind:'permanent'|'subscription';store:string;environment:'production'|'sandbox';state:string;givesAccess:boolean;expiresAt:number|null;entitlementIds:string[]};
+type EditionContent={schemaVersion:1;editionId:string;revision:number;blocks:{id:string;sectionId:string;sectionTitle:string;sourceLocator:string;latin:string|null;english:string|null}[];sourceUrls:string[];redirects:Record<string,string[]>};
+type RightsEvidence={assetId:string;kind:'text'|'score'|'audio'|'cover';sourceUrl:string;sourceEdition:string;translator:string|null;publicationYear:number|null;basis:string;territories:string[];commercial:boolean;redistribution:boolean;attribution:string;reviewedBy:string|null;reviewedAt:string|null;sha256:string};
+type EditionReview={schemaVersion:1;reviewId:string;editionId:string;revision:number;minimumReaderVersion:string;rights:RightsEvidence[];sourceFiles:{assetId:string;path:string}[]};
+type PublishEditionArgs={editionId:string;revision:number;inputPath:string;reviewPath:string};
+type AccessSnapshot={schemaVersion:1;rcAppUserId:string;environment:'production'|'sandbox';revision:number;verifiedAt:number;grants:{lookupKey:string;rcEntitlementId:string;kind:'permanent'|'subscription';expiresAt:number|null}[]};
+type PackageManifest={schemaVersion:1;editionId:string;revision:number;contentFormat:'sanctissimissa-edition-json-v1';anchorScheme:'book:<editionId>#<blockId>';bytes:number;sha256:string;mediaType:'application/json';rights:{reviewId:string;sourceUrls:string[];territories:string[];commercialUse:true;assets:RightsEvidence[]};minimumReaderVersion:string};
+type OfflineLicense={schemaVersion:1;rcAppUserId:string;environment:'production'|'sandbox';revision:number;issuedAt:number;grants:{lookupKey:string;rcEntitlementId:string;kind:'permanent'|'subscription';expiresAt:number|null}[]};
+type SignedEnvelope<T>={schemaVersion:1;type:'manifest'|'license';kid:string;payload:T;signature:string};
+```
+
+`entitlementId` in CatalogEdition/CatalogService and `entitlementIds` in CatalogProduct/VerifiedSource are stable **SDK lookup keys**; edition keys are exactly `reference_<editionId>`, global-library key exactly `study_library_all`. `rcEntitlementId` is the RC v2 internal `entl…` ID; `rcProductId` is its internal `prod…` ID. Both are nonempty ASCII <=200 characters. Adapter maps RC internal IDs to lookup keys using configured edition/service/global pairs; both fields appear in every signed grant, and UI gates use lookupKey only. A store SKU and offering/package identifier are separate frontend PurchaseController fields, never substitutes for prod IDs. Free editions carry both entitlement fields null. Revisions are positive safe integers; edition IDs are ASCII kebab-case; service IDs use Id. Products reference declared lookup keys: permanent only paid editions; subscription paid editions, services, or global library. Permanent never grants study_library_all. One lookup key maps to exactly one RC ID and vice versa; duplicate edition IDs/revisions and undeclared references are invalid. An edition may have separate permanent/subscription products mapping the same key. Bundles explicitly list paid edition keys; free Haydock is never charged again. This adapter configuration is separate from the frontend editorial catalog.
+
+## 3. Environment and local readiness
+
+`BookstoreConfig={host:string;port:number;publicOrigin:string;allowedOrigins:string[];deploymentTerritories:string[];oidcIssuer:string;oidcAudience:string;oidcJwksUri:string;rcProjectId:string;rcSecretApiKey:string;rcEnvironment:'production'|'sandbox';rcAppIds:string[];rcWebhookHmacSecret:string;signingKeyId:string;signingPrivateKeyFile:string;signingPublicKeysFile:string;catalogFile:string;packageRoot:string;databaseFile:string}`. Strip the `SM_` prefix and map each uppercase snake-case environment key below to this exact camelCase field; trim surrounding whitespace; parse port as integer 1024–65535; parse declared comma-separated arrays in order, trim entries, reject duplicates. Missing string values are not silently replaced with arbitrary IDs or paths.
+
+Create `services/bookstore/.env.example` with these exact keys; blanks remain blank, never fabricated account values:
+
+```dotenv
+SM_HOST=127.0.0.1
+SM_PORT=43817
+SM_PUBLIC_ORIGIN=
+SM_ALLOWED_ORIGINS=
+SM_DEPLOYMENT_TERRITORIES=
+SM_OIDC_ISSUER=
+SM_OIDC_AUDIENCE=
+SM_OIDC_JWKS_URI=
+SM_RC_PROJECT_ID=
+SM_RC_SECRET_API_KEY=
+SM_RC_ENVIRONMENT=production
+SM_RC_APP_IDS=
+SM_RC_WEBHOOK_HMAC_SECRET=
+SM_SIGNING_KEY_ID=
+SM_SIGNING_PRIVATE_KEY_FILE=
+SM_SIGNING_PUBLIC_KEYS_FILE=
+SM_CATALOG_FILE=
+SM_PACKAGE_ROOT=
+SM_DATABASE_FILE=
+```
+
+`SM_ALLOWED_ORIGINS` and `SM_RC_APP_IDS` are comma-separated exact strings; `SM_DEPLOYMENT_TERRITORIES` is a nonempty comma-separated ISO3166 alpha-2 uppercase list. Other values are single strings. Public origin, issuer, JWKS URI require HTTPS, with HTTP permitted only for literal loopback hosts in development/tests. File paths must be absolute. Public keys file is a JSON object mapping key IDs to PEM SPKI public keys; private key file is PEM PKCS8 Ed25519, mode 0600; matching configured public key must exist. Catalog file schema is §2. Node is launched with `node --env-file=.env dist/src/main.js` when an env file is desired; `npm start` uses process environment. No dotenv dependency. `SM_HOST/PORT` have the example defaults; all other keys are required, except no origins is a valid native-only deployment.
+
+Missing/invalid configuration keeps HTTP `/healthz` alive and makes `/readyz` and `/v1/*` return 503 `CONFIG_INCOMPLETE`; report key **names**, never values. Invalid DB/schema, unreadable package root/catalog, or invalid keys also make readiness 503. Readiness checks local capability, not proof of successful merchant activation. Production starts no test adapter and creates no sample paid products. An empty real catalog is valid but has no sellable downloads.
+
+## 4. Identity and persistent schema
+
+`deriveRcAppUserId = 'sm_' + base64url(SHA256(UTF8(issuer + U+0000 + subject)))`, without padding. Use the JWT `iss` exactly, no URL normalization. `verifyAccessToken` uses `jose.createRemoteJWKSet(new URL(config.oidcJwksUri))` and `jwtVerify` with exact issuer, audience, algorithms `['RS256','ES256','EdDSA']`, clock tolerance 30 seconds; require nonempty `sub`, `exp`, and `iat`, reject future `iat > now+30s`, reject absent Bearer token, algorithm none, and expired JWT. Do not accept an OIDC ID token in place of an access token: issuer activation must establish a distinct API audience; browser/mobile client IDs cannot be the configured API audience. Do not persist JWTs, issuer, subject, email, or authorization headers. The opaque derived account ID is sufficient.
+
+`src/schema.sql` applies `PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;` and idempotently creates:
+
+```sql
+CREATE TABLE IF NOT EXISTS accounts(id TEXT PRIMARY KEY, created_at INTEGER NOT NULL, next_reconcile_at INTEGER NOT NULL, retries INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE IF NOT EXISTS events(id TEXT PRIMARY KEY, body_sha256 TEXT NOT NULL, received_at INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS event_targets(event_id TEXT NOT NULL REFERENCES events(id), account_id TEXT NOT NULL REFERENCES accounts(id), done INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(event_id,account_id));
+CREATE TABLE IF NOT EXISTS sources(account_id TEXT NOT NULL REFERENCES accounts(id), source_id TEXT NOT NULL, product_id TEXT NOT NULL, body_json TEXT NOT NULL, observed_at INTEGER NOT NULL, PRIMARY KEY(account_id,source_id));
+CREATE TABLE IF NOT EXISTS snapshots(account_id TEXT PRIMARY KEY REFERENCES accounts(id), revision INTEGER NOT NULL, verified_at INTEGER NOT NULL, body_json TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS snapshot_history(account_id TEXT NOT NULL REFERENCES accounts(id), revision INTEGER NOT NULL, verified_at INTEGER NOT NULL, body_json TEXT NOT NULL, PRIMARY KEY(account_id,revision));
+```
+
+Use parameter binding for every value and `BEGIN IMMEDIATE` transactions for queue inserts and snapshot replacement. Never delete historical snapshots/events because a refund occurs. Replace source rows with the complete latest provider result inside the same snapshot transaction; history preserves previous grant states. `revision` starts at 1 and increases only when canonical grants/environment change; always update `verified_at`. Insert history only on revision change. Account registration is idempotent, schedules immediate reconciliation, and never changes identity mapping. Duplicate event ID/same hash is a no-op; duplicate ID/different hash is conflict. `dueAccounts` selects pending event targets or due accounts, ordered next-reconcile time then ID; limit 20. Mark all current targets done only after successful reconciliation. Failures increment retries and schedule `now+min(30000*2^min(retries,7),3600000)`; success resets retries and schedules one hour later.
+
+## 5. Exact RevenueCat read adapter and reconciliation
+
+Use secret Bearer authentication to `https://api.revenuecat.com/v2/projects/{encodedProjectId}/customers/{encodedAccountId}/active_entitlements`, `/purchases?environment={production|sandbox}`, and `/subscriptions?environment={production|sandbox}`. Request `limit=100`; follow every `next_page` until null, including each source's nested entitlement list. Permit pagination only on HTTPS `api.revenuecat.com` with paths under the configured project; reject loops, more than 100 pages, or an environment mismatch. Set a 10-second timeout per request. A customer 404 produces an empty state only if **all three initial endpoints** return 404; mixed success/404 is retryable inconsistent upstream, never a grant. 401/403/429/5xx, invalid JSON, or malformed fields return `UPSTREAM_UNAVAILABLE`; no local fallback grants.
+
+Normalize active list items from `entitlement_id,expires_at`, mapping internal IDs to configured lookup keys. Normalize purchases from `id,product_id,status,store,environment,entitlements.items[].id`; permanent validity requires `status==='owned'` and a configured permanent product. Normalize subscriptions from `id,product_id,gives_access,current_period_ends_at,store,environment,entitlements.items[].id`; validity requires `gives_access===true`, configured subscription product, and future integer `current_period_ends_at`. IDs are prefixed `purchase:` or `subscription:` as `sourceId`; preserve provider status in `state`. Unknown products are recorded but grant nothing; map source internal entitlement IDs to lookup keys, then intersect with configured product mapping. Purchase `expiresAt=null`; subscription expiry is the earlier of the future provider period-end and active entitlement expiry when non-null. Unsupported statuses are inactive, not parse failures.
+
+Effective access requires BOTH a matching entry in RevenueCat's active-entitlements result (null or future expiry) AND at least one valid source from the configured environment. For each lookup key, permanent wins if any owned permanent source covers it; otherwise use subscription kind with the latest valid source expiry, excluding expirations <=now. Refunding one source preserves another. The global-library grant remains one expiring subscription grant; do not synthesize permanent edition grants from it. Subscriptions never produce permanent licenses. The active-entitlements endpoint has no environment parameter; the source intersection prevents sandbox access leaking into production. No promotional-only entitlements are granted. [Verified endpoint/field reference](https://www.revenuecat.com/docs/api-v2/customer/resources).
+
+`EntitlementSyncBridge.reconcile` fetches complete state, computes sorted grants, and atomically replaces the snapshot. Serialize all calls per account and coalesce concurrent refreshes. `freshSnapshot` returns stored state only when age <=60 seconds, otherwise reconciles. Every explicit `POST /v1/reconcile` forces reconciliation. `tick` processes due accounts sequentially; failures preserve last verified evidence and schedule retry, never infer cancellation. After webhook intake, the next tick reconciles current state; event arrival order cannot roll a refunded account back to an old sale. Imported native/RC Web purchases need **no promotional grant/revoke calls**.
+
+## 6. RevenueCat webhook contract
+
+`POST /v1/webhooks/revenuecat` reads original bytes before parsing, max 1 MiB; require `Content-Type: application/json` (optional charset accepted). Header is `X-RevenueCat-Webhook-Signature: t=<unix_timestamp>,v1=<hmac_sha256_hex>`. Parse exactly one integer `t` and one 64-hex `v1`; reject duplicates/unknown formats. Compute HMAC-SHA256 with UTF8 secret over `ASCII(t) + '.' + rawBody`, use constant-time comparison, and require `abs(now/1000-t)<=300`. Timestamp is delivery time, not event time. Return 401 `INVALID_SIGNATURE` for bad/missing signature or timestamp. RevenueCat documents: “HMAC-SHA256 is computed over `"<timestamp>.<raw_json_body>"`”. [Current HMAC instructions](https://www.revenuecat.com/docs/integrations/webhooks).
+
+After verification, parse inside try/catch. Require body `event` object with nonempty string `id,type,app_id,environment`; accept extra provider fields. Compare `app_id` with configured app IDs and uppercase `environment` with configured environment. Nonmatching app/environment and `TEST` events return 200 `{accepted:true,ignored:true}` without grants. Gather known registered accounts from string `app_user_id`, string-array `aliases`, `transferred_from`, and `transferred_to`; ignore unknown/nonmatching IDs. Store only hash, event ID, targets, and received time; raw payload remains ephemeral. Durable insert precedes 200 `{accepted:true,duplicate:boolean}`. Same ID/different body hash returns 409 `EVENT_CONFLICT`; DB failure 503. No account is created from a webhook. Because retries reuse ID/body, timestamp changes do not defeat deduplication.
+
+## 7. Signing and offline access
+
+Canonicalization is a deliberately restricted JSON profile: accept null, booleans, Unicode strings without lone surrogates, safe integers, arrays in order, and plain objects with lexicographically sorted UTF-16 keys; recursively JSON-stringify values, emit no whitespace, encode UTF8; reject undefined, floats, BigInt, functions, prototypes other than Object/null, and cyclic values. No Unicode normalization. Object member order must not affect signatures. Sign **canonicalJson({schemaVersion:1,type,kid,payload})** with Node `crypto.sign(null,bytes,privateKey)` Ed25519; `signature` is base64url without padding. Verify exact envelope type, known pinned `kid`, schema, and signature before trusting payload. Signed structure domain-separates manifests/licenses. Never trust an arbitrary public key supplied with a package or fetched by a client without a shipped trust anchor.
+
+`issueOfflineLicense` copies fresh snapshot grants, `issuedAt=clock.now()`, identical account/environment/revision, no transaction secrets. Permanent grants have null expiry; subscriptions expire at `min(providerEffectiveExpiry,issuedAt+72h)` with **no grace after paid access ends**. `authorizeEdition` first requires publication ready and every configured deployment territory present in edition territories; otherwise 403 `NOT_AVAILABLE_IN_DEPLOYMENT`. It then accepts a free edition, a matching active permanent/subscription lookup-key grant, or active globalLibraryEntitlement subscription. No client-supplied country can widen availability. Service deployments are configured only for territories covered by merchant sales/fulfillment restrictions; this configuration is a conservative publication gate, not a claim to geolocate a reader. Parent reader uses lookupKey with the same permanent/per-edition-subscription/global-subscription precedence. Persist highest license revision per account; newer complete evidence replaces the grant set, missing keys revoke managed access, and older revisions never restore access. Equal-revision refresh may replace evidence only when issuedAt is later.
+
+Permanent offline ownership cannot support instant revocation while disconnected. Downloaded books remain available with valid cached evidence until successful online reconciliation communicates a refund. Expired cloud service grants never remove permanent books or local annotations/recordings. Network failures do not revoke licenses. Annotation stores remain separate and exportable. A production client rejects sandbox licenses. Key rotation ships the new public key to clients before issuance; retain old verification keys for still-valid permanent licenses. Do not claim remote deletion of exported files.
+
+## 8. Immutable packages, verification, and resumption
+
+Package storage layout: `{SM_PACKAGE_ROOT}/{editionId}/{revision}/edition.json` plus `manifest.json` containing `SignedEnvelope<PackageManifest>`. Edition JSON is the exact UTF-8 EditionContent schema in §2; manifest contentFormat is `sanctissimissa-edition-json-v1` and anchorScheme is the literal template `book:<editionId>#<blockId>`. Revision is a positive safe integer, serialized as canonical decimal digits in paths (reject zero, signs, fractions, and leading zeros). Metadata must match path, catalog revision, positive byte length, SHA256, signature, and rights territories covering every configured deployment territory. Package inspection validates JSON in try/catch, matching edition/revision, unique nonempty block IDs, string metadata, and at least one non-null language per block. Each redirects value is a nonempty ordered array of distinct successor block IDs; every target must exist in this revision, scalar values are invalid, and order is preserved for split-block relocation; never silently choose only its first successor. No HTML evaluation. Reject symlink components and paths outside root. Hash bytes on first use, cache verified inode/size/mtime, and rehash after change; verify sidecar each use. Invalid metadata/signature/bytes/schema produces 503 `CORRUPT_PACKAGE`, never bytes. Ingestion atomically publishes new revisions and never overwrites an existing revision.
+
+Authenticated `GET` content supports a single HTTP bytes range: `start-end`, `start-`, or `-suffixLength`; parse safe nonnegative integers; clamp end to size-1; reject empty/reversed/out-of-bounds/multipart ranges with 416 and `Content-Range: bytes */size`. No Range gives 200; valid Range gives 206 with exact `Content-Range`, `Content-Length`, `Accept-Ranges: bytes`, `Content-Type: application/json; charset=utf-8`, `ETag: "sha256-<hex>"`, `Cache-Control: private, no-store`. `If-Range` must equal ETag or ignore Range and send full 200. Each request rechecks fresh entitlement/publication/territory; JWT renewal can resume immutable bytes. HEAD authorizes and returns full-file 200 headers with no body, ignoring Range. Stream using file handle and close on disconnect. Client verifies full SHA256 after range assembly before atomic installation. There is no separate download-ticket endpoint: client fetches the signed manifest and content with its Bearer access token.
+
+## 8a. Exact local signing/publication command
+
+After ingestion and review, operator runs from `services/bookstore`: `npm run sign:edition -- --edition <editionId> --revision <positiveInteger> --input <absolute-edition.json-path> --review <absolute-review.json-path>`. CLI accepts exactly those four required flags once each; rejects unknown/duplicate/missing arguments with exit 2. It loads only `loadPublishConfig(process.env)` (merchant/OIDC credentials are unnecessary), then calls `publishEdition`; success prints one JSON receipt `{editionId,revision,directory,sha256}` and exits 0; validation/config/source mismatch exits 1 with a redacted code. It neither contacts RevenueCat nor changes commerce products. No real publication is performed by writing this contract.
+
+`EditionReview` is supplied by the named reviewer, not generated as approval by the signing command. Require matching edition/revision, a catalog edition already in `reviewed` or `ready`, target revision in its explicit revisions array, nonempty reviewId, >=1 text RightsEvidence, unique asset IDs, nonempty sourceEdition/basis/reviewedBy, parseable reviewedAt ISO datetime, commercial=true, redistribution=true, and every deployment territory in both catalogue territories and every asset's territory list. Every distributed source asset needs exactly one absolute sourceFiles path; reject extra/missing mappings and symlinks. Hash each actual source file and compare its RightsEvidence.sha256; failed proof aborts. `EditionContent.sourceUrls` must equal the ordered deduplicated sourceUrl list from review.rights. `sourceFiles.path` is never copied into the signed manifest. Review selection/rights findings are human authority; this tool verifies supplied evidence, not legal status.
+
+Validate EditionContent and preserve its exact input bytes; derive bytes/SHA256 from that byte sequence. Manifest fields are fixed by §2; minimumReaderVersion comes from the review; rights.assets is the complete reviewed array; rights.sourceUrls is its ordered deduplicated source URL list; rights.territories is the ordered intersection of catalogue and every asset's territories; commercialUse=true. Use configured key ID/private key and signEnvelope('manifest',...). Verify the newly generated envelope with configured public key before writing.
+
+Acquire root `.publish.lock` using exclusive create; an existing lock fails `PUBLISH_BUSY` without deleting it. Under the lock ensure `{root}/{editionId}` exists as a real directory (create if absent, reject symlinks), reject any existing target revision directory with `REVISION_EXISTS` (even identical bytes), and create `.<editionId>-<revision>-<UUID>.staging` inside root. Write edition.json and manifest.json using exclusive-create files, fsync files/staging, rename staging to the previously absent revision directory, then fsync its parent. On error remove only this invocation's staging; always close/unlink only this invocation's lock. Source inputs/catalogue are never mutated. After success operator changes the edition's catalogue publication from reviewed to ready; until then HTTP delivery is denied. README states this exact activation step and immutable-revision rule. Tests publish only inside their owned fixture root.
+
+`compareVersionTriples` parses **MAJOR.MINOR.BUILD**, exactly three nonnegative safe decimal integers separated by dots (no leading zeros except zero, suffixes, ranges, or prerelease notation); compares numeric components lexicographically and returns -1/0/1. This is the project version scheme, not semver. Validate manifest minimumReaderVersion by this parser; client installation requires `compareVersionTriples(currentVersion,minimumReaderVersion)>=0` and rejects incompatible content before active-revision switch. The current app version comes from the project's actual version source, not this dated contract.
+
+## 9. HTTP surface and uniform errors
+
+All app routes use Bearer authentication except health, readiness, and signed webhook. JSON responses use `application/json`, `Cache-Control:no-store`, `X-Content-Type-Options:nosniff`; no cookies. Generate UUID request ID per request. CORS permits exact configured origins only, reflects a permitted Origin, includes `Vary: Origin`, permits GET/HEAD/POST/OPTIONS and Authorization/Content-Type/Range/If-Range, and exposes ETag/Content-Range/Accept-Ranges/Content-Length. Deny unknown origins 403. Native requests without Origin are permitted after normal auth. OPTIONS returns 204 only for configured origins.
+
+| Method/path | Success body/status | Important failure |
+|---|---|---|
+| `GET /healthz` | 200 `{status:'alive'}` | None while server is alive |
+| `GET /readyz` | 200 `{status:'ready',scope:'local'}` | 503 `{error:{code:'CONFIG_INCOMPLETE',message:'Service configuration incomplete',requestId},missingKeys:string[]}`; only this error adds `missingKeys` |
+| `GET /v1/identity` | Register mapped account; 200 `{rcAppUserId,environment}` | 401 `INVALID_TOKEN`; issuer/JWKS unavailable 503 `UPSTREAM_UNAVAILABLE` |
+| `GET /v1/entitlements` | Register account; fresh state; 200 `AccessSnapshot` | 503 `UPSTREAM_UNAVAILABLE` |
+| `POST /v1/reconcile` | Body exactly `{}`; register; force refresh; 200 `AccessSnapshot` | malformed/nonempty body 400 `BAD_REQUEST` |
+| `POST /v1/license` | Body exactly `{}`; register; fresh state; 200 `SignedEnvelope<OfflineLicense>` | 503 if refresh/signing unavailable |
+| `GET /v1/packages/:editionId/:revision/manifest` | Fresh access and integrity checks; 200 `SignedEnvelope<PackageManifest>` | 404 `UNKNOWN_PACKAGE`; 403 `NOT_ENTITLED`; 503 `CORRUPT_PACKAGE` |
+| `GET` or `HEAD /v1/packages/:editionId/:revision/content` | Bytes/headers per §8 | Above, plus 416 `INVALID_RANGE` |
+| `POST /v1/webhooks/revenuecat` | §6 | 401 `INVALID_SIGNATURE`, 409 `EVENT_CONFLICT` |
+| `GET /v1/metrics` | Auth JWT additionally requires `scope` space-delimited string containing `bookstore:ops`; 200 `{pending,oldestPendingAt,failures}` | 403 `FORBIDDEN` |
+
+All other failures have exactly `ApiErrorBody`: 400 `BAD_REQUEST`, 401 `INVALID_TOKEN`, 403 `NOT_ENTITLED/FORBIDDEN/NOT_AVAILABLE_IN_DEPLOYMENT`, 404 `NOT_FOUND/UNKNOWN_PACKAGE`, 405 `METHOD_NOT_ALLOWED` with Allow, 413 `PAYLOAD_TOO_LARGE`, 415 `UNSUPPORTED_MEDIA_TYPE`, 416 `INVALID_RANGE`, 429 `RATE_LIMITED`, 500 `INTERNAL_ERROR`, 503 `CONFIG_INCOMPLETE/UPSTREAM_UNAVAILABLE/CORRUPT_PACKAGE`. Apply 12 requests/minute/account to POST reconcile/license and 120/minute/account elsewhere except active byte streams; 429 includes integer Retry-After. POST bodies except webhook max 1 KiB. Never include upstream bodies, tokens, paths, or keys in error messages. Structured logs: requestId, route template, status, durationMs, error code; background logs include hashed account ID only, event ID, attempt, and error code.
+
+## 10. GLM tasks — adopted in CHECKLIST stanza LS
+
+The following tasks are sequential; coder reads only the adopted checklist contract and files named by its task. Tests create independent fixture directories under `services/bookstore/.test-state/` using process ID + random ID, remove only their own directory, and never use `/tmp`, LAN services, live credentials, or committed customer data. Every test uses Node's test runner and strict assertions, closes servers/databases, and runs repeatedly without state dependence. Test fixture adapters are injected via the interface only; main.ts has no fake mode or bypass environment flag. All Verify commands run from repository root.
+
+- [ ] **BS-S1 — Runtime, schemas, configuration.** Files: `services/bookstore/package.json,package-lock.json,tsconfig.json,.gitignore,.env.example,scripts/copy-schema.mjs,src/types.ts,src/config.ts,src/catalog.ts,src/errors.ts,src/schema.sql,test/config.test.ts`. Do: create §1 package/scripts, every §2 type, and complete §4 schema.sql including PRAGMAs before running build; validate §2 catalog and exact §3 config fields/types; export exact entities. Test missing keys, valid isolated fixture paths, wrong schemes, duplicate catalog IDs, invalid product mapping, and unknown signed/config fields. Install dependencies and produce lockfile. Verify: `npm --prefix services/bookstore run test`. Accept: exit 0; zero failures including invalid-config cases; build copies existing schema.sql successfully; no external network tests.
+- [ ] **BS-S2 — JWT identity and durable state.** Depends BS-S1. Files to create: `src/identity.ts,src/repository.ts,test/identity.test.ts,test/repository.test.ts`; read-only: `src/schema.sql` and BS-S1 modules needed for imports. Do: implement §4 using local HTTP JWKS fixture with generated RSA/EC keys and jose JWT signatures; cases correct issuer/audience, wrong issuer/audience/key, expired/future/missing claims, stable mapping across calls, distinct subjects/issuers, no raw identity persistence. Load existing schema.sql without editing it; implement repository methods/transactions, event duplicate/conflict, complete snapshot replacement, immutable history, unchanged grant revision, retry schedule, and reopen persistence. Verify: `npm --prefix services/bookstore run test`. Accept: exit 0; identity/repository assertions pass on two sequential invocations.
+- [ ] **BS-S3 — Real RC read adapter and bridge.** Depends BS-S2. Files: `src/revenuecat.ts,src/bridge.ts,test/revenuecat.test.ts,test/bridge.test.ts`; earlier files imports only. Do: implement §5, injecting fetch in tests; fixtures represent active entitlements and owned/refunded purchases plus subscriptions. Cover internal-ID/lookup-key mapping, URL/auth/pagination, nested entitlements pagination, sandbox exclusion, 404-all versus mixed-404, timeout/429/invalid JSON, unknown product, per-edition/global-library subscription expiry, permanent ownership surviving subscription expiry, refund one of two overlapping sources, inactive RC entitlement despite owned source, coalesced concurrent refresh, failed read preserving prior snapshot, scheduled repair. Verify: `npm --prefix services/bookstore run test`. Accept: exit 0; all adapter/bridge assertions pass; production class always calls RC over HTTPS.
+- [ ] **BS-S4 — Signed webhook intake, manifests, licenses, and publication CLI.** Depends BS-S3. Files: `src/webhook.ts,src/signing.ts,src/access.ts,src/packages.ts,src/publish.ts,src/versions.ts,test/webhook.test.ts,test/signing.test.ts,test/packages.test.ts,test/publish.test.ts`; earlier files imports only. Do: implement §§6–8a and the sign:edition script specified in BS-S1. Use generated Ed25519 keys, tiny UTF-8 EditionContent JSON and hashed source fixtures. Test HMAC raw bytes/timestamps/header duplicates, environment/app/known-account filters, canonical ordering/invalid Unicode/unsafe numbers, wrong key/type/signature, permanent versus leased expiry, global-library access, publication/territory denial, corrupted package/schema, symlink/traversal/integer revision/ranges. Publication tests cover missing reviewer/source mismatch, wrong edition/revision, missing territorial/commercial permission, exact bytes/hash/provenance, independent signature verification, lock contention, no-overwrite, stage cleanup and source immutability; version tests compare 1.9.4<1.10.0, 1.10.2<1.10.11 and reject prerelease syntax. Verify: `npm --prefix services/bookstore run test`. Accept: exit 0; all fixtures pass; generated manifests verify independently with node:crypto; tests require no ingestion output from another task and publish no real catalog.
+- [ ] **BS-S5 — HTTP composition, systemd definition, and operations guide.** Depends BS-S4. Files: `src/server.ts,src/main.ts,src/activate.ts,systemd/sanctissimissa-bookstore.service,README.md,test/server.test.ts`; earlier files imports only. Do: implement §9 routes/headers/errors and startup/shutdown/timer behavior; write exact §11a unit and §§11–11b runbook without deploying. Server tests use ephemeral loopback, real JWT verifier and controlled adapter; cover missing-config health200/readiness503/app503, unauthorized401, owned JSON206/hash/reassembly, If-Range mismatch200, unowned403, territory/publication403 without client-country bypass, unknown404, method405, JSON400, body413, media415, range416, rate429, upstream503 without license issue, forged webhook401, verified webhook durable-before200, duplicate delivery, refund removing only affected coverage, metrics scope, CORS and HEAD. Verify: `npm --prefix services/bookstore run test`. Accept: exit 0; fixtures pass; unit/runbook files exist with specified contents; README labels installation/merchant activation as operator work; no mock production mode.
+
+## 11. Operator activation protocol — not checklist acceptance
+
+After code/tests pass, operator provisions Node24 native host, HTTPS reverse proxy, an existing OIDC API audience/JWKS, RevenueCat project and native/Web Billing products, v2 read scopes (`customer_information:customers:read`, `customer_information:purchases:read`, `customer_information:subscriptions:read`, `project_configuration:projects:read`), configured app IDs, HMAC-enabled webhook, Ed25519 keypair, protected package root, and database path. Create the catalog with actual RC internal IDs and fixed bundle mappings; paid editions require rights-cleared signed packages. Secrets belong only in local `.env` or service manager environment. Initial catalog publication and store configuration are explicit operator actions, not fabricated by the coder.
+
+`activate:check` validates config, key match, database open, catalog/package roots, OIDC JWKS retrieval with valid keys, and authenticated RC `GET https://api.revenuecat.com/v2/projects/{projectId}`; it prints names/status only and exits 1 on failure. It does not buy, grant, refund, deploy, or alter accounts. Then operator runs sandbox purchase→identity-bound restore→signed download→airplane-mode read→refund→reconciliation, checks subscriptions do not remove owned editions/annotations, and checks a forged webhook never grants access. Operator separately validates one production checkout, store notification forwarding, mobile distribution policy, backups/restore, supervision, HTTPS limits, monitoring, and key distribution before declaring live. Record observations in the release verification log; do not mark external merchant/device states as idempotent CHECKLIST acceptance.
+
+## 11a. Exact systemd unit and installation ownership
+
+BS-S5 creates `services/bookstore/systemd/sanctissimissa-bookstore.service` with exactly:
+
+```ini
+[Unit]
+Description=SanctissiMissa bookstore entitlement and download service
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=bookstore
+Group=bookstore
+WorkingDirectory=/opt/sanctissimissa-bookstore
+Environment=NODE_ENV=production
+EnvironmentFile=/home/robin/Admin-Manual/CREDENTIALS/SanctissiMissa/bookstore-service.env
+ExecStart=/usr/bin/node /opt/sanctissimissa-bookstore/dist/src/main.js
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=15s
+StateDirectory=sanctissimissa-bookstore
+StateDirectoryMode=0700
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/sanctissimissa-bookstore
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Operator verifies `/usr/bin/node --version` reports v24.x, creates the nonlogin system user/group `bookstore` if absent, installs the built service plus production dependencies under `/opt/sanctissimissa-bookstore` owned root and not writable by bookstore, and installs the unit under `/etc/systemd/system/`. Register the credential path above in Admin-Manual without secret values; the actual EnvironmentFile is gitignored, root-owned mode0600, read by systemd's manager. Set databaseFile to `/var/lib/sanctissimissa-bookstore/bookstore.sqlite`, packageRoot to `/var/lib/sanctissimissa-bookstore/packages`, catalogFile to `/var/lib/sanctissimissa-bookstore/catalog.json`, signingPrivateKeyFile to `/var/lib/sanctissimissa-bookstore/keys/ed25519-private.pem`, and signingPublicKeysFile to `/var/lib/sanctissimissa-bookstore/keys/public-keys.json`; paths are supplied through their exact SM_* keys. State/key files belong to bookstore, private keys mode0600. Complete activation checks, run `systemd-analyze verify /etc/systemd/system/sanctissimissa-bookstore.service`, then explicitly `systemctl daemon-reload` and `systemctl enable --now sanctissimissa-bookstore.service`. Check local readiness and `journalctl -u sanctissimissa-bookstore.service`; configure the existing HTTPS reverse proxy to loopback port43817. These are operator operations; coder writes files only.
+
+## 11b. Minimal privacy and backup/recovery runbook
+
+Service logs and backups remain operator-private; retain only the documented opaque identity, source/event IDs and evidence in the ledger. Do not log bearer tokens, personal reading/recording content, sourceFiles paths, raw provider payloads or credential values. Public manifests contain reviewed public sources and reviewer attribution, never local file paths. Backups include database history because permanent ownership must survive service repair.
+
+For a consistent minimal backup, operator stops the unit, copies the complete `/var/lib/sanctissimissa-bookstore` directory (including SQLite WAL/SHM if present), the registered EnvironmentFile, deployed package-lock, and unit into an operator-registered encrypted backup destination, verifies copied hashes privately, then restarts the unit and checks readiness. Never copy only a live SQLite main file, place backups in `/tmp`, or commit credentials/account data. Record backup timestamp and success without customer data. Keep encrypted copies of old signing verification keys and the current signing secret; key rotation must not strand permanent licenses.
+
+Restore into a separate protected directory first, with the unit stopped and no production overwrite. Validate the SQLite copy with Node24 `DatabaseSync` opened readOnly and `PRAGMA quick_check` returning `ok`; verify package manifest signatures/hashes with PackageStore and the restored public keyring. Once validated, operator installs the recovered state with bookstore ownership/mode0700 directory, restores protected env/key files, starts the unit, checks readiness, and runs authenticated reconciliation before issuing new licenses. Test this recovery protocol periodically against isolated copied state; never substitute empty state for a failed restore or regenerate signing keys silently.
+
+
+## LS chant/reference common contract and CH tasks
+
+Status: architecture/PLAN contract; no implementation or verification claimed. Selected wave: backend/data and generated sidebar UI for the 1962 general Roman calendar. This adopted annex supplies the exact tasks reproduced in CHECKLIST stanza LS; GLM receives the complete task text plus the data/behavior contracts below, not a pointer requiring architecture research.
+
+## Existing integration facts and scope
+
+Focused CodeGraph inspection identified `resolveDay(db, iso)` and `massTextsForDay(db, day)` in `src/core/data/liturgicalDay.ts:64`, the private reader builder in `src/ui/ReaderView.tsx:46` and `:74`, `CorpusDb.getMassTexts` in `src/core/data/corpusDb.ts:170`, and `MASS_ORDO`, `MASS_SECTION_ORDER`, `READER_ORDER`, `stationActive`, `chantRenders`, and `stationForAnchor` in `src/core/model/massOrdo.ts:44`. The builder must become shared before planning can promise parity with the reader. Both corpus retrieval and reader order currently name only the L1 lesson group. The dismissal note at `massOrdo.ts:95` and `src/core/model/stationLore.ts:148` incorrectly connects Benedicamus to omission of the Gloria; both are in scope for correction. Graph did not index package scripts; one targeted package.json read established Node's built-in TypeScript test runner.
+
+No new calendar engine, local-calendar inference, audio-blob store, entitlement gate, or sync protocol. Unsupported diocesan, religious-order, votive, procession, and locally substituted celebrations within the 1962 profile require an explicitly sourced manual plan. Their labels must survive persistence. The current Roman Rite is external reference links only in this wave. Existing calendar/text limitations become explicit coverage findings; a date-resolved plan is not a claim that the corpus implements every 1962 rubric.
+
+## Entity table (new file line numbers are insertion anchors)
+
+| Exact name | Target | Role / signature |
+|---|---|---|
+| `massSectionOrder` | `src/core/model/massOrdo.ts:44` | `(present: Iterable<string>): string[]`; expand numbered lesson triples in canonical order |
+| `massReaderOrder` | `src/core/model/massOrdo.ts:216` | `(present: Iterable<string>): typeof READER_ORDER`; same expansion within interleaved reader order |
+| `stationForAnchor` | `src/core/model/massOrdo.ts:284` | Existing function; map all numbered lesson anchors to existing L1 station IDs |
+| `massOrdinaryEligibility` | `src/core/liturgy/massSpecials.ts:76` | `(ctx: MassSpecialsContext): { gloria: boolean; credo: boolean }`; share existing `gloriaOmit`/`credoOmit` decisions with hooks |
+| `MassReaderEntry` | `src/core/data/massReaderEntries.ts:1` | `SectionText & { ordinary: boolean; displayTitle: string; anchor: string }` |
+| `buildMassReaderEntries` | `src/core/data/massReaderEntries.ts:1` | `(db: CorpusDb, day: DayInfo, opts: { solemn: boolean }): MassReaderEntry[]`; shared reader truth |
+| `ChantEdition`, `ChantAsset`, `ChantCoverage`, `ReferenceArticle`, `ChantPlan`, `ChantSlot`, `ChantAssignment`, `PracticeState`, `RecordMeta`, `ChantPlanOptions`, `ChantRepository` | `src/core/chant/types.ts:1` | Exact fields below; type-only imports of corpus, reader and library types |
+| `buildChantPlan` | `src/core/chant/plan.ts:1` | `(day: DayInfo, entries: MassReaderEntry[], options: ChantPlanOptions, catalogue: ChantEdition[], coverage: ChantCoverage[]): ChantPlan` |
+| `resolveChantPlan` | `src/core/chant/plan.ts:1` | `(db: CorpusDb, iso: string, options: ChantPlanOptions, catalogue: ChantEdition[], coverage: ChantCoverage[]): ChantPlan`; existing resolver then shared builder then pure planner |
+| `saveChantPlan`, `savePracticeState` | `src/core/chant/plan.ts:1` | `(repo: ChantRepository, record: ChantPlan/PracticeState): Promise<void>`; await shared store, propagate rejection |
+| `copyChantPlan`, `exportChantPlanJson` | `src/core/chant/plan.ts:1` | `(plan: ChantPlan, meta: RecordMeta): ChantPlan`; `(plan: ChantPlan, includeDirectorNotes: boolean): string` |
+| `PracticeAudioPort`, `configurePractice`, `attachPracticeLoop` | `src/core/chant/practice.ts:1` | Port and functions specified below; playback only |
+| `validateChantContent`, `findReferenceArticles` | `src/core/chant/reference.ts:1` | `(catalogue: ChantEdition[], coverage: ChantCoverage[], articles: ReferenceArticle[]): string[]`; `(articles: ReferenceArticle[], query: string): ReferenceArticle[]` |
+| `chantCatalogue`, `chantCoverage`, `massReferenceArticles` | `content/chant/catalogue.json:1`, `content/chant/coverage.json:1`, `content/chant/reference.json:1` | Top-level JSON arrays of the corresponding types; these are document names, not runtime global variables |
+| `chantPlanTests`, `massReferenceTests` | `tests/chantPlan.test.ts:1`, `tests/massReference.test.ts:1` | Node `node:test` / `node:assert/strict`; deterministic fixtures, no external services |
+| `ChantView`, `ChantViewProps` | `src/ui/ChantView.tsx:1` | React component and exact props below; planner, rehearsal, learning, print |
+| `MassReferenceView`, `MassReferenceViewProps` | `src/ui/MassReferenceView.tsx:1` | React component and same props; searchable source-linked SectionReader |
+| `chantReferenceStyles` | `src/ui/library/library.css:1` | Scoped `.chant-view`, `.mass-reference-view`, and print styles; preserve other feature styles |
+
+## Exact data contracts
+
+```ts
+type RecordMeta = { id: string; deviceId: string; createdAt: string; updatedAt: string; deletedAt: string | null };
+type ChantAsset = { kind: 'gabc' | 'score' | 'audio'; url: string; localPath: string | null; sha256: string | null; rights: 'reference-only' | 'redistributable'; licenseUrl: string | null; attribution: string; editionNote: string };
+type ChantEdition = { id: string; title: string; category: 'ordinary' | 'proper' | 'sprinkling'; stationIds: string[]; language: 'la'; editionYear: 1961; sourceUrl: string; assets: ChantAsset[]; phraseIds: string[] };
+type ChantCoverage = { id: string; profile: 'roman-1962-general'; sourcePath: string; section: string; editionId: string; textIncipit: string; status: 'reference-only' | 'verified' };
+type ChantAssignment = { id: string; slotId: string; stationId: string | null; performer: 'celebrant' | 'deacon' | 'subdeacon' | 'schola' | 'cantor' | 'congregation' | 'servers' | 'all' | 'unassigned'; label: string };
+type ReferenceArticle = { id: string; title: string; profile: 'roman-1962-general'; stationId: string | null; blocks: { id: 'meaning' | 'participation' | 'context'; text: string; sources: { url: string; locator: string }[] }[]; relatedArticleIds: string[]; status: 'draft' | 'reviewed' };
+type ChantSlot = { id: string; anchor: string; nodeKey: string; sourcePath: string; section: string; title: string; stationIds: string[]; latin: string | null; english: string | null; role: 'schola' | 'clergy' | 'congregation' | 'mixed'; lessonGroup: number | null; editionIds: string[]; choices: { stationId: string; editionId: string }[]; status: 'text-only' | 'reference-only' | 'ready' };
+type ChantPlanOptions = { meta: RecordMeta; profile: 'roman-1962-general' | 'manual'; calendarLabel: string; solemn: boolean; sprinkling: 'principal-sunday' | 'none'; ordinaryChoices: { stationId: string; editionId: string }[]; manualSource: { url: string; locator: string } | null; manualCelebration: string | null; manualEntries: MassReaderEntry[]; notes: string };
+type ChantPlan = RecordMeta & { profile: 'roman-1962-general' | 'manual'; calendarLabel: string; date: string; celebration: string; sourcePaths: string[]; slots: ChantSlot[]; ordinaryChoices: { stationId: string; editionId: string }[]; manualSource: { url: string; locator: string } | null; notes: string; directorNotes: string; assignments: ChantAssignment[]; rehearsalOrder: string[]; revision: number; copiedFrom: { id: string; revision: number } | null; coverage: 'partial' | 'verified'; issues: string[] };
+type PracticeState = RecordMeta & { editionId: string; phraseId: string; audioUrl: string; startSeconds: number; endSeconds: number; rate: number; loop: boolean; recordingIds: string[] };
+type ChantRepository = Pick<LibraryStore, 'getRecord' | 'listRecords' | 'putRecord' | 'removeRecord'>;
+```
+
+Import `LibraryStore` as a type from `src/core/library/store.ts`; its parent-owned constructor is `(sidecar: SidecarDb)`, generic reads are `getRecord<T>(kind,id):T|null` / `listRecords<T>(kind):T[]`, writes are `putRecord(kind,id,value):Promise<void>` / `removeRecord(kind,id):Promise<void>`. Use only record kinds `chant-plan` and `practice` here. User-supplied IDs/timestamps make planner output deterministic; do not generate UUIDs or read the clock inside pure functions. Shared `RecordingController`/`RecordingPanel` own recorder permissions, blobs and object-URL lifetime. `recordingIds` link their records; do not duplicate them. Anchors are `chant:<editionId>#<phraseId>` and `reference:<articleId>#<blockId>`.
+
+## Shared reader and calendar algorithm
+
+1. In `massSectionOrder`, collect numeric suffixes matching `^(Lectio|Graduale|Oratio)L([1-9][0-9]*)$`; sort integers ascending. Replace the existing contiguous L1 triple by each observed group's `LectioLn`, `GradualeLn`, `OratioLn` in that order, retaining only keys actually present. Leave every other `MASS_SECTION_ORDER` entry in place. No lexical L10-before-L2 sort, invented missing lessons, or fractional positions. `massReaderOrder` performs the identical triple replacement in `READER_ORDER`, with `{kind:'proper',section}` rows.
+2. `CorpusDb.getMassTexts` must call `massSectionOrder` on the union of own and commune section keys before its existing selection loop. Preserve `ownText ?? communeText`, empty-own suppression, bilingual values, `fromCommune`, `nodeKey`, and actual `sourcePath`. Merely changing reader order cannot recover lessons already discarded by this query.
+3. Extract ReaderView's entry builder into `buildMassReaderEntries`, retaining its `massTextsForDay`, Ordo/prayer retrieval, `massSpecialsContextFromDay(day,{solemn})`, `applyMassSpecialsBilingual`, `chantRenders`, ordinary flags, and display titles. Use `massReaderOrder(propers.keys())`. Keep only entries with some nonblank text after filtering. ReaderView imports this function and type; replace only the private type and useMemo body, preserving existing rendering and dependencies.
+4. For the Sunday sprinkling entry, select `Vidi aquam` first in Paschaltide and `Asperges me` otherwise. If the chosen section is missing, omit it; do not substitute the other season's prayer. Apply bilingual special filtering consistently. Preserve the stable reader anchor `prayers:Asperges me` and the selected source's real section/nodeKey; title Vidi aquam accurately. The plan retains this entry only when `sprinkling='principal-sunday'`. This option is an explicit service fact, not inferred from time or parish.
+5. Extend `stationForAnchor` with `LectioLn→lectio-l1`, `GradualeLn→graduale-l1`, `OratioLn→oratio-l1`; retain the existing 31 map IDs. Combined Ordo mappings are: `Incipit→iudica,confiteor`; `Kyrie→kyrie,gloria`; `Credo→credo`; `Offertorium→lavabo,orate-fratres`; `Præfatio→praefatio,sanctus`; `Canon→canon`; `Preparatio Communionis→pater-noster,agnus-dei`; `Conclusio→ite,ultimum-evangelium`. Prayer mapping is `prayers:Asperges me→asperges`.
+6. `resolveChantPlan` calls `resolveDay(db,iso)`, then the shared builder, then `buildChantPlan`; no independent computus or transfer table. `buildChantPlan` uses supplied `manualEntries` exclusively for `profile='manual'`, requires a nonempty manual source HTTPS URL/locator, calendar label and manualCelebration, and records that celebration title. Manual entries bypass general-calendar seasonal/ordinary omission decisions; retain their authored order and text without inferred local rules, with plan coverage partial and issue `manual-source`. General mode requires calendarLabel exactly `General Roman Calendar (1962)`, rejects nonempty manualEntries/manualSource/manualCelebration, and sets celebration to `day.feastName ?? day.winner?.title ?? day.temporaPath`. Validate canonical real Gregorian `YYYY-MM-DD` without timezone conversion; invalid dates throw before resolver invocation.
+
+The existing `SectionText` fields are `nodeKey,section,latin,english,sourcePath,fromCommune`; `DayInfo` fields include `date,weekday,weekKey,season,color,temporaPath,winner,feastName,rank,commemorations`. `massTextsForDay` may return the preceding Sunday's text for an uncovered feria: preserve that row's sourcePath and add issue `fallback-source:<path>` when it differs from `winner?.key ?? temporaPath`; never relabel it as the feria's own chant.
+
+## Planner behavior
+
+Emit one slot per retained reader entry in exactly its existing order. Slot ID is `slot:<anchor>`; retain complete bilingual source text, including embedded Alleluia/Sequence, instead of adding a duplicate guessed chant. Use the mapping above for combined ordinary entries and `stationForAnchor(entry.section)` for proper entries; anchors remain unique even in manually ordered repeated sections. For `GradualeP`, retain the shared builder's result: `chantRenders` has a deliberate non-Paschal fallback that `stationActive` alone would incorrectly remove. For other seasonal stations in general mode, honor `stationActive` plus actual entry presence. Map non-Paschal `GradualeP` to `alleluia`; in Paschaltide map it to `graduale-p`. Embedded Alleluia within Graduale stays one slot, with `alleluia` additionally included only through existing `stationAnchorFor`/text gating. Do not synthesize Sequentia, offertory, lessons, or Last Gospel entries absent from the shared reader.
+
+Use `massOrdinaryEligibility(massSpecialsContextFromDay(day,{solemn}))` to remove Gloria/Credo station choices when existing reader hooks omit them; this function returns the negations of the existing private omission functions and becomes the hooks' common source. It does not certify all local celebration rules. Ordinary choices are valid only for active station IDs and a catalogue edition explicitly naming that station. Reject unknown, duplicated-per-station, or incompatible choices with an Error; never silently select a default. Initial suggestions are Kyrie XVI, Sanctus XVIII and Agnus XVIII; choosing pieces from different numbered Masses is supported, with no invented obligatory pairing.
+
+Attach each validated ordinary choice to the slot containing its station ID; slot `choices` retains input order and `editionIds` merges choice IDs with matched coverage IDs without duplicates. For sprinkling, use the selected entry's actual section to choose gb-497-1961 or gb-958-1961, never both. If principal-sunday sprinkling was requested but no prayer entry exists, add issue `missing-sprinkling-text`. Unknown source sections retain a slot with stationIds empty and issue `unmapped-section:<section>`.
+
+`lessonGroup` is numeric Ln or null. Roles: schola for proper Introitus/Graduale/GradualeP/Tractus/Alleluia/Offertorium/Communio and GradualeLn; clergy for Oratio/Secreta/Postcommunio/Super populum, their numbered forms, Lectio/LectioLn/Evangelium and OratioLn; mixed for combined ordinary/prayer blocks and unknown manual sections. Clergy includes the celebrant, deacon or subdeacon as the service requires. The reserved congregation value is not inferred automatically. Do not confuse a reader's text block with who audibly sings each sentence.
+
+Coverage matches exact profile, actual sourcePath and section; compare the normalized Latin text's beginning with `textIncipit` (NFD, remove combining marks, lowercase, collapse whitespace/punctuation). Do not match by title, feast name, fuzzy text, or incipit alone. Matching metadata yields `reference-only`; `ready` additionally requires status verified and a redistributable score/GABC asset with localPath, SHA-256, license evidence and matching edition. Missing media is `text-only`; unmatched/invalid claims add stable issues. Default plan coverage remains `partial`; use `verified` only when every retained slot's source/placement has a verified coverage record and no issues. Eight seed records cannot yield annual coverage. `sourcePaths` is a first-occurrence ordered unique array. Reject duplicate slot anchors in input; do not overwrite silently.
+
+`saveChantPlan` calls `putRecord('chant-plan',record.id,record)` once; `savePracticeState` uses `practice`. Validate record ID, ISO timestamps, nonempty deviceId, and updatedAt>=createdAt; plan revision is a positive integer and copiedFrom is null or a different nonempty ID with positive revision. Practice saves additionally require nonempty edition/phrase IDs, finite start>=0/end>start/rate in [0.5,2], and an HTTPS asset URL or `recording:<id>` whose ID appears in recordingIds. A rejected persist remains a rejected save; caller must not display saved. Keep local sidecar behavior; no independent cloud synchronization promise. Export all declared public type names and functions; no wildcard barrel creation.
+
+Plans start revision1, copiedFrom null, directorNotes empty, rehearsalOrder equal to slot IDs. Create one assignment for each slot/station subrow, or one null-station assignment for an unmapped slot; ID `<slotId>@<stationId-or-unmapped>`, label empty. Defaults: schola for asperges/introitus/graduale/graduale-l1/alleluia/tractus/graduale-p/offertorium/communio; all for kyrie/gloria/credo/sanctus/agnus-dei; deacon for evangelium/ite and subdeacon for lectio/lectio-l1 when solemn, celebrant for those when not solemn; celebrant for iudica/confiteor/oratio/oratio-l1/lavabo/orate-fratres/secreta/praefatio/canon/pater-noster/postcommunio/super-populum/ultimum-evangelium. Manual entries start unassigned. These are editable rehearsal assignments, not a claim that every sentence in a combined block is sung by one person. Users may assign congregation, cantor, servers, or a named label to any subrow; validate every assignment ID and prohibit duplicate/foreign slot IDs. Rehearsal order must be a permutation of current slot IDs, independent of immutable liturgical slot order.
+
+Editing a saved plan creates an unsaved working copy with revision=last saved revision+1; repeated local keystrokes do not increment again. Save confirms only after persistence. `copyChantPlan` deep-copies arrays, requires a different meta.id, sets revision1 and copiedFrom `{id:plan.id,revision:plan.revision}`, and never changes the source plan; it carries notes/assignments/rehearsal order and explicitly remains on the same date until regenerated. Loading filters deletedAt records. `exportChantPlanJson` serializes schema `{schemaVersion:1,plan}` with two-space indentation; false replaces directorNotes with empty string, true includes them. UI passes true only from an explicit `Export director rehearsal JSON` action; ordinary exports/print default to congregation privacy. No advertised PDF/score download is generated from JSON.
+
+## Seed catalogue and rights
+
+Create exactly these eight metadata records, IDs fixed below. Each starts with one `score` asset pointing to the same source URL, `rights='reference-only'`, localPath/sha256/licenseUrl null, attribution `GregoBase; source edition: Graduale Romanum 1961`, editionNote `Graduale Romanum 1961; external reference only`, phraseIds `["whole"]`. No modern audio download, resale claim, or unverified GABC attachment. Seed edition IDs are stable independently of future assets.
+
+| Edition ID | Title | Category / station IDs | Verified source |
+|---|---|---|---|
+| `gb-545-1961` | Kyrie XVI | ordinary / kyrie | https://gregobase.selapa.net/chant.php?id=545 |
+| `gb-298-1961` | Sanctus XVIII | ordinary / sanctus | https://gregobase.selapa.net/chant.php?id=298 |
+| `gb-2412-1961` | Agnus Dei XVIII | ordinary / agnus-dei | https://gregobase.selapa.net/chant.php?id=2412 |
+| `gb-497-1961` | Asperges me | sprinkling / asperges | https://gregobase.selapa.net/chant.php?id=497 |
+| `gb-958-1961` | Vidi aquam | sprinkling / asperges | https://gregobase.selapa.net/chant.php?id=958 |
+| `gb-132-1961` | Ad te levavi | proper / introitus | https://gregobase.selapa.net/chant.php?id=132 |
+| `gb-962-1961` | Ad te Domine | proper / offertorium | https://gregobase.selapa.net/chant.php?id=962 |
+| `gb-1036-1961` | Dominus dabit | proper / communio | https://gregobase.selapa.net/chant.php?id=1036 |
+
+Seed coverage exactly three reference-only rows: IDs `advent1-introitus`, `advent1-offertorium`, `advent1-communio`; sourcePath `Tempora/Adv1-0`; sections `Introitus`,`Offertorium`,`Communio`; respective editions 132,962,1036; incipits `Ad te levavi`,`Ad te Domine`,`Dominus dabit`. A mismatch against local corpus must leave them unselected; authoring metadata is not text verification. Ordinary choices and sprinkling selection use explicit station compatibility, not these proper coverage rows.
+
+GregoBase dedicates its transcriptions under [CC0](https://gregobase.selapa.net/?page_id=2); a site's transcription policy does not establish rights in every source scan, translation or recording. GABC has separate [score-copyright and gabc-copyright headers](https://gregorio-project.github.io/gabc/index.html). Pin the 1961 version, particularly Vidi aquam's Gloria Patri; later source versions differ. Validate every downloaded asset against its own evidence before changing rights/status. [CMAA resources](https://musicasacra.com/resource-lists/) support a future corpus programme; public downloadable audio alone is not permission for product redistribution.
+
+## Practice backend
+
+`PracticeAudioPort` is `Pick<HTMLAudioElement,'currentTime'|'duration'|'playbackRate'|'paused'|'addEventListener'|'removeEventListener'> & { preservesPitch?: boolean }`. `configurePractice(audio: PracticeAudioPort, state: PracticeState): { status: 'ready'|'duration-unavailable'|'unsupported-pitch-preservation'; startSeconds: number; endSeconds: number; rate: number }` requires finite rate in [0.5,2], finite start>=0, end>start; throws otherwise. If duration is nonfinite or <=0 return duration-unavailable with input bounds and audio.playbackRate, without mutation. Clamp endpoints to duration, reject a collapsed interval. When preservesPitch exists, set it true and set requested rate; otherwise set rate 1 and report unsupported-pitch-preservation for any non-1 request (ready for rate1). Never autoplay, change audio src, or seek merely while configuring.
+
+`attachPracticeLoop(audio: PracticeAudioPort, state: PracticeState): () => void` validates configuration, listens to `timeupdate`, and when loop is true, duration valid, not paused and currentTime>=effective end, seeks to effective start. Clamp original state bounds against the current duration inside the handler, so metadata arriving after installation works; skip nonfinite/collapsed intervals without throwing in the event callback. No timer, recorder, network fetch or repeated listener installation in render. Disposer removes the identical handler and is safe to call twice. Source replacement requires disposing the old listener. Shared recording UI passes a resolved URL to the audio element; state stores its stable asset URL or shared recording identity, never a transient blob URL. Reject blob URLs in saved PracticeState. A–B looping and speed are learning aids, not a substituted singer during worship.
+
+## Mass Reference content contract
+
+Exactly 37 articles: one for every existing station ID and six introductions. For station articles use IDs `mass-<stationId>`, titles from this ordered list: asperges / Sprinkling before Mass; iudica / Prayers at the Foot of the Altar; confiteor / Confession of Sin; introitus / Introit; kyrie / Kyrie; gloria / Gloria; oratio / Collect; lectio-l1 / Additional Lessons; graduale-l1 / Chants between Lessons; oratio-l1 / Additional Collects; lectio / Epistle; graduale / Gradual; alleluia / Alleluia; tractus / Tract; graduale-p / Paschal Alleluias; evangelium / Gospel; credo / Creed; offertorium / Offertory Antiphon; lavabo / Lavabo; orate-fratres / Orate Fratres; secreta / Secret; praefatio / Preface; sanctus / Sanctus; canon / Roman Canon; pater-noster / Lord's Prayer; agnus-dei / Agnus Dei; communio / Communion Antiphon; postcommunio / Postcommunion; super-populum / Prayer over the People; ite / Dismissal; ultimum-evangelium / Last Gospel.
+
+Intro IDs/titles: `mass-overview` / Following the Mass; `mass-1962-profile` / The 1962 Roman Missal; `mass-ordinary-propers` / Ordinary and Propers; `mass-participation` / Roles, Responses and Posture; `mass-calendar` / Calendar and Seasonal Changes; `mass-sources` / Reading Sources and Local Directions. stationId is null for intros. Every article has the three stable blocks meaning, participation, context; author 90–180 original English words across those blocks, with source URL and section/page locator on each block, no fabricated quotation. Status starts draft; related IDs must resolve. Explain chant's position and who sings/hears it, define unfamiliar terms, distinguish low/sung/solemn practice and authorized local directions without declaring one congregational posture universal. Bookmarks and notes use stable block anchors, not translated text offsets.
+
+Authoring authority: [1960 Rubrics in AAS 52](https://www.vatican.va/archive/aas/documents/AAS-52-1960-ocr.pdf), especially 467–470 (extra lessons, chants, sequences), 475–477 (Creed; Easter Vigil offertory), 507–510 (dismissal and Last Gospel); [1958 instruction in AAS 50](https://www.vatican.va/archive/aas/documents/AAS-50-1958-ocr.pdf) for sung/solemn participation and sacred music; and the source texts in existing Ordo data for order/text, never unsupported modern paraphrase presented as a rubric. [Catechism 1345–1355](https://www.vatican.va/content/catechism/en/part_two/section_two/chapter_one/article_3/iv_the_liturgical_celebration_of_the_eucharist.html) supports theological overview, not distinct 1962 ceremonial details. The [current GIRM](https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20030317_ordinamento-messale_en.html) is an explicitly separate comparison, never the 1962 placement authority. Keep linked copyrighted sources as links and original paraphrase, not copied full text.
+
+Required exact correction in both existing `ite` note/about: “In the 1962 rubrics, Ite, missa est is the usual dismissal. Benedicamus Domino is used when a procession follows; Requiem Masses conclude Requiescant in pace. The Easter octave adds the prescribed double Alleluia.” Cite AAS52 rubric507 in code comments and mass-ite context. Omission of Gloria does not determine dismissal. Reference must also explain sequence before the last Alleluia or after the Tract in this profile (470), extra lesson alternatives per 467–468, and no offertory antiphon / Last Gospel in Easter Vigil per 477/510. Do not create an automated exception engine from these prose records.
+
+`validateChantContent` checks unique IDs; exact 31-station coverage plus six intro IDs; exact three unique blocks; nonempty prose and source locators; resolvable links/edition IDs; valid HTTPS URLs; valid asset hashes when local; supported rights states; valid phrase IDs; coverage source fields. It returns deterministic sorted error strings, never network requests. `findReferenceArticles` normalizes case/diacritics and searches title plus block prose; empty query returns all in document order, unknown query returns []. Malformed externally read JSON must be caught before validation; do not silently promote draft to reviewed.
+
+## Self-contained GLM tasks (adopted in CHECKLIST stanza LS)
+
+- [ ] **CH1 — Share actual reader order and correct dismissal**
+
+Dependencies: none. Read/modify only `src/core/model/massOrdo.ts`, `src/core/model/stationLore.ts`, `src/core/data/corpusDb.ts`, `src/core/data/liturgicalDay.ts` (read only), `src/core/data/types.ts` (read only), `src/core/liturgy/massSpecials.ts`, `src/ui/ReaderView.tsx`, new `src/core/data/massReaderEntries.ts`, `tests/chantPlan.test.ts`, existing `tests/massOrdo.test.ts`, `tests/massSpecials.test.ts`. Implement the entity signatures, complete mapping, extraction, numbered groups, seasonal sprinkling and exact dismissal correction above. Use type-only CorpusDb imports in pure modules so Node tests do not load Vite's `?url` WASM import. Retain existing public constants for callers; no rendered UI redesign.
+
+Verify: `node --experimental-strip-types --test tests/chantPlan.test.ts tests/massOrdo.test.ts tests/massSpecials.test.ts`. Accept: exit0; fixtures assert L1,L2,L10 order and missing-members preservation, mapping to existing stations, no duplicated ordinary text, actual post-filtered entries, both sprinkling seasons/missing source, and changed dismissal text. Test builders using a deliberately minimal fake typed `as unknown as CorpusDb` in tests only; stub getMassTexts/getOrdoTexts/getPrayersTexts. No corpus database download, DOM, wall clock or production casts.
+
+- [ ] **CH2 — Typed catalogue and source coverage**
+
+Dependencies: CH1, LS.02. Read/modify only new `src/core/chant/types.ts`, `content/chant/catalogue.json`, `content/chant/coverage.json`, `tests/chantPlan.test.ts`; read parent `src/core/library/store.ts`, `src/core/data/types.ts`, `src/core/data/massReaderEntries.ts` for imports. Add exact contracts, eight metadata editions and three proper coverage records above. Keep all seed media reference-only; no fetching during tests. Verify: `node --experimental-strip-types --test tests/chantPlan.test.ts`. Accept: exit0; eight unique fixed IDs, three exact coverage rows, no local assets or audio resale flags, and referential integrity.
+
+- [ ] **CH3 — Date planner and shared persistence**
+
+Dependencies: CH1, CH2, LS.02. Read/modify new `src/core/chant/plan.ts`, `tests/chantPlan.test.ts`; read only the files named in CH1/CH2 and `src/core/library/store.ts`. Implement exact builder/adapter/save APIs and every planner behavior above. Use existing resolveDay and shared builder; no calendar fork or new storage. Fixtures supply explicit dates/day metadata and fake DB/record store; test pure planning separately from one adapter call whose fake additionally implements getKalendar/getTransfers/getFileNode/asDayMeta. Verify: `node --experimental-strip-types --test tests/chantPlan.test.ts`. Accept: exit0; ordinary Sunday Graduale with embedded Alleluia yields one source slot; Pre-Lent with Tractus excludes separate Alleluia; Paschal dual source entries remain ordered; Ember five groups preserved; supplied Requiem day omits Gloria/Credo; supplied Easter Vigil entries lacking Offertorium/Conclusio stay absent; unknown locale rejected in general mode, accepted only manual with source and its own celebration; manual text is not seasonally rewritten; duplicate/incompatible choices throw; mismatched incipits remain unselected; feria fallback source visible; persistence rejection propagates and saves use correct kind/ID once.
+
+- [ ] **CH4 — Practical playback backend**
+
+Dependencies: CH2,CH3; shared recording implementation remains parent-owned. Read/modify new `src/core/chant/practice.ts`, `tests/chantPlan.test.ts`; read only chant types/plan. Implement port, validation, AB-loop listener/disposer, pitch-preserving rate behavior and PracticeState saves exactly as above. Verify: `node --experimental-strip-types --test tests/chantPlan.test.ts`. Accept: exit0; fake audio tests cover invalid/unknown duration, clipping, rate0.5/1/2, no pitch support fallback, paused no-seek, loop boundary seek, repeated disposal, no autoplay and blob-URL persistence rejection. No microphone, timer or network test.
+
+- [ ] **CH5 — Complete authored reference skeleton and validation**
+
+Dependencies: CH1,CH2. Read/modify new `src/core/chant/reference.ts`, `content/chant/reference.json`, `tests/massReference.test.ts`; read only chant types/catalogue/coverage, `src/core/model/massOrdo.ts`, `src/core/model/stationLore.ts`, and the four primary source URLs specified above. Author all 37 complete articles to the content contract; citations must identify the actual supporting passage. Reference status draft remains visible in data until qualified review. Implement content validation/search. Tests read committed JSON using `node:fs` and `new URL('../content/chant/...',import.meta.url)` with guarded JSON.parse.
+
+Verify: `node --experimental-strip-types --test tests/chantPlan.test.ts tests/massReference.test.ts tests/massOrdo.test.ts tests/massSpecials.test.ts`. Accept: exit0; validator reports no errors on committed data, catches duplicate IDs/anchors, unknown station/reference/edition links and missing evidence, asserts exactly37 articles and all31 IDs, checks search accent/case behavior, and asserts correct1962 dismissal/sequence/Vigil distinctions from deliberately authored expected facts. Semantic assertions complement source review; word counts alone do not establish accuracy.
+
+- [ ] **CH6 — Generated practical Chant and Mass Reference UI**
+
+Dependencies: CH1–CH5, LS.05, LS.07 and LS.08 (shared LibraryStore/LibraryMediaStore/RecordingController/SectionReader study tools). Own only new `src/ui/ChantView.tsx`, `src/ui/MassReferenceView.tsx`, additive scoped rules in `src/ui/library/library.css`, and additions to `tests/chantPlan.test.ts`/`tests/massReference.test.ts`. Read the CH1–CH5 files, `src/ui/SectionReader.tsx`, `src/core/accompaniment/store.ts`, `src/core/library/{types,store,media,recording}.ts`, and generated `LIBS/UI/STITCH/sanctissimissa-library-20260913/{chant,mass-reference}.html`. Parent LS.10 owns sidebar/App destination wiring with the matching callback contract.
+
+Design authority: chant screen `a8f2b5d39410445b91178636a97824a2`, artifact `chant.html`, preserve component purposes associated with `chant-profile`, `chant-plan-slots`/`.slot-card`, `ordinary-selector`, `rehearsal-panel`, `chant-learning`; Mass Reference screen `f6cc5e4c8df3462f96aa7806aa60624a`, verified against `manifest.json`, artifact `mass-reference.html`, use `mass-reference-search`, `mass-order`, `reference-article`, `rite-profile`, `reference-sources`. Adapt generated markup to existing React styling and accessibility; no new third-party UI/recorder library.
+
+Export both prop types with `{db: CorpusDb; sidecar: SidecarDb; store: LibraryStore; media: LibraryMediaStore; recording: RecordingController; onNavigate: (destination: LibraryDestination) => void; planId?: string; articleId?: string; blockId?: string; editionId?: string}`. Imports use parent `src/core/library/types.ts` for LibraryDestination, `store.ts`, `media.ts`, `recording.ts`; CorpusDb comes from `src/core/data/corpusDb.ts`, SidecarDb from `src/core/accompaniment/store.ts`. Parent LibraryDestination includes `{view:'chant';planId?:string}` and `{view:'mass-reference';articleId?:string;blockId?:string}`; editionId is a local learning-panel prop, not a chant destination field. Restore a supplied planId through `store.getRecord<ChantPlan>('chant-plan',planId)`, rejecting missing/deleted records visibly. Restore articleId/blockId by passing SectionReader `openAnchor:'reference:'+articleId+'#'+blockId` when both resolve; unknown IDs show a visible missing-target state. React to changed navigation IDs without deleting saved state.
+
+ChantView: date/profile selector, visible resolved celebration and source/coverage issues; general profile or sourced manual form including celebration/calendar/source URL/locator and ordered manual text entries; select/save/load/copy plans with revision/provenance, public notes and clearly private director notes; explicit singer assignments per mapped station subrow and editable labels; accessible move-up/down rehearsal order with keyboard support; ordinary choices for available catalogue editions; active-reader source text shown once per source group. Combined Kyrie/Gloria or Preface/Sanctus groups expose separate station controls without duplicating source text. Retain liturgical order in the main plan; show rehearsal order separately. Errors are visible and unsaved data is retained after failed save.
+
+Manual entry authoring exposes title, optional mapped Mass section, Latin/English text and citation, not internal keys. On add, the UI creates a UUID once: anchor/nodeKey `manual:<uuid>`, sourcePath from the supplied citation URL, fromCommune false, ordinary false, displayTitle from user title, section from the selected section key or `Manual`. Preserve that UUID while reordering/editing. All manual assignments start unassigned; source row text and supplied assignments drive the run sheet. Date changes never overwrite a saved plan without an explicit regenerate action; regeneration creates an unsaved revision and resets rehearsal order/assignments only after the user invokes that action.
+
+Learning panel: browse the eight starter editions, display reference-only versus locally ready status, open verified source links, choose phrase (initially whole), mount an HTML audio element only for an available licensed audio asset or shared user recording, AB-start/end/rate/loop controls wired to practice backend, and shared recording actions. No sample audio claim for empty assets. Missing microphone/MediaRecorder/native-webview capability displays the shared controller's unsupported reason and keeps text/score learning usable. Native pitch-preservation failure displays the practice status and retains rate1. Do not create a second recorder or persist blob URLs. Current-rite material is link-only, clearly labelled, with no second calendar mode.
+
+MassReferenceView: search/list all 37 articles in Mass order plus introductions, show draft/reviewed status and 1962 profile, current article with source locators and related links. Mount the existing SectionReader for three blocks, mapping each to `{anchor:'reference:'+article.id+'#'+block.id,nodeKey:same,title:block.id,latin:null,english:block.text}`. Pass db/sidecar and `documentContext:{documentId:'reference:'+article.id,revision:1,blockIdForSection:anchor=>anchor.slice(anchor.indexOf('#')+1)}`, `studyTools:{store,media,controller:recording}`. This uses the same bookmark/highlight/comment/annotation/recording controls as Library. No custom annotation store. Preserve source links outside article text selection, and let onNavigate move between chant/reference articles through the parent destination union.
+
+Print/export: render a real run-sheet DOM containing date, celebration/profile, source citations, liturgical slots, selected chants and assignments. Default congregation view omits directorNotes; director mode requires an explicit audience selection and visibly previews those notes. A user `Print run sheet` action sets the chosen preview state, then calls `window.print()` only after that DOM has committed (effect/requestAnimationFrame); print CSS hides navigation/controls and shows the complete selected run sheet. Do not claim a PDF was saved. Export director rehearsal JSON uses a real Blob/download link, the explicit true export option, and revokes object URL after the download action; congregation JSON uses false. No QR code, public sharing server, or fabricated export URL.
+
+Verify: `npx --no-install tsc -b --pretty false`; `node --experimental-strip-types --test tests/chantPlan.test.ts tests/massReference.test.ts`. Accept: exit0 for strict project compilation and deterministic backend tests including assignment completeness/edit validation, rehearsal permutation, deep-copy independence/provenance, revision fields, no private note in congregation JSON and inclusion only in explicit director JSON. Frontend compile resolves exact shared types and both exports. Operator verification protocol (not a CHECKLIST Accept): use both generated routes, open/save/reload/copy a plan, set assignments/rehearsal order, inspect congregation/director print previews, download and inspect each JSON, add a reference bookmark/highlight/comment/recording through SectionReader, and confirm unsupported recorder/audio states remain visible. Record outcomes without substituting them for automated gates.
+
+Release distinction: CH1–CH6 implement functional planning/reference/learning surfaces and backend with the stated starter data. Downloadable scores, licensed practice audio, full-year propers, official local calendars and liturgical editorial review remain separately measured content readiness, not hidden application functionality. Tests must not label missing corpus/media as completed or make a complete-annual-library claim. No publisher/store operation is authorized by this annex.

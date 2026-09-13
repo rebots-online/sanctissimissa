@@ -1,5 +1,27 @@
 # SanctissiMissa — Authoritative Architecture
 
+> **Current Library/Bookstore/Chant/Reference contract — 2026-09-13 (LS-1).**
+> The inherited document mixes shipped behavior with pending designs. The audit
+> confirmed Haydock commentary and shared reader foundations; it did **not** find
+> a working Bookstore/download/entitlement flow or the four requested sidebar
+> destinations. Do not read historical architecture prose as proof of delivery.
+>
+> The adopted [Library and study architecture](ARCHITECTURE/library-study-20260913.md),
+> [bookstore service contract](ARCHITECTURE/bookstore-service-20260913.md), and
+> [chant/reference contract](ARCHITECTURE/chant-reference-20260913.md) now govern
+> this feature wave. [CHECKLIST stanza LS](../CHECKLIST.md#stanza-ls--library-bookstore-chant-and-mass-reference)
+> contains the complete GLM execution contract; all 21 tasks begin pending.
+> Five exported Stitch screens are frozen under `LIBS/UI/STITCH/sanctissimissa-library-20260913/`.
+> The preliminary catalogue has 61 works, eight prayer/collection proposals and
+> seven bundle proposals, all candidates pending exact-edition rights review.
+>
+> LS supersedes conflicting BQ/BU.2 instructions: Haydock and personal study tools
+> stay free; paid editions use stable edition entitlements and a single RevenueCat
+> controller; permanent ownership survives subscription expiry; missing merchant
+> configuration denies new paid access. The launch package is signed JSON; the
+> old mandatory corpus SQLite split is not an LS prerequisite. The rest of this
+> master remains an inherited contract/audit trail, not a newly reverified release.
+
 **Status:** current master contract, with inherited release history · **Supersedes:** `DOCS/ARCHITECTURE/StAndroidsMissal-v1.md` (retained as the v0.1 historical record) · **Identifier:** `mba.robin.sanctissimissa` · **Version string:** one string across `package.json` / `src-tauri/tauri.conf.json` / `src-tauri/Cargo.toml`
 
 ## 1. Overview

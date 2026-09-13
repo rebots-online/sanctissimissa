@@ -226,3 +226,35 @@ and timecodes. This amendment creates no completed verdicts.
 | V-S2 | CTA opens the app at the shared position | AUTO | Click → app boots on `payload.dest` (e.g. `#/verse/Gen/1/1` → Genesis 1 with the verse visible) | HIGH |
 | V-S3 | Badges are honest pre-publish | AUTO | With `STORE_LINKS.* = null` the badges render inert with a pending tooltip — no fabricated store links | MEDIUM |
 | V-S4 | Share passage from the reader | COND | Select text → context menu "⛓ Share passage" → copied URL opens the landing (V-S1) with that quote and its aligned counterpart | HIGH |
+
+
+---
+
+## LS — Library, Bookstore, Gregorian Chant and Mass Reference operator protocol
+
+Authored 2026-09-13 for the 21 pending LS/BS-S/CH tasks. **Not executed.**
+Run after task-level checks and LS.10 integration; these are direct operator/UI,
+content and provider observations, not idempotent CHECKLIST Accept clauses.
+Record actual app version/channel, platform, commit, account environment,
+observed outcome and evidence artifact. Use existing release evidence policy;
+redact checkout/account data and never record credentials. A source export or
+passing fixture does not mark any row passed.
+
+| ID | Direct action and expected observation |
+|---|---|
+| LS-UI | On web, Linux, Android and Windows, open all four rail destinations and the book reader. Compare with frozen source layouts at desktop and below1100px; verify existing rail entries, theme combinations, keyboard focus/drawer Escape/return focus, touch controls and readable monolingual text. Search by category/author and combined accents. Candidates show unavailable-for-purchase reasons and exact source links. |
+| LS-CATALOGUE | Inspect all61 work records, eight collection and seven bundle proposals. Review each promoted edition's exact scan/text, translation/year, hashes and commercial/redistribution territories independently of work age. Confirm Haydock stays free, no modern translation silently substituted, and Raccolta historical claims are labeled. Candidate count is not a count of books ready to sell. |
+| LS-READER | In an actual included or legitimately acquired edition, bookmark, highlight two different ranges, add/edit a rich note, navigate TOC, close/reopen and resume. Repeat common controls in Missal/Office/Scripture/Reference. Correct an edition using real revision redirects; uniquely resolvable anchors relocate, ambiguous ones visibly remain unresolved. Export personal notes without paid access. |
+| LS-AUDIO | On each native platform and web, explicitly start/stop/cancel a voice note, deny permission once, reopen and play/download actual nonempty recorded bytes. Observe track release on route exit, correct busy/error states, IndexedDB persistence and quota failure handling. Exported file plays independently. Nothing records automatically during Mass; missing support is visible. |
+| LS-DOWNLOAD | Install a real signed edition, interrupt/restart and resume download, then read offline. Reject altered bytes/signatures/wrong key/unsupported reader version. Prior active revision survives failure. Remove downloaded text and confirm bookmarks, notes and audio remain. Included free content opens anonymously with commerce unconfigured. |
+| LS-COMMERCE | Against provisioned sandbox products, sign in using the configured issuer, buy one lifetime edition, restore on another device with the same account, and download. Exercise cancel/pending/error and verify no new access. Start/expire a subscription while owning that edition: owned access remains. Refund one overlapping source and reconcile: only unsupported access ends. Signed sandbox licenses cannot unlock production. Record actual provider events, not fixture output. |
+| LS-PLATFORM | Verify Play distribution contains Play Billing purchase flow and no external web checkout link; direct/web channel uses its configured RC Web Billing flow. Exercise native system-browser PKCE callback, malicious/stale state rejection, restore, and microphone permission gesture. Compilation alone does not pass this row. |
+| LS-CHANT | Generate a sourced1962 Sunday plan; compare its exact visible source groups with the shared Mass reader. Check seasonal sprinkling, Pre-Lent/Paschal chant differences, multiple Ember lessons, supplied Requiem and Vigil examples, and explicit unsupported-calendar/manual behavior. The corrected dismissal explanation cites1962 rubric507. A resolved date cannot claim unreviewed corpus completeness. |
+| LS-DIRECTOR | Save/reload/copy a plan, assign singers separately within combined source groups, reorder rehearsal without changing liturgical order, and regenerate only explicitly. Inspect printed congregation and director previews: private notes appear only after director audience selection. Download actual JSON for both modes and inspect correct privacy/provenance. |
+| LS-LEARN | Open all eight sourced chant metadata records. Reference-only items link to their actual edition; no fabricated score/audio appears. With a separately rights-cleared audio asset or own recording, use AB-loop, supported pitch-preserving rate and normal playback; unsupported pitch control falls back visibly. No autoplay and no persisted blob URL. |
+| LS-REFERENCE | Review37 complete articles: all31 Mass stages and six introductions, each with meaning/participation/context and supporting source locators. A competent liturgical reviewer checks1962 ritual distinctions, Catholic explanations and role assignments before changing draft to reviewed. Current-rite links remain explicitly separate; they do not change the1962 calendar. |
+| LS-SERVICE | Execute the service activation guide on the actual protected host: Node24, HTTPS/OIDC/RC scopes, webhook signature and durable delivery, owned downloads, forged webhook rejection, reconciled refunds, systemd restart, private logs/metrics, protected keys and an actual backup/restore rehearsal. Check the manifest keyring survives rotation. Passing local readiness is not proof of live merchant setup. |
+
+Release report must separately state functioning application features, reviewed
+content/territories, populated media coverage and active distribution channels.
+No blanket SHIP-READY claim while any applicable row is unrun or failing.
