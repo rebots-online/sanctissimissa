@@ -44,12 +44,12 @@ export default function ShareLanding({ payload, onOpenApp }: Props) {
         )}
       </figure>
       <p className="share-lead">
-        This passage lives inside St. Android&apos;s Missal — the Traditional
+        This passage lives inside SanctissiMissa — the Traditional
         Latin Mass and Divine Office as a navigable map, with the full
         liturgical corpus in Latin and English.
       </p>
       <button className="share-cta" onClick={onOpenApp}>
-        Open St. Android&apos;s Missal
+        Open SanctissiMissa
       </button>
       <div className="store-badges" aria-label="Get the app">
         {STORE_LINKS.play
@@ -59,7 +59,7 @@ export default function ShareLanding({ payload, onOpenApp }: Props) {
           ? <a className="store-badge ms" href={STORE_LINKS.microsoft} target="_blank" rel="noreferrer">▦ Get it from Microsoft Store</a>
           : <span className="store-badge ms pending" title="Microsoft Store listing pending public release">▦ Get it from Microsoft Store</span>}
       </div>
-      <p className="share-foot">St. Android&apos;s Missal · standroid.robin.mba</p>
+      <p className="share-foot">SanctissiMissa · sanctissimissa.robin.mba</p>
     </div>
   );
 }
