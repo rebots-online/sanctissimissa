@@ -1,0 +1,1150 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-09-13",
+  "works": [
+    {
+      "id": "work-c001",
+      "catalogueId": "C001",
+      "title": "Douay–Rheims Bible, complete",
+      "author": "Traditional Catholic translation; Challoner revision lineage",
+      "category": "Scripture and commentary",
+      "sourceNotes": "[Gutenberg 8300](https://www.gutenberg.org/ebooks/8300). Catalogue describes a 1999 electronic publication; pin the historical text lineage and any electronic additions during ingest.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/8300"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c002",
+      "catalogueId": "C002",
+      "title": "Haydock Catholic Bible Commentary",
+      "author": "George Leo Haydock and contributors",
+      "category": "Scripture and commentary",
+      "sourceNotes": "[1859-edition download page](https://johnblood.gitlab.io/haydock/id2.html), including a Bible/commentary EPUB. Verify completeness, transcription changes and commercial reuse before adoption.",
+      "sourceUrls": [
+        "https://johnblood.gitlab.io/haydock/id2.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c003",
+      "catalogueId": "C003",
+      "title": "Catena Aurea, commentary on the four Gospels",
+      "author": "Thomas Aquinas; English edition associated with John Henry Newman and contributors",
+      "category": "Scripture and commentary",
+      "sourceNotes": "[1841 J. H. Parker catalogue record](https://openlibrary.org/books/OL7029827M/Catena_aurea). Acquire and verify every part; one linked volume is not the whole set.",
+      "sourceUrls": [
+        "https://openlibrary.org/books/OL7029827M/Catena_aurea"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c004",
+      "catalogueId": "C004",
+      "title": "Confessions",
+      "author": "Augustine; E. B. Pusey translation",
+      "category": "Fathers and early Church",
+      "sourceNotes": "[Gutenberg 3296](https://www.gutenberg.org/ebooks/3296); translator lineage corroborated by [CCEL's translation index](https://www.ccel.org/a/augustine/confessions/confessions.html). Pin full text rather than an abridgment.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/3296",
+        "https://www.ccel.org/a/augustine/confessions/confessions.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c005",
+      "catalogueId": "C005",
+      "title": "City of God, volumes I–II",
+      "author": "Augustine",
+      "category": "Fathers and early Church",
+      "sourceNotes": "[Volume I, Gutenberg 45304](https://www.gutenberg.org/ebooks/45304), [volume II, 45305](https://www.gutenberg.org/ebooks/45305). Treat the pair as one work-set.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/45304",
+        "https://www.gutenberg.org/ebooks/45305"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c006",
+      "catalogueId": "C006",
+      "title": "First Epistle to the Corinthians",
+      "author": "Clement of Rome",
+      "category": "Fathers and early Church",
+      "sourceNotes": "[ANF1 contents](https://www.ccel.org/ccel/schaff/anf01.html). Edition and translator clearance needed.",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/schaff/anf01.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c007",
+      "catalogueId": "C007",
+      "title": "Epistles of Ignatius",
+      "author": "Ignatius of Antioch",
+      "category": "Fathers and early Church",
+      "sourceNotes": "[ANF1 contents](https://www.ccel.org/ccel/schaff/anf01.html). Select recension explicitly.",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/schaff/anf01.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c008",
+      "catalogueId": "C008",
+      "title": "Epistle to the Philippians",
+      "author": "Polycarp of Smyrna",
+      "category": "Fathers and early Church",
+      "sourceNotes": "[ANF1 contents](https://www.ccel.org/ccel/schaff/anf01.html).",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/schaff/anf01.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c009",
+      "catalogueId": "C009",
+      "title": "Martyrdom of Polycarp",
+      "author": "Church of Smyrna; traditional attribution",
+      "category": "Fathers and early Church",
+      "sourceNotes": "[ANF1 contents](https://www.ccel.org/ccel/schaff/anf01.html). Verify attribution in selected edition.",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/schaff/anf01.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c010",
+      "catalogueId": "C010",
+      "title": "Epistle to Diognetus",
+      "author": "Anonymous; traditionally labelled Mathetes",
+      "category": "Fathers and early Church",
+      "sourceNotes": "[ANF1 contents](https://www.ccel.org/ccel/schaff/anf01.html).",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/schaff/anf01.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c011",
+      "catalogueId": "C011",
+      "title": "First Apology",
+      "author": "Justin Martyr",
+      "category": "Fathers and early Church",
+      "sourceNotes": "[ANF1 contents](https://www.ccel.org/ccel/schaff/anf01.html). Useful Eucharist cross-reference.",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/schaff/anf01.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c012",
+      "catalogueId": "C012",
+      "title": "Second Apology",
+      "author": "Justin Martyr",
+      "category": "Fathers and early Church",
+      "sourceNotes": "[ANF1 contents](https://www.ccel.org/ccel/schaff/anf01.html).",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/schaff/anf01.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c013",
+      "catalogueId": "C013",
+      "title": "Against Heresies, books I–V",
+      "author": "Irenaeus of Lyons",
+      "category": "Fathers and early Church",
+      "sourceNotes": "[ANF1 contents](https://www.ccel.org/ccel/schaff/anf01.html). One work, five internal books.",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/schaff/anf01.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c014",
+      "catalogueId": "C014",
+      "title": "Select Works and Letters",
+      "author": "Athanasius of Alexandria; NPNF editors/translators",
+      "category": "Fathers and early Church",
+      "sourceNotes": "[NPNF2-04](https://www.ccel.org/ccel/schaff/npnf204.html). Full contributor/edition audit required.",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/schaff/npnf204.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c015",
+      "catalogueId": "C015",
+      "title": "Selected Works and Letters",
+      "author": "Ambrose of Milan; H. and E. de Romestin, H. T. F. Duckworth",
+      "category": "Fathers and early Church",
+      "sourceNotes": "[NPNF2-10](https://www.ccel.org/ccel/schaff/npnf210.html), [translator title page](https://ccel.org/ccel/schaff/npnf210/npnf210.i.html).",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/schaff/npnf210.html",
+        "https://ccel.org/ccel/schaff/npnf210/npnf210.i.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c016",
+      "catalogueId": "C016",
+      "title": "Sulpitius Severus, Vincent of Lérins, John Cassian",
+      "author": "Named Fathers; NPNF editors/translators",
+      "category": "Fathers and early Church",
+      "sourceNotes": "[NPNF2-11 collection](https://www.ccel.org/ccel/schaff/npnf211.html). Split into correctly attributed works after ingest, with stable references.",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/schaff/npnf211.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c017",
+      "catalogueId": "C017",
+      "title": "Baltimore Catechism No. 1",
+      "author": "Third Plenary Council of Baltimore; edition contributors",
+      "category": "Catechism, theology and apologetics",
+      "sourceNotes": "[Gutenberg 14551](https://www.gutenberg.org/ebooks/14551), first-communion level. Verify the actual printing rather than using the 1885 imprimatur as its publication date.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/14551"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c018",
+      "catalogueId": "C018",
+      "title": "Baltimore Catechism No. 2",
+      "author": "Third Plenary Council of Baltimore; edition contributors",
+      "category": "Catechism, theology and apologetics",
+      "sourceNotes": "[Gutenberg 14552](https://www.gutenberg.org/ebooks/14552), confirmation level.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/14552"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c019",
+      "catalogueId": "C019",
+      "title": "Baltimore Catechism No. 3",
+      "author": "Third Plenary Council of Baltimore; Thomas L. Kinkead supplement",
+      "category": "Catechism, theology and apologetics",
+      "sourceNotes": "[Gutenberg 14553](https://www.gutenberg.org/ebooks/14553), post-confirmation level.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/14553"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c020",
+      "catalogueId": "C020",
+      "title": "Explanation of the Baltimore Catechism",
+      "author": "Thomas L. Kinkead; edition contributors",
+      "category": "Catechism, theology and apologetics",
+      "sourceNotes": "[Gutenberg 14554](https://www.gutenberg.org/ebooks/14554), teacher/advanced level.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/14554"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c021",
+      "catalogueId": "C021",
+      "title": "Catechism of the Council of Trent",
+      "author": "Catholic Church; Jeremiah Donovan, translator",
+      "category": "Catechism, theology and apologetics",
+      "sourceNotes": "**1833, Baltimore, J. Myres**; [Library of Congress scan and rights statement](https://www.loc.gov/resource/gdcmassbookdig.catechismofcounc00cath/?st=gallery).",
+      "sourceUrls": [
+        "https://www.loc.gov/resource/gdcmassbookdig.catechismofcounc00cath/?st=gallery"
+      ],
+      "evidence": "ED",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c022",
+      "catalogueId": "C022",
+      "title": "A Full Catechism of the Catholic Religion",
+      "author": "Joseph Deharbe",
+      "category": "Catechism, theology and apologetics",
+      "sourceNotes": "**1890, Catholic Publication Society**; [digitized edition record](https://books.google.com/books/about/A_Full_Catechism_of_the_Catholic_Religio.html?id=_UYXAAAAYAAJ). Translator verification and complete file acquisition remain.",
+      "sourceUrls": [
+        "https://books.google.com/books/about/A_Full_Catechism_of_the_Catholic_Religio.html?id=_UYXAAAAYAAJ"
+      ],
+      "evidence": "ED",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c023",
+      "catalogueId": "C023",
+      "title": "The Faith of Our Fathers",
+      "author": "James Gibbons",
+      "category": "Catechism, theology and apologetics",
+      "sourceNotes": "[Gutenberg 27435](https://www.gutenberg.org/ebooks/27435).",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/27435"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c024",
+      "catalogueId": "C024",
+      "title": "Summa Theologica: Prima Pars",
+      "author": "Thomas Aquinas; English Dominican translation lineage",
+      "category": "Catechism, theology and apologetics",
+      "sourceNotes": "[Gutenberg 17611](https://www.gutenberg.org/ebooks/17611), Complete American Edition designation; exact printing/contributors to pin.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/17611"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c025",
+      "catalogueId": "C025",
+      "title": "Summa Theologica: Prima Secundae",
+      "author": "Thomas Aquinas; English Dominican translation lineage",
+      "category": "Catechism, theology and apologetics",
+      "sourceNotes": "[Gutenberg 17897](https://www.gutenberg.org/ebooks/17897). Part of C024–C027 work-set, not an unrelated work.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/17897"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c026",
+      "catalogueId": "C026",
+      "title": "Summa Theologica: Secunda Secundae",
+      "author": "Thomas Aquinas; Fathers of the English Dominican Province",
+      "category": "Catechism, theology and apologetics",
+      "sourceNotes": "[Gutenberg 18755](https://www.gutenberg.org/ebooks/18755).",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/18755"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c027",
+      "catalogueId": "C027",
+      "title": "Summa Theologica: Tertia Pars",
+      "author": "Thomas Aquinas; English Dominican translation lineage",
+      "category": "Catechism, theology and apologetics",
+      "sourceNotes": "[Gutenberg 19950](https://www.gutenberg.org/ebooks/19950). Do not claim these four files establish coverage of every supplement.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/19950"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c028",
+      "catalogueId": "C028",
+      "title": "On Prayer and the Contemplative Life",
+      "author": "Thomas Aquinas; Hugh Pope, translator",
+      "category": "Catechism, theology and apologetics",
+      "sourceNotes": "[Gutenberg 22295](https://www.gutenberg.org/ebooks/22295); distinct curated treatment, with overlap disclosed.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/22295"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c029",
+      "catalogueId": "C029",
+      "title": "Essay on the Development of Christian Doctrine",
+      "author": "John Henry Newman",
+      "category": "Catechism, theology and apologetics",
+      "sourceNotes": "[Gutenberg 35110](https://www.gutenberg.org/ebooks/35110).",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/35110"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c030",
+      "catalogueId": "C030",
+      "title": "Essay in Aid of a Grammar of Assent",
+      "author": "John Henry Newman",
+      "category": "Catechism, theology and apologetics",
+      "sourceNotes": "[Gutenberg 34022](https://www.gutenberg.org/ebooks/34022).",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/34022"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c031",
+      "catalogueId": "C031",
+      "title": "Imitation of Christ",
+      "author": "Thomas à Kempis; William Benham, translator",
+      "category": "Spiritual life and prayer",
+      "sourceNotes": "[Gutenberg 1653](https://www.gutenberg.org/ebooks/1653). Catholic editorial review of this translation; do not substitute a modern edition.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/1653"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c032",
+      "catalogueId": "C032",
+      "title": "Introduction to the Devout Life",
+      "author": "Francis de Sales",
+      "category": "Spiritual life and prayer",
+      "sourceNotes": "[CCEL text](https://www.ccel.org/ccel/desales/devout_life.toc.html). Select a cleared historic translation; CCEL copy is not commercially cleared.",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/desales/devout_life.toc.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c033",
+      "catalogueId": "C033",
+      "title": "Treatise on the Love of God",
+      "author": "Francis de Sales",
+      "category": "Spiritual life and prayer",
+      "sourceNotes": "[CCEL edition lead](https://www.ccel.org/ccel/desales/love.html).",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/desales/love.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c034",
+      "catalogueId": "C034",
+      "title": "Interior Castle / The Mansions",
+      "author": "Teresa of Ávila; Benedictines of Stanbrook; Benedict Zimmerman revision",
+      "category": "Spiritual life and prayer",
+      "sourceNotes": "**1921 third edition, Thomas Baker, London**; [transcribed title page](https://sacred-texts.com/chr/tic/tic00.htm). Verify translator/editor contributions and source terms.",
+      "sourceUrls": [
+        "https://sacred-texts.com/chr/tic/tic00.htm"
+      ],
+      "evidence": "ED",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c035",
+      "catalogueId": "C035",
+      "title": "Way of Perfection",
+      "author": "Teresa of Ávila",
+      "category": "Spiritual life and prayer",
+      "sourceNotes": "[CCEL edition lead](https://ccel.org/ccel/teresa/way/way). Translation not yet selected.",
+      "sourceUrls": [
+        "https://ccel.org/ccel/teresa/way/way"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c036",
+      "catalogueId": "C036",
+      "title": "Life of St. Teresa of Jesus",
+      "author": "Teresa of Ávila",
+      "category": "Spiritual life and prayer",
+      "sourceNotes": "[Gutenberg 8120](https://www.gutenberg.org/ebooks/8120). Pin translator and revision from full edition.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/8120"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c037",
+      "catalogueId": "C037",
+      "title": "Ascent of Mount Carmel",
+      "author": "John of the Cross",
+      "category": "Spiritual life and prayer",
+      "sourceNotes": "[CCEL edition lead](https://ccel.org/ccel/john_cross/ascent/ascent). Select older cleared translation; do not infer rights from the saint's dates.",
+      "sourceUrls": [
+        "https://ccel.org/ccel/john_cross/ascent/ascent"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c038",
+      "catalogueId": "C038",
+      "title": "Dark Night of the Soul",
+      "author": "John of the Cross",
+      "category": "Spiritual life and prayer",
+      "sourceNotes": "[CCEL edition lead](https://ccel.org/ccel/john_cross/dark_night/dark_night).",
+      "sourceUrls": [
+        "https://ccel.org/ccel/john_cross/dark_night/dark_night"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c039",
+      "catalogueId": "C039",
+      "title": "Spiritual Canticle",
+      "author": "John of the Cross",
+      "category": "Spiritual life and prayer",
+      "sourceNotes": "[CCEL edition lead](https://ccel.org/ccel/john_cross/canticle/canticle).",
+      "sourceUrls": [
+        "https://ccel.org/ccel/john_cross/canticle/canticle"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c040",
+      "catalogueId": "C040",
+      "title": "Dialogue",
+      "author": "Catherine of Siena",
+      "category": "Spiritual life and prayer",
+      "sourceNotes": "[CCEL edition lead](https://www.ccel.org/ccel/catherine/dialog.html). Translation not yet selected.",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/catherine/dialog.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c041",
+      "catalogueId": "C041",
+      "title": "Spiritual Exercises",
+      "author": "Ignatius of Loyola",
+      "category": "Spiritual life and prayer",
+      "sourceNotes": "[CCEL edition lead](https://www.ccel.org/ccel/ignatius/exercises.html). Select actual text; do not silently substitute Coppens's later Jesuit retreat adaptation.",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/ignatius/exercises.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c042",
+      "catalogueId": "C042",
+      "title": "Spiritual Combat, with supplement and Path of Paradise",
+      "author": "Lorenzo Scupoli",
+      "category": "Spiritual life and prayer",
+      "sourceNotes": "**1875, Rivingtons, new translation**; [historical transcription/title page](https://en.wikisource.org/wiki/The_Spiritual_Combat), [scan index](https://en.wikisource.org/wiki/Index:Spiritualcombat.djvu). Translator and digital reuse review remain.",
+      "sourceUrls": [
+        "https://en.wikisource.org/wiki/The_Spiritual_Combat",
+        "https://en.wikisource.org/wiki/Index:Spiritualcombat.djvu"
+      ],
+      "evidence": "ED",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c043",
+      "catalogueId": "C043",
+      "title": "Practice of the Presence of God",
+      "author": "Brother Lawrence",
+      "category": "Spiritual life and prayer",
+      "sourceNotes": "[CCEL edition lead](https://www.ccel.org/ccel/lawrence/practice.html). Translation/compilation edition to select.",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/lawrence/practice.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c044",
+      "catalogueId": "C044",
+      "title": "On Loving God",
+      "author": "Bernard of Clairvaux",
+      "category": "Spiritual life and prayer",
+      "sourceNotes": "[CCEL edition lead](https://www.ccel.org/ccel/bernard/loving_god.html).",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/bernard/loving_god.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c045",
+      "catalogueId": "C045",
+      "title": "Friendship of Christ",
+      "author": "Robert Hugh Benson",
+      "category": "Spiritual life and prayer",
+      "sourceNotes": "[University of Notre Dame text](https://archives.nd.edu/episodes/visitors/rhb/fc01.htm). Verify whole-book coverage and reuse basis.",
+      "sourceUrls": [
+        "https://archives.nd.edu/episodes/visitors/rhb/fc01.htm"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c046",
+      "catalogueId": "C046",
+      "title": "Story of a Soul, with additional writings",
+      "author": "Thérèse of Lisieux; Thomas N. Taylor, translator",
+      "category": "Saints and spiritual biography",
+      "sourceNotes": "[Gutenberg 16772](https://www.gutenberg.org/ebooks/16772). Poems also credit Susan L. Emery in the text; review all contributors. Historic edited autobiography, not necessarily modern critical manuscript order.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/16772"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c047",
+      "catalogueId": "C047",
+      "title": "Autobiography of St. Ignatius",
+      "author": "Ignatius of Loyola; J. F. X. O'Conor, editor",
+      "category": "Saints and spiritual biography",
+      "sourceNotes": "[Gutenberg 24534](https://www.gutenberg.org/ebooks/24534).",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/24534"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c048",
+      "catalogueId": "C048",
+      "title": "Apologia pro Vita Sua",
+      "author": "John Henry Newman",
+      "category": "Saints and spiritual biography",
+      "sourceNotes": "[Gutenberg 19690](https://www.gutenberg.org/ebooks/19690).",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/19690"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c049",
+      "catalogueId": "C049",
+      "title": "Lives of the Saints, with reflections for every day",
+      "author": "Alban Butler; historical abridgment/editors",
+      "category": "Saints and spiritual biography",
+      "sourceNotes": "**1894, Benziger Brothers**; [New York Public Library scan](https://archive.org/details/livesofsaintswith00butl). Do not equate this abridgment with later Thurston/Attwater editions.",
+      "sourceUrls": [
+        "https://archive.org/details/livesofsaintswith00butl"
+      ],
+      "evidence": "ED",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c050",
+      "catalogueId": "C050",
+      "title": "Little Flowers of St. Francis",
+      "author": "Traditional Franciscan collection, associated with Ugolino",
+      "category": "Saints and spiritual biography",
+      "sourceNotes": "[CCEL edition lead](https://www.ccel.org/ccel/ugolino/flowers.html). The page describes a 1930s reproduction, so select a separately verified earlier translation for the initial catalogue.",
+      "sourceUrls": [
+        "https://www.ccel.org/ccel/ugolino/flowers.html"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c051",
+      "catalogueId": "C051",
+      "title": "Glories of Mary",
+      "author": "Alphonsus Liguori",
+      "category": "Marian devotion",
+      "sourceNotes": "**1852, second American edition, Edward Dunigan and Brother**; [Gutenberg 72411](https://www.gutenberg.org/ebooks/72411), [title page](https://www.gutenberg.org/files/72411/72411-h/72411-h.htm). Translator attribution to resolve.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/72411",
+        "https://www.gutenberg.org/files/72411/72411-h/72411-h.htm"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c052",
+      "catalogueId": "C052",
+      "title": "True Devotion to the Blessed Virgin",
+      "author": "Louis-Marie Grignion de Montfort; Frederick William Faber, translator",
+      "category": "Marian devotion",
+      "sourceNotes": "**1863** historical scan; [PDF](https://www.sdbv.org/TD_E-BOOK.pdf). Faber's preface is dated 1862. Verify scan completeness and front matter.",
+      "sourceUrls": [
+        "https://www.sdbv.org/TD_E-BOOK.pdf"
+      ],
+      "evidence": "ED",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c053",
+      "catalogueId": "C053",
+      "title": "Mary, the Help of Christians: novenas",
+      "author": "Bonaventure Hammer",
+      "category": "Marian devotion",
+      "sourceNotes": "[Gutenberg 33671](https://www.gutenberg.org/ebooks/33671). Extracted/overlapping material also exists in the larger [Gutenberg 33596 collection](https://www.gutenberg.org/ebooks/33596); avoid charging twice for the same text.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/33671",
+        "https://www.gutenberg.org/ebooks/33596"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c054",
+      "catalogueId": "C054",
+      "title": "General Catholic Devotions",
+      "author": "Bonaventure Hammer, compiler",
+      "category": "Prayer books and devotional collections",
+      "sourceNotes": "[Gutenberg 33676](https://www.gutenberg.org/ebooks/33676). Includes daily, sacramental, and other devotions; also overlaps the larger Hammer compilation.",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/33676"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c055",
+      "catalogueId": "C055",
+      "title": "Our Monthly Devotions",
+      "author": "Albert A. Lings",
+      "category": "Prayer books and devotional collections",
+      "sourceNotes": "[Gutenberg 50739](https://www.gutenberg.org/ebooks/50739).",
+      "sourceUrls": [
+        "https://www.gutenberg.org/ebooks/50739"
+      ],
+      "evidence": "PG",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c056",
+      "catalogueId": "C056",
+      "title": "Golden Manual: guide to Catholic devotion, public and private",
+      "author": "Compiled from approved Catholic sources; individual compiler unresolved",
+      "category": "Prayer books and devotional collections",
+      "sourceNotes": "**1850, London, Burns & Lambert**; [scan, contents and downloads](https://archive.org/details/TheGoldenManual1850). Source has a Public Domain Mark; still validate constituent material.",
+      "sourceUrls": [
+        "https://archive.org/details/TheGoldenManual1850"
+      ],
+      "evidence": "ED",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c057",
+      "catalogueId": "C057",
+      "title": "Raccolta: indulgenced prayers and good works",
+      "author": "Catholic Church; Ambrose St John translation lineage",
+      "category": "Prayer books and devotional collections",
+      "sourceNotes": "**1910, Burns & Oates / Benziger**; [edition record](https://search.worldcat.org/title/670377221), [title-page-bearing PDF](https://homemcatolico.com/wp-content/uploads/2024/02/The-Raccolta-1910.pdf). Verify complete original scan rather than relying on a modern reflow.",
+      "sourceUrls": [
+        "https://search.worldcat.org/title/670377221",
+        "https://homemcatolico.com/wp-content/uploads/2024/02/The-Raccolta-1910.pdf"
+      ],
+      "evidence": "ED",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c058",
+      "catalogueId": "C058",
+      "title": "My Prayer Book: Happiness in Goodness",
+      "author": "Francis Xavier Lasance",
+      "category": "Prayer books and devotional collections",
+      "sourceNotes": "[historical scan lead](https://www.catholickingdom.com/s_Library/Books/P/My_Prayer_Book_Lasance_OCR_CK.pdf); preface dated May 24, 1908. Actual printing, image rights and commercial source terms still to pin.",
+      "sourceUrls": [
+        "https://www.catholickingdom.com/s_Library/Books/P/My_Prayer_Book_Lasance_OCR_CK.pdf"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c059",
+      "catalogueId": "C059",
+      "title": "Holy Sacrifice of the Mass: dogmatically, liturgically and ascetically explained",
+      "author": "Nikolaus Gihr",
+      "category": "The Mass and liturgical year",
+      "sourceNotes": "**1902, B. Herder**; [University of California scan](https://archive.org/details/holysacrificeofm00gihriala). Translator/contributors to pin; historical Roman rite context.",
+      "sourceUrls": [
+        "https://archive.org/details/holysacrificeofm00gihriala"
+      ],
+      "evidence": "ED",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c060",
+      "catalogueId": "C060",
+      "title": "Explanation of the Prayers and Ceremonies of Holy Mass",
+      "author": "Prosper Guéranger; Laurence Shepherd, translator",
+      "category": "The Mass and liturgical year",
+      "sourceNotes": "**1885** English transcription; [title page and text](https://www.liturgialatina.org/benedictine/holymass.htm). Verify source scan and reuse terms.",
+      "sourceUrls": [
+        "https://www.liturgialatina.org/benedictine/holymass.htm"
+      ],
+      "evidence": "ED",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    },
+    {
+      "id": "work-c061",
+      "catalogueId": "C061",
+      "title": "The Liturgical Year, multi-volume set",
+      "author": "Prosper Guéranger; Lucien Fromage; James Laurence Shepherd and other translators",
+      "category": "The Mass and liturgical year",
+      "sourceNotes": "[historical volume list](https://en.wikisource.org/wiki/The_Liturgical_Year). The online transcription is incomplete; acquire each volume, identify contributors, and record its calendar assumptions.",
+      "sourceUrls": [
+        "https://en.wikisource.org/wiki/The_Liturgical_Year"
+      ],
+      "evidence": "LEAD",
+      "publication": "candidate",
+      "editionId": null,
+      "price": null,
+      "productId": null
+    }
+  ],
+  "collections": [
+    {
+      "id": "collection-daily-and-family-prayer",
+      "title": "Daily and Family Prayer",
+      "description": "Morning/evening prayer, grace, family prayer, short acts of faith/hope/charity. Source plan: C054, C056; review selected passages.",
+      "publication": "candidate"
+    },
+    {
+      "id": "collection-rosary-and-marian-prayer",
+      "title": "Rosary and Marian Prayer",
+      "description": "Traditional mysteries, Angelus, Marian prayers, feast novenas. Source plan: C053, C056; keep historical and newly written meditations distinct.",
+      "publication": "candidate"
+    },
+    {
+      "id": "collection-confession-and-communion",
+      "title": "Confession and Communion",
+      "description": "Preparation, examination guidance, thanksgiving. Source plan: C054, C056; historical discipline annotated.",
+      "publication": "candidate"
+    },
+    {
+      "id": "collection-stations-and-passion",
+      "title": "Stations and Passion",
+      "description": "Stations, Passion meditations, prayers before a crucifix. Source plan: C054, C056; select and name the exact version.",
+      "publication": "candidate"
+    },
+    {
+      "id": "collection-eucharistic-adoration",
+      "title": "Eucharistic Adoration",
+      "description": "Visits to the Blessed Sacrament, adoration prayers. Source plan: C054, C056; personal devotion distinct from liturgical rubrics.",
+      "publication": "candidate"
+    },
+    {
+      "id": "collection-litanies-and-saints",
+      "title": "Litanies and Saints",
+      "description": "Jesus, Mary, saints, St Joseph and angels. Source plan: C053, C056; distinguish private-use texts from approved public liturgical use.",
+      "publication": "candidate"
+    },
+    {
+      "id": "collection-sick-dying-and-departed",
+      "title": "Sick, Dying and Departed",
+      "description": "Intercession for the sick, dying and departed. Source plan: C056; do not present lay prayers as administration of sacraments.",
+      "publication": "candidate"
+    },
+    {
+      "id": "collection-the-devotional-year",
+      "title": "The Devotional Year",
+      "description": "Monthly prayers and season/feast-linked selections. Source plan: C055, C057, C061; date and calendar metadata required.",
+      "publication": "candidate"
+    }
+  ],
+  "bundles": [
+    {
+      "id": "bundle-included-essentials",
+      "title": "Included essentials",
+      "workIds": [
+        "work-c001",
+        "work-c018",
+        "work-c054"
+      ],
+      "description": "Candidate contents: C001, C018, C054, selected daily prayers. Recommended acquisition model: Free permanent Library additions; prioritize complete usable editions.",
+      "publication": "candidate"
+    },
+    {
+      "id": "bundle-scripture-study",
+      "title": "Scripture Study",
+      "workIds": [
+        "work-c002",
+        "work-c003"
+      ],
+      "description": "Candidate contents: C002–C003, with C001 cross-links. Recommended acquisition model: One-time prepared-edition bundle; make Haydock's precise coverage visible. Current policy override: Haydock remains free; inclusion in this preliminary bundle does not authorize charging for Haydock.",
+      "publication": "candidate"
+    },
+    {
+      "id": "bundle-catholic-foundations",
+      "title": "Catholic Foundations",
+      "workIds": [
+        "work-c017",
+        "work-c018",
+        "work-c019",
+        "work-c020",
+        "work-c021",
+        "work-c022",
+        "work-c023",
+        "work-c029",
+        "work-c030"
+      ],
+      "description": "Candidate contents: C017–C023, C029–C030. Recommended acquisition model: One-time bundle with deduplication/credit for already owned editions.",
+      "publication": "candidate"
+    },
+    {
+      "id": "bundle-doctors-and-spiritual-classics",
+      "title": "Doctors and Spiritual Classics",
+      "workIds": [
+        "work-c004",
+        "work-c005",
+        "work-c024",
+        "work-c025",
+        "work-c026",
+        "work-c027",
+        "work-c028",
+        "work-c029",
+        "work-c030",
+        "work-c031",
+        "work-c032",
+        "work-c033",
+        "work-c034",
+        "work-c035",
+        "work-c036",
+        "work-c037",
+        "work-c038",
+        "work-c039",
+        "work-c040",
+        "work-c041",
+        "work-c042",
+        "work-c043",
+        "work-c044",
+        "work-c045"
+      ],
+      "description": "Candidate contents: C004–C005, C024–C045. Recommended acquisition model: Smaller author bundles and individual purchases; avoid forcing a huge package.",
+      "publication": "candidate"
+    },
+    {
+      "id": "bundle-saints-and-marian-life",
+      "title": "Saints and Marian Life",
+      "workIds": [
+        "work-c046",
+        "work-c047",
+        "work-c048",
+        "work-c049",
+        "work-c050",
+        "work-c051",
+        "work-c052",
+        "work-c053"
+      ],
+      "description": "Candidate contents: C046–C053. Recommended acquisition model: Individual editions plus optional bundle.",
+      "publication": "candidate"
+    },
+    {
+      "id": "bundle-prayer-companion",
+      "title": "Prayer Companion",
+      "workIds": [
+        "work-c055",
+        "work-c056",
+        "work-c057",
+        "work-c058"
+      ],
+      "description": "Candidate contents: C055–C058 and the proposed prayer selections. Recommended acquisition model: Optional prepared collection; retain a useful free daily set.",
+      "publication": "candidate"
+    },
+    {
+      "id": "bundle-understanding-the-mass",
+      "title": "Understanding the Mass",
+      "workIds": [
+        "work-c059",
+        "work-c060",
+        "work-c061"
+      ],
+      "description": "Candidate contents: C059–C061, with links to C011 and C021. Recommended acquisition model: Reference bundle integrated with the Mass guide, historically labelled.",
+      "publication": "candidate"
+    }
+  ]
+}

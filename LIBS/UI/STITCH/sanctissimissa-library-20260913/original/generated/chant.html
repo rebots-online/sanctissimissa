@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SanctissiMissa - Gregorian Chant Director Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #221c14;
+      --ink-soft: #4a4034;
+      --ink-faint: #7a6e5d;
+      --parchment: #f6f0e2;
+      --parchment-deep: #ece2cc;
+      --parchment-deepest: #ded2b5;
+      --vellum: #fbf7ee;
+      --gold: #a97e13;
+      --gold-bright: #d4a017;
+      --gold-soft: rgba(169, 126, 19, 0.12);
+      --burgundy: #9c2733;
+      --burgundy-soft: rgba(156, 39, 51, 0.08);
+      --rail: #2b241b;
+      --rail-text: #d9cdb8;
+      --rail-active: #3a3227;
+      --rail-border: #3d3428;
+      --serif: 'Source Serif 4', Georgia, serif;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --display: 'Cinzel', serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--parchment);
+      color: var(--ink);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .app-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      width: 100vw;
+      min-height: 100vh;
+    }
+
+    /* Rail */
+    .nav-rail {
+      background-color: var(--rail);
+      color: var(--rail-text);
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--rail-border);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .brand-section {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--rail-border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-cross {
+      width: 26px;
+      height: 26px;
+      color: var(--gold-bright);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-family: var(--display);
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+    }
+
+    .brand-subtitle {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      color: var(--gold);
+      margin-top: 2px;
+    }
+
+    .nav-group-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #8c7f6e;
+      padding: 20px 20px 8px;
+      font-weight: 600;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 0 10px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      color: var(--rail-text);
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+
+    .nav-link svg {
+      width: 17px;
+      height: 17px;
+      opacity: 0.75;
+      flex-shrink: 0;
+    }
+
+    .nav-link:hover {
+      background-color: var(--rail-active);
+      color: #fff;
+    }
+
+    .nav-link.active {
+      background-color: var(--rail-active);
+      color: #fff;
+      font-weight: 500;
+      position: relative;
+    }
+
+    .nav-link.active svg {
+      color: var(--gold-bright);
+      opacity: 1;
+    }
+
+    .nav-link.active::before {
+      content: "";
+      position: absolute;
+      left: -6px;
+      top: 6px;
+      bottom: 6px;
+      width: 3px;
+      background: var(--gold-bright);
+      border-radius: 2px;
+    }
+
+    .rail-bottom-chip {
+      margin-top: auto;
+      padding: 16px;
+      border-top: 1px solid var(--rail-border);
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .feast-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      background: #1f1912;
+      border: 1px solid var(--rail-border);
+    }
+
+    .liturgical-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #ffffff;
+      border: 2px solid var(--gold-bright);
+    }
+
+    /* Main Area */
+    .main-column {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow-y: auto;
+      background-color: var(--parchment);
+    }
+
+    .masthead {
+      background: var(--vellum);
+      border-bottom: 1px solid var(--parchment-deep);
+      padding: 18px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .page-title {
+      font-family: var(--display);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .button-primary {
+      background: var(--burgundy);
+      color: #fff;
+      border: 1px solid #7e1d28;
+    }
+
+    .button-secondary {
+      background: var(--vellum);
+      color: var(--ink);
+      border: 1px solid var(--parchment-deepest);
+    }
+
+    /* Tabs Bar */
+    .workspace-tabs {
+      display: flex;
+      background: #eee6d3;
+      border-bottom: 1px solid var(--parchment-deepest);
+      padding: 0 36px;
+      gap: 24px;
+    }
+
+    .tab-btn {
+      padding: 14px 4px;
+      background: none;
+      border: none;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      cursor: pointer;
+      position: relative;
+      transition: color 0.15s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--ink);
+    }
+
+    .tab-btn.active {
+      color: var(--burgundy);
+    }
+
+    .tab-btn.active::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--burgundy);
+      border-radius: 2px 2px 0 0;
+    }
+
+    /* Content Area */
+    .content-container {
+      padding: 28px 36px 48px;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Liturgical Profile Bar */
+    #chant-profile {
+      background: var(--vellum);
+      border: 1px solid var(--parchment-deep);
+      border-left: 4px solid var(--gold);
+      border-radius: 8px;
+      padding: 18px 24px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .profile-meta-title {
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .profile-subline {
+      font-size: 12px;
+      color: var(--ink-soft);
+      margin-top: 4px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .profile-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      background: var(--parchment);
+      border: 1px solid var(--parchment-deep);
+    }
+
+    /* Dual Column Layout: Planner vs Rehearsal Panel */
+    .director-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Slots Container */
+    #chant-plan-slots {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .slot-card {
+      background: var(--vellum);
+      border: 1px solid var(--parchment-deep);
+      border-radius: 6px;
+      padding: 14px 18px;
+      display: grid;
+      grid-template-columns: 130px 1fr auto;
+      align-items: center;
+      gap: 16px;
+      transition: border-color 0.15s ease;
+    }
+
+    .slot-card:hover {
+      border-color: var(--gold);
+    }
+
+    .slot-type-proper {
+      border-left: 3px solid var(--burgundy);
+    }
+
+    .slot-type-ordinary {
+      border-left: 3px solid var(--gold);
+    }
+
+    .slot-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .slot-class-badge {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 600;
+      margin-top: 2px;
+      color: var(--ink-faint);
+    }
+
+    .slot-detail-center {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .slot-incipit {
+      font-family: var(--serif);
+      font-size: 15px;
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .slot-meta {
+      font-size: 11px;
+      color: var(--ink-soft);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .rights-flag {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      font-weight: 500;
+    }
+
+    .rights-flag.missing {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .slot-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* Ordinary Selector Box */
+    #ordinary-selector {
+      background: #f4edd9;
+      border: 1px solid var(--parchment-deepest);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Rehearsal & Learn Right Panel */
+    #rehearsal-panel {
+      background: var(--vellum);
+      border: 1px solid var(--parchment-deep);
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .side-card-title {
+      font-family: var(--display);
+      font-size: 13px;
+      letter-spacing: 0.8px;
+      color: var(--ink);
+      text-transform: uppercase;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--parchment-deep);
+    }
+
+    /* Chant Learning Four-Line Staff */
+    #chant-learning {
+      background: #fdfbf7;
+      border: 1px solid var(--parchment-deepest);
+      border-radius: 6px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .staff-svg-wrap {
+      background: #fffcf5;
+      border: 1px solid #ebdcc1;
+      border-radius: 4px;
+      padding: 10px;
+    }
+
+    .staff-disclaimer {
+      font-size: 11px;
+      color: var(--ink-faint);
+      line-height: 1.4;
+      font-style: italic;
+    }
+
+    .player-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--parchment);
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid var(--parchment-deep);
+    }
+
+    .player-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .control-btn {
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: var(--vellum);
+      border: 1px solid var(--parchment-deepest);
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    /* Rehearsal Responsibilities */
+    .duty-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      font-size: 11px;
+    }
+
+    .duty-box {
+      padding: 10px;
+      border-radius: 4px;
+      background: var(--parchment);
+      border: 1px solid var(--parchment-deep);
+    }
+
+    .duty-box strong {
+      display: block;
+      color: var(--burgundy);
+      margin-bottom: 4px;
+    }
+
+    /* Responsive at 1100px */
+    @media (max-width: 1100px) {
+      .app-layout { grid-template-columns: 1fr; }
+      .nav-rail { position: fixed; left: -260px; width: 250px; }
+      .director-grid { grid-template-columns: 1fr; }
+      .slot-card { grid-template-columns: 1fr; gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Preserved Left Rail -->
+    <nav class="nav-rail" id="main-nav-rail">
+      <div class="brand-section">
+        <svg class="brand-cross" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11 2h2v6h5v2h-5v12h-2V10H6V8h5V2z"/>
+          <circle cx="12" cy="9" r="1.5" fill="#f6f0e2"/>
+        </svg>
+        <div>
+          <div class="brand-title">SanctissiMissa</div>
+          <div class="brand-subtitle">Missale &amp; Officium</div>
+        </div>
+      </div>
+
+      <div class="nav-group-title">Navigation</div>
+      <ul class="nav-list">
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/><path d="M6 9v6M9 6h6"/></svg>Holy Mass</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Missal Reader</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Perpetual Calendar</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Divine Office</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Sacred Scripture</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>My Library</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Bookstore</a></li>
+        <li><a href="#" class="nav-link active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Gregorian Chant</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Mass Reference</a></li>
+      </ul>
+
+      <div class="nav-group-title">Study &amp; Ministry</div>
+      <ul class="nav-list">
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Journal</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Homily Writer</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Annotations</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</a></li>
+      </ul>
+
+      <div class="rail-bottom-chip">
+        <div class="feast-chip">
+          <div class="liturgical-dot"></div>
+          <div>
+            <div class="feast-title">Transfigurátio D.N.J.C.</div>
+            <div class="feast-sub">II Classis • Alba</div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Workspace -->
+    <main class="main-column">
+      <header class="masthead">
+        <div>
+          <h1 class="page-title">Gregorian Chant Workspace</h1>
+          <div style="font-size: 12px; color: var(--ink-faint); margin-top: 2px;">
+            Cantor &amp; Schola Cantorum Master Director • Roman Missal 1962 Profile
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="button button-secondary" onclick="window.print()">
+            🖨️ Printable Choir Set
+          </button>
+          <button class="button button-primary" onclick="alert('Exporting chant binder metadata (Solestmes Liber Usualis pages)...')">
+            Export Binder &rarr;
+          </button>
+        </div>
+      </header>
+
+      <!-- 4 Tabs -->
+      <nav class="workspace-tabs" role="tablist">
+        <button class="tab-btn active" role="tab" onclick="switchChantTab(this, 'plan')">Plan a Mass</button>
+        <button class="tab-btn" role="tab" onclick="switchChantTab(this, 'learn')">Learn &amp; Notation</button>
+        <button class="tab-btn" role="tab" onclick="switchChantTab(this, 'browse')">Browse Graduale</button>
+        <button class="tab-btn" role="tab" onclick="switchChantTab(this, 'rehearsal')">Rehearsal Sets</button>
+      </nav>
+
+      <div class="content-container">
+        <!-- Profile Banner -->
+        <section id="chant-profile">
+          <div>
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--gold); font-weight: 600;">Liturgical Profile</div>
+            <h2 class="profile-meta-title">Missa Cantata: Dominica IV post Pascha</h2>
+            <div class="profile-subline">
+              <span class="profile-badge">📅 1962 Roman Calendar</span>
+              <span class="profile-badge">⚪ Alba (White)</span>
+              <span class="profile-badge">II Classis</span>
+              <span>• Rubric Rationale: Gloria &amp; Credo prescribed; Alleluia duplex.</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <select class="button-secondary" style="padding: 6px 12px; border-radius: 4px; font-size: 12px;">
+              <option>Missa Cantata (Sung Mass)</option>
+              <option>Missa Solemnis (High Mass)</option>
+              <option>Missa Lecta cum Cantu</option>
+            </select>
+          </div>
+        </section>
+
+        <!-- Director Grid -->
+        <div class="director-grid">
+          <!-- Left Column: Ordered Chant Slots -->
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Ordinary Selector -->
+            <div id="ordinary-selector">
+              <div>
+                <strong style="font-size: 13px;">Ordinary Selection: Kyriale VIII (De Angelis)</strong>
+                <div style="font-size: 11px; color: var(--ink-soft);">Mode V &amp; VI • For II Classis Feasts through Paschaltide</div>
+              </div>
+              <button class="control-btn" onclick="alert('Change Kyriale: Select from I (Lux et Origo), IV (Cunctipotens), XI (Orbis Factor), or XVII (Lent)')">Change Mass Ordinary</button>
+            </div>
+
+            <!-- Ordered Slots -->
+            <div id="chant-plan-slots">
+              <!-- 1. Introit (Proper) -->
+              <div class="slot-card slot-type-proper" id="slot-introit">
+                <div>
+                  <div class="slot-name">1. Introitus</div>
+                  <div class="slot-class-badge">Prescribed Proper</div>
+                </div>
+                <div class="slot-detail-center">
+                  <div class="slot-incipit">Cantáte Dómino canticum novum</div>
+                  <div class="slot-meta">
+                    <span>Mode VI</span>
+                    <span>• Ps. 97:1-2</span>
+                    <span class="rights-flag">Graduale Romanum (PD)</span>
+                  </div>
+                </div>
+                <div class="slot-actions">
+                  <button class="control-btn" onclick="loadChantToPlayer('Cantate Domino', 'Mode VI', 112)">Inspect</button>
+                </div>
+              </div>
+
+              <!-- 2. Kyrie (Ordinary) -->
+              <div class="slot-card slot-type-ordinary" id="slot-kyrie">
+                <div>
+                  <div class="slot-name">2. Kyrie eleison</div>
+                  <div class="slot-class-badge">Ordinary (Missa VIII)</div>
+                </div>
+                <div class="slot-detail-center">
+                  <div class="slot-incipit">Kyrie VIII (De Angelis)</div>
+                  <div class="slot-meta">
+                    <span>Mode V</span>
+                    <span>• Alternating Schola &amp; People</span>
+                    <span class="rights-flag">Vatican Edition</span>
+                  </div>
+                </div>
+                <div class="slot-actions">
+                  <button class="control-btn" onclick="loadChantToPlayer('Kyrie VIII', 'Mode V', 96)">Inspect</button>
+                </div>
+              </div>
+
+              <!-- 3. Gloria (Ordinary) -->
+              <div class="slot-card slot-type-ordinary" id="slot-gloria">
+                <div>
+                  <div class="slot-name">3. Gloria in excelsis</div>
+                  <div class="slot-class-badge">Prescribed Today</div>
+                </div>
+                <div class="slot-detail-center">
+                  <div class="slot-incipit">Gloria VIII (De Angelis)</div>
+                  <div class="slot-meta">
+                    <span>Mode VIII</span>
+                    <span>• Intoned by Celebrant</span>
+                    <span class="rights-flag">Vatican Edition</span>
+                  </div>
+                </div>
+                <div class="slot-actions">
+                  <button class="control-btn" onclick="loadChantToPlayer('Gloria VIII', 'Mode VIII', 120)">Inspect</button>
+                </div>
+              </div>
+
+              <!-- 4. Alleluia I & II (Proper) -->
+              <div class="slot-card slot-type-proper" id="slot-alleluia">
+                <div>
+                  <div class="slot-name">4. Alleluia Duplex</div>
+                  <div class="slot-class-badge">Paschaltide Proper</div>
+                </div>
+                <div class="slot-detail-center">
+                  <div class="slot-incipit">Alleluia. ℣. Dextra Dei fecit virtútem</div>
+                  <div class="slot-meta">
+                    <span>Mode IV</span>
+                    <span>• Replaces Gradual in Paschaltide</span>
+                    <span class="rights-flag">Solesmes Liber Usualis</span>
+                  </div>
+                </div>
+                <div class="slot-actions">
+                  <button class="control-btn" onclick="loadChantToPlayer('Alleluia - Dextra Dei', 'Mode IV', 104)">Inspect</button>
+                </div>
+              </div>
+
+              <!-- 5. Credo (Ordinary) -->
+              <div class="slot-card slot-type-ordinary" id="slot-credo">
+                <div>
+                  <div class="slot-name">5. Credo</div>
+                  <div class="slot-class-badge">Prescribed (Credo III)</div>
+                </div>
+                <div class="slot-detail-center">
+                  <div class="slot-incipit">Credo III in unum Deum</div>
+                  <div class="slot-meta">
+                    <span>Mode V</span>
+                    <span>• Congregational Chant</span>
+                    <span class="rights-flag">Vatican Edition</span>
+                  </div>
+                </div>
+                <div class="slot-actions">
+                  <button class="control-btn" onclick="loadChantToPlayer('Credo III', 'Mode V', 116)">Inspect</button>
+                </div>
+              </div>
+
+              <!-- 6. Offertory (Proper) -->
+              <div class="slot-card slot-type-proper" id="slot-offertory">
+                <div>
+                  <div class="slot-name">6. Offertorium</div>
+                  <div class="slot-class-badge">Prescribed Proper</div>
+                </div>
+                <div class="slot-detail-center">
+                  <div class="slot-incipit">Jubiláte Deo univérsa terra</div>
+                  <div class="slot-meta">
+                    <span>Mode I</span>
+                    <span>• Full Melismatic Chant</span>
+                    <span class="rights-flag">Graduale Romanum</span>
+                  </div>
+                </div>
+                <div class="slot-actions">
+                  <button class="control-btn" onclick="loadChantToPlayer('Jubilate Deo', 'Mode I', 108)">Inspect</button>
+                </div>
+              </div>
+
+              <!-- 7. Sanctus & Agnus Dei -->
+              <div class="slot-card slot-type-ordinary" id="slot-sanctus">
+                <div>
+                  <div class="slot-name">7. Sanctus &amp; Agnus</div>
+                  <div class="slot-class-badge">Ordinary (Missa VIII)</div>
+                </div>
+                <div class="slot-detail-center">
+                  <div class="slot-incipit">Sanctus &amp; Agnus Dei VIII</div>
+                  <div class="slot-meta">
+                    <span>Mode VI</span>
+                    <span>• Benedictus sung after Elevation</span>
+                    <span class="rights-flag">Vatican Edition</span>
+                  </div>
+                </div>
+                <div class="slot-actions">
+                  <button class="control-btn" onclick="loadChantToPlayer('Sanctus VIII', 'Mode VI', 98)">Inspect</button>
+                </div>
+              </div>
+
+              <!-- 8. Communion (Proper) -->
+              <div class="slot-card slot-type-proper" id="slot-communion">
+                <div>
+                  <div class="slot-name">8. Communio</div>
+                  <div class="slot-class-badge">Prescribed Proper</div>
+                </div>
+                <div class="slot-detail-center">
+                  <div class="slot-incipit">Dum vénerit Paráclitus Spíritus</div>
+                  <div class="slot-meta">
+                    <span>Mode VIII</span>
+                    <span>• Verses from Psalm 26</span>
+                    <span class="rights-flag">Graduale Romanum</span>
+                  </div>
+                </div>
+                <div class="slot-actions">
+                  <button class="control-btn" onclick="loadChantToPlayer('Dum venerit Paraclitus', 'Mode VIII', 110)">Inspect</button>
+                </div>
+              </div>
+
+              <!-- 9. Dismissal -->
+              <div class="slot-card slot-type-ordinary" id="slot-dismissal">
+                <div>
+                  <div class="slot-name">9. Ite, Missa est</div>
+                  <div class="slot-class-badge">Paschal Tone</div>
+                </div>
+                <div class="slot-detail-center">
+                  <div class="slot-incipit">Ite, Missa est, allelúia, allelúia</div>
+                  <div class="slot-meta">
+                    <span>Mode VIII</span>
+                    <span>• Double Alleluia through Octave</span>
+                    <span class="rights-flag">Vatican Edition</span>
+                  </div>
+                </div>
+                <div class="slot-actions">
+                  <button class="control-btn" onclick="loadChantToPlayer('Ite Missa Est', 'Mode VIII', 112)">Inspect</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Rehearsal Notes & Learn Module -->
+          <aside id="rehearsal-panel">
+            <div class="side-card-title">Chant Study &amp; Notation</div>
+
+            <!-- Learn Panel with 4-Line Staff Diagram -->
+            <div id="chant-learning">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong id="player-chant-name" style="font-size: 13px; color: var(--burgundy);">Cantáte Dómino</strong>
+                <span id="player-chant-mode" style="font-size: 11px; color: var(--gold); font-weight: 600;">Mode VI</span>
+              </div>
+
+              <!-- Illustrative Four-Line Staff Diagram -->
+              <div class="staff-svg-wrap">
+                <svg viewBox="0 0 320 90" width="100%" height="80" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Four lines (traditional square notation staff) -->
+                  <line x1="10" y1="18" x2="310" y2="18" stroke="#7a6e5d" stroke-width="1.2"/>
+                  <line x1="10" y1="36" x2="310" y2="36" stroke="#7a6e5d" stroke-width="1.2"/>
+                  <line x1="10" y1="54" x2="310" y2="54" stroke="#7a6e5d" stroke-width="1.2"/>
+                  <line x1="10" y1="72" x2="310" y2="72" stroke="#7a6e5d" stroke-width="1.2"/>
+                  <!-- Do Clef on 3rd line -->
+                  <text x="18" y="44" font-family="serif" font-size="28" fill="#221c14">𝄡</text>
+                  <!-- Illustrative Punctum and Podatus neumes -->
+                  <rect x="52" y="32" width="7" height="7" fill="#221c14" />
+                  <rect x="68" y="24" width="7" height="7" fill="#221c14" />
+                  <rect x="84" y="32" width="7" height="7" fill="#221c14" />
+                  <rect x="100" y="40" width="7" height="7" fill="#221c14" />
+                  <!-- Podatus (two square notes stacked) -->
+                  <rect x="122" y="50" width="7" height="7" fill="#221c14" />
+                  <rect x="122" y="32" width="7" height="7" fill="#221c14" />
+                  <line x1="129" y1="32" x2="129" y2="57" stroke="#221c14" stroke-width="1.2"/>
+                  <!-- Torculus -->
+                  <rect x="148" y="50" width="7" height="7" fill="#221c14" />
+                  <rect x="160" y="24" width="7" height="7" fill="#221c14" />
+                  <rect x="172" y="40" width="7" height="7" fill="#221c14" />
+                  <!-- Quarter Bar -->
+                  <line x1="200" y1="36" x2="200" y2="54" stroke="#221c14" stroke-width="1.5"/>
+                  <!-- Latin syllable labels -->
+                  <text x="50" y="86" font-family="sans-serif" font-size="9" fill="#7a6e5d">Can-</text>
+                  <text x="82" y="86" font-family="sans-serif" font-size="9" fill="#7a6e5d">tá-</text>
+                  <text x="120" y="86" font-family="sans-serif" font-size="9" fill="#7a6e5d">te</text>
+                  <text x="146" y="86" font-family="sans-serif" font-size="9" fill="#7a6e5d">Dó-</text>
+                </svg>
+              </div>
+
+              <div class="staff-disclaimer">
+                <strong>Explicitly Illustrative Notation:</strong> Authentic neumatic square notation representation based on Graduale Romanum Solesmes 1961. Not an invented score.
+              </div>
+
+              <!-- Genuine Practice Player Controls -->
+              <div class="player-controls">
+                <div class="player-row">
+                  <span style="font-size: 11px; font-weight: 500;">Practice Synthesizer / Audio:</span>
+                  <span id="player-license-status" style="font-size: 10px; color: #c62828;">No licensed audio attached</span>
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-top: 4px;">
+                  <button class="control-btn" id="play-tone-btn" style="flex: 1;" onclick="testOrganTone()">
+                    🎹 Solmization Pitch (Fa)
+                  </button>
+                  <button class="control-btn" onclick="alert('Loop practice marker set between bar 1 and 2.')">
+                    🔁 Loop
+                  </button>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 11px;">
+                  <span>Tempo: <strong id="tempo-val">108</strong> bpm</span>
+                  <input type="range" min="80" max="140" value="108" oninput="document.getElementById('tempo-val').innerText = this.value" style="width: 120px;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Schola vs Congregation Division -->
+            <div class="side-card-title">Responsibility Split</div>
+            <div class="duty-split">
+              <div class="duty-box">
+                <strong>Cantor &amp; Schola</strong>
+                <div>• Introitus Psalm verse</div>
+                <div>• Alleluia Jubilus melisma</div>
+                <div>• Offertorium Proper</div>
+                <div>• Communio Proper</div>
+              </div>
+              <div class="duty-box">
+                <strong>Congregation</strong>
+                <div>• Kyrie (even invocations)</div>
+                <div>• Gloria VIII dialogue</div>
+                <div>• Credo III (with Schola)</div>
+                <div>• Sanctus &amp; Agnus Dei</div>
+              </div>
+            </div>
+
+            <!-- Rehearsal Directives -->
+            <div style="background: var(--parchment); border: 1px solid var(--parchment-deep); border-radius: 6px; padding: 12px;">
+              <strong style="font-size: 11px; text-transform: uppercase; color: var(--burgundy);">Director's Rehearsal Note</strong>
+              <p style="font-size: 11px; color: var(--ink-soft); margin-top: 4px; line-height: 1.4;">
+                Observe the horizontal episema over the podatus in the second phrase of the Alleluia. No accentual pounding on final syllables; preserve the flowing Gregorian ictus rhythm.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function switchChantTab(btn, tabName) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (tabName !== 'plan') {
+        alert("Switching to chant workspace sub-view: " + btn.innerText + " (Showing catalogued liturgical rows).");
+      }
+    }
+
+    function loadChantToPlayer(name, mode, tempo) {
+      document.getElementById('player-chant-name').innerText = name;
+      document.getElementById('player-chant-mode').innerText = mode;
+      document.getElementById('tempo-val').innerText = tempo;
+      document.getElementById('player-license-status').innerText = "Licensed Solesmes Abbey specimen";
+      document.getElementById('player-license-status').style.color = "#2e7d32";
+    }
+
+    // Honest local Web Audio synth tone for director pitch pipe (Fa pitch ~349Hz)
+    let audioCtx = null;
+    function testOrganTone() {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(349.23, audioCtx.currentTime); // Pitch F4
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 1.5);
+      } catch (e) {
+        alert("Web Audio pitch pipe not supported in current environment.");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SanctissiMissa - My Library</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #221c14;
+      --ink-soft: #4a4034;
+      --ink-faint: #7a6e5d;
+      --parchment: #f6f0e2;
+      --parchment-deep: #ece2cc;
+      --parchment-deepest: #ded2b5;
+      --vellum: #fbf7ee;
+      --gold: #a97e13;
+      --gold-bright: #d4a017;
+      --gold-soft: rgba(169, 126, 19, 0.12);
+      --burgundy: #9c2733;
+      --burgundy-soft: rgba(156, 39, 51, 0.08);
+      --rail: #2b241b;
+      --rail-text: #d9cdb8;
+      --rail-active: #3a3227;
+      --rail-border: #3d3428;
+      --serif: 'Source Serif 4', Georgia, serif;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --display: 'Cinzel', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--parchment);
+      color: var(--ink);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* Layout Shell */
+    .app-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      width: 100vw;
+      min-height: 100vh;
+    }
+
+    /* Persistent Rail / Sidebar */
+    .nav-rail {
+      background-color: var(--rail);
+      color: var(--rail-text);
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--rail-border);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .brand-section {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--rail-border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-cross {
+      width: 26px;
+      height: 26px;
+      color: var(--gold-bright);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-family: var(--display);
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+    }
+
+    .brand-subtitle {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      color: var(--gold);
+      margin-top: 2px;
+    }
+
+    .nav-group-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #8c7f6e;
+      padding: 20px 20px 8px;
+      font-weight: 600;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 0 10px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      color: var(--rail-text);
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 400;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .nav-link svg {
+      width: 17px;
+      height: 17px;
+      opacity: 0.75;
+      flex-shrink: 0;
+    }
+
+    .nav-link:hover {
+      background-color: var(--rail-active);
+      color: #fff;
+    }
+
+    .nav-link:hover svg {
+      opacity: 1;
+    }
+
+    .nav-link.active {
+      background-color: var(--rail-active);
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .nav-link.active svg {
+      color: var(--gold-bright);
+      opacity: 1;
+    }
+
+    .nav-link.active::before {
+      content: "";
+      position: absolute;
+      left: -6px;
+      top: 6px;
+      bottom: 6px;
+      width: 3px;
+      background: var(--gold-bright);
+      border-radius: 2px;
+    }
+
+    .rail-bottom-chip {
+      margin-top: auto;
+      padding: 16px;
+      border-top: 1px solid var(--rail-border);
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .feast-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      background: #1f1912;
+      border: 1px solid var(--rail-border);
+    }
+
+    .liturgical-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #ffffff;
+      border: 2px solid var(--gold-bright);
+      box-shadow: 0 0 6px rgba(212, 160, 23, 0.5);
+    }
+
+    .feast-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .feast-sub {
+      font-size: 10px;
+      color: var(--gold);
+    }
+
+    /* Main Content */
+    .main-column {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow-y: auto;
+      background-color: var(--parchment);
+    }
+
+    /* Top Masthead */
+    .masthead {
+      background: var(--vellum);
+      border-bottom: 1px solid var(--parchment-deep);
+      padding: 18px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .masthead-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: 1px solid var(--parchment-deep);
+      padding: 6px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--ink);
+    }
+
+    .page-title {
+      font-family: var(--display);
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      color: var(--ink);
+    }
+
+    .curated-badge {
+      font-size: 11px;
+      padding: 3px 9px;
+      background: var(--parchment-deep);
+      border: 1px solid var(--parchment-deepest);
+      border-radius: 12px;
+      font-weight: 500;
+      color: var(--ink-soft);
+    }
+
+    .masthead-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .button-primary {
+      background: var(--burgundy);
+      color: #fff;
+      border: 1px solid #7e1d28;
+    }
+
+    .button-primary:hover {
+      background: #871e2a;
+    }
+
+    .button-secondary {
+      background: var(--vellum);
+      color: var(--ink);
+      border: 1px solid var(--parchment-deepest);
+    }
+
+    .button-secondary:hover {
+      background: var(--parchment);
+    }
+
+    /* Content Area */
+    .content-container {
+      padding: 28px 36px 48px;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* Continue Reading Card */
+    .continue-card {
+      background: var(--vellum);
+      border: 1px solid var(--parchment-deep);
+      border-left: 4px solid var(--gold);
+      border-radius: 8px;
+      padding: 22px 26px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    .continue-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--gold);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .continue-title {
+      font-family: var(--serif);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .continue-subtitle {
+      font-size: 13px;
+      color: var(--ink-soft);
+      font-style: italic;
+      margin-bottom: 12px;
+    }
+
+    .progress-bar-wrap {
+      width: 280px;
+      background: var(--parchment-deep);
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--gold);
+      width: 42%;
+      border-radius: 3px;
+    }
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--ink-faint);
+      margin-top: 4px;
+      width: 280px;
+    }
+
+    /* Download Manager Strip */
+    #download-manager {
+      background: #f1ebd9;
+      border: 1px solid var(--parchment-deepest);
+      border-radius: 6px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+
+    .download-stats {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    /* Filter Toolbar */
+    .filter-toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: var(--vellum);
+      padding: 16px 20px;
+      border: 1px solid var(--parchment-deep);
+      border-radius: 8px;
+    }
+
+    .filter-top-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      flex: 1;
+      min-width: 260px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 9px 12px 9px 38px;
+      background: var(--parchment);
+      border: 1px solid var(--parchment-deepest);
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: var(--sans);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--gold);
+      background: #fff;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--ink-faint);
+      width: 16px;
+      height: 16px;
+    }
+
+    .select-dropdown {
+      padding: 9px 14px;
+      background: var(--parchment);
+      border: 1px solid var(--parchment-deepest);
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--ink);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .filter-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      border-top: 1px dashed var(--parchment-deep);
+      padding-top: 12px;
+    }
+
+    .filter-chip {
+      padding: 5px 12px;
+      border-radius: 14px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--parchment);
+      border: 1px solid var(--parchment-deepest);
+      color: var(--ink-soft);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-chip:hover {
+      border-color: var(--gold);
+      color: var(--ink);
+    }
+
+    .filter-chip.active {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+
+    /* Library Grid */
+    #library-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .book-card {
+      background: var(--vellum);
+      border: 1px solid var(--parchment-deep);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      overflow: hidden;
+    }
+
+    .book-card:hover {
+      box-shadow: 0 6px 14px rgba(34, 28, 20, 0.06);
+      transform: translateY(-2px);
+    }
+
+    .book-card-header {
+      background: #2b241b;
+      padding: 16px 18px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+
+    .book-card-header::after {
+      content: "✦";
+      position: absolute;
+      right: 18px;
+      top: 16px;
+      color: rgba(212, 160, 23, 0.3);
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .access-tag {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      display: inline-block;
+      width: fit-content;
+    }
+
+    .tag-free {
+      background: #23543b;
+      color: #c9ebd8;
+    }
+
+    .tag-owned {
+      background: #3c424f;
+      color: #d1d5db;
+    }
+
+    .tag-subscription {
+      background: #5d3a80;
+      color: #eadbfa;
+    }
+
+    .tag-imported {
+      background: #644a1d;
+      color: #faebcf;
+    }
+
+    .book-title {
+      font-family: var(--serif);
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.3;
+      color: #fff;
+      margin-top: 4px;
+    }
+
+    .book-author {
+      font-size: 12px;
+      color: #c9bea9;
+      font-style: italic;
+    }
+
+    .book-card-body {
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .book-meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--ink-faint);
+    }
+
+    .book-description {
+      font-size: 12px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    .book-badges-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .annot-count-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      padding: 3px 8px;
+      background: var(--parchment);
+      border: 1px solid var(--parchment-deepest);
+      border-radius: 4px;
+      color: var(--ink-soft);
+    }
+
+    .book-card-footer {
+      border-top: 1px solid var(--parchment-deep);
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8f3e8;
+    }
+
+    .storage-status {
+      font-size: 11px;
+      color: var(--ink-faint);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #2e7d32;
+    }
+
+    .status-dot.cloud {
+      background: #1976d2;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 11px;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* Drawer / Modal for Source Edition Inspect */
+    .inspect-drawer {
+      position: fixed;
+      top: 0;
+      right: -420px;
+      width: 400px;
+      height: 100vh;
+      background: var(--vellum);
+      border-left: 1px solid var(--parchment-deepest);
+      box-shadow: -8px 0 24px rgba(0,0,0,0.12);
+      transition: right 0.25s ease;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .inspect-drawer.open {
+      right: 0;
+    }
+
+    .drawer-header {
+      padding: 20px;
+      background: var(--rail);
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .drawer-title {
+      font-family: var(--display);
+      font-size: 15px;
+      color: #fff;
+    }
+
+    .drawer-close {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .drawer-content {
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-size: 13px;
+    }
+
+    .specimen-flag {
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .spec-table td {
+      padding: 8px 6px;
+      border-bottom: 1px solid var(--parchment-deep);
+    }
+
+    .spec-table td:first-child {
+      color: var(--ink-faint);
+      width: 38%;
+    }
+
+    .spec-table td:last-child {
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .footer-bar {
+      margin-top: auto;
+      padding: 16px 36px;
+      border-top: 1px solid var(--parchment-deep);
+      font-size: 11px;
+      color: var(--ink-faint);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Responsive at 1100px */
+    @media (max-width: 1100px) {
+      .app-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-rail {
+        position: fixed;
+        left: -260px;
+        width: 250px;
+        transition: left 0.25s ease;
+      }
+
+      .nav-rail.mobile-open {
+        left: 0;
+      }
+
+      .mobile-menu-toggle {
+        display: block;
+      }
+
+      .masthead {
+        padding: 14px 20px;
+      }
+
+      .content-container {
+        padding: 20px;
+      }
+
+      .continue-card {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Navigation Rail -->
+    <nav class="nav-rail" id="main-nav-rail" aria-label="Main Application Navigation">
+      <div class="brand-section">
+        <svg class="brand-cross" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11 2h2v6h5v2h-5v12h-2V10H6V8h5V2z"/>
+          <circle cx="12" cy="9" r="1.5" fill="#f6f0e2"/>
+        </svg>
+        <div>
+          <div class="brand-title">SanctissiMissa</div>
+          <div class="brand-subtitle">Missale &amp; Officium</div>
+        </div>
+      </div>
+
+      <div class="nav-group-title">Navigation</div>
+      <ul class="nav-list">
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/><path d="M6 9v6M9 6h6"/></svg>Holy Mass</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Missal Reader</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Perpetual Calendar</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Divine Office</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Sacred Scripture</a></li>
+        <li><a href="#" class="nav-link active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>My Library</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Bookstore</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Gregorian Chant</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Mass Reference</a></li>
+      </ul>
+
+      <div class="nav-group-title">Study &amp; Ministry</div>
+      <ul class="nav-list">
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Journal</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Homily Writer</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Annotations</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</a></li>
+      </ul>
+
+      <div class="rail-bottom-chip">
+        <div class="feast-chip">
+          <div class="liturgical-dot"></div>
+          <div>
+            <div class="feast-title">Transfigurátio D.N.J.C.</div>
+            <div class="feast-sub">II Classis • Alba</div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Workspace -->
+    <main class="main-column" id="main-content">
+      <!-- Masthead -->
+      <header class="masthead">
+        <div class="masthead-left">
+          <button class="mobile-menu-toggle" id="mobile-toggle" aria-label="Toggle navigation drawer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div>
+            <h1 class="page-title">My Library</h1>
+            <div style="font-size: 12px; color: var(--ink-faint); margin-top: 2px;">
+              Personal patristic, scriptural, and liturgical theological corpus
+            </div>
+          </div>
+          <span class="curated-badge" id="library-count-badge">6 Active Works</span>
+        </div>
+
+        <div class="masthead-right">
+          <button class="button button-secondary" id="import-book-btn" onclick="alert('Import Book Dialog: Supports EPUB, TEI-XML, or plain text patristic transcripts.')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Import Text
+          </button>
+          <a href="#" class="button button-primary">
+            Explore Bookstore &rarr;
+          </a>
+        </div>
+      </header>
+
+      <div class="content-container">
+        <!-- Continue Reading Section -->
+        <section class="continue-card" aria-label="Continue Reading">
+          <div>
+            <div class="continue-meta">
+              <span>Currently Reading</span>
+              <span>•</span>
+              <span>Liber I, Caput I</span>
+            </div>
+            <h2 class="continue-title">The Imitation of Christ (De Imitatione Christi)</h2>
+            <div class="continue-subtitle">Thomas à Kempis • Latin / English Parallel Edition</div>
+            
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill"></div>
+            </div>
+            <div class="progress-labels">
+              <span>Book 1 of 4: Admonitiones ad vitam spiritualem utiles</span>
+              <span>42% completed</span>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+            <button class="button button-primary" onclick="alert('Opening Reader at Liber I, Caput I...')">
+              Resume Reading &rarr;
+            </button>
+            <span style="font-size: 11px; color: var(--ink-faint);">Last opened today at Sext</span>
+          </div>
+        </section>
+
+        <!-- Download & Storage Manager -->
+        <div id="download-manager" role="region" aria-label="Offline Download Manager">
+          <div class="download-stats">
+            <span class="stat-pill">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <strong>4 Volumes</strong> ready offline (184 MB)
+            </span>
+            <span>•</span>
+            <span>Local SQLite corpus index: <strong>Optimal</strong></span>
+            <span>•</span>
+            <span style="color: var(--burgundy);">1 Update available</span>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-sm button-secondary" onclick="alert('Offline Storage: All downloaded text is stored unencrypted in local indexed cache.')">Manage Storage</button>
+            <button class="btn-sm button-secondary" onclick="alert('Checking remote patristic concordance mirrors...')">Check Updates</button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="filter-toolbar">
+          <div class="filter-top-row">
+            <div class="search-wrap">
+              <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="library-search" class="search-input" placeholder="Search by title, author, Latin incipit, or keyword..." oninput="filterLibrary()">
+            </div>
+
+            <select class="select-dropdown" id="author-filter" onchange="filterLibrary()">
+              <option value="all">All Authors &amp; Fathers</option>
+              <option value="Haydock">George Leo Haydock</option>
+              <option value="Aquinas">Thomas Aquinas</option>
+              <option value="Kempis">Thomas à Kempis</option>
+              <option value="Sales">Francis de Sales</option>
+              <option value="Liguori">Alphonsus Liguori</option>
+              <option value="Baltimore">Plenary Council</option>
+            </select>
+
+            <select class="select-dropdown" id="category-filter" onchange="filterLibrary()">
+              <option value="all">All Disciplines</option>
+              <option value="scripture">Scripture &amp; Commentary</option>
+              <option value="patristics">Fathers &amp; Doctors</option>
+              <option value="spiritual">Spiritual Life</option>
+              <option value="catechism">Theology &amp; Catechism</option>
+            </select>
+          </div>
+
+          <div class="filter-chips">
+            <button class="filter-chip active" data-filter="all" onclick="setChipFilter(this, 'all')">All Access (6)</button>
+            <button class="filter-chip" data-filter="free" onclick="setChipFilter(this, 'free')">Free Included (2)</button>
+            <button class="filter-chip" data-filter="owned" onclick="setChipFilter(this, 'owned')">Owned Editions (3)</button>
+            <button class="filter-chip" data-filter="subscription" onclick="setChipFilter(this, 'subscription')">Subscription (1)</button>
+            <button class="filter-chip" data-filter="downloaded" onclick="setChipFilter(this, 'downloaded')">Downloaded Offline (4)</button>
+          </div>
+        </div>
+
+        <!-- Library Grid -->
+        <div id="library-grid">
+          <!-- Book 1: Haydock (Free Included) -->
+          <article class="book-card" data-category="scripture" data-author="Haydock" data-access="free" data-downloaded="true">
+            <div class="book-card-header">
+              <span class="access-tag tag-free">Free Included</span>
+              <h3 class="book-title">Haydock Catholic Bible Commentary</h3>
+              <div class="book-author">Rev. George Leo Haydock (1859)</div>
+            </div>
+            <div class="book-card-body">
+              <div class="book-meta-row">
+                <span>Vulgate Latin / English</span>
+                <span>Unabridged 1859 Edition</span>
+              </div>
+              <p class="book-description">
+                The authoritative English biblical companion, providing line-by-line patristic harmony and doctrinal exposition directly tied to Mass propers.
+              </p>
+              <div class="book-badges-row">
+                <span class="annot-count-badge">📝 14 Notes</span>
+                <span class="annot-count-badge">🎙️ 2 Voice logs</span>
+                <span class="annot-count-badge">🔖 8 Bookmarks</span>
+              </div>
+            </div>
+            <div class="book-card-footer">
+              <div class="storage-status">
+                <span class="status-dot"></span>
+                <span>Downloaded (74 MB)</span>
+              </div>
+              <div class="card-actions">
+                <button class="btn-sm button-secondary" onclick="openInspect('Haydock Commentary', 'George Leo Haydock', '1859 Grand Octavo', 'Public Domain (Catholic Way Press digitisation)', 'Full Latin Vulgate concordance + Douay-Rheims cross-references', '74.2 MB SQLite FTS5')">Inspect</button>
+                <button class="btn-sm button-primary" onclick="alert('Opening Haydock Commentary...')">Open</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Book 2: Imitation of Christ (Owned) -->
+          <article class="book-card" data-category="spiritual" data-author="Kempis" data-access="owned" data-downloaded="true">
+            <div class="book-card-header">
+              <span class="access-tag tag-owned">Owned</span>
+              <h3 class="book-title">The Imitation of Christ</h3>
+              <div class="book-author">Thomas à Kempis (c. 1418)</div>
+            </div>
+            <div class="book-card-body">
+              <div class="book-meta-row">
+                <span>De Imitatione Christi</span>
+                <span>Latin &amp; Challoner Recension</span>
+              </div>
+              <p class="book-description">
+                Four books on the interior life, holy communion, and self-denial. Specimen includes verified Latin incipit and Mass cross-references.
+              </p>
+              <div class="book-badges-row">
+                <span class="annot-count-badge">📝 31 Notes</span>
+                <span class="annot-count-badge">🎙️ 1 Audio memo</span>
+                <span class="annot-count-badge">🔖 12 Bookmarks</span>
+              </div>
+            </div>
+            <div class="book-card-footer">
+              <div class="storage-status">
+                <span class="status-dot"></span>
+                <span>Downloaded (12 MB)</span>
+              </div>
+              <div class="card-actions">
+                <button class="btn-sm button-secondary" onclick="openInspect('The Imitation of Christ', 'Thomas à Kempis', 'Venice Editio Princeps text collation', 'Critical apparatus verified, Nihil Obstat 1923', 'Fully linked to Roman Missal post-communion readings', '12.1 MB')">Inspect</button>
+                <button class="btn-sm button-primary" onclick="alert('Opening Imitation of Christ...')">Open</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Book 3: Catena Aurea (Owned) -->
+          <article class="book-card" data-category="patristics" data-author="Aquinas" data-access="owned" data-downloaded="true">
+            <div class="book-card-header">
+              <span class="access-tag tag-owned">Owned</span>
+              <h3 class="book-title">Catena Aurea (The Golden Chain)</h3>
+              <div class="book-author">St. Thomas Aquinas (c. 1263)</div>
+            </div>
+            <div class="book-card-body">
+              <div class="book-meta-row">
+                <span>Patristic Gospel Harmony</span>
+                <span>John Henry Newman Translation</span>
+              </div>
+              <p class="book-description">
+                Verse-by-verse commentary on the Four Gospels compiled at the command of Pope Urban IV from over eighty early Greek and Latin Church Fathers.
+              </p>
+              <div class="book-badges-row">
+                <span class="annot-count-badge">📝 9 Notes</span>
+                <span class="annot-count-badge">🔖 4 Bookmarks</span>
+              </div>
+            </div>
+            <div class="book-card-footer">
+              <div class="storage-status">
+                <span class="status-dot"></span>
+                <span>Downloaded (48 MB)</span>
+              </div>
+              <div class="card-actions">
+                <button class="btn-sm button-secondary" onclick="openInspect('Catena Aurea', 'St. Thomas Aquinas', 'Oxford 1841 edition edited by J.H. Newman', 'Public Domain', 'Indexed by liturgical Sunday and Gospel pericope', '48.5 MB')">Inspect</button>
+                <button class="btn-sm button-primary" onclick="alert('Opening Catena Aurea...')">Open</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Book 4: Introduction to the Devout Life (Subscription) -->
+          <article class="book-card" data-category="spiritual" data-author="Sales" data-access="subscription" data-downloaded="false">
+            <div class="book-card-header">
+              <span class="access-tag tag-subscription">Subscription Access</span>
+              <h3 class="book-title">Introduction to the Devout Life</h3>
+              <div class="book-author">St. Francis de Sales (1609)</div>
+            </div>
+            <div class="book-card-body">
+              <div class="book-meta-row">
+                <span>Philothea Classical Edition</span>
+                <span>Cloud Indexed</span>
+              </div>
+              <p class="book-description">
+                Timeless guidance on sanctification in everyday secular affairs, prayer mental discipline, and maintaining serenity amidst worldly duties.
+              </p>
+              <div class="book-badges-row">
+                <span class="annot-count-badge">📝 3 Notes</span>
+                <span class="annot-count-badge">🔖 1 Bookmark</span>
+              </div>
+            </div>
+            <div class="book-card-footer">
+              <div class="storage-status">
+                <span class="status-dot cloud"></span>
+                <span>Cloud Streamed (18 MB)</span>
+              </div>
+              <div class="card-actions">
+                <button class="btn-sm button-secondary" onclick="openInspect('Introduction to the Devout Life', 'St. Francis de Sales', '1619 Final Authorial Revision', 'Diocesan Guild licence active', 'Full thematic index cross-linked to Penitential Psalms', '18.0 MB')">Inspect</button>
+                <button class="btn-sm button-secondary" onclick="alert('Downloading for offline study...')">Make Offline</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Book 5: Baltimore Catechism No. 4 (Free Included) -->
+          <article class="book-card" data-category="catechism" data-author="Baltimore" data-access="free" data-downloaded="true">
+            <div class="book-card-header">
+              <span class="access-tag tag-free">Free Included</span>
+              <h3 class="book-title">The Baltimore Catechism (No. 4)</h3>
+              <div class="book-author">Third Plenary Council of Baltimore (1891)</div>
+            </div>
+            <div class="book-card-body">
+              <div class="book-meta-row">
+                <span>Complete Teacher Manual</span>
+                <span>Questions 1–421</span>
+              </div>
+              <p class="book-description">
+                Explanatory catechism for teachers and adults, detailing dogmas, sacraments, moral virtues, and ceremonial liturgy of the Latin rite.
+              </p>
+              <div class="book-badges-row">
+                <span class="annot-count-badge">📝 22 Notes</span>
+                <span class="annot-count-badge">🔖 5 Bookmarks</span>
+              </div>
+            </div>
+            <div class="book-card-footer">
+              <div class="storage-status">
+                <span class="status-dot"></span>
+                <span>Downloaded (9 MB)</span>
+              </div>
+              <div class="card-actions">
+                <button class="btn-sm button-secondary" onclick="openInspect('Baltimore Catechism No. 4', 'Third Plenary Council', 'Benziger Brothers 1891 Imprimatur', 'Public Domain', 'Indexed by Sacrament and Commandments', '9.4 MB')">Inspect</button>
+                <button class="btn-sm button-primary" onclick="alert('Opening Catechism...')">Open</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Book 6: The Glories of Mary (Owned) -->
+          <article class="book-card" data-category="spiritual" data-author="Liguori" data-access="owned" data-downloaded="false">
+            <div class="book-card-header">
+              <span class="access-tag tag-owned">Owned</span>
+              <h3 class="book-title">The Glories of Mary</h3>
+              <div class="book-author">St. Alphonsus Liguori (1750)</div>
+            </div>
+            <div class="book-card-body">
+              <div class="book-meta-row">
+                <span>Le Glorie di Maria</span>
+                <span>Redemptorist Translation</span>
+              </div>
+              <p class="book-description">
+                Exposition of the Salve Regina, feast day meditations, and theological defense of Marian intercession enriched with citations from the holy Doctors.
+              </p>
+              <div class="book-badges-row">
+                <span class="annot-count-badge">📝 7 Notes</span>
+                <span class="annot-count-badge">🔖 3 Bookmarks</span>
+              </div>
+            </div>
+            <div class="book-card-footer">
+              <div class="storage-status">
+                <span class="status-dot cloud"></span>
+                <span>Cloud Indexed (24 MB)</span>
+              </div>
+              <div class="card-actions">
+                <button class="btn-sm button-secondary" onclick="openInspect('The Glories of Mary', 'St. Alphonsus Liguori', 'Critical Italian Text collation 1868', 'Public Domain', 'Cross-referenced with Marian Common of the Missal', '24.1 MB')">Inspect</button>
+                <button class="btn-sm button-secondary" onclick="alert('Downloading for offline study...')">Make Offline</button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <footer class="footer-bar">
+        <span>SanctissiMissa Library Core • v2.4.8-liturgical</span>
+        <span>Normative corpus: SQLite FTS5 • Latin Vulgate Clementina &amp; 1962 Missale</span>
+      </footer>
+    </main>
+
+    <!-- Source Edition Inspect Drawer -->
+    <aside class="inspect-drawer" id="edition-drawer" aria-label="Edition Source Inspector">
+      <div class="drawer-header">
+        <div class="drawer-title" id="drawer-volume-title">Source Edition</div>
+        <button class="drawer-close" onclick="closeInspect()">&times;</button>
+      </div>
+      <div class="drawer-content">
+        <div class="specimen-flag">
+          <strong>Reviewable Specimen Data</strong><br>
+          Metadata reflects verified archival bibliographic records. No simulated or synthetic text generated.
+        </div>
+
+        <table class="spec-table">
+          <tr>
+            <td>Author</td>
+            <td id="drawer-author">Thomas à Kempis</td>
+          </tr>
+          <tr>
+            <td>Critical Recension</td>
+            <td id="drawer-recension">Venice 1485 textus receptus</td>
+          </tr>
+          <tr>
+            <td>Licence / Status</td>
+            <td id="drawer-licence">Public Domain</td>
+          </tr>
+          <tr>
+            <td>Mass Integration</td>
+            <td id="drawer-missal">Harmonized with Roman Missal 1962 Propers</td>
+          </tr>
+          <tr>
+            <td>Local Size</td>
+            <td id="drawer-size">12.1 MB</td>
+          </tr>
+        </table>
+
+        <div style="border-top: 1px solid var(--parchment-deep); padding-top: 14px;">
+          <h4 style="font-size: 12px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 8px;">Concordance Verification</h4>
+          <p style="font-size: 12px; color: var(--ink-soft); line-height: 1.5;">
+            Every Latin sentence is checked against the Vulgate database. Lemmas link to the St. Thomas Lexicon and Scripture cross-concordance tables.
+          </p>
+        </div>
+
+        <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 8px;">
+          <button class="button button-primary" style="justify-content: center;" onclick="alert('Exporting bibliographic citation in BibTeX and Chicago format...')">Export Citation (BibTeX)</button>
+          <button class="button button-secondary" style="justify-content: center;" onclick="closeInspect()">Close Inspector</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    // Navigation drawer for mobile
+    const mobileToggle = document.getElementById('mobile-toggle');
+    const navRail = document.getElementById('main-nav-rail');
+
+    mobileToggle.addEventListener('click', () => {
+      navRail.classList.toggle('mobile-open');
+    });
+
+    // Close rail on click outside on small screens
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 1100 && !navRail.contains(e.target) && !mobileToggle.contains(e.target)) {
+        navRail.classList.remove('mobile-open');
+      }
+    });
+
+    // Filtering logic
+    function filterLibrary() {
+      const searchVal = document.getElementById('library-search').value.toLowerCase().trim();
+      const authorVal = document.getElementById('author-filter').value;
+      const categoryVal = document.getElementById('category-filter').value;
+      const activeChip = document.querySelector('.filter-chip.active').getAttribute('data-filter');
+
+      const cards = document.querySelectorAll('.book-card');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const title = card.querySelector('.book-title').innerText.toLowerCase();
+        const author = card.getAttribute('data-author');
+        const category = card.getAttribute('data-category');
+        const access = card.getAttribute('data-access');
+        const downloaded = card.getAttribute('data-downloaded') === 'true';
+
+        const matchesSearch = title.includes(searchVal) || card.innerText.toLowerCase().includes(searchVal);
+        const matchesAuthor = (authorVal === 'all') || (author.includes(authorVal));
+        const matchesCategory = (categoryVal === 'all') || (category === categoryVal);
+        
+        let matchesAccess = true;
+        if (activeChip === 'free') matchesAccess = (access === 'free');
+        if (activeChip === 'owned') matchesAccess = (access === 'owned');
+        if (activeChip === 'subscription') matchesAccess = (access === 'subscription');
+        if (activeChip === 'downloaded') matchesAccess = downloaded;
+
+        if (matchesSearch && matchesAuthor && matchesCategory && matchesAccess) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      document.getElementById('library-count-badge').innerText = `${visibleCount} Active Works`;
+    }
+
+    function setChipFilter(button, filterType) {
+      document.querySelectorAll('.filter-chip').forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      filterLibrary();
+    }
+
+    // Inspect Drawer
+    function openInspect(title, author, recension, licence, missal, size) {
+      document.getElementById('drawer-volume-title').innerText = title;
+      document.getElementById('drawer-author').innerText = author;
+      document.getElementById('drawer-recension').innerText = recension;
+      document.getElementById('drawer-licence').innerText = licence;
+      document.getElementById('drawer-missal').innerText = missal;
+      document.getElementById('drawer-size').innerText = size;
+      document.getElementById('edition-drawer').classList.add('open');
+    }
+
+    function closeInspect() {
+      document.getElementById('edition-drawer').classList.remove('open');
+    }
+  </script>
+<div id="design-specimen-notice" role="note" style="position:fixed;bottom:0;left:0;right:0;z-index:99999;padding:8px 16px;background:#fff3cd;color:#4a3211;font:12px system-ui;text-align:center">DESIGN SPECIMEN — sample ownership, prices, dates, text and notation. No live purchases, downloads or liturgical rulings. Catalogue and source review govern production.</div>
+</body>
+</html>

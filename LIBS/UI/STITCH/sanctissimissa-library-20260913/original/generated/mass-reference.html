@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SanctissiMissa - Mass Reference Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #221c14;
+      --ink-soft: #4a4034;
+      --ink-faint: #7a6e5d;
+      --parchment: #f6f0e2;
+      --parchment-deep: #ece2cc;
+      --parchment-deepest: #ded2b5;
+      --vellum: #fbf7ee;
+      --gold: #a97e13;
+      --gold-bright: #d4a017;
+      --gold-soft: rgba(169, 126, 19, 0.12);
+      --burgundy: #9c2733;
+      --burgundy-soft: rgba(156, 39, 51, 0.08);
+      --rail: #2b241b;
+      --rail-text: #d9cdb8;
+      --rail-active: #3a3227;
+      --rail-border: #3d3428;
+      --serif: 'Source Serif 4', Georgia, serif;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --display: 'Cinzel', serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--parchment);
+      color: var(--ink);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .app-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      width: 100vw;
+      min-height: 100vh;
+    }
+
+    /* Rail */
+    .nav-rail {
+      background-color: var(--rail);
+      color: var(--rail-text);
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--rail-border);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .brand-section {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--rail-border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-cross {
+      width: 26px;
+      height: 26px;
+      color: var(--gold-bright);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-family: var(--display);
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+    }
+
+    .brand-subtitle {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      color: var(--gold);
+      margin-top: 2px;
+    }
+
+    .nav-group-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #8c7f6e;
+      padding: 20px 20px 8px;
+      font-weight: 600;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 0 10px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      color: var(--rail-text);
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+
+    .nav-link svg {
+      width: 17px;
+      height: 17px;
+      opacity: 0.75;
+      flex-shrink: 0;
+    }
+
+    .nav-link:hover {
+      background-color: var(--rail-active);
+      color: #fff;
+    }
+
+    .nav-link.active {
+      background-color: var(--rail-active);
+      color: #fff;
+      font-weight: 500;
+      position: relative;
+    }
+
+    .nav-link.active svg {
+      color: var(--gold-bright);
+      opacity: 1;
+    }
+
+    .nav-link.active::before {
+      content: "";
+      position: absolute;
+      left: -6px;
+      top: 6px;
+      bottom: 6px;
+      width: 3px;
+      background: var(--gold-bright);
+      border-radius: 2px;
+    }
+
+    .rail-bottom-chip {
+      margin-top: auto;
+      padding: 16px;
+      border-top: 1px solid var(--rail-border);
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .feast-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      background: #1f1912;
+      border: 1px solid var(--rail-border);
+    }
+
+    .liturgical-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #ffffff;
+      border: 2px solid var(--gold-bright);
+    }
+
+    /* Main Area */
+    .main-column {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow-y: auto;
+      background-color: var(--parchment);
+    }
+
+    .masthead {
+      background: var(--vellum);
+      border-bottom: 1px solid var(--parchment-deep);
+      padding: 18px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .page-title {
+      font-family: var(--display);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .button-primary {
+      background: var(--burgundy);
+      color: #fff;
+      border: 1px solid #7e1d28;
+    }
+
+    .button-secondary {
+      background: var(--vellum);
+      color: var(--ink);
+      border: 1px solid var(--parchment-deepest);
+    }
+
+    /* Rite Profile Selector Banner */
+    #rite-profile {
+      background: #f3ecd8;
+      border-bottom: 1px solid var(--parchment-deepest);
+      padding: 12px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 12px;
+    }
+
+    .rite-toggle-group {
+      display: inline-flex;
+      background: var(--parchment-deep);
+      padding: 3px;
+      border-radius: 6px;
+      border: 1px solid var(--parchment-deepest);
+    }
+
+    .rite-option-btn {
+      padding: 5px 14px;
+      border-radius: 4px;
+      border: none;
+      background: none;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      cursor: pointer;
+    }
+
+    .rite-option-btn.active {
+      background: var(--vellum);
+      color: var(--ink);
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    /* Content Stage: Search, Map/Contents left, Article right */
+    .reference-stage {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      flex: 1;
+      height: calc(100vh - 122px);
+      overflow: hidden;
+    }
+
+    /* Left: Search & Guided Mass Order */
+    .order-sidebar {
+      background: var(--vellum);
+      border-right: 1px solid var(--parchment-deep);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .search-container {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--parchment-deep);
+      background: var(--parchment);
+    }
+
+    .search-input-wrap {
+      position: relative;
+    }
+
+    #mass-reference-search {
+      width: 100%;
+      padding: 8px 10px 8px 34px;
+      border-radius: 6px;
+      border: 1px solid var(--parchment-deepest);
+      background: var(--vellum);
+      font-size: 12px;
+      font-family: var(--sans);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .search-icon-ref {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 15px;
+      height: 15px;
+      color: var(--ink-faint);
+    }
+
+    /* Subway Two-Part Map Tree */
+    #mass-order {
+      overflow-y: auto;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .mass-part-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .part-catechumens {
+      color: var(--gold);
+      border-bottom: 2px solid var(--gold);
+    }
+
+    .part-faithful {
+      color: var(--burgundy);
+      border-bottom: 2px solid var(--burgundy);
+    }
+
+    .order-tree {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .order-station {
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink-soft);
+      transition: background 0.15s ease;
+    }
+
+    .order-station:hover {
+      background: var(--parchment);
+      color: var(--ink);
+    }
+
+    .order-station.active {
+      background: var(--gold-soft);
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .station-marker {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--parchment-deepest);
+      border: 2px solid var(--gold);
+      flex-shrink: 0;
+    }
+
+    .station-marker.faithful {
+      border-color: var(--burgundy);
+    }
+
+    .order-station.active .station-marker {
+      background: var(--gold);
+    }
+
+    .order-station.active .station-marker.faithful {
+      background: var(--burgundy);
+    }
+
+    /* Right: Reference Article */
+    #reference-article {
+      overflow-y: auto;
+      padding: 32px 48px 64px;
+      background: var(--parchment);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .article-header {
+      border-bottom: 1px solid var(--parchment-deep);
+      padding-bottom: 18px;
+    }
+
+    .article-station-badge {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--burgundy);
+      font-weight: 600;
+    }
+
+    .article-title {
+      font-family: var(--serif);
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-top: 4px;
+    }
+
+    .article-latin-incipit {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 16px;
+      color: var(--ink-soft);
+      margin-top: 2px;
+    }
+
+    /* Deep Action Links */
+    .article-actions-strip {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .deep-link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--vellum);
+      border: 1px solid var(--parchment-deepest);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--burgundy);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .deep-link-btn:hover {
+      background: #fff;
+      border-color: var(--gold);
+    }
+
+    /* 7 Explanatory Tabs */
+    .reference-tabs {
+      display: flex;
+      background: var(--vellum);
+      border: 1px solid var(--parchment-deep);
+      border-radius: 6px;
+      padding: 4px;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .ref-tab {
+      padding: 6px 12px;
+      border-radius: 4px;
+      border: none;
+      background: none;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .ref-tab:hover {
+      color: var(--ink);
+      background: var(--parchment);
+    }
+
+    .ref-tab.active {
+      background: var(--ink);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Tab Content Cards */
+    .tab-content-card {
+      background: var(--vellum);
+      border: 1px solid var(--parchment-deep);
+      border-radius: 8px;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .rubric-callout {
+      background: #fdf3f4;
+      border-left: 3px solid var(--burgundy);
+      padding: 12px 16px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #691720;
+      line-height: 1.5;
+    }
+
+    .commentary-block {
+      font-size: 13px;
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    .posture-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .posture-card {
+      background: var(--parchment);
+      border: 1px solid var(--parchment-deep);
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 11px;
+    }
+
+    .posture-card strong {
+      display: block;
+      color: var(--gold);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    /* Reference Sources & Critical Apparatus */
+    #reference-sources {
+      background: #fbf7ee;
+      border: 1px solid var(--parchment-deep);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 11px;
+      color: var(--ink-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .source-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed var(--parchment-deep);
+      padding-bottom: 6px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .app-layout { grid-template-columns: 1fr; }
+      .nav-rail { position: fixed; left: -260px; width: 250px; }
+      .reference-stage { grid-template-columns: 1fr; height: auto; }
+      .order-sidebar { display: none; }
+      #reference-article { padding: 20px; }
+      .posture-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Preserved Left Rail -->
+    <nav class="nav-rail" id="main-nav-rail">
+      <div class="brand-section">
+        <svg class="brand-cross" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11 2h2v6h5v2h-5v12h-2V10H6V8h5V2z"/>
+          <circle cx="12" cy="9" r="1.5" fill="#f6f0e2"/>
+        </svg>
+        <div>
+          <div class="brand-title">SanctissiMissa</div>
+          <div class="brand-subtitle">Missale &amp; Officium</div>
+        </div>
+      </div>
+
+      <div class="nav-group-title">Navigation</div>
+      <ul class="nav-list">
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/><path d="M6 9v6M9 6h6"/></svg>Holy Mass</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Missal Reader</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Perpetual Calendar</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Divine Office</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Sacred Scripture</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>My Library</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Bookstore</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Gregorian Chant</a></li>
+        <li><a href="#" class="nav-link active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Mass Reference</a></li>
+      </ul>
+
+      <div class="nav-group-title">Study &amp; Ministry</div>
+      <ul class="nav-list">
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Journal</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Homily Writer</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Annotations</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</a></li>
+      </ul>
+
+      <div class="rail-bottom-chip">
+        <div class="feast-chip">
+          <div class="liturgical-dot"></div>
+          <div>
+            <div class="feast-title">Transfigurátio D.N.J.C.</div>
+            <div class="feast-sub">II Classis • Alba</div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Column -->
+    <main class="main-column">
+      <header class="masthead">
+        <div>
+          <h1 class="page-title">Mass Reference Guide</h1>
+          <div style="font-size: 12px; color: var(--ink-faint); margin-top: 2px;">
+            Liturgical Ceremonial, Rubrical Meaning, Historical Form, and Custom
+          </div>
+        </div>
+        <div>
+          <button class="button button-primary" onclick="alert('Exporting complete Rubrical Reference Handbook (PDF)...')">
+            Export Reference PDF
+          </button>
+        </div>
+      </header>
+
+      <!-- Rite Profile Selector -->
+      <section id="rite-profile" role="region" aria-label="Rite Selection">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <strong>Select Rite Profile:</strong>
+          <div class="rite-toggle-group">
+            <button class="rite-option-btn active" id="btn-rite-1962" onclick="setRite(this, '1962')">1962 Missale Romanum (Usus Antiquior)</button>
+            <button class="rite-option-btn" id="btn-rite-current" onclick="setRite(this, 'current')">Current Ordinary Form (Paul VI / 2002)</button>
+          </div>
+        </div>
+        <div style="color: var(--ink-faint); font-style: italic;">
+          * Distinguishing prescribed rubrics from commentary. No blanket rules across rites.
+        </div>
+      </section>
+
+      <!-- Stage Grid -->
+      <div class="reference-stage">
+        <!-- Left: Search & Station Map -->
+        <aside class="order-sidebar">
+          <div class="search-container">
+            <div class="search-input-wrap">
+              <svg class="search-icon-ref" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="mass-reference-search" placeholder="Search rubrics, prayers, postures..." oninput="searchMassOrder()">
+            </div>
+          </div>
+
+          <div id="mass-order">
+            <!-- Part 1 -->
+            <div class="mass-part-header part-catechumens">
+              <span>● Mass of the Catechumens</span>
+            </div>
+            <ul class="order-tree">
+              <li class="order-station active" onclick="loadStation('Prayers at the Foot of the Altar', 'Judica me, Deus', 'catechumens', this)">
+                <span class="station-marker"></span>
+                <span>Prayers at the Foot of the Altar</span>
+              </li>
+              <li class="order-station" onclick="loadStation('Introitus (Entrance Chant)', 'Cantate Domino', 'catechumens', this)">
+                <span class="station-marker"></span>
+                <span>Introitus</span>
+              </li>
+              <li class="order-station" onclick="loadStation('Kyrie Eleison', 'Kyrie, eleison; Christe, eleison', 'catechumens', this)">
+                <span class="station-marker"></span>
+                <span>Kyrie Eleison</span>
+              </li>
+              <li class="order-station" onclick="loadStation('Gloria in Excelsis Deo', 'Et in terra pax hominibus', 'catechumens', this)">
+                <span class="station-marker"></span>
+                <span>Gloria in Excelsis</span>
+              </li>
+              <li class="order-station" onclick="loadStation('Collecta (Orationes)', 'Oremus. Da nobis quaesumus...', 'catechumens', this)">
+                <span class="station-marker"></span>
+                <span>Collecta (The Collect)</span>
+              </li>
+              <li class="order-station" onclick="loadStation('Epistle & Gradual', 'Lectio Epistolae beati...', 'catechumens', this)">
+                <span class="station-marker"></span>
+                <span>Epistle &amp; Gradual</span>
+              </li>
+              <li class="order-station" onclick="loadStation('Evangelium (Holy Gospel)', 'Sequentia Sancti Evangelii...', 'catechumens', this)">
+                <span class="station-marker"></span>
+                <span>Evangelium (Holy Gospel)</span>
+              </li>
+              <li class="order-station" onclick="loadStation('Credo (Nicene-Constantinopolitan)', 'Credo in unum Deum...', 'catechumens', this)">
+                <span class="station-marker"></span>
+                <span>Credo</span>
+              </li>
+            </ul>
+
+            <!-- Part 2 -->
+            <div class="mass-part-header part-faithful" style="margin-top: 10px;">
+              <span>■ Mass of the Faithful</span>
+            </div>
+            <ul class="order-tree">
+              <li class="order-station" onclick="loadStation('Offertory & Censing', 'Suscipe, Sancte Pater...', 'faithful', this)">
+                <span class="station-marker faithful"></span>
+                <span>Offertory &amp; Censing</span>
+              </li>
+              <li class="order-station" onclick="loadStation('Secret & Preface', 'Vere dignum et justum est...', 'faithful', this)">
+                <span class="station-marker faithful"></span>
+                <span>Secret &amp; Preface</span>
+              </li>
+              <li class="order-station" onclick="loadStation('Canon Missae (Roman Canon)', 'Te igitur, clementissime Pater...', 'faithful', this)">
+                <span class="station-marker faithful"></span>
+                <span>Canon Missae (Consecration)</span>
+              </li>
+              <li class="order-station" onclick="loadStation('Pater Noster & Fraction', 'Praeceptis salutaribus moniti...', 'faithful', this)">
+                <span class="station-marker faithful"></span>
+                <span>Pater Noster &amp; Fraction</span>
+              </li>
+              <li class="order-station" onclick="loadStation('Agnus Dei & Pax', 'Agnus Dei, qui tollis peccata...', 'faithful', this)">
+                <span class="station-marker faithful"></span>
+                <span>Agnus Dei &amp; Pax</span>
+              </li>
+              <li class="order-station" onclick="loadStation('Holy Communion', 'Domine, non sum dignus...', 'faithful', this)">
+                <span class="station-marker faithful"></span>
+                <span>Holy Communion</span>
+              </li>
+              <li class="order-station" onclick="loadStation('Last Gospel (In principio)', 'In principio erat Verbum...', 'faithful', this)">
+                <span class="station-marker faithful"></span>
+                <span>Last Gospel &amp; Blessing</span>
+              </li>
+            </ul>
+          </div>
+        </aside>
+
+        <!-- Right: Guided Reference Article -->
+        <article id="reference-article">
+          <header class="article-header">
+            <div class="article-station-badge" id="art-part-badge">Mass of the Catechumens</div>
+            <h2 class="article-title" id="art-title">Prayers at the Foot of the Altar</h2>
+            <div class="article-latin-incipit" id="art-latin">Introibo ad altare Dei • Ad Deum qui laetificat juventutem meam</div>
+            
+            <div class="article-actions-strip">
+              <a href="#" class="deep-link-btn" onclick="alert('Opening this exact station in Missal Reader...')">
+                📖 Open this part in Missal Reader
+              </a>
+              <a href="#" class="deep-link-btn" onclick="alert('Opening Gregorian Chant chant score for this section...')">
+                🎵 Learn its Chant
+              </a>
+              <a href="#" class="deep-link-btn" onclick="alert('Opening related books in My Library: Explanation of the Holy Mass (Cochem)...')">
+                📚 Related Books (Catena, Cochem)
+              </a>
+            </div>
+          </header>
+
+          <!-- 7 Reference Detail Tabs -->
+          <nav class="reference-tabs" role="tablist">
+            <button class="ref-tab active" onclick="switchRefTab(this, 'happens')">What Happens</button>
+            <button class="ref-tab" onclick="switchRefTab(this, 'why')">Why &amp; Meaning</button>
+            <button class="ref-tab" onclick="switchRefTab(this, 'words')">Words &amp; Form</button>
+            <button class="ref-tab" onclick="switchRefTab(this, 'roles')">Roles &amp; Dialogue</button>
+            <button class="ref-tab" onclick="switchRefTab(this, 'posture')">Posture</button>
+            <button class="ref-tab" onclick="switchRefTab(this, 'custom')">Local Custom</button>
+            <button class="ref-tab" onclick="switchRefTab(this, 'history')">History &amp; Sources</button>
+          </nav>
+
+          <!-- Tab Content Host -->
+          <div class="tab-content-card" id="tab-content-display">
+            <div class="rubric-callout">
+              <strong>Prescribed Rubric (Ritus Servandus in Celebratione Missae, III.4):</strong><br>
+              The Priest, standing at the foot of the altar, makes a profound inclination, signs himself with the sign of the cross from forehead to breast, saying with an audible voice: <em>In nómine Patris...</em> The server kneels at the left side behind the celebrant.
+            </div>
+
+            <div class="commentary-block">
+              <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--ink);">Ceremonial Sequence:</h3>
+              <p>
+                The priest and ministers approach the altar. In the 1962 Missal, Psalm 42 (<em>Judica me, Deus</em>) is recited antiphonally with the ministers or sacred servers. This expresses the priest's preparation and humility before mounting the steps to the Holy of Holies.
+              </p>
+              <p style="margin-top: 8px;">
+                Following Psalm 42, the <strong>Confiteor</strong> is recited first by the celebrant bowed profoundly, then by the ministers, acknowledging personal sinfulness before Almighty God and the heavenly court.
+              </p>
+            </div>
+
+            <!-- Posture Breakdown -->
+            <div class="posture-grid">
+              <div class="posture-card">
+                <strong>Celebrant</strong>
+                Standing at bottom step; profound bow during Confiteor; ascends altar steps at <em>Oremus / Aufer a nobis</em>.
+              </div>
+              <div class="posture-card">
+                <strong>Sacred Ministers / Servers</strong>
+                Kneeling on the lowest step or pavement; bowing toward the celebrant at <em>et tibi, pater</em>.
+              </div>
+              <div class="posture-card">
+                <strong>Faithful / Congregation</strong>
+                Kneeling throughout the Prayers at the Foot of the Altar (Low Mass and Missa Cantata practice).
+              </div>
+            </div>
+          </div>
+
+          <!-- Original Sources Panel -->
+          <section id="reference-sources">
+            <div style="font-weight: 600; text-transform: uppercase; color: var(--gold); letter-spacing: 0.5px;">Authoritative Source Citations</div>
+            <div class="source-row">
+              <span>Rubricae Generales Missalis Romani (1962)</span>
+              <strong>Cap. IX, n. 423–438</strong>
+            </div>
+            <div class="source-row">
+              <span>J.B. O'Connell, <em>The Celebration of Mass</em></span>
+              <strong>Part II: The Low Mass, pp. 248–255</strong>
+            </div>
+            <div class="source-row">
+              <span>Father Martin von Cochem, <em>Explanation of the Holy Mass</em></span>
+              <strong>Ch. 4: On the Confiteor and Judica Me</strong>
+            </div>
+          </section>
+        </article>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Rite Switching
+    function setRite(btn, rite) {
+      document.querySelectorAll('.rite-option-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (rite === 'current') {
+        alert("Switched to current Roman Missal profile (Paul VI 2002). Prayers at the foot of the altar are replaced by the Introductory Entrance Rite and Penitential Act (Form A, B, or C).");
+      } else {
+        alert("Switched to 1962 Roman Missal profile (Usus Antiquior). Full Judica Me and double Confiteor active.");
+      }
+    }
+
+    // Search Mass order
+    function searchMassOrder() {
+      const q = document.getElementById('mass-reference-search').value.toLowerCase();
+      const items = document.querySelectorAll('.order-station');
+      items.forEach(item => {
+        const text = item.innerText.toLowerCase();
+        item.style.display = text.includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    // Station Loader
+    function loadStation(title, latin, part, el) {
+      document.querySelectorAll('.order-station').forEach(s => s.classList.remove('active'));
+      el.classList.add('active');
+
+      document.getElementById('art-title').innerText = title;
+      document.getElementById('art-latin').innerText = latin;
+      document.getElementById('art-part-badge').innerText = (part === 'catechumens') ? 'Mass of the Catechumens' : 'Mass of the Faithful';
+      document.getElementById('art-part-badge').style.color = (part === 'catechumens') ? 'var(--gold)' : 'var(--burgundy)';
+    }
+
+    // Tab switcher
+    function switchRefTab(btn, tab) {
+      document.querySelectorAll('.ref-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const host = document.getElementById('tab-content-display');
+      if (tab === 'why') {
+        host.innerHTML = `
+          <div class="rubric-callout">
+            <strong>Theological Rationale:</strong>
+            The altar represents both Mount Calvary and the heavenly throne. Just as Moses approached Mount Sinai with fear and trembling, the priest cannot enter the presence of the divine sacrifice without first acknowledging his unworthiness.
+          </div>
+          <p style="font-size: 13px; line-height: 1.6; color: var(--ink);">
+            The recitation of Psalm 42 ("Judge me, O God, and distinguish my cause from the nation that is not holy") contrasts divine holiness with worldly deception, ending with the joyful hope of climbing God's holy mountain.
+          </p>
+        `;
+      } else if (tab === 'words') {
+        host.innerHTML = `
+          <div class="rubric-callout">
+            <strong>Latin / English Liturgical Text:</strong>
+          </div>
+          <div style="font-family: var(--serif); font-size: 14px; line-height: 1.6;">
+            <p><strong>℣.</strong> Introíbo ad altáre Dei.<br>
+            <strong>℟.</strong> Ad Deum qui lætíficat juventútem meam.<br>
+            <em>(I will go in unto the altar of God. Unto God who giveth joy to my youth.)</em></p>
+            <p style="margin-top: 10px;"><strong>℣.</strong> Júdica me, Deus, et discérne causam meam de gente non sancta: ab hómine iníquo et dolóso érue me.<br>
+            <em>(Judge me, O God, and distinguish my cause from the nation that is not holy: deliver me from the unjust and deceitful man.)</em></p>
+          </div>
+        `;
+      } else if (tab === 'roles') {
+        host.innerHTML = `
+          <div class="commentary-block">
+            <h3 style="font-size: 13px; font-weight: 600; color: var(--burgundy); margin-bottom: 8px;">Prescribed Dialogue Split:</h3>
+            <p><strong>Priest alone:</strong> Initiates each versicle, bows profoundly during the Celebrant's Confiteor.</p>
+            <p style="margin-top: 6px;"><strong>Server / Schola:</strong> Answers with the response versicle, recites the second Confiteor on behalf of the faithful, bow toward the priest at <em>et tibi, pater</em>.</p>
+          </div>
+        `;
+      } else if (tab === 'posture') {
+        host.innerHTML = `
+          <div class="posture-grid">
+            <div class="posture-card">
+              <strong>Celebrant</strong>
+              Standing at foot; inclined profoundly at Confiteor; stands upright at Indulgentiam.
+            </div>
+            <div class="posture-card">
+              <strong>Ministers</strong>
+              Kneeling on bottom step; turning slightly inward during responses.
+            </div>
+            <div class="posture-card">
+              <strong>Congregation</strong>
+              Kneeling throughout.
+            </div>
+          </div>
+        `;
+      } else if (tab === 'custom') {
+        host.innerHTML = `
+          <div class="rubric-callout">
+            <strong>Distinction: Prescribed Rubric vs. Custom:</strong>
+            In Requiem Masses and Passiontide, Psalm 42 is omitted by universal rubric. In some dioceses (Dominican &amp; Carmelite rites), the preparatory prayers follow an ancient shorter form.
+          </div>
+        `;
+      } else if (tab === 'history') {
+        host.innerHTML = `
+          <div class="commentary-block">
+            <h3 style="font-size: 13px; font-weight: 600; color: var(--burgundy); margin-bottom: 8px;">Historical Development:</h3>
+            <p>Originally private devotions recited in the sacristy or during the procession in the 10th-11th centuries. Standardized universally into the Roman Missal by Pope St. Pius V in 1570 in the bull <em>Quo Primum</em>.</p>
+          </div>
+        `;
+      } else {
+        location.reload();
+      }
+    }
+  </script>
+</body>
+</html>

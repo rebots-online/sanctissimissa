@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "projectId": "7192660594233084032",
+  "retrievedAt": "2026-09-13",
+  "source": "Google Stitch HTML export",
+  "adaptations": [
+    "Added visible design-specimen notice",
+    "Corrected unsupported notation-authenticity claim on chant specimen"
+  ],
+  "screens": [
+    {
+      "file": "bookstore.html",
+      "screenId": "eeb7643f00314991ab7a325c9daa2216",
+      "sourceSha256": "dc5176385d927332e014e6bc4782aa34891113c5e9a64d74e0a6b0b5788245e9",
+      "sha256": "fc877246d6cf20a1c64ebd6e351af48400b2a213c0f2daa1c8b833e57af64ebe",
+      "status": "design-specimen"
+    },
+    {
+      "file": "library.html",
+      "screenId": "83d9c89c5d0f42d29707648c9a4b1acd",
+      "sourceSha256": "7784903bbf3c03af0e8f6db4d96500bf0dbbf3572837ad114009918f1f0f6980",
+      "sha256": "5978d8351429587f5861a2d4fb6e049140ffb9a683dfc028910b70001862e479",
+      "status": "design-specimen"
+    },
+    {
+      "file": "reader.html",
+      "screenId": "0918fcd8e0174446b17b14df6611830b",
+      "sourceSha256": "c6633b586bcc2abeb56d2dee6dad766052713ced210e7db05d5fde944a8cf302",
+      "sha256": "db5d2bf3a783c334fabecc3ce3166f91e0cb9075a25057512b4a354667086ee5",
+      "status": "design-specimen"
+    },
+    {
+      "file": "chant.html",
+      "screenId": "a8f2b5d39410445b91178636a97824a2",
+      "sourceSha256": "b01dd8ac94396c8e93e6421a1799108b05489e54ae894ddcc5e79a77ca20e0e6",
+      "sha256": "cc337c2945b232499fe16eb5c5dd1bc117218a4d1c7da16cdb6ab75c9bded93f",
+      "status": "design-specimen"
+    },
+    {
+      "file": "mass-reference.html",
+      "screenId": "f6cc5e4c8df3462f96aa7806aa60624a",
+      "sourceSha256": "eb98ec372f8c11fd7490846c945a71069a756c0cfccd3e551ecc929dcba7a55d",
+      "sha256": "4bb67959461ed53d4c0576b14b22a3d73c9e093e9a78646c8364c37c0bbb5d86",
+      "status": "design-specimen"
+    }
+  ]
+}

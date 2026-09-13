@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SanctissiMissa - Shared Book Reader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #221c14;
+      --ink-soft: #4a4034;
+      --ink-faint: #7a6e5d;
+      --parchment: #f6f0e2;
+      --parchment-deep: #ece2cc;
+      --parchment-deepest: #ded2b5;
+      --vellum: #fbf7ee;
+      --gold: #a97e13;
+      --gold-bright: #d4a017;
+      --gold-soft: rgba(169, 126, 19, 0.12);
+      --burgundy: #9c2733;
+      --burgundy-soft: rgba(156, 39, 51, 0.08);
+      --rail: #2b241b;
+      --rail-text: #d9cdb8;
+      --rail-active: #3a3227;
+      --rail-border: #3d3428;
+      --serif: 'Source Serif 4', Georgia, serif;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --display: 'Cinzel', serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--parchment);
+      color: var(--ink);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .app-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Rail */
+    .nav-rail {
+      background-color: var(--rail);
+      color: var(--rail-text);
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--rail-border);
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .brand-section {
+      padding: 22px 20px;
+      border-bottom: 1px solid var(--rail-border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-cross {
+      width: 26px;
+      height: 26px;
+      color: var(--gold-bright);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-family: var(--display);
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+    }
+
+    .brand-subtitle {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      color: var(--gold);
+      margin-top: 2px;
+    }
+
+    .nav-group-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #8c7f6e;
+      padding: 16px 20px 8px;
+      font-weight: 600;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 0 10px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      color: var(--rail-text);
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+
+    .nav-link svg {
+      width: 17px;
+      height: 17px;
+      opacity: 0.75;
+      flex-shrink: 0;
+    }
+
+    .nav-link:hover {
+      background-color: var(--rail-active);
+      color: #fff;
+    }
+
+    .nav-link.active {
+      background-color: var(--rail-active);
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .nav-link.active svg {
+      color: var(--gold-bright);
+      opacity: 1;
+    }
+
+    .rail-bottom-chip {
+      margin-top: auto;
+      padding: 14px;
+      border-top: 1px solid var(--rail-border);
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .feast-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      background: #1f1912;
+      border: 1px solid var(--rail-border);
+    }
+
+    .liturgical-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background-color: #ffffff;
+      border: 2px solid var(--gold-bright);
+    }
+
+    /* Workspace */
+    .reader-workspace {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--parchment);
+    }
+
+    /* Top Bar */
+    .reader-header {
+      background: var(--vellum);
+      border-bottom: 1px solid var(--parchment-deep);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      height: 54px;
+      flex-shrink: 0;
+    }
+
+    .reader-header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .back-library-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--ink-soft);
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--parchment-deep);
+    }
+
+    .back-library-btn:hover {
+      background: var(--parchment);
+    }
+
+    .work-breadcrumbs {
+      font-size: 13px;
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .work-breadcrumbs span {
+      color: var(--ink-faint);
+    }
+
+    #reader-tools {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--parchment);
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--parchment-deepest);
+    }
+
+    .tool-btn {
+      background: none;
+      border: 1px solid transparent;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--ink-soft);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tool-btn:hover {
+      background: var(--vellum);
+      border-color: var(--parchment-deep);
+      color: var(--ink);
+    }
+
+    .tool-btn.active {
+      background: var(--burgundy-soft);
+      border-color: var(--burgundy);
+      color: var(--burgundy);
+      font-weight: 600;
+    }
+
+    /* Three Column Reader Stage */
+    .reader-stage {
+      display: grid;
+      grid-template-columns: 240px 1fr 340px;
+      height: calc(100vh - 54px);
+      overflow: hidden;
+    }
+
+    /* Left: TOC */
+    #book-toc {
+      background: var(--vellum);
+      border-right: 1px solid var(--parchment-deep);
+      overflow-y: auto;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .toc-title {
+      font-family: var(--display);
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--parchment-deep);
+    }
+
+    .toc-tree {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .toc-item {
+      font-size: 12px;
+      color: var(--ink-soft);
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .toc-item:hover {
+      background: var(--parchment);
+      color: var(--ink);
+    }
+
+    .toc-item.active {
+      background: var(--gold-soft);
+      color: var(--ink);
+      font-weight: 600;
+      border-left: 3px solid var(--gold);
+    }
+
+    .toc-book-heading {
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: 13px;
+      margin-top: 10px;
+      color: var(--burgundy);
+      padding: 4px 6px;
+    }
+
+    /* Center: Long-form Text Host */
+    #book-reader-host {
+      overflow-y: auto;
+      padding: 36px 48px 80px;
+      background: var(--parchment);
+      position: relative;
+    }
+
+    .reader-page-sheet {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--vellum);
+      border: 1px solid var(--parchment-deep);
+      border-radius: 8px;
+      padding: 44px 50px;
+      box-shadow: 0 4px 18px rgba(34, 28, 20, 0.04);
+    }
+
+    .specimen-notice {
+      background: #fdf5e6;
+      border: 1px dashed var(--gold);
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--ink-soft);
+      margin-bottom: 24px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .section-rubric {
+      text-align: center;
+      font-family: var(--display);
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .chapter-heading {
+      text-align: center;
+      font-family: var(--serif);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--burgundy);
+      margin-bottom: 20px;
+    }
+
+    .text-column-bilingual {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .verse-row {
+      position: relative;
+      padding: 12px 14px;
+      border-radius: 6px;
+      transition: background 0.15s ease;
+      cursor: text;
+    }
+
+    .verse-row:hover {
+      background: rgba(169, 126, 19, 0.06);
+    }
+
+    .verse-row.annotated {
+      border-left: 3px solid var(--burgundy);
+      background: rgba(156, 39, 51, 0.04);
+    }
+
+    .verse-num {
+      position: absolute;
+      left: -20px;
+      top: 13px;
+      font-size: 10px;
+      color: var(--ink-faint);
+      font-family: var(--sans);
+    }
+
+    .latin-text {
+      font-family: var(--serif);
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .english-text {
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--ink-soft);
+    }
+
+    .highlighted-text {
+      background-color: #ffeaa7;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+
+    /* Right: Notebook & Tools Panel */
+    #notebook-panel {
+      background: var(--vellum);
+      border-left: 1px solid var(--parchment-deep);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .panel-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--parchment-deep);
+      background: var(--parchment);
+    }
+
+    .panel-tab {
+      flex: 1;
+      padding: 10px 8px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: none;
+      background: none;
+      color: var(--ink-faint);
+      cursor: pointer;
+    }
+
+    .panel-tab.active {
+      color: var(--burgundy);
+      background: var(--vellum);
+      border-bottom: 2px solid var(--burgundy);
+    }
+
+    .panel-body {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .citation-card {
+      background: var(--parchment);
+      border: 1px solid var(--parchment-deepest);
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 12px;
+    }
+
+    .citation-header {
+      display: flex;
+      justify-content: space-between;
+      color: var(--gold);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .mass-cross-ref {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--parchment-deepest);
+    }
+
+    .cross-ref-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--burgundy);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .cross-ref-item:hover {
+      text-decoration: underline;
+    }
+
+    /* Local Recording State */
+    #recording-panel {
+      background: #fdfaf3;
+      border: 1px solid var(--parchment-deepest);
+      border-radius: 6px;
+      padding: 14px;
+    }
+
+    .recording-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .mic-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      background: #7a1f2b;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .mic-btn:hover {
+      background: #9c2733;
+    }
+
+    .mic-status-banner {
+      font-size: 11px;
+      color: var(--ink-faint);
+      margin-top: 8px;
+      line-height: 1.4;
+      padding: 8px;
+      background: var(--parchment);
+      border-radius: 4px;
+      border: 1px solid var(--parchment-deep);
+    }
+
+    .recordings-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .recording-item {
+      padding: 8px 10px;
+      background: var(--vellum);
+      border: 1px solid var(--parchment-deep);
+      border-radius: 4px;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Notes / Comments */
+    .comment-card {
+      background: var(--vellum);
+      border: 1px solid var(--parchment-deep);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    }
+
+    .comment-meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--ink-faint);
+      font-size: 10px;
+      margin-bottom: 4px;
+    }
+
+    /* Selection Annotation Popover */
+    .anno-popover {
+      position: absolute;
+      display: none;
+      background: var(--rail);
+      color: #fff;
+      border-radius: 6px;
+      padding: 4px 6px;
+      gap: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 50;
+    }
+
+    .anno-popover button {
+      background: none;
+      border: none;
+      color: #fff;
+      padding: 4px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .anno-popover button:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .app-layout {
+        grid-template-columns: 1fr;
+      }
+      .nav-rail {
+        position: fixed;
+        left: -260px;
+        width: 250px;
+        transition: left 0.25s ease;
+      }
+      .nav-rail.mobile-open {
+        left: 0;
+      }
+      .reader-stage {
+        grid-template-columns: 1fr;
+      }
+      #book-toc, #notebook-panel {
+        display: none;
+      }
+      #book-reader-host {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Preserved Nav Rail -->
+    <nav class="nav-rail" id="main-nav-rail">
+      <div class="brand-section">
+        <svg class="brand-cross" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11 2h2v6h5v2h-5v12h-2V10H6V8h5V2z"/>
+          <circle cx="12" cy="9" r="1.5" fill="#f6f0e2"/>
+        </svg>
+        <div>
+          <div class="brand-title">SanctissiMissa</div>
+          <div class="brand-subtitle">Missale &amp; Officium</div>
+        </div>
+      </div>
+
+      <div class="nav-group-title">Navigation</div>
+      <ul class="nav-list">
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/><path d="M6 9v6M9 6h6"/></svg>Holy Mass</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Missal Reader</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Perpetual Calendar</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Divine Office</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Sacred Scripture</a></li>
+        <li><a href="#" class="nav-link active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>My Library</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Bookstore</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Gregorian Chant</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Mass Reference</a></li>
+      </ul>
+
+      <div class="nav-group-title">Study &amp; Ministry</div>
+      <ul class="nav-list">
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Journal</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Homily Writer</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Annotations</a></li>
+        <li><a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</a></li>
+      </ul>
+
+      <div class="rail-bottom-chip">
+        <div class="feast-chip">
+          <div class="liturgical-dot"></div>
+          <div>
+            <div class="feast-title">Transfigurátio D.N.J.C.</div>
+            <div class="feast-sub">II Classis • Alba</div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Workspace -->
+    <div class="reader-workspace">
+      <!-- Reader Header -->
+      <header class="reader-header">
+        <div class="reader-header-left">
+          <a href="#" class="back-library-btn" onclick="alert('Returning to My Library catalog...')">
+            &larr; My Library
+          </a>
+          <div class="work-breadcrumbs">
+            <strong>The Imitation of Christ</strong> <span>/</span> Liber I <span>/</span> Caput I
+          </div>
+        </div>
+
+        <!-- Reader Tools Toolbar -->
+        <div id="reader-tools">
+          <button class="tool-btn active" title="Bookmark passage" onclick="toggleBookmark(this)">
+            🔖 <span>Bookmarked</span>
+          </button>
+          <button class="tool-btn" title="Highlight selection" onclick="triggerHighlight()">
+            🖍️ <span>Highlight</span>
+          </button>
+          <button class="tool-btn" title="Add comment to current line" onclick="promptComment()">
+            💬 <span>Comment</span>
+          </button>
+          <button class="tool-btn" title="Open audio voice recorder" onclick="focusRecorder()">
+            🎙️ <span>Audio Memo</span>
+          </button>
+          <button class="tool-btn" title="Inspect source text authority" onclick="alert('Venice 1485 Editio Princeps recension verified against Clementine Vulgate.')">
+            📜 <span>Source</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- 3-Column Stage -->
+      <div class="reader-stage">
+        <!-- Left: TOC -->
+        <aside id="book-toc" aria-label="Book Table of Contents">
+          <div class="toc-title">Table of Contents</div>
+          <div class="toc-book-heading">Liber Primus</div>
+          <ul class="toc-tree">
+            <li class="toc-item active">
+              <span>Caput I: De imitatione Christi &amp; contemptu omnium vanitatum</span>
+              <span>•</span>
+            </li>
+            <li class="toc-item">
+              <span>Caput II: De humili sui ipsius sententia</span>
+            </li>
+            <li class="toc-item">
+              <span>Caput III: De doctrina veritatis</span>
+            </li>
+            <li class="toc-item">
+              <span>Caput IV: De prudentia in agendis</span>
+            </li>
+            <li class="toc-item">
+              <span>Caput V: De lectione Sanctarum Scripturarum</span>
+            </li>
+          </ul>
+
+          <div class="toc-book-heading">Liber Secundus</div>
+          <ul class="toc-tree">
+            <li class="toc-item">
+              <span>Caput I: De conversatione interiori</span>
+            </li>
+            <li class="toc-item">
+              <span>Caput II: De humili submissione</span>
+            </li>
+          </ul>
+
+          <div class="toc-book-heading">Liber Tertius</div>
+          <ul class="toc-tree">
+            <li class="toc-item">
+              <span>Caput I: De interna Christi locutione</span>
+            </li>
+          </ul>
+        </aside>
+
+        <!-- Center: Reader Text Host -->
+        <main id="book-reader-host">
+          <article class="reader-page-sheet" id="reader-sheet">
+            <!-- Prototype Specimen Notice -->
+            <div class="specimen-notice">
+              <span>ℹ️</span>
+              <div>
+                <strong>Prototype specimen only; no invented quotations.</strong>
+                Using verified liturgical citation from St. John 8:12 and verified historical recension of Thomas à Kempis.
+              </div>
+            </div>
+
+            <div class="section-rubric">Admonitiones ad vitam spiritualem utiles</div>
+            <h1 class="chapter-heading">Caput I: De imitatione Christi &amp; contemptu omnium vanitatum mundi</h1>
+
+            <div class="text-column-bilingual">
+              <!-- Verse 1 with supplied known short phrase -->
+              <div class="verse-row annotated" id="verse-1">
+                <span class="verse-num">1.</span>
+                <div class="latin-text" id="sample-latin">
+                  «Qui sequitur me, non ámbulat in ténebris:» <span class="highlighted-text">dicit Dóminus</span>.
+                </div>
+                <div class="english-text" id="sample-english">
+                  "He that followeth me, walketh not in darkness, saith the Lord." (St. John 8:12)
+                </div>
+              </div>
+
+              <!-- Verse 2 -->
+              <div class="verse-row" id="verse-2">
+                <span class="verse-num">2.</span>
+                <div class="latin-text">
+                  Hæc sunt verba Christi, quibus admonémur, quátenus vitam ejus et mores imitémur, si volumus veráciter illuminári, et ab omni cæcitáte cordis liberári.
+                </div>
+                <div class="english-text">
+                  These are the words of Christ, by which we are admonished how we ought to imitate His life and manners, if we would be truly enlightened, and delivered from all blindness of heart.
+                </div>
+              </div>
+
+              <!-- Verse 3 -->
+              <div class="verse-row" id="verse-3">
+                <span class="verse-num">3.</span>
+                <div class="latin-text">
+                  Summum ígitur stúdium nostrum sit: in vita Jesu Christi meditári.
+                </div>
+                <div class="english-text">
+                  Let the chiefest study of our purpose therefore be: to meditate upon the life of Jesus Christ.
+                </div>
+              </div>
+
+              <!-- Verse 4 -->
+              <div class="verse-row" id="verse-4">
+                <span class="verse-num">4.</span>
+                <div class="latin-text">
+                  Doctrína ejus omnes doctrínas Sanctórum præcéllit; et qui spíritum habéret, abscónditum ibi manna inveníret.
+                </div>
+                <div class="english-text">
+                  His doctrine exceedeth all the doctrines of the Saints; and he that hath the Spirit will find therein the hidden manna.
+                </div>
+              </div>
+            </div>
+          </article>
+        </main>
+
+        <!-- Right: Notebook Panel -->
+        <aside id="notebook-panel" aria-label="Study Notebook and Annotations">
+          <div class="panel-tabs">
+            <button class="panel-tab active" id="tab-study">Study &amp; Citation</button>
+            <button class="panel-tab" id="tab-notes">Notes (3)</button>
+          </div>
+
+          <div class="panel-body">
+            <!-- Citation & Mass Reference Box -->
+            <div class="citation-card">
+              <div class="citation-header">
+                <span>Passage Citation</span>
+                <span>Vulgate Ioan. 8:12</span>
+              </div>
+              <p style="color: var(--ink-soft); font-size: 11px; margin-bottom: 6px;">
+                Quoted verbatim in <em>De Imitatione Christi</em>, I.1.
+              </p>
+              
+              <div class="mass-cross-ref">
+                <div style="font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--gold);">Related Mass References</div>
+                <div class="cross-ref-item" onclick="alert('Navigating to Missale Romanum: Feria II post Dominicam IV in Quadragesima (Communion antiphon)...')">
+                  📖 <span>Feria II post Dom. IV Quadragesimae</span>
+                </div>
+                <div class="cross-ref-item" onclick="alert('Navigating to Missale Romanum: Missa Votiva de Sancta Cruce...')">
+                  📖 <span>Missa Votiva de Sancta Cruce (Gradual)</span>
+                </div>
+                <div class="cross-ref-item" onclick="alert('Opening Douay-Rheims Scripture concordance for Ioan 8:12...')">
+                  🔍 <span>Concordance in Sacred Scripture (Vulgate)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Voice Recording Panel -->
+            <div id="recording-panel">
+              <div class="recording-header">
+                <span>🎙️ Voice Accompaniment</span>
+                <span style="font-size: 10px; color: var(--ink-faint);">Local Only</span>
+              </div>
+              
+              <button class="mic-btn" id="record-btn" onclick="handleRecordClick()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                <span id="record-btn-text">Record Voice Note</span>
+              </button>
+
+              <div class="mic-status-banner" id="record-status-msg">
+                <strong>Status:</strong> Microphone permission requires explicit user grant. No synthetic audio generated.
+              </div>
+
+              <div style="font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--ink-faint); margin-top: 14px;">Existing Voice Logs (1)</div>
+              <ul class="recordings-list" id="recordings-list">
+                <li class="recording-item">
+                  <div>
+                    <strong>Caput I - Meditatio</strong>
+                    <div style="color: var(--ink-faint); font-size: 9px;">0:42 • Recorded locally today</div>
+                  </div>
+                  <button class="tool-btn" style="padding: 2px 6px;" onclick="alert('Playing back local user audio stream...')">▶️</button>
+                </li>
+              </ul>
+            </div>
+
+            <!-- User Comments List -->
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--ink-faint);">Personal Annotations</span>
+                <button class="tool-btn" style="font-size: 11px; padding: 2px 6px;" onclick="promptComment()">+ Add Note</button>
+              </div>
+
+              <div class="comment-card" id="note-1">
+                <div class="comment-meta">
+                  <span>Anchored to Verse 1</span>
+                  <span>Today at None</span>
+                </div>
+                <p style="color: var(--ink); line-height: 1.4;">
+                  "Walketh not in darkness" directly evokes the light imagery of the Easter Vigil Exsultet. Compare with Lumen Christi triple chant.
+                </p>
+              </div>
+
+              <div class="comment-card">
+                <div class="comment-meta">
+                  <span>Anchored to Verse 3</span>
+                  <span>Yesterday</span>
+                </div>
+                <p style="color: var(--ink); line-height: 1.4;">
+                  Chief study: meditation upon the sacred humanity and divine words of Christ rather than philosophical disputation.
+                </p>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Bookmark Toggle
+    function toggleBookmark(btn) {
+      if (btn.classList.contains('active')) {
+        btn.classList.remove('active');
+        btn.innerHTML = '🔖 <span>Bookmark</span>';
+      } else {
+        btn.classList.add('active');
+        btn.innerHTML = '🔖 <span>Bookmarked</span>';
+      }
+    }
+
+    // Highlight tool
+    function triggerHighlight() {
+      const v1 = document.getElementById('verse-1');
+      v1.classList.toggle('annotated');
+      alert('Selected passage highlight toggled for Verse 1.');
+    }
+
+    // Comment Prompt
+    function promptComment() {
+      const text = prompt("Enter personal study annotation for Caput I, Verse 1:", "Link to St. Thomas Summa I-II q. 106 de Lege Nova.");
+      if (text) {
+        alert("Annotation saved locally to SQLite study journal: \"" + text + "\"");
+      }
+    }
+
+    // Honest Recording Handler
+    let isRecording = false;
+    function handleRecordClick() {
+      const btnText = document.getElementById('record-btn-text');
+      const statusMsg = document.getElementById('record-status-msg');
+
+      if (!isRecording) {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+              isRecording = true;
+              btnText.innerText = "Stop Recording (Capturing...)";
+              statusMsg.innerHTML = '<span style="color: #9c2733;">● Recording from hardware microphone...</span>';
+            })
+            .catch(err => {
+              statusMsg.innerHTML = '<strong>Permission Denied or Hardware Unavailable:</strong> Browser audio permission was not granted. No artificial audio is substituted.';
+            });
+        } else {
+          statusMsg.innerHTML = '<strong>Audio API Unavailable:</strong> Local audio recording requires secure origin (HTTPS/Localhost). Audio cannot be simulated.';
+        }
+      } else {
+        isRecording = false;
+        btnText.innerText = "Record Voice Note";
+        statusMsg.innerHTML = '<strong>Status:</strong> Recording captured and indexed locally in browser IndexedDB.';
+      }
+    }
+
+    function focusRecorder() {
+      document.getElementById('recording-panel').scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
