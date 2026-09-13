@@ -90,7 +90,10 @@ npm run build:release -- --restart
 
 The predecessor state is copied to the stamped outbox before a fresh stamp.
 Corrupt or mismatched state fails closed; never change its version by hand to
-make a different source tree look like the original release.
+make a different source tree look like the original release. The driver writes
+a durable stampPending record before changing versions. If interrupted during
+stamping itself, it fails closed instead of silently consuming another version;
+inspect the retained attempt or deliberately start a new one with --restart.
 
 The driver detects the actual host. On Linux it runs tests, web, deb/AppImage,
 Windows cross EXE/NSIS, Android debug/release APK/AAB and symbols. Windows native
@@ -127,7 +130,7 @@ All filenames begin `standroidsmissal-v<full-version>-`:
 | Web/PWA | `web-pwa.zip` |
 | Linux | `linux-amd64.deb`, `linux-amd64.AppImage` |
 | Windows cross | `windows-x64-standalone.exe`, `windows-x64-setup.exe` |
-| Windows native | Native standalone EXE, MSI, MSIX (distinct native EXE filename in collector) |
+| Windows native | `windows-x64-native-standalone.exe`, `windows-x64.msi`, `windows-x64.msix` |
 | Android | `android-universal-debug.apk`, `android-universal-release.apk`, `android-universal-release.aab`, `android-native-debug-symbols.zip` |
 
 The collector requires NSIS and native Windows packages; they are not optional
