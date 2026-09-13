@@ -1,12 +1,12 @@
 [package]
-name = "st-androids-missal"
+name = "sanctissimissa"
 version = "1.40.21223"
-description = "St. Android's Missal — the Traditional Latin Mass and Divine Office as a navigable subway map"
+description = "SanctissiMissa — the Traditional Latin Mass and Divine Office as a navigable subway map"
 authors = ["Robin L. M. Cheung, MBA"]
 edition = "2021"
 
 [lib]
-name = "st_androids_missal_lib"
+name = "sanctissimissa_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

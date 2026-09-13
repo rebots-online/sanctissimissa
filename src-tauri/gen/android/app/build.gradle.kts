@@ -23,15 +23,15 @@ val keystoreProperties = Properties().apply {
 base {
     // Every artifact filename must be self-identifying: product + stamped version.
     // Never Gradle's default "app-universal-release.*". Drives APK and AAB output names.
-    archivesName.set("standroidsmissal-v" + tauriProperties.getProperty("tauri.android.versionName", "0.0"))
+    archivesName.set("sanctissimissa-v" + tauriProperties.getProperty("tauri.android.versionName", "0.0"))
 }
 
 android {
     compileSdk = 36
-    namespace = "mba.robin.standroidsmissal"
+    namespace = "mba.robin.sanctissimissa"
     defaultConfig {
         manifestPlaceholders["usesCleartextTraffic"] = "false"
-        applicationId = "mba.robin.standroidsmissal"
+        applicationId = "mba.robin.sanctissimissa"
         minSdk = 24
         targetSdk = 36
         versionCode = tauriProperties.getProperty("tauri.android.versionCode", "1").toInt()

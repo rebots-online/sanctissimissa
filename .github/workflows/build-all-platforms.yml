@@ -22,7 +22,7 @@ jobs:
         run: npm run build:vite
       - uses: actions/upload-artifact@v4
         with:
-          name: standroidsmissal-web-${{ github.sha }}
+          name: sanctissimissa-web-${{ github.sha }}
           path: dist-web/
           if-no-files-found: error
 
@@ -50,7 +50,7 @@ jobs:
         run: npx tauri build --bundles deb,appimage
       - uses: actions/upload-artifact@v4
         with:
-          name: standroidsmissal-linux-${{ github.sha }}
+          name: sanctissimissa-linux-${{ github.sha }}
           path: |
             src-tauri/target/release/bundle/deb/*.deb
             src-tauri/target/release/bundle/appimage/*.AppImage
@@ -74,7 +74,7 @@ jobs:
         run: npx tauri build --bundles nsis
       - uses: actions/upload-artifact@v4
         with:
-          name: standroidsmissal-windows-nsis-${{ github.sha }}
+          name: sanctissimissa-windows-nsis-${{ github.sha }}
           path: src-tauri/target/release/bundle/nsis/*.exe
 
   # ── Android: debug-signed APK (staging/production signing per SOP) ─
@@ -111,5 +111,5 @@ jobs:
           NDK_HOME: ${{ env.ANDROID_SDK_ROOT }}/ndk/27.0.12077973
       - uses: actions/upload-artifact@v4
         with:
-          name: standroidsmissal-android-apk-${{ github.sha }}
+          name: sanctissimissa-android-apk-${{ github.sha }}
           path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk

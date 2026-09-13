@@ -19,7 +19,7 @@ def refuse(message):
 try:
     version = (root / 'version.txt').read_text().strip()
     metadata = json.loads((root / 'version.json').read_text())
-    state = json.loads((root / 'standroidsmissal-release-state.json').read_text())
+    state = json.loads((root / 'sanctissimissa-release-state.json').read_text())
 except (OSError, UnicodeError, json.JSONDecodeError):
     refuse('cannot read valid version metadata and frozen release state')
 
@@ -48,12 +48,12 @@ RELEASE_GUARD
 )"
 SOURCE="src-tauri/gen/android/app/build/intermediates/merged_native_libs/universalRelease/mergeUniversalReleaseNativeLibs/out/lib"
 OUTPUT_DIR="src-tauri/gen/android/app/build/outputs/native-debug-symbols/universalRelease"
-OUTPUT="$ROOT/$OUTPUT_DIR/standroidsmissal-v${VERSION}-android-native-debug-symbols.zip"
+OUTPUT="$ROOT/$OUTPUT_DIR/sanctissimissa-v${VERSION}-android-native-debug-symbols.zip"
 
 abis=(arm64-v8a armeabi-v7a x86 x86_64)
 libraries=()
 for abi in "${abis[@]}"; do
-  lib="$SOURCE/$abi/libst_androids_missal_lib.so"
+  lib="$SOURCE/$abi/libsanctissimissa_lib.so"
   if [ ! -f "$lib" ]; then
     echo "Missing native symbols input: $lib" >&2
     exit 1
@@ -96,7 +96,7 @@ for line in readelf('--debug-dump=info', '--dwarf-depth=1').splitlines():
 
 def is_application_unit(unit):
     name = unit.get('name', '')
-    if re.search(r'(?<![A-Za-z0-9_])st_androids_missal_lib(?![A-Za-z0-9_])', name):
+    if re.search(r'(?<![A-Za-z0-9_])sanctissimissa_lib(?![A-Za-z0-9_])', name):
         return True
     # Also accept the exact app source under its compilation directory, so
     # a generic dependency src/lib.rs cannot satisfy application coverage.
@@ -128,19 +128,19 @@ for segment in segments:
 
 print(f'{library.parent.name}: application DWARF and 16 KB LOAD alignment verified')
 PY
-  libraries+=("$abi/libst_androids_missal_lib.so")
+  libraries+=("$abi/libsanctissimissa_lib.so")
 done
 
 mkdir -p "$OUTPUT_DIR"
 ARCHIVE_STAMP="$(date -u +%Y%m%dT%H%M%S%NZ)"
-STAGED_OUTPUT="$ROOT/$OUTPUT_DIR/standroidsmissal-v${VERSION}-android-native-debug-symbols-${ARCHIVE_STAMP}.zip"
+STAGED_OUTPUT="$ROOT/$OUTPUT_DIR/sanctissimissa-v${VERSION}-android-native-debug-symbols-${ARCHIVE_STAMP}.zip"
 test ! -e "$STAGED_OUTPUT"
 # Create a fresh archive containing exactly the four validated ABI libraries.
 (cd "$SOURCE" && zip -q "$STAGED_OUTPUT" "${libraries[@]}")
 test -s "$STAGED_OUTPUT"
 if [ -e "$OUTPUT" ]; then
-  PREVIOUS_DIR="$HOME/outbox/standroidsmissal"
-  PREVIOUS_OUTPUT="$PREVIOUS_DIR/standroidsmissal-v${VERSION}-android-native-debug-symbols-previous-${ARCHIVE_STAMP}.zip"
+  PREVIOUS_DIR="$HOME/outbox/sanctissimissa"
+  PREVIOUS_OUTPUT="$PREVIOUS_DIR/sanctissimissa-v${VERSION}-android-native-debug-symbols-previous-${ARCHIVE_STAMP}.zip"
   mkdir -p "$PREVIOUS_DIR"
   test ! -e "$PREVIOUS_OUTPUT"
   cp -p -- "$OUTPUT" "$PREVIOUS_OUTPUT"

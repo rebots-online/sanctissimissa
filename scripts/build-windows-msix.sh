@@ -12,4 +12,4 @@ else
   exit 1
 fi
 exec "$POWERSHELL" -NoProfile -NonInteractive -File \
-  scripts/standroidsmissal-v1.39.15371-windows-native-20260913.ps1 -Kind MSIX
+  scripts/sanctissimissa-v1.40.21223-windows-native-20260913.ps1 -Kind MSIX

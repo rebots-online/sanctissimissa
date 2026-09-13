@@ -12,13 +12,13 @@
   IgnorableNamespaces="uap uap2 uap3 uap10 desktop desktop6 rescap">
 
   <Identity
-    Name="mba.robin.standroidsmissal"
+    Name="mba.robin.sanctissimissa"
     Publisher="CN=Robin Cheung"
     ProcessorArchitecture="x64"
     Version="1.40.0.0" />
 
   <Properties>
-    <DisplayName>St. Android's Missal</DisplayName>
+    <DisplayName>SanctissiMissa</DisplayName>
     <PublisherDisplayName>Robin Cheung</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <uap10:PackageIntegrity>
@@ -35,11 +35,11 @@
   </Resources>
 
   <Applications>
-    <Application Id="standroidsmissal"
-      Executable="st-androids-missal.exe"
+    <Application Id="sanctissimissa"
+      Executable="sanctissimissa.exe"
       EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
-        DisplayName="St. Android's Missal"
+        DisplayName="SanctissiMissa"
         Description="Traditional Latin Mass and Divine Office rendered as a navigable subway map."
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"

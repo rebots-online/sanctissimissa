@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "St. Android's Missal",
+  "productName": "SanctissiMissa",
   "version": "1.40.21223",
-  "identifier": "mba.robin.standroidsmissal",
+  "identifier": "mba.robin.sanctissimissa",
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build:vite",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "St. Android's Missal — Traditional Latin Mass & Divine Office",
+        "title": "SanctissiMissa — Traditional Latin Mass & Divine Office",
         "width": 1320,
         "height": 860,
         "minWidth": 800,
@@ -41,7 +41,7 @@
     "copyright": "Copyright (C) 2026 Robin L. M. Cheung, MBA. All rights reserved.",
     "category": "Education",
     "shortDescription": "The Traditional Latin Mass and Divine Office as a navigable subway map",
-    "longDescription": "St. Android's Missal presents the Traditional Latin Mass (1962 Missal) and the Divine Office of the Extraordinary Form as a subway-style map: bilingual exegetical reader, annotations, corpus concordance, vector similarity, cross-references, and a perpetual liturgical calendar computed by Butcher's Easter algorithm.",
+    "longDescription": "SanctissiMissa presents the Traditional Latin Mass (1962 Missal) and the Divine Office of the Extraordinary Form as a subway-style map: bilingual exegetical reader, annotations, corpus concordance, vector similarity, cross-references, and a perpetual liturgical calendar computed by Butcher's Easter algorithm.",
     "linux": {
       "deb": {
         "depends": [],

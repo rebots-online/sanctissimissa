@@ -71,7 +71,7 @@ function Assert-ReceiptArtifact($Artifact) {
 }
 function Save-Receipt($Receipt) {
     if (Test-Path -LiteralPath $ReceiptPath) {
-        $Backup = Join-Path $env:USERPROFILE 'outbox\standroidsmissal'
+        $Backup = Join-Path $env:USERPROFILE 'outbox\sanctissimissa'
         New-Item -ItemType Directory -Path $Backup -Force | Out-Null
         Copy-Item -LiteralPath $ReceiptPath -Destination (Join-Path $Backup ($Prefix + '-windows-native-metadata-before-' + $Attempt + '.json'))
     }
@@ -100,7 +100,7 @@ $MsixVersion = '{0}.{1}.0.0' -f $Major, $Minor
 if ((Get-Content -LiteralPath (Join-Path $Root 'version.txt') -Raw).Trim() -cne $Version) {
     throw 'version.txt and version.json disagree.'
 }
-$State = Read-Json (Join-Path $Root 'standroidsmissal-release-state.json')
+$State = Read-Json (Join-Path $Root 'sanctissimissa-release-state.json')
 $PendingStamp = $State.PSObject.Properties['stampPending']
 if ($PendingStamp -and $PendingStamp.Value -is [bool] -and $PendingStamp.Value -eq $true) {
     throw 'Release stamping is incomplete; reconcile the pending stamp through the canonical release driver before native packaging.'
@@ -139,14 +139,14 @@ if ($Thumbprint -notmatch '^[a-fA-F0-9]{40}$' -or $TimestampUrl -notmatch '^http
 $Certificate = Get-Item -LiteralPath ('Cert:\CurrentUser\My\' + $Thumbprint)
 if (-not $Certificate.HasPrivateKey) { throw 'Configured Windows signing certificate has no private key.' }
 $SignTool = Find-SdkTool 'signtool.exe'
-$Prefix = 'standroidsmissal-v' + $Version
+$Prefix = 'sanctissimissa-v' + $Version
 $Attempt = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssfffZ') + '-' + [guid]::NewGuid().ToString('N')
 $Target = [IO.Path]::GetFullPath((Join-Path $Root 'src-tauri\target\windows-native'))
 $env:CARGO_TARGET_DIR = $Target
 $AttemptDir = Join-Path $Target ($Prefix + '-windows-native-' + $Attempt)
 New-Item -ItemType Directory -Path $AttemptDir | Out-Null
 $NativeRelease = Join-Path $Target 'x86_64-pc-windows-msvc\release'
-$ExePath = Join-Path $NativeRelease 'st-androids-missal.exe'
+$ExePath = Join-Path $NativeRelease 'sanctissimissa.exe'
 $ReceiptPath = Join-Path $Target ($Prefix + '-windows-native-metadata.json')
 
 if ($Kind -eq 'MSI') {
@@ -214,7 +214,7 @@ if ($Kind -eq 'MSI') {
     Invoke-Checked $MakeAppx @('unpack', '/p', $Package, '/d', $Unpacked)
     Assert-PackageIdentity (Join-Path $Unpacked 'AppxManifest.xml')
     if ((Read-Json (Join-Path $Unpacked 'version.json')).version -cne $Version -or
-        (Get-FileHash -LiteralPath (Join-Path $Unpacked 'st-androids-missal.exe') -Algorithm SHA256).Hash -cne
+        (Get-FileHash -LiteralPath (Join-Path $Unpacked 'sanctissimissa.exe') -Algorithm SHA256).Hash -cne
         (Get-FileHash -LiteralPath $ExePath -Algorithm SHA256).Hash) {
         throw 'MSIX contents differ from the frozen native executable or full release version.'
     }

@@ -4,7 +4,7 @@
   "buildNumber": "21223",
   "versionCode": 100040,
   "buildDate": "2026-09-13T04:23:24.872Z",
-  "productName": "St. Android's Missal",
-  "internalName": "st-androids-missal",
-  "packageName": "mba.robin.standroidsmissal"
+  "productName": "SanctissiMissa",
+  "internalName": "sanctissimissa",
+  "packageName": "mba.robin.sanctissimissa"
 }

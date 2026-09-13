@@ -1,4 +1,4 @@
-//! St. Android's Missal — Tauri shell.
+//! SanctissiMissa — Tauri shell.
 //!
 //! The native side is deliberately minimal: it hands the embedded corpus
 //! database to the frontend, where the SAME sql.js query layer used by the
@@ -71,5 +71,5 @@ pub fn run() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![load_corpus, load_sidecar, save_sidecar])
         .run(tauri::generate_context!())
-        .expect("error while running St. Android's Missal");
+        .expect("error while running SanctissiMissa");
 }

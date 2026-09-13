@@ -12,7 +12,7 @@ VERSION="$(node -e "try { console.log(JSON.parse(require('fs').readFileSync('ver
 test "$(tr -d '\r\n' < version.txt)" = "$VERSION"
 
 # Keep diagnostics and generated NSIS input within the disposable target tree.
-PREFIX="standroidsmissal-v${VERSION}"
+PREFIX="sanctissimissa-v${VERSION}"
 RELEASE=src-tauri/target/x86_64-pc-windows-msvc/release
 NSIS_PROJ="$RELEASE/nsis/x64"
 mkdir -p "$RELEASE"
@@ -38,8 +38,8 @@ if [ "$BUILD_STATUS" -ne 0 ]; then
   (cd "$NSIS_PROJ" && makensis -INPUTCHARSET UTF8 installer.nsi)
   mkdir -p "$RELEASE/bundle/nsis"
   cp "$NSIS_PROJ/nsis-output.exe" \
-    "$RELEASE/bundle/nsis/St. Android's Missal_${VERSION}_x64-setup.exe"
+    "$RELEASE/bundle/nsis/SanctissiMissa_${VERSION}_x64-setup.exe"
 fi
 
-test -s "$RELEASE/st-androids-missal.exe"
-test -s "$RELEASE/bundle/nsis/St. Android's Missal_${VERSION}_x64-setup.exe"
+test -s "$RELEASE/sanctissimissa.exe"
+test -s "$RELEASE/bundle/nsis/SanctissiMissa_${VERSION}_x64-setup.exe"

@@ -1,4 +1,4 @@
-package mba.robin.standroidsmissal
+package mba.robin.sanctissimissa
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

@@ -66,24 +66,24 @@ function setupVersion(root: string, version: string): void {
   fs.writeFileSync(path.join(root, 'version.txt'), version, 'utf-8');
 }
 
-// Helper: write standroidsmissal-release-state.json
+// Helper: write sanctissimissa-release-state.json
 function writeLock(root: string, lock: ReleaseState): void {
   fs.writeFileSync(
-    path.join(root, 'standroidsmissal-release-state.json'),
+    path.join(root, 'sanctissimissa-release-state.json'),
     JSON.stringify(lock, null, 2),
     'utf-8'
   );
 }
 
-// Helper: read standroidsmissal-release-state.json
+// Helper: read sanctissimissa-release-state.json
 function readLock(root: string): ReleaseState {
-  const content = fs.readFileSync(path.join(root, 'standroidsmissal-release-state.json'), 'utf-8');
+  const content = fs.readFileSync(path.join(root, 'sanctissimissa-release-state.json'), 'utf-8');
   return JSON.parse(content);
 }
 
-// Helper: read standroidsmissal-release-stage-events.log from fixture dir
+// Helper: read sanctissimissa-release-stage-events.log from fixture dir
 function readRunCommandLog(fixtureDir: string): string {
-  const logPath = path.join(fixtureDir, 'standroidsmissal-release-stage-events.log');
+  const logPath = path.join(fixtureDir, 'sanctissimissa-release-stage-events.log');
   if (!fs.existsSync(logPath)) {
     return '';
   }
@@ -133,8 +133,8 @@ describe('Unit tests: expandHomePath', () => {
 
   it('should expand ~/path to home/path', () => {
     const home = '/home/testuser';
-    const result = expandHomePath('~/outbox/standroidsmissal', home);
-    assert.strictEqual(result, '/home/testuser/outbox/standroidsmissal');
+    const result = expandHomePath('~/outbox/sanctissimissa', home);
+    assert.strictEqual(result, '/home/testuser/outbox/sanctissimissa');
   });
 
   it('should pass absolute paths unchanged', () => {
@@ -248,13 +248,13 @@ describe('Unit tests: main with injected deps', () => {
     assert.strictEqual(commandsRun.filter(c => c === 'stamp').length, 1);
 
     // Terminal lock remains in root and has an archive copy
-    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), true);
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'sanctissimissa-release-state.json')), true);
 
     // Archived lock should exist in dist/rubric-runs
     const distDir = path.join(tempDir, 'dist', 'rubric-runs');
     assert.ok(fs.existsSync(distDir));
     const archiveFiles = fs.readdirSync(distDir);
-    const archiveFile = archiveFiles.find(f => f.startsWith('standroidsmissal-v2.17.34595-release-state'));
+    const archiveFile = archiveFiles.find(f => f.startsWith('sanctissimissa-v2.17.34595-release-state'));
     assert.ok(archiveFile);
 
     // Verify archived lock contents
@@ -293,11 +293,11 @@ describe('Unit tests: main with injected deps', () => {
     assert.deepStrictEqual(commandsRun, expectedStages);
 
     // Lock should be archived
-    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), true);
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'sanctissimissa-release-state.json')), true);
     const distDir = path.join(tempDir, 'dist', 'rubric-runs');
     assert.ok(fs.existsSync(distDir));
     const archiveFiles = fs.readdirSync(distDir);
-    assert.ok(archiveFiles.some(f => f.startsWith('standroidsmissal-v2.17.34595-release-state')));
+    assert.ok(archiveFiles.some(f => f.startsWith('sanctissimissa-v2.17.34595-release-state')));
   });
 
   it('should fail on mismatched version lock', async () => {
@@ -353,7 +353,7 @@ describe('Unit tests: main with injected deps', () => {
   });
 
   it('should fail on corrupt JSON lock', async () => {
-    fs.writeFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), '{invalid json', 'utf-8');
+    fs.writeFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), '{invalid json', 'utf-8');
 
     const stubDeps: ReleaseDeps = {
       runCommand: async (name: string) => {
@@ -368,7 +368,7 @@ describe('Unit tests: main with injected deps', () => {
     assert.strictEqual(commandsRun.length, 0);
 
     // Corrupt lock should remain byte-identical
-    const afterContent = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf-8');
+    const afterContent = fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), 'utf-8');
     assert.strictEqual(afterContent, '{invalid json');
   });
 
@@ -381,7 +381,7 @@ describe('Unit tests: main with injected deps', () => {
     };
     writeLock(tempDir, existingLock);
 
-    const outboxDir = path.join(tempDir, 'outbox', 'standroidsmissal');
+    const outboxDir = path.join(tempDir, 'outbox', 'sanctissimissa');
     fs.mkdirSync(outboxDir, { recursive: true });
 
     const stubDeps: ReleaseDeps = {
@@ -398,9 +398,9 @@ describe('Unit tests: main with injected deps', () => {
     assert.deepStrictEqual(commandsRun, ['stamp', ...CANONICAL_STAGE_ORDER]);
 
     // Previous lock is preserved in outbox; active state remains
-    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), true);
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'sanctissimissa-release-state.json')), true);
     const outboxFiles = fs.readdirSync(outboxDir);
-    assert.ok(outboxFiles.some(f => f.startsWith('standroidsmissal-v')));
+    assert.ok(outboxFiles.some(f => f.startsWith('sanctissimissa-v')));
   });
 
   it('should handle --clean-only flag with matching lock', async () => {
@@ -412,7 +412,7 @@ describe('Unit tests: main with injected deps', () => {
     };
     writeLock(tempDir, matchingLock);
 
-    const outboxDir = path.join(tempDir, 'outbox', 'standroidsmissal');
+    const outboxDir = path.join(tempDir, 'outbox', 'sanctissimissa');
     fs.mkdirSync(outboxDir, { recursive: true });
 
     const stubDeps: ReleaseDeps = {
@@ -429,9 +429,9 @@ describe('Unit tests: main with injected deps', () => {
     assert.strictEqual(commandsRun.length, 0);
 
     // Previous lock is preserved in outbox; active state remains
-    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), true);
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'sanctissimissa-release-state.json')), true);
     const outboxFiles = fs.readdirSync(outboxDir);
-    assert.ok(outboxFiles.some(f => f.startsWith('standroidsmissal-v')));
+    assert.ok(outboxFiles.some(f => f.startsWith('sanctissimissa-v')));
   });
 
   it('should fail --clean-only with mismatched lock', async () => {
@@ -457,7 +457,7 @@ describe('Unit tests: main with injected deps', () => {
     assert.strictEqual(commandsRun.length, 0);
 
     // Lock should remain unchanged
-    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), true);
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'sanctissimissa-release-state.json')), true);
   });
 
   it('should exit 0 when all stages already completed', async () => {
@@ -550,12 +550,12 @@ describe('Integration tests: Real CLI spawning', () => {
       assert.strictEqual(result.code, 0);
       const afterVersion = fs.readFileSync(path.join(tempDir, 'version.txt'), 'utf-8');
       assert.strictEqual(initialVersion, afterVersion);
-      assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), false);
+      assert.strictEqual(fs.existsSync(path.join(tempDir, 'sanctissimissa-release-state.json')), false);
     });
   });
 
   describe('Hermetic stub mode with RELEASE_STATE_RUNNER=stub', () => {
-    it('should log stamp and stages to standroidsmissal-release-stage-events.log on fresh release', async () => {
+    it('should log stamp and stages to sanctissimissa-release-stage-events.log on fresh release', async () => {
       const result = await spawnCli([], {
         RELEASE_STATE_RUNNER: 'stub',
         RELEASE_STATE_FIXTURE: tempDir,
@@ -616,7 +616,7 @@ describe('Integration tests: Real CLI spawning', () => {
       };
       writeLock(tempDir, existingLock);
 
-      const outboxDir = path.join(tempDir, 'outbox', 'standroidsmissal');
+      const outboxDir = path.join(tempDir, 'outbox', 'sanctissimissa');
       fs.mkdirSync(outboxDir, { recursive: true });
 
       const result = await spawnCli(['--restart'], {
@@ -628,9 +628,9 @@ describe('Integration tests: Real CLI spawning', () => {
       assert.strictEqual(result.code, 0);
 
       // Active lock remains after the copy
-      assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), true);
+      assert.strictEqual(fs.existsSync(path.join(tempDir, 'sanctissimissa-release-state.json')), true);
       const outboxFiles = fs.readdirSync(outboxDir);
-      assert.ok(outboxFiles.some(f => f.startsWith('standroidsmissal-v')));
+      assert.ok(outboxFiles.some(f => f.startsWith('sanctissimissa-v')));
 
       // Restart runs a new complete release in this same invocation.
       const logContent = readRunCommandLog(tempDir);
@@ -639,7 +639,7 @@ describe('Integration tests: Real CLI spawning', () => {
 
     it('should preserve corrupt lock byte-identically in stub mode', async () => {
       const corruptContent = '{invalid json';
-      fs.writeFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), corruptContent, 'utf-8');
+      fs.writeFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), corruptContent, 'utf-8');
 
       const result = await spawnCli([], {
         RELEASE_STATE_RUNNER: 'stub',
@@ -650,7 +650,7 @@ describe('Integration tests: Real CLI spawning', () => {
       assert.ok(result.stderr.includes('Lock mismatch or corruption detected'));
 
       // Corrupt lock should remain byte-identical
-      const afterContent = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf-8');
+      const afterContent = fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), 'utf-8');
       assert.strictEqual(afterContent, corruptContent);
     });
 
@@ -662,7 +662,7 @@ describe('Integration tests: Real CLI spawning', () => {
         completedStages: ['test'],
       };
       writeLock(tempDir, mismatchedLock);
-      const originalContent = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf-8');
+      const originalContent = fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), 'utf-8');
 
       const result = await spawnCli([], {
         RELEASE_STATE_RUNNER: 'stub',
@@ -673,7 +673,7 @@ describe('Integration tests: Real CLI spawning', () => {
       assert.ok(result.stderr.includes('Lock mismatch or corruption detected'));
 
       // Mismatched lock should remain byte-identical
-      const afterContent = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf-8');
+      const afterContent = fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), 'utf-8');
       assert.strictEqual(afterContent, originalContent);
     });
   });
@@ -697,20 +697,20 @@ describe('Integration tests: Real CLI spawning', () => {
       assert.deepStrictEqual(lock1.completedStages, ['test', 'web']);
 
       // Receipt should exist with target='linux'
-      assert.ok(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-interrupt-receipt.json')));
-      const receipt1 = JSON.parse(fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-interrupt-receipt.json'), 'utf-8'));
+      assert.ok(fs.existsSync(path.join(tempDir, 'sanctissimissa-release-interrupt-receipt.json')));
+      const receipt1 = JSON.parse(fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-interrupt-receipt.json'), 'utf-8'));
       assert.strictEqual(receipt1.target, 'linux');
       assert.strictEqual(receipt1.consumed, true);
 
       // Call 2: resume from same env, same fixture/lock/receipt
-      const receiptBeforeBytes = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-interrupt-receipt.json'), 'utf-8');
+      const receiptBeforeBytes = fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-interrupt-receipt.json'), 'utf-8');
       const r2 = await spawnCli([], env, tempDir);
 
       // Should exit 0 (resume succeeded)
       assert.strictEqual(r2.code, 0);
 
       // Receipt bytes unchanged by call 2
-      const receiptAfterBytes = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-interrupt-receipt.json'), 'utf-8');
+      const receiptAfterBytes = fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-interrupt-receipt.json'), 'utf-8');
       assert.strictEqual(receiptAfterBytes, receiptBeforeBytes);
 
       // After both spawns: log should show stamp once, each stage once, in order
@@ -731,10 +731,10 @@ describe('Integration tests: Real CLI spawning', () => {
       });
 
       // Write corrupt receipt
-      fs.writeFileSync(path.join(tempDir, 'standroidsmissal-release-interrupt-receipt.json'), '{invalid json', 'utf-8');
+      fs.writeFileSync(path.join(tempDir, 'sanctissimissa-release-interrupt-receipt.json'), '{invalid json', 'utf-8');
 
       // Record lock bytes before spawn
-      const lockBefore = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf-8');
+      const lockBefore = fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), 'utf-8');
 
       // Spawn with interrupt at linux
       const r = await spawnCli([], {
@@ -747,10 +747,10 @@ describe('Integration tests: Real CLI spawning', () => {
       assert.notStrictEqual(r.code, 0);
 
       // Lock byte-identical (no mutation)
-      assert.strictEqual(fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf-8'), lockBefore);
+      assert.strictEqual(fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), 'utf-8'), lockBefore);
 
       // Receipt byte-identical (no mutation)
-      assert.strictEqual(fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-interrupt-receipt.json'), 'utf-8'), '{invalid json');
+      assert.strictEqual(fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-interrupt-receipt.json'), 'utf-8'), '{invalid json');
     });
 
     it('mismatched interrupt receipt fails closed without mutating the lock', async () => {
@@ -763,15 +763,15 @@ describe('Integration tests: Real CLI spawning', () => {
       });
 
       // Write structurally valid but mismatched receipt (target='windows' not 'linux')
-      fs.writeFileSync(path.join(tempDir, 'standroidsmissal-release-interrupt-receipt.json'), JSON.stringify({
+      fs.writeFileSync(path.join(tempDir, 'sanctissimissa-release-interrupt-receipt.json'), JSON.stringify({
         target: 'windows',
         consumed: true,
         writtenAt: '2026-07-15T00:00:00.000Z',
       }), 'utf-8');
 
       // Record lock and receipt bytes before spawn
-      const lockBefore = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf-8');
-      const receiptBefore = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-interrupt-receipt.json'), 'utf-8');
+      const lockBefore = fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), 'utf-8');
+      const receiptBefore = fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-interrupt-receipt.json'), 'utf-8');
 
       // Spawn with interrupt at linux
       const r = await spawnCli([], {
@@ -784,10 +784,10 @@ describe('Integration tests: Real CLI spawning', () => {
       assert.notStrictEqual(r.code, 0);
 
       // Lock byte-identical (no mutation)
-      assert.strictEqual(fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf-8'), lockBefore);
+      assert.strictEqual(fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), 'utf-8'), lockBefore);
 
       // Receipt byte-identical (no mutation)
-      assert.strictEqual(fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-interrupt-receipt.json'), 'utf-8'), receiptBefore);
+      assert.strictEqual(fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-interrupt-receipt.json'), 'utf-8'), receiptBefore);
     });
   });
 
@@ -801,7 +801,7 @@ describe('Integration tests: Real CLI spawning', () => {
       };
       writeLock(tempDir, lock);
 
-      const outboxDir = path.join(tempDir, 'outbox', 'standroidsmissal');
+      const outboxDir = path.join(tempDir, 'outbox', 'sanctissimissa');
       fs.mkdirSync(outboxDir, { recursive: true });
 
       const result = await spawnCli(['--restart'], {
@@ -814,11 +814,11 @@ describe('Integration tests: Real CLI spawning', () => {
       assert.ok(result.stdout.includes('Copied old lock') || result.stdout.includes('ℹ️'));
 
       // Terminal lock should remain in root
-      assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), true);
+      assert.strictEqual(fs.existsSync(path.join(tempDir, 'sanctissimissa-release-state.json')), true);
 
       // Lock should be in outbox
       const outboxFiles = fs.readdirSync(outboxDir);
-      assert.ok(outboxFiles.some(f => f.startsWith('standroidsmissal-v')));
+      assert.ok(outboxFiles.some(f => f.startsWith('sanctissimissa-v')));
     });
 
     it('should exit 0 when no lock file exists', async () => {
@@ -839,7 +839,7 @@ describe('Integration tests: Real CLI spawning', () => {
       };
       writeLock(tempDir, lock);
 
-      const outboxDir = path.join(tempDir, 'outbox', 'standroidsmissal');
+      const outboxDir = path.join(tempDir, 'outbox', 'sanctissimissa');
       fs.mkdirSync(outboxDir, { recursive: true });
 
       const result = await spawnCli(['--clean-only'], {
@@ -850,9 +850,9 @@ describe('Integration tests: Real CLI spawning', () => {
       assert.strictEqual(result.code, 0);
       assert.ok(result.stdout.includes('Copied lock'));
 
-      assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), true);
+      assert.strictEqual(fs.existsSync(path.join(tempDir, 'sanctissimissa-release-state.json')), true);
       const outboxFiles = fs.readdirSync(outboxDir);
-      assert.ok(outboxFiles.some(f => f.startsWith('standroidsmissal-v')));
+      assert.ok(outboxFiles.some(f => f.startsWith('sanctissimissa-v')));
     });
 
     it('should fail closed when version mismatches', async () => {
@@ -912,7 +912,7 @@ describe('Byte-identical nonmutation tests', () => {
 
   it('should preserve corrupt lock byte-identically after failure', async () => {
     const corruptContent = '{invalid json';
-    fs.writeFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), corruptContent, 'utf-8');
+    fs.writeFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), corruptContent, 'utf-8');
 
     const stubDeps: ReleaseDeps = {
       runCommand: async (_name: string) => 0,
@@ -922,7 +922,7 @@ describe('Byte-identical nonmutation tests', () => {
     const exitCode = await main(['node', 'test'], stubDeps);
     assert.strictEqual(exitCode, 1);
 
-    const afterContent = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf-8');
+    const afterContent = fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), 'utf-8');
     assert.strictEqual(afterContent, corruptContent);
   });
 
@@ -934,7 +934,7 @@ describe('Byte-identical nonmutation tests', () => {
       completedStages: ['test'],
     };
     writeLock(tempDir, mismatchedLock);
-    const originalContent = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf-8');
+    const originalContent = fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), 'utf-8');
 
     const stubDeps: ReleaseDeps = {
       runCommand: async (_name: string) => 0,
@@ -944,7 +944,7 @@ describe('Byte-identical nonmutation tests', () => {
     const exitCode = await main(['node', 'test'], stubDeps);
     assert.strictEqual(exitCode, 1);
 
-    const afterContent = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf-8');
+    const afterContent = fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), 'utf-8');
     assert.strictEqual(afterContent, originalContent);
   });
 
@@ -956,7 +956,7 @@ describe('Byte-identical nonmutation tests', () => {
       completedStages: ['test'],
     };
     writeLock(tempDir, mismatchedLock);
-    const originalContent = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf-8');
+    const originalContent = fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), 'utf-8');
 
     const stubDeps: ReleaseDeps = {
       runCommand: async (_name: string) => 0,
@@ -966,7 +966,7 @@ describe('Byte-identical nonmutation tests', () => {
     const exitCode = await main(['node', 'test'], stubDeps);
     assert.strictEqual(exitCode, 1);
 
-    const afterContent = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf-8');
+    const afterContent = fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), 'utf-8');
     assert.strictEqual(afterContent, originalContent);
   });
 });
@@ -1005,11 +1005,11 @@ describe('RP.1 shared release across build hosts', () => {
     assert.strictEqual(commands.filter(name => name === 'stamp').length, 1);
     assert.strictEqual(readLock(tempDir).version, linuxState.version);
     assert.strictEqual(readLock(tempDir).sourceHead, linuxState.sourceHead);
-    const completedBytes = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'));
+    const completedBytes = fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'));
     const count = commands.length;
     assert.strictEqual(await main(['node', 'test', '--resume-only'], { ...deps, platform: 'win32' }), 0);
     assert.strictEqual(commands.length, count);
-    assert.ok(fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json')).equals(completedBytes));
+    assert.ok(fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json')).equals(completedBytes));
   });
 
   it('can start on Windows and defer Linux targets until a same-version Linux continuation', async () => {
@@ -1023,7 +1023,7 @@ describe('RP.1 shared release across build hosts', () => {
   it('never stamps or writes state when resume-only has no existing state', async () => {
     assert.strictEqual(await main(['node', 'test', '--resume-only'], { fixtureDir: tempDir, runCommand: runner }), 1);
     assert.deepStrictEqual(commands, []);
-    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), false);
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'sanctissimissa-release-state.json')), false);
   });
 
   it('persists an interrupted stamp and rejects ordinary/resume-only retries without stamping again', async () => {
@@ -1036,7 +1036,7 @@ describe('RP.1 shared release across build hosts', () => {
       return 9;
     };
     await assert.rejects(main(['node', 'test'], { fixtureDir: tempDir, runCommand: interruptedRunner }), /Stamp failed with exit code 9/);
-    const statePath = path.join(tempDir, 'standroidsmissal-release-state.json');
+    const statePath = path.join(tempDir, 'sanctissimissa-release-state.json');
     const failedState = fs.readFileSync(statePath);
     assert.strictEqual(readLock(tempDir).version, '2.17.34595');
     assert.deepStrictEqual(readLock(tempDir).completedStages, []);
@@ -1049,7 +1049,7 @@ describe('RP.1 shared release across build hosts', () => {
     assert.strictEqual(await main(['node', 'test', '--restart'], { fixtureDir: tempDir, runCommand: runner }), 0);
     assert.strictEqual(commands.filter(name => name === 'stamp').length, 2);
     assert.strictEqual(readLock(tempDir).stampPending, undefined);
-    const outbox = path.join(tempDir, 'outbox', 'standroidsmissal');
+    const outbox = path.join(tempDir, 'outbox', 'sanctissimissa');
     const archived = fs.readdirSync(outbox).find(name => name.includes('release-state-restarted'));
     assert.ok(archived);
     assert.ok(fs.readFileSync(path.join(outbox, archived)).equals(failedState));
@@ -1059,18 +1059,18 @@ describe('RP.1 shared release across build hosts', () => {
     for (const invalid of ['null', '{}', '{"version":"2.17.34595"}', JSON.stringify({
       version: '2.17.34595', sourceHead: 'abc123def456', startedAt: '2026-09-13T00:00:00Z', completedStages: ['collect'],
     })]) {
-      fs.writeFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), invalid);
+      fs.writeFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), invalid);
       assert.strictEqual(await main(['node', 'test'], { fixtureDir: tempDir, runCommand: runner }), 1);
-      assert.strictEqual(fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf8'), invalid);
+      assert.strictEqual(fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), 'utf8'), invalid);
     }
     assert.deepStrictEqual(commands, []);
   });
 
   it('restart preserves corrupt state byte-for-byte and runs a fresh stamp immediately', async () => {
     const bytes = '{invalid old state';
-    fs.writeFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), bytes);
+    fs.writeFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'), bytes);
     assert.strictEqual(await main(['node', 'test', '--restart'], { fixtureDir: tempDir, runCommand: runner }), 0);
-    const outbox = path.join(tempDir, 'outbox', 'standroidsmissal');
+    const outbox = path.join(tempDir, 'outbox', 'sanctissimissa');
     const oldState = fs.readdirSync(outbox).find(name => name.includes('release-state-restarted'));
     assert.ok(oldState);
     assert.strictEqual(fs.readFileSync(path.join(outbox, oldState), 'utf8'), bytes);
@@ -1100,7 +1100,7 @@ describe('RP.1 shared release across build hosts', () => {
       fixtureDir: tempDir, runCommand: runner, platform: 'linux', env: { WSL_DISTRO_NAME: 'Ubuntu' },
     }), 1);
     assert.deepStrictEqual(commands, []);
-    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), false);
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'sanctissimissa-release-state.json')), false);
   });
 
   it('rejects an unsupported production host before attempting Git or stamping', async () => {
@@ -1108,20 +1108,20 @@ describe('RP.1 shared release across build hosts', () => {
       platform: 'darwin', env: { RELEASE_ROOT: tempDir },
     }), 1);
     assert.strictEqual(fs.readFileSync(path.join(tempDir, 'version.txt'), 'utf8'), '2.17.34595');
-    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), false);
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'sanctissimissa-release-state.json')), false);
   });
 
   it('preserves a previous completed archive before replacing it', async () => {
     const archiveDir = path.join(tempDir, 'dist', 'rubric-runs');
     fs.mkdirSync(archiveDir, { recursive: true });
-    const archive = path.join(archiveDir, 'standroidsmissal-v2.17.34595-release-state.json');
+    const archive = path.join(archiveDir, 'sanctissimissa-v2.17.34595-release-state.json');
     fs.writeFileSync(archive, 'prior archive bytes');
     assert.strictEqual(await main(['node', 'test'], { fixtureDir: tempDir, runCommand: runner }), 0);
-    const outbox = path.join(tempDir, 'outbox', 'standroidsmissal');
+    const outbox = path.join(tempDir, 'outbox', 'sanctissimissa');
     const prior = fs.readdirSync(outbox).find(name => name.includes('release-state-before-archive'));
     assert.ok(prior);
     assert.strictEqual(fs.readFileSync(path.join(outbox, prior), 'utf8'), 'prior archive bytes');
-    assert.ok(fs.readFileSync(archive).equals(fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'))));
+    assert.ok(fs.readFileSync(archive).equals(fs.readFileSync(path.join(tempDir, 'sanctissimissa-release-state.json'))));
   });
 
   it('declares host eligibility without treating unsupported targets as successful', () => {

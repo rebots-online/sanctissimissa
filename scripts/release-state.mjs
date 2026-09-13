@@ -4,7 +4,7 @@
  * Release state management for autonomous stamped resume.
  *
  * The first invocation of `npm run build:release` stamps once, writes
- * `standroidsmissal-release-state.json`, and runs named stages. A later invocation with a matching
+ * `sanctissimissa-release-state.json`, and runs named stages. A later invocation with a matching
  * lock resumes automatically at the first incomplete stage without stamping.
  * Mismatched/corrupt locks fail closed with exact remediation.
  */
@@ -34,7 +34,7 @@ function getRoot(deps) {
  * Get lock path for current root
  */
 function getLockPath(root) {
-  return path.join(root, 'standroidsmissal-release-state.json');
+  return path.join(root, 'sanctissimissa-release-state.json');
 }
 
 /**
@@ -168,7 +168,7 @@ function preserveState(lockPath, version, reason, outboxDir) {
   fs.mkdirSync(outboxDir, { recursive: true });
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const archivedPath = path.join(outboxDir,
-    `standroidsmissal-v${version}-${reason}-${timestamp}-${randomUUID()}.json`);
+    `sanctissimissa-v${version}-${reason}-${timestamp}-${randomUUID()}.json`);
   fs.copyFileSync(lockPath, archivedPath, fs.constants.COPYFILE_EXCL);
   return archivedPath;
 }
@@ -239,7 +239,7 @@ function isFixture(deps) {
 function getOutboxDir(deps) {
   const env = deps?.env || process.env;
   const home = deps?.env?.HOME || deps?.fixtureDir || env.RELEASE_STATE_FIXTURE || env.HOME || os.homedir();
-  return expandHomePath('~/outbox/standroidsmissal', home);
+  return expandHomePath('~/outbox/sanctissimissa', home);
 }
 
 /**
@@ -264,7 +264,7 @@ export function stageRunsOnHost(stage, platform) {
 /**
  * Interrupt receipt filename
  */
-export const INTERRUPT_RECEIPT_FILENAME = 'standroidsmissal-release-interrupt-receipt.json';
+export const INTERRUPT_RECEIPT_FILENAME = 'sanctissimissa-release-interrupt-receipt.json';
 
 /**
  * Exit code when controlled interrupt occurs
@@ -384,7 +384,7 @@ async function runCommand(name, deps, root) {
 
           // First reach: write receipt and interrupt
           if (receipt === null) {
-            const logPath = path.join(fixtureDir, 'standroidsmissal-release-stage-events.log');
+            const logPath = path.join(fixtureDir, 'sanctissimissa-release-stage-events.log');
             fs.appendFileSync(logPath, name + '\n', 'utf-8');
             writeInterruptReceipt(name, fixtureDir);
             console.log(`⏸️  Controlled interrupt at ${name} (receipt written)`);
@@ -407,7 +407,7 @@ async function runCommand(name, deps, root) {
       }
 
       // Non-target stages: log normally
-      const logPath = path.join(fixtureDir, 'standroidsmissal-release-stage-events.log');
+      const logPath = path.join(fixtureDir, 'sanctissimissa-release-stage-events.log');
       const logLine = `${name}\n`;
       fs.appendFileSync(logPath, logLine, 'utf-8');
       console.log(`🔧 [STUB] ${name}`);
@@ -415,7 +415,7 @@ async function runCommand(name, deps, root) {
     }
 
     // Normal stub logging (no interrupt requested)
-    const logPath = path.join(fixtureDir, 'standroidsmissal-release-stage-events.log');
+    const logPath = path.join(fixtureDir, 'sanctissimissa-release-stage-events.log');
     const logLine = `${name}\n`;
     fs.appendFileSync(logPath, logLine, 'utf-8');
     console.log(`🔧 [STUB] ${name}`);
@@ -484,12 +484,12 @@ async function runCommand(name, deps, root) {
     'windows-msi': () => {
       console.log('🔧 Stage: windows-msi');
       execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-File',
-        'scripts/standroidsmissal-v1.39.15371-windows-native-20260913.ps1', '-Kind', 'MSI'], inherited);
+        'scripts/sanctissimissa-v1.40.21223-windows-native-20260913.ps1', '-Kind', 'MSI'], inherited);
     },
     'windows-msix': () => {
       console.log('🔧 Stage: windows-msix');
       execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-File',
-        'scripts/standroidsmissal-v1.39.15371-windows-native-20260913.ps1', '-Kind', 'MSIX'], inherited);
+        'scripts/sanctissimissa-v1.40.21223-windows-native-20260913.ps1', '-Kind', 'MSIX'], inherited);
     },
     'android-debug': () => {
       console.log('🔧 Stage: android-debug');
@@ -578,7 +578,7 @@ Release stages (run automatically):
   symbols            Package Android native debug symbols
   collect            Collect and validate all release artifacts
 
-The state file (standroidsmissal-release-state.json) enables resume after interruption:
+The state file (sanctissimissa-release-state.json) enables resume after interruption:
 - First run: stamps version and writes lock with empty completedStages
 - Subsequent runs: resume at first incomplete stage (no stamp)
 - Mismatched/corrupt locks: fail closed with remediation instructions`);
@@ -705,7 +705,7 @@ export async function main(argv, deps = {}) {
       ...(!fixture ? { inputHashes: getInputHashes(root) } : {}),
     };
     writeLock(lock, lockPath, outboxDir);
-    console.log(`🔒 Wrote standroidsmissal-release-state.json v${lock.version}`);
+    console.log(`🔒 Wrote sanctissimissa-release-state.json v${lock.version}`);
   }
 
   for (const stage of STAGE_ORDER) {
@@ -727,7 +727,7 @@ export async function main(argv, deps = {}) {
   // Keep the terminal state so another invocation cannot accidentally stamp again.
   const distRubricRuns = getDistRubricRuns(root);
   fs.mkdirSync(distRubricRuns, { recursive: true });
-  const archivePath = path.join(distRubricRuns, `standroidsmissal-v${lock.version}-release-state.json`);
+  const archivePath = path.join(distRubricRuns, `sanctissimissa-v${lock.version}-release-state.json`);
   const lockBytes = fs.readFileSync(lockPath);
   if (!fs.existsSync(archivePath) || !fs.readFileSync(archivePath).equals(lockBytes)) {
     if (fs.existsSync(archivePath)) preserveState(archivePath, lock.version, 'release-state-before-archive', outboxDir);

@@ -61,7 +61,7 @@ if (dirty) {
 // 4. dist/ must not already have artifacts at this version
 const distDir = join(ROOT, 'dist');
 if (existsSync(distDir)) {
-  const prefix = `standroidsmissal-v${version}-`;
+  const prefix = `sanctissimissa-v${version}-`;
   const existing = readdirSync(distDir).filter(f => f.startsWith(prefix));
   if (existing.length > 0) {
     fail(`dist/ already contains ${existing.length} artifact(s) at version ${version}.\n` +

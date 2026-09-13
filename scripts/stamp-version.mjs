@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// stamp-version.mjs — canonical version stamper for St. Android's Missal.
+// stamp-version.mjs — canonical version stamper for SanctissiMissa.
 //
 // Node port of the WORKING pattern (Kintsugi-Unbroken tauri2/scripts/
 // update-version.sh): the bump lives INSIDE the stamper. A stamper that only
@@ -29,9 +29,9 @@ import { fileURLToPath } from 'node:url';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const p = (rel) => resolve(ROOT, rel);
 
-const PRODUCT = "St. Android's Missal";
-const INTERNAL = 'st-androids-missal';
-const PACKAGE = 'mba.robin.standroidsmissal'; // must match tauri.conf.json identifier — no underscores, no hyphens
+const PRODUCT = "SanctissiMissa";
+const INTERNAL = 'sanctissimissa';
+const PACKAGE = 'mba.robin.sanctissimissa'; // must match tauri.conf.json identifier — no underscores, no hyphens
 
 let MAJOR, MINOR, BUILD;
 const lockPath = p('release.lock');
