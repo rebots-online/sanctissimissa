@@ -3,34 +3,51 @@
 // of historical artifacts, hashes from the final files, and fail-closed gaps.
 
 import {
+  constants,
   copyFileSync,
   existsSync,
   mkdirSync,
+  mkdtempSync,
   readdirSync,
   closeSync,
   openSync,
   readFileSync,
   readSync,
-  renameSync,
   statSync,
   writeFileSync,
 } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { homedir } from 'node:os';
-import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = resolve(ROOT, 'dist');
 const WEBDIST = resolve(ROOT, 'dist-web');
-const SLUG = 'standroidsmissal';
+const COLLECTOR = resolve(ROOT, 'src-tauri/target/collector');
+const SLUG = 'sanctissimissa';
+const PRODUCT = 'SanctissiMissa';
+const PACKAGE_NAME = 'mba.robin.sanctissimissa';
 function readJson(path) {
-  try { return JSON.parse(readFileSync(path, 'utf8').replace(/^\uFEFF/, '')); }
-  catch { throw new Error(`Missing or invalid JSON: ${path}`); }
+  const text = readFileSync(path, 'utf8').replace(/^\uFEFF/, '');
+  try {
+    const value = JSON.parse(text);
+    if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Expected an object');
+    return value;
+  } catch {
+    const error = new Error(`Invalid JSON object: ${path}`);
+    error.code = 'INVALID_RELEASE_JSON';
+    throw error;
+  }
 }
 const versionJson = readJson(resolve(ROOT, 'version.json'));
 const VERSION = versionJson.version;
+if (typeof VERSION !== 'string' || !/^\d+\.\d+\.\d+$/.test(VERSION) ||
+    !Number.isSafeInteger(versionJson.versionCode) || versionJson.versionCode <= 0 ||
+    typeof versionJson.buildDate !== 'string' || !Number.isFinite(Date.parse(versionJson.buildDate))) {
+  throw new Error('version.json has an invalid release version, versionCode or buildDate');
+}
 const VERSION_CODE = String(versionJson.versionCode);
 const PREFIX = `${SLUG}-v${VERSION}`;
 const [windowsMajor, windowsMinor] = VERSION.split('.');
@@ -39,7 +56,43 @@ const WINDOWS_VERSIONS = { canonical: VERSION, msi: `${windowsMajor}.${windowsMi
 if (readFileSync(resolve(ROOT, 'version.txt'), 'utf8').trim() !== VERSION) {
   throw new Error('version.txt and version.json disagree');
 }
-mkdirSync(DIST, { recursive: true });
+const packageJson = readJson(resolve(ROOT, 'package.json'));
+const tauriConfig = readJson(resolve(ROOT, 'src-tauri/tauri.conf.json'));
+if (versionJson.productName !== PRODUCT || versionJson.internalName !== SLUG ||
+    versionJson.packageName !== PACKAGE_NAME || packageJson.name !== SLUG ||
+    packageJson.productName !== PRODUCT || packageJson.version !== VERSION ||
+    tauriConfig.productName !== PRODUCT || tauriConfig.identifier !== PACKAGE_NAME ||
+    tauriConfig.version !== VERSION || tauriConfig.bundle?.android?.versionCode !== versionJson.versionCode) {
+  throw new Error('Release package, Tauri and version metadata must agree on the SanctissiMissa identity/version');
+}
+const releaseState = readJson(resolve(ROOT, `${SLUG}-release-state.json`));
+const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
+const sourceBranch = execFileSync('git', ['branch', '--show-current'], { cwd: ROOT, encoding: 'utf8' }).trim();
+if (releaseState.stampPending || releaseState.version !== VERSION || releaseState.sourceHead !== sourceCommit) {
+  throw new Error('Release state does not match the current stamped version and source commit');
+}
+if (!releaseState.inputHashes || typeof releaseState.inputHashes !== 'object' ||
+    Array.isArray(releaseState.inputHashes) ||
+    typeof releaseState.inputHashes['assets/missal.db'] !== 'string' ||
+    !/^[a-f0-9]{64}$/.test(releaseState.inputHashes['assets/missal.db']) ||
+    typeof releaseState.inputHashes['.env'] !== 'string' ||
+    !(releaseState.inputHashes['.env'] === 'absent' || /^[a-f0-9]{64}$/.test(releaseState.inputHashes['.env']))) {
+  throw new Error('Release state requires frozen hashes for assets/missal.db and .env');
+}
+if (!Array.isArray(releaseState.completedStages) ||
+    !releaseState.completedStages.every((stage) => typeof stage === 'string')) {
+  throw new Error('Release state requires a completedStages array');
+}
+for (const [name, expected] of Object.entries(releaseState.inputHashes)) {
+  if (!['assets/missal.db', '.env'].includes(name) ||
+      !(expected === 'absent' || /^[a-f0-9]{64}$/.test(expected))) {
+    throw new Error('Release state contains an invalid input hash');
+  }
+  const path = resolve(ROOT, name);
+  if ((existsSync(path) ? sha256(path) : 'absent') !== expected) {
+    throw new Error(`Release input changed since the frozen build: ${name}`);
+  }
+}
 
 // dist/ is an append-only release archive. Older versions remain in place;
 // cleanup and deployment retention are separate, explicit operator actions.
@@ -59,6 +112,20 @@ mkdirSync(DIST, { recursive: true });
  */
 const PARTIAL = process.argv.includes('--partial') || process.env.RELEASE_PARTIAL === '1';
 const missing = [];
+const sourceStages = {
+  'web-pwa': 'web',
+  'linux-deb': 'linux',
+  'linux-appimage': 'linux',
+  'windows-standalone': 'windows',
+  'windows-nsis': 'windows',
+  'windows-native-standalone': 'windows-msi',
+  'windows-msi': 'windows-msi',
+  'windows-msix': 'windows-msix',
+  'android-apk-debug': 'android-debug',
+  'android-apk-release': 'android-release',
+  'android-aab-release': 'android-release',
+  'android-native-debug-symbols': 'symbols',
+};
 
 function exactOne(dir, predicate, label) {
   if (!existsSync(dir)) throw new Error(`${label}: missing directory ${dir}`);
@@ -72,11 +139,14 @@ function exactOne(dir, predicate, label) {
 /** Wrap a source entry so partial mode records the gap instead of aborting. */
 function optional(id, platform, kind, build) {
   try {
+    if (!releaseState.completedStages.includes(sourceStages[id])) {
+      throw new Error(`Required build stage is still pending: ${sourceStages[id]}`);
+    }
     return build();
   } catch (err) {
-    if (!PARTIAL) throw err;
+    if (!PARTIAL || err.code === 'INVALID_RELEASE_JSON') throw err;
     missing.push({ id, platform, kind, reason: err.message });
-    console.warn(`  ⏭  ${id}: not present on this host — ${err.message}`);
+    console.warn(`  ⏭  ${id}: unavailable or unverified — ${err.message}`);
     return null;
   }
 }
@@ -86,10 +156,7 @@ function optional(id, platform, kind, build) {
 function nativeWindowsArtifact(kind) {
   const target = resolve(ROOT, 'src-tauri/target/windows-native');
   const receipt = readJson(join(target, `${PREFIX}-windows-native-metadata.json`));
-  const state = readJson(resolve(ROOT, 'standroidsmissal-release-state.json'));
-  const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
-  if (receipt.version !== VERSION || receipt.sourceHead !== head ||
-      state.version !== VERSION || state.sourceHead !== head ||
+  if (receipt.version !== VERSION || receipt.sourceHead !== sourceCommit ||
       receipt.msiVersion !== WINDOWS_VERSIONS.msi || receipt.msixVersion !== WINDOWS_VERSIONS.msix ||
       receipt.verification?.signatures !== true) {
     throw new Error('Native Windows receipt does not match the frozen release or package verification');
@@ -114,24 +181,24 @@ const sources = [
   {
     id: 'linux-deb', platform: 'linux', kind: 'deb',
     source: optional('linux-deb', 'linux', 'deb', () => exactOne(resolve(ROOT, 'src-tauri/target/release/bundle/deb'),
-      (f) => f.endsWith('.deb') && f.includes(VERSION), 'Linux deb')),
+      (f) => f.endsWith('.deb') && [SLUG, PRODUCT].some((name) => f.startsWith(`${name}_${VERSION}_`)), 'Linux deb')),
     filename: `${PREFIX}-linux-amd64.deb`,
   },
   {
     id: 'linux-appimage', platform: 'linux', kind: 'appimage',
     source: optional('linux-appimage', 'linux', 'appimage', () => exactOne(resolve(ROOT, 'src-tauri/target/release/bundle/appimage'),
-      (f) => f.endsWith('.AppImage') && f.includes(VERSION), 'Linux AppImage')),
+      (f) => f.endsWith('.AppImage') && [SLUG, PRODUCT].some((name) => f.startsWith(`${name}_${VERSION}_`)), 'Linux AppImage')),
     filename: `${PREFIX}-linux-amd64.AppImage`,
   },
   {
     id: 'windows-standalone', platform: 'windows', kind: 'exe',
-    source: optional('windows-standalone', 'windows', 'exe', () => resolve(ROOT, 'src-tauri/target/x86_64-pc-windows-msvc/release/st-androids-missal.exe')),
+    source: optional('windows-standalone', 'windows', 'exe', () => resolve(ROOT, 'src-tauri/target/x86_64-pc-windows-msvc/release/sanctissimissa.exe')),
     filename: `${PREFIX}-windows-x64-standalone.exe`,
   },
   {
     id: 'windows-nsis', platform: 'windows', kind: 'nsis',
     source: optional('windows-nsis', 'windows', 'nsis', () => exactOne(resolve(ROOT, 'src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis'),
-      (f) => f === `St. Android's Missal_${VERSION}_x64-setup.exe`, 'Windows NSIS')),
+      (f) => f === `SanctissiMissa_${VERSION}_x64-setup.exe`, 'Windows NSIS')),
     filename: `${PREFIX}-windows-x64-setup.exe`,
   },
   {
@@ -186,72 +253,38 @@ for (const artifact of present) {
 sources.length = 0;
 sources.push(...present.filter((a) => existsSync(a.source)));
 
-// Web/PWA: the runnable web surface lives in the clean `dist-web/` embed dir
-// (vite outDir), zipped into `dist/` alongside the native artifacts. dist-web/
-// holds ONLY the web surface, so the zip is never contaminated by prior
-// release binaries the way a shared `dist/` would be.
-for (const required of [
-  'index.html',
-  'assets',
-  'icon.png',
-  'icon-192.png',
-  'manifest.webmanifest',
-  'registerSW.js',
-  'sw.js',
-  'missal.db',
-]) {
-  if (!existsSync(join(WEBDIST, required))) throw new Error(`Web build missing dist-web/${required}`);
-}
-if (!readdirSync(WEBDIST).some((entry) => /^workbox-[\w-]+\.js$/.test(entry))) {
-  throw new Error('Web build missing generated Workbox runtime');
-}
-const webFilename = `${PREFIX}-web-pwa.zip`;
-const webPath = join(DIST, webFilename);
-if (existsSync(webPath)) {
-  throw new Error(`Refusing to overwrite existing release artifact: ${webPath}`);
-}
-console.log(`  ⟳ web-pwa: archiving dist-web/ to dist/${webFilename}`);
-/**
- * `zip` is not present on a stock Windows host, so this step aborted the whole
- * collection there — another place the pipeline silently assumed Linux. Prefer
- * the real `zip` when it exists (deterministic, streaming, handles the 194 MB
- * corpus well) and fall back to PowerShell's Compress-Archive on Windows.
- */
-function archiveWeb() {
+// Web/PWA is another required matrix row, including when it is absent on a
+// partial host. Validate inputs first; the ZIP is built in a disposable target
+// directory and never updates an existing archive in place.
+const webReady = optional('web-pwa', 'web', 'pwa-zip', () => {
+  for (const required of [
+    'index.html', 'assets', 'icon.png', 'icon-192.png', 'manifest.webmanifest',
+    'registerSW.js', 'sw.js', 'missal.db',
+  ]) {
+    if (!existsSync(join(WEBDIST, required))) throw new Error(`Web build missing dist-web/${required}`);
+  }
+  if (!readdirSync(WEBDIST).some((entry) => /^workbox-[\w-]+\.js$/.test(entry))) {
+    throw new Error('Web build missing generated Workbox runtime');
+  }
+  return true;
+});
+
+function archiveWeb(webPath) {
   const entries = readdirSync(WEBDIST).sort();
   try {
-    execFileSync('zip', ['-r', webPath, ...entries], { cwd: WEBDIST, stdio: 'inherit' });
+    // -X excludes access-time extra fields: reading the same inputs a second
+    // time must produce the same candidate bytes for actual SHA256 comparison.
+    execFileSync('zip', ['-X', '-r', webPath, ...entries], { cwd: WEBDIST, stdio: 'inherit' });
     return 'zip';
   } catch (err) {
     if (err.code !== 'ENOENT' || process.platform !== 'win32') throw err;
   }
-  console.log('     zip not found — falling back to Compress-Archive');
   execFileSync('powershell.exe', [
     '-NoProfile', '-NonInteractive', '-Command',
     `Compress-Archive -Path ${entries.map((e) => `'${e.replace(/'/g, "''")}'`).join(',')} ` +
-    `-DestinationPath '${webPath.replace(/'/g, "''")}' -CompressionLevel Optimal -Force`,
+    `-DestinationPath '${webPath.replace(/'/g, "''")}' -CompressionLevel Optimal`,
   ], { cwd: WEBDIST, stdio: 'inherit' });
   return 'Compress-Archive';
-}
-const archiver = archiveWeb();
-console.log(`     archived with ${archiver}`);
-
-const copied = [{ id: 'web-pwa', platform: 'web', kind: 'pwa-zip', filename: webFilename }];
-for (const artifact of sources) {
-  const destination = join(DIST, artifact.filename);
-  if (existsSync(destination)) {
-    throw new Error(`Refusing to overwrite existing release artifact: ${destination}`);
-  }
-  copyFileSync(artifact.source, destination);
-  copied.push({
-    id: artifact.id,
-    platform: artifact.platform,
-    kind: artifact.kind,
-    filename: artifact.filename,
-    ...(artifact.platform === 'windows' ? { canonical_version: VERSION } : {}),
-    ...(artifact.installer_version ? { installer_version: artifact.installer_version } : {}),
-  });
-  console.log(`  ✓ ${artifact.id} → dist/${artifact.filename}`);
 }
 
 /**
@@ -275,19 +308,6 @@ function sha256(path) {
   return hash.digest('hex');
 }
 
-for (const artifact of copied) {
-  const path = join(DIST, artifact.filename);
-  artifact.size_bytes = statSync(path).size;
-  artifact.sha256 = sha256(path);
-  artifact.locations = [{
-    role: 'canonical-checkout-dist',
-    transport: 'local-fs',
-    host: 'developer-workstation',
-    path,
-    public: false,
-  }];
-}
-
 const apkSources = sources.filter((a) => a.kind.startsWith('apk-'));
 // Android identity/signature verification only runs when Android artifacts are
 // actually present. Skipping it must be RECORDED, never silently implied by an
@@ -297,25 +317,23 @@ if (!androidVerified) {
   if (!PARTIAL) throw new Error('no Android artifacts to verify — refusing to write a manifest claiming otherwise');
   console.warn('  ⏭  Android signature verification skipped: no Android artifacts on this host.');
 }
-const buildTools = androidVerified
-  ? resolve(process.env.ANDROID_HOME || join(homedir(), 'Android', 'Sdk'), 'build-tools')
-  : null;
 if (androidVerified) {
-const buildToolsInner = resolve(process.env.ANDROID_HOME || join(homedir(), 'Android', 'Sdk'), 'build-tools');
-const latestBuildTools = readdirSync(buildToolsInner).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).at(-1);
-const apksigner = resolve(buildToolsInner, latestBuildTools, 'apksigner');
-const aapt2 = resolve(buildToolsInner, latestBuildTools, 'aapt2');
-for (const artifact of apkSources) {
-  execFileSync(apksigner, ['verify', '--verbose', artifact.source], { stdio: 'pipe' });
-  const badging = execFileSync(aapt2, ['dump', 'badging', artifact.source], { encoding: 'utf8' });
-  const pkg = badging.match(/^package: name='([^']+)' versionCode='([^']+)' versionName='([^']+)'/m);
-  if (!pkg || pkg[1] !== versionJson.packageName || pkg[2] !== VERSION_CODE || pkg[3] !== VERSION) {
-    throw new Error(`${artifact.id}: embedded Android identity/version does not match version.json`);
+  const buildToolsInner = resolve(process.env.ANDROID_HOME || join(homedir(), 'Android', 'Sdk'), 'build-tools');
+  const latestBuildTools = readdirSync(buildToolsInner).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).at(-1);
+  if (!latestBuildTools) throw new Error('Android build-tools are required to verify APKs');
+  const apksigner = resolve(buildToolsInner, latestBuildTools, 'apksigner');
+  const aapt2 = resolve(buildToolsInner, latestBuildTools, 'aapt2');
+  for (const artifact of apkSources) {
+    execFileSync(apksigner, ['verify', '--verbose', artifact.source], { stdio: 'pipe' });
+    const badging = execFileSync(aapt2, ['dump', 'badging', artifact.source], { encoding: 'utf8' });
+    const pkg = badging.match(/^package: name='([^']+)' versionCode='([^']+)' versionName='([^']+)'/m);
+    if (!pkg || pkg[1] !== versionJson.packageName || pkg[2] !== VERSION_CODE || pkg[3] !== VERSION) {
+      throw new Error(`${artifact.id}: embedded Android identity/version does not match version.json`);
+    }
   }
 }
 const aab = sources.find((a) => a.kind === 'aab-release');
 if (aab) execFileSync('jarsigner', ['-verify', aab.source], { stdio: 'pipe' });
-}
 
 /**
  * Change notes are a build INPUT, not an afterthought. `DOCS/CHANGELOG.md`
@@ -366,19 +384,79 @@ if (!changeNotes.present) {
   console.log(`  ⟳ change notes: ${changeNotes.highlights.length} highlight(s) from DOCS/CHANGELOG.md`);
 }
 
-const sourceCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
+const jsonName = `${PREFIX}-release-manifest.json`;
+const xmlName = `${PREFIX}-release-manifest.xml`;
+const notesName = `${PREFIX}-release-notes.md`;
+// Validate predecessor metadata before any archive or durable-file mutations.
+// Its hashes are never proof that a destination still contains those bytes.
+if (existsSync(join(DIST, jsonName))) {
+  const previous = readJson(join(DIST, jsonName));
+  if (previous.schema !== 'mba.robin.release-manifest.v1' || previous.slug !== SLUG ||
+      previous.project !== PRODUCT || previous.version !== VERSION ||
+      previous.versionCode !== versionJson.versionCode || previous.source?.commit !== sourceCommit) {
+    throw new Error('Existing release manifest belongs to a different release identity/source');
+  }
+}
+if (existsSync(join(DIST, xmlName)) &&
+    !readFileSync(join(DIST, xmlName), 'utf8').includes(`version="${VERSION}" versionCode="${VERSION_CODE}"`)) {
+  throw new Error('Existing release XML does not match this version');
+}
+if (existsSync(join(DIST, notesName)) &&
+    !readFileSync(join(DIST, notesName), 'utf8').startsWith(`# ${PRODUCT} v${VERSION}\n`)) {
+  throw new Error('Existing release notes do not match this product/version');
+}
+
+if (webReady) {
+  mkdirSync(COLLECTOR, { recursive: true });
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const candidateDir = mkdtempSync(join(COLLECTOR, `${PREFIX}-collection-${timestamp}-`));
+  const webFilename = `${PREFIX}-web-pwa.zip`;
+  const webPath = join(candidateDir, webFilename);
+  console.log(`  ⟳ web-pwa: preparing a candidate with ${archiveWeb(webPath)}`);
+  sources.unshift({ id: 'web-pwa', platform: 'web', kind: 'pwa-zip', source: webPath, filename: webFilename });
+}
+
+// Check the entire set before copying any absent artifact. A conflict is an
+// error even in partial mode; it cannot be relabeled or silently overwritten.
+for (const artifact of sources) {
+  if (!statSync(artifact.source).isFile()) throw new Error(`${artifact.id}: source is not a file`);
+  artifact.expectedHash = sha256(artifact.source);
+  const destination = join(DIST, artifact.filename);
+  if (existsSync(destination) && (!statSync(destination).isFile() || sha256(destination) !== artifact.expectedHash)) {
+    throw new Error(`Conflicting bytes at existing release artifact: ${destination}`);
+  }
+}
+mkdirSync(DIST, { recursive: true });
+const copied = [];
+for (const artifact of sources) {
+  const destination = join(DIST, artifact.filename);
+  const reused = existsSync(destination);
+  if (!reused) copyFileSync(artifact.source, destination, constants.COPYFILE_EXCL);
+  const hash = sha256(destination);
+  if (hash !== artifact.expectedHash) throw new Error(`${artifact.id}: staged bytes changed during collection`);
+  copied.push({
+    id: artifact.id, platform: artifact.platform, kind: artifact.kind, filename: artifact.filename,
+    ...(artifact.platform === 'windows' ? { canonical_version: VERSION } : {}),
+    ...(artifact.installer_version ? { installer_version: artifact.installer_version } : {}),
+    size_bytes: statSync(destination).size,
+    sha256: hash,
+    locations: [{ role: 'canonical-checkout-dist', transport: 'local-fs', host: 'developer-workstation', path: destination, public: false }],
+  });
+  console.log(`  ✓ ${artifact.id} → dist/${artifact.filename}${reused ? ' (matching bytes reused)' : ''}`);
+}
+
 const manifest = {
   schema: 'mba.robin.release-manifest.v1',
-  project: "St. Android's Missal",
+  project: PRODUCT,
   slug: SLUG,
   version: VERSION,
   versionCode: versionJson.versionCode,
   built_at: versionJson.buildDate,
   release_status: PARTIAL ? 'partial' : 'release-candidate',
-  host: { platform: process.platform, complete: missing.length === 0 },
+  host: { platform: process.platform, complete: !PARTIAL && missing.length === 0 },
   missing,
   working_status: process.env.RELEASE_WORKING_STATUS || 'unknown',
-  source: { commit: sourceCommit, branch: execFileSync('git', ['branch', '--show-current'], { cwd: ROOT, encoding: 'utf8' }).trim() },
+  source: { commit: sourceCommit, branch: sourceBranch },
   change_notes: changeNotes,
   artifacts: copied,
   windows_versions: WINDOWS_VERSIONS,
@@ -387,10 +465,6 @@ const manifest = {
     windows_store_runtime: 'unverified', windows_store_acceptance: 'unverified',
     android_play_delivery: 'unverified (BP.1)' },
 };
-
-const jsonName = `release-manifest-v${VERSION}.json`;
-writeFileSync(join(DIST, jsonName), JSON.stringify(manifest, null, 2) + '\n');
-writeFileSync(join(DIST, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
 
 const xmlEscape = (s) => String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 const xmlArtifacts = copied.map((a) =>
@@ -405,11 +479,32 @@ const xmlChangeNotes =
   `  <change_notes source="${xmlEscape(changeNotes.source)}" present="${changeNotes.present}">\n` +
   (xmlHighlights ? `${xmlHighlights}\n` : '') +
   `  </change_notes>`;
-writeFileSync(join(DIST, `release-manifest-v${VERSION}.xml`),
-  `<?xml version="1.0" encoding="UTF-8"?>\n<release schema="mba.robin.release-manifest.v1" version="${xmlEscape(VERSION)}" versionCode="${VERSION_CODE}">\n${xmlChangeNotes}\n${xmlVerification}\n${xmlArtifacts}\n</release>\n`);
-writeFileSync(join(DIST, `RELEASE_NOTES-v${VERSION}.md`),
-  `# St. Android's Missal v${VERSION}\n\n${changeNotes.markdown}\n\n---\n\n` +
+const xmlMissing = missing.map((entry) =>
+  `    <artifact id="${xmlEscape(entry.id)}" platform="${xmlEscape(entry.platform)}" kind="${xmlEscape(entry.kind)}">${xmlEscape(entry.reason)}</artifact>`
+).join('\n');
+const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<release schema="mba.robin.release-manifest.v1" version="${xmlEscape(VERSION)}" versionCode="${VERSION_CODE}" status="${manifest.release_status}">\n${xmlChangeNotes}\n${xmlVerification}\n${xmlArtifacts}\n  <missing>\n${xmlMissing}\n  </missing>\n</release>\n`;
+const notes = `# ${PRODUCT} v${VERSION}\n\n${changeNotes.markdown}\n\n---\n\n` +
   `Built from commit ${sourceCommit}. See the adjacent release manifest for exact ` +
-  `artifact hashes and verification state.\n`);
+  `artifact hashes and verification state.\n\nCollection status: ${manifest.release_status}.\n` +
+  (missing.length ? `\nMissing or unverified required artifacts:\n\n${missing.map((entry) => `- ${entry.id}: ${entry.reason}`).join('\n')}\n` : '') +
+  '\nPlatform runtime, Store acceptance and Play delivery verification remain separate gates.\n';
 
-console.log(`\nCollected ${copied.length} coherent artifacts for v${VERSION}`);
+const metadata = [[jsonName, JSON.stringify(manifest, null, 2) + '\n'], [xmlName, xml], [notesName, notes]];
+for (const [filename, content] of metadata) {
+  const destination = join(DIST, filename);
+  if (existsSync(destination)) {
+    if (readFileSync(destination, 'utf8') === content) continue;
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const extension = filename.slice(filename.lastIndexOf('.'));
+    const qualifier = filename.slice(PREFIX.length + 1, -extension.length);
+    const archive = join(DIST, 'rubric-runs', `${PREFIX}-${qualifier}-before-${timestamp}-${sha256(destination).slice(0, 12)}${extension}`);
+    mkdirSync(dirname(archive), { recursive: true });
+    if (existsSync(archive) && sha256(archive) !== sha256(destination)) {
+      throw new Error(`Conflicting predecessor metadata archive: ${archive}`);
+    }
+    if (!existsSync(archive)) copyFileSync(destination, archive, constants.COPYFILE_EXCL);
+  }
+  writeFileSync(destination, content);
+}
+
+console.log(`\nCollected ${copied.length} coherent artifacts for v${VERSION}; ${PARTIAL ? `partial inventory, ${missing.length} required artifact(s) missing or unverified; strict collection remains pending` : 'strict artifact collection passed; platform/Store acceptance remains subject to recorded gates'}.`);
