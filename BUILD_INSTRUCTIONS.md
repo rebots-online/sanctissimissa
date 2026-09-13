@@ -110,8 +110,11 @@ Windows cross EXE/NSIS, Android debug/release APK/AAB and symbols. Windows nativ
 MSI/MSIX remain pending and do not stop subsequent Android work. Exit2 means
 incomplete release; it preserves state and does not perform final collection.
 
-For native Windows continuation, copy the checkout at the state's source commit,
-matching ignored corpus/.env inputs and the state file to a local Windows drive.
+For native Windows continuation, create a separate build worktree at the exact
+`sourceHead` recorded in `sanctissimissa-release-state.json` on a local Windows
+drive, then provision the matching ignored corpus/.env inputs and state file.
+Publishing partial artifacts advances the canonical checkout's HEAD; its newer
+HEAD must not replace the frozen build source.
 Do not run the stamp command. Install dependencies, then run from that checkout:
 
 ```powershell
@@ -124,12 +127,13 @@ and configured Authenticode signing. The MSIX stage packages that same native
 EXE, version.json and required logos through Windows SDK tools. Its receipt
 records full version/source commit, installer mappings, paths and hashes.
 
-Copy the entire native target directory and updated release state back to the
-canonical Linux checkout; preserve predecessor files before replacement. Resume
-there with `npm run build:release -- --resume-only`. Final collection requires every platform stage and
-all required files. A native host's completed-stage record alone does not supply
-its artifacts. Source/input changes require a new full release, not continued
-reuse of the old stamp.
+Copy the entire native target directory and updated state to a Linux build
+worktree at the same frozen `sourceHead`; preserve prior files before replacement.
+Resume there with `npm run build:release -- --resume-only`, then return its
+collected `dist/` artifacts and receipts to the canonical checkout for publication.
+Keep the source/input guards intact. Final collection requires every platform
+stage and all required files; a host's completed-stage record alone does not
+supply its artifacts. Changed build inputs require a new full release.
 
 ## Required artifact set
 
@@ -145,6 +149,7 @@ All filenames begin `sanctissimissa-v<full-version>-`:
 | Windows cross | `windows-x64-standalone.exe`, `windows-x64-setup.exe` |
 | Windows native | `windows-x64-native-standalone.exe`, `windows-x64.msi`, `windows-x64.msix` |
 | Android | `android-universal-debug.apk`, `android-universal-release.apk`, `android-universal-release.aab`, `android-native-debug-symbols.zip` |
+| Release metadata | `release-manifest.json`, `release-manifest.xml`, `release-notes.md` |
 
 The collector requires NSIS and native Windows packages; they are not optional
 extras. `npm run collect-artifacts -- --partial` preserves available release

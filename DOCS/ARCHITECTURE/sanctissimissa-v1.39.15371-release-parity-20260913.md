@@ -47,12 +47,13 @@ there with an explicit missing-item record; it does not establish completion.
 1. Commit approved source/tooling. A new explicit release provisions local tools
    and signing inputs using the existing documented setup, stamps once, records
    the stamp commit and input hashes, and builds host-supported pending stages.
-2. Keep one state file through every host continuation. Copy the source checkout
-   at its recorded commit, the matching ignored inputs, state file, and required
-   build outputs to the second host. `node scripts/release-state.mjs --resume-only`
-   must refuse changed inputs or an absent state. Keep cross/native Windows EXEs
-   in distinct target directories. Transfer native output directory and updated
-   state back to the canonical Linux checkout for final collection.
+2. Keep one state file through every host continuation. Use separate build
+   worktrees at the exact recorded `sourceHead`, with matching ignored inputs,
+   state and required outputs. Partial-artifact publication advances canonical
+   HEAD without changing the frozen build source. `node scripts/release-state.mjs
+   --resume-only` must refuse changed inputs or absent state. Keep cross/native
+   EXEs distinct; final Linux collection also runs at that frozen source. Return
+   collected `dist/` artifacts and receipts to the canonical checkout for publication.
 3. Native Windows stages remain pending until a real Windows host and signing /
    Partner Center identity inputs are supplied. A Linux invocation still runs
    later Android stages; it then exits 2 with the pending matrix, preserving state.
