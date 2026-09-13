@@ -38,7 +38,9 @@ export interface Annotation {
   createdAt: string;
 }
 
-const KEY = 'standroidsmissal.annotations.v1';
+const KEY = 'sanctissimissa.annotations.v1';
+/** Read-only compatibility with annotations saved before the fork identity correction. */
+const LEGACY_KEY = 'standroidsmissal.annotations.v1';
 
 /**
  * Notes are HTML (CKEditor 5 compact-preset output) since the 2026-09 editor
@@ -62,7 +64,7 @@ export function ensureNoteHtml(note: string): string {
 
 function readAll(): Annotation[] {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(KEY) ?? localStorage.getItem(LEGACY_KEY);
     const list = raw ? (JSON.parse(raw) as Annotation[]) : [];
     return list.map((a) => ({ ...a, note: ensureNoteHtml(a.note ?? '') }));
   } catch {

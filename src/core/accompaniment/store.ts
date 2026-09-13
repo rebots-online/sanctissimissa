@@ -50,42 +50,82 @@ CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, device_id TEXT NOT NU
 /* Platform byte persistence (web IndexedDB; Tauri load/save_sidecar) */
 /* ------------------------------------------------------------------ */
 
-const IDB_NAME = 'standroidsmissal';
+const IDB_NAME = 'sanctissimissa';
+/** Read-only compatibility with sidecars saved before the fork identity correction. */
+const LEGACY_IDB_NAME = 'standroidsmissal';
 const IDB_STORE = 'blobs';
 const IDB_KEY = 'sidecar.db';
 
-function idbOpen(): Promise<IDBDatabase> {
+function idbOpen(name: string, create: boolean): Promise<IDBDatabase | null> {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(IDB_NAME, 1);
+    let absentLegacy = false;
+    const req = create ? indexedDB.open(name, 1) : indexedDB.open(name);
     req.onupgradeneeded = () => {
+      if (!create) {
+        // Opening an absent legacy database would create it. Abort that
+        // upgrade so a fallback read leaves no predecessor database behind.
+        absentLegacy = true;
+        req.transaction!.abort();
+        req.result.close();
+        return;
+      }
       if (!req.result.objectStoreNames.contains(IDB_STORE)) req.result.createObjectStore(IDB_STORE);
     };
     req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
+    req.onerror = () => {
+      if (absentLegacy && req.error?.name === 'AbortError') resolve(null);
+      else reject(req.error ?? new Error('Could not open IndexedDB sidecar'));
+    };
   });
 }
 
-async function idbGet(): Promise<Uint8Array | null> {
-  const db = await idbOpen();
+async function idbRead(name: string, create: boolean): Promise<Uint8Array | null> {
+  const db = await idbOpen(name, create);
+  if (!db) return null;
   try {
     return await new Promise((resolve, reject) => {
-      const req = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).get(IDB_KEY);
-      req.onsuccess = () => resolve(req.result instanceof Uint8Array ? req.result : null);
-      req.onerror = () => reject(req.error);
+      let bytes: Uint8Array | null = null;
+      const tx = db.transaction(IDB_STORE, 'readonly');
+      // A cursor distinguishes a missing record from an existing undefined
+      // value; every existing non-byte value must fail without legacy fallback.
+      const req = tx.objectStore(IDB_STORE).openCursor(IDB_KEY);
+      req.onsuccess = () => {
+        if (!req.result) return;
+        if (!(req.result.value instanceof Uint8Array)) {
+          reject(new Error(`Invalid IndexedDB sidecar byte record in ${name}`));
+          tx.abort();
+          return;
+        }
+        bytes = req.result.value;
+      };
+      req.onerror = () => reject(req.error ?? new Error('Could not read IndexedDB sidecar'));
+      tx.oncomplete = () => resolve(bytes);
+      tx.onerror = () => reject(tx.error ?? new Error('IndexedDB read transaction failed'));
+      tx.onabort = () => reject(tx.error ?? new Error('IndexedDB read transaction aborted'));
     });
   } finally {
     db.close();
   }
 }
 
+async function idbGet(): Promise<{ bytes: Uint8Array | null; legacy: boolean }> {
+  const bytes = await idbRead(IDB_NAME, true);
+  if (bytes !== null) return { bytes, legacy: false };
+  const legacyBytes = await idbRead(LEGACY_IDB_NAME, false);
+  return { bytes: legacyBytes, legacy: legacyBytes !== null };
+}
+
 async function idbPut(bytes: Uint8Array): Promise<void> {
-  const db = await idbOpen();
+  const db = await idbOpen(IDB_NAME, true);
+  if (!db) throw new Error('Could not open current IndexedDB sidecar');
   try {
     await new Promise<void>((resolve, reject) => {
       const tx = db.transaction(IDB_STORE, 'readwrite');
-      tx.objectStore(IDB_STORE).put(bytes, IDB_KEY);
+      const req = tx.objectStore(IDB_STORE).put(bytes, IDB_KEY);
+      req.onerror = () => reject(req.error ?? new Error('Could not write IndexedDB sidecar'));
       tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
+      tx.onerror = () => reject(tx.error ?? new Error('IndexedDB write transaction failed'));
+      tx.onabort = () => reject(tx.error ?? new Error('IndexedDB write transaction aborted'));
     });
   } finally {
     db.close();
@@ -152,12 +192,13 @@ export class SidecarDb {
   /** Load persisted bytes (Tauri `load_sidecar` / web IndexedDB), open, ensure schema + device id. */
   static async open(): Promise<SidecarDb> {
     let bytes: Uint8Array | null = null;
+    let legacy = false;
     if (isTauri()) {
       const { invoke } = await import('@tauri-apps/api/core');
       const b = await invoke<number[] | null>('load_sidecar', { scopeDir: storageRootName() });
       if (b && b.length > 0) bytes = Uint8Array.from(b);
     } else if (typeof indexedDB !== 'undefined') {
-      bytes = await idbGet();
+      ({ bytes, legacy } = await idbGet());
     }
     const SQL = await initSql();
     const db = new SQL.Database(bytes ?? undefined);
@@ -165,6 +206,14 @@ export class SidecarDb {
     const sdb = new SidecarDb(db);
     sdb.ensureColumn('accompaniments', 'quote_alt', 'TEXT'); // §7.7 upgrade of a pre-quote_alt byte store
     sdb.deviceId = sdb.ensureDeviceId();
+    if (legacy) {
+      try {
+        await sdb.persist();
+      } catch (error) {
+        db.close();
+        throw error;
+      }
+    }
     return sdb;
   }
 
@@ -391,19 +440,29 @@ interface LegacyAnnotation {
  * One-shot import of v1 localStorage annotations as lightweight journal
  * accompaniments. Idempotent via settings flag `migrated.localStorage.v2`;
  * the old localStorage keys are preserved read-only (never deleted).
- * Reads both `sam.annotations.v1` (spec key) and
- * `standroidsmissal.annotations.v1` (the key `src/core/annotations/store.ts`
- * actually writes). Returns the number of annotations migrated.
+ * The active `sanctissimissa.annotations.v1` key is authoritative whenever
+ * present, including an empty list. Only when absent, read `sam.annotations.v1`
+ * and the compatibility key `standroidsmissal.annotations.v1` in that order.
+ * Returns the number of annotations migrated.
  */
 export async function migrateLocalStorageAnnotations(sdb: SidecarDb): Promise<number> {
   const FLAG = 'migrated.localStorage.v2';
   if (sdb.getSetting(FLAG) === '1') return 0;
   if (typeof localStorage === 'undefined') return 0;
+  let currentRaw: string | null;
+  try {
+    currentRaw = localStorage.getItem('sanctissimissa.annotations.v1');
+  } catch {
+    return 0;
+  }
+  const keys = currentRaw === null
+    ? ['sam.annotations.v1', 'standroidsmissal.annotations.v1']
+    : ['sanctissimissa.annotations.v1'];
   let count = 0;
-  for (const key of ['sam.annotations.v1', 'standroidsmissal.annotations.v1']) {
+  for (const key of keys) {
     let list: unknown = null;
     try {
-      const raw = localStorage.getItem(key);
+      const raw = key === 'sanctissimissa.annotations.v1' ? currentRaw : localStorage.getItem(key);
       list = raw ? JSON.parse(raw) : null;
     } catch {
       list = null;
