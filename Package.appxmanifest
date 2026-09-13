@@ -15,7 +15,7 @@
     Name="mba.robin.standroidsmissal"
     Publisher="CN=Robin Cheung"
     ProcessorArchitecture="x64"
-    Version="1.39.0.0" />
+    Version="1.40.0.0" />
 
   <Properties>
     <DisplayName>St. Android's Missal</DisplayName>
