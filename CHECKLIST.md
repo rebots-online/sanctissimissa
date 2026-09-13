@@ -1271,3 +1271,10 @@ the packaged allocated ELF sections. Targeted browser identity/glass observation
 passed. Full native Windows/Store/Play acceptance and strict collection remain
 pending; FI.5 stays in progress. See
 dist/sanctissimissa-v1.41.21298-artifact-status.md and its rubric-runs evidence.
+
+FI.5 available artifact publication verified: commit
+e815e289c94d061821fa6b52e8361e1b6f1ffb4d reached both origin/master and github/master.
+All ten LFS objects are available from Forgejo with matching lengths. Initial
+local Btrfs cache read failures were preserved and the cache regenerated from
+verified artifacts; full LFS fsck passed before the successful origin push.
+The underlying filesystem issue remains unresolved and is recorded in evidence.

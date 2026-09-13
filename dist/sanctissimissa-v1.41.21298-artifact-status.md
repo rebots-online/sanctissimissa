@@ -4,6 +4,9 @@ Built on native Linux `asrock` on 2026-09-13 from frozen source
 `de26d665db1f0e327e47996fafe6bd2ebc8dfad0`. Android versionCode is `100041`.
 The coordinated build exited `2` with native Windows and strict collection
 pending. All nine available artifacts (4,700,421,118 bytes) are retained here.
+Artifact commit `e815e289c94d061821fa6b52e8361e1b6f1ffb4d` was verified on
+both remotes. Forgejo accepted all ten LFS objects (nine platform artifacts plus
+the raw-log archive); download probes confirmed their availability and lengths.
 
 | Platform | Retained outputs |
 |---|---|
@@ -61,6 +64,16 @@ symbol correspondence and browser observation. These checks do not attest the
 full TEST_RUBRIC, native runtime, Microsoft Store acceptance or Play readiness.
 Play delivery BP.1 remains incomplete. No application deployment or deferred
 HelloWord website/Play migration occurred in this release run.
+
+## Local storage issue observed during publication
+
+Btrfs reported checksum failures while reading LFS cache entries on
+`/dev/nvme0n1p2`. The affected cache inodes were retained, and cache entries were
+regenerated through buffered writes from hash-verified `dist/` copies. The full
+`git lfs fsck --objects --pointers HEAD` check then passed before the guarded
+origin push began. The wider filesystem/hardware cause remains unresolved and
+needs infrastructure attention; cache regeneration is not a filesystem repair.
+The stamped `lfs-cache-observation.json` in `rubric-runs/` records the evidence.
 
 ## Continue the same release
 

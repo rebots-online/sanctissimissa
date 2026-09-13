@@ -1,0 +1,203 @@
+{
+  "project": "SanctissiMissa",
+  "version": "1.41.21298",
+  "source_commit": "de26d665db1f0e327e47996fafe6bd2ebc8dfad0",
+  "recorded_at": "2026-09-13T07:17:44.618431+00:00",
+  "evidence_kind": "bounded-lfs-cache-btrfs-inode-correlation",
+  "result": "Both retained cache inodes match recent kernel Btrfs checksum failures; replacement cache files have distinct inodes.",
+  "observation_basis": "Prior bounded read-only stat, mount and kernel-journal inspection in this session; this JSON records those observations without repeating file-content reads or filesystem diagnostics.",
+  "filesystem": {
+    "host": "asrock",
+    "device": "/dev/nvme0n1p2",
+    "type": "btrfs",
+    "filesystem_root": "/",
+    "subvolume_id": 5,
+    "stat_device_major_minor": "0:30",
+    "findmnt_options": "rw,relatime,ssd,discard=async,space_cache=v2,subvolid=5,subvol=/"
+  },
+  "journal_query": {
+    "command": "journalctl -k --since '-30 minutes' --no-pager -o short-iso | rg -i 'btrfs.*(checksum|csum|corrupt|ino )'",
+    "scope": "The 30 minutes preceding the observation; not a historical or filesystem-wide scan.",
+    "displayed_timezone_offset": "-04:00",
+    "matching_error_interval_utc": {
+      "first": "2026-09-13T07:11:01Z",
+      "last": "2026-09-13T07:12:59Z"
+    },
+    "replacement_inode_errors_seen": false
+  },
+  "metadata_commands": [
+    {
+      "command": [
+        "python3",
+        "-"
+      ],
+      "operation": "Path.stat() on the two exact current LFS object paths and the two matching stamped retained-cache paths; reported device, inode, size and link count."
+    },
+    {
+      "command": [
+        "findmnt",
+        "--target",
+        ".git/lfs/objects/06/b0/06b0c57315fa3641d4e6162be94a4949dd27ef8b42d78eefbdb3f0a8cd30003e",
+        "--noheadings",
+        "--output",
+        "SOURCE,FSTYPE,FSROOT,OPTIONS"
+      ],
+      "operation": "Confirmed device, Btrfs filesystem and subvolume 5, correlating the stat paths with kernel root 5."
+    }
+  ],
+  "archive_hash_provenance": {
+    "path": "dist/sanctissimissa-v1.41.21298-release-manifest.json",
+    "method": "Expected SHA-256 and artifact sizes copied from the existing release manifest; this observation did not hash damaged cache contents or replacement contents."
+  },
+  "files": [
+    {
+      "artifact_id": "android-apk-release",
+      "expected_sha256": "06b0c57315fa3641d4e6162be94a4949dd27ef8b42d78eefbdb3f0a8cd30003e",
+      "retained_path": ".git/lfs/bad/sanctissimissa-v1.41.21298-android-apk-release-unreadable-cache-20260913",
+      "retained_inode": 13973514,
+      "current_inode": 13977473,
+      "error_offset_bytes": 1158144000,
+      "event_first_utc": "2026-09-13T07:12:59Z",
+      "event_last_utc": "2026-09-13T07:12:59Z",
+      "observed_checksum": "0x560cdef4",
+      "expected_checksum": "0x3714227a",
+      "event_count": 3,
+      "collected_path": "dist/sanctissimissa-v1.41.21298-android-universal-release.apk",
+      "current_cache_path": ".git/lfs/objects/06/b0/06b0c57315fa3641d4e6162be94a4949dd27ef8b42d78eefbdb3f0a8cd30003e",
+      "expected_size_bytes": 1364424837,
+      "retained_stat_size_bytes": 1364424837,
+      "current_stat_size_bytes": 1364424837,
+      "stat_device_major_minor": "0:30",
+      "retained_stat_link_count": 1,
+      "current_stat_link_count": 1,
+      "kernel_root_id": 5,
+      "kernel_mirror": 1,
+      "inode_correlation": "match",
+      "replacement_inode_in_recent_checksum_records": false
+    },
+    {
+      "artifact_id": "android-native-debug-symbols",
+      "expected_sha256": "a8cdab3a5b4a05aa5f7b3d6f0c3acb3afc3ebf66d101227478a3d7fc7f49cb4d",
+      "retained_path": ".git/lfs/bad/sanctissimissa-v1.41.21298-android-native-debug-symbols-unreadable-cache-20260913",
+      "retained_inode": 13972086,
+      "current_inode": 13977476,
+      "error_offset_bytes": 246210560,
+      "event_first_utc": "2026-09-13T07:11:01Z",
+      "event_last_utc": "2026-09-13T07:11:52Z",
+      "observed_checksum": "0x4944f418",
+      "expected_checksum": "0x285c0896",
+      "event_count": 6,
+      "collected_path": "dist/sanctissimissa-v1.41.21298-android-native-debug-symbols.zip",
+      "current_cache_path": ".git/lfs/objects/a8/cd/a8cdab3a5b4a05aa5f7b3d6f0c3acb3afc3ebf66d101227478a3d7fc7f49cb4d",
+      "expected_size_bytes": 540956321,
+      "retained_stat_size_bytes": 540956321,
+      "current_stat_size_bytes": 540956321,
+      "stat_device_major_minor": "0:30",
+      "retained_stat_link_count": 1,
+      "current_stat_link_count": 1,
+      "kernel_root_id": 5,
+      "kernel_mirror": 1,
+      "inode_correlation": "match",
+      "replacement_inode_in_recent_checksum_records": false
+    }
+  ],
+  "verified_read_only": [
+    "Retained symbols inode 13972086 and retained APK inode 13973514 match the logged checksum-failure inode numbers on Btrfs root 5.",
+    "Current replacement inodes 13977476 and 13977473 are distinct from the retained inodes and stat sizes match their expected artifact sizes.",
+    "No checksum records in the queried interval name either replacement inode.",
+    "No damaged file content reads, filesystem repair, privileged changes or cache mutations were performed by this observer."
+  ],
+  "root_reported_remediation": {
+    "source": "Parent agent report; not independently executed by this observer.",
+    "description": "Root retained the original cache inodes using hard links, regenerated the two cache entries from hash-verified dist copies, and verified fresh cache hashes.",
+    "lfs_fsck_status_at_task_assignment": "running",
+    "lfs_fsck_result": null,
+    "lfs_fsck_result_owner": "root"
+  },
+  "limits": [
+    "The filesystem or hardware cause remains unresolved.",
+    "Matching inode metadata and journal records establish correlation only; they do not establish full filesystem health or rule out additional affected data.",
+    "Absence of recent replacement-inode errors is limited to the queried journal interval and does not prove replacement-byte integrity.",
+    "The full LFS fsck result and upload/publication verification are intentionally left to root."
+  ],
+  "rootFollowup": {
+    "additionalFsckFailure": {
+      "id": "windows-standalone",
+      "atUtc": "2026-09-13T07:15:55Z",
+      "error": "LFS cache read returned EIO"
+    },
+    "originPushStoppedBeforeVerification": true,
+    "remainingCacheCopiesRegenerated": [
+      {
+        "id": "web-pwa",
+        "sha256": "57011e7190760ad8758871064001a1001ceda23cf91393af71a5daaaf49b854f",
+        "retainedInode": 13973543,
+        "replacementInode": 13978029,
+        "sourceAndReplacementHashVerified": true
+      },
+      {
+        "id": "linux-deb",
+        "sha256": "13d8199a086a4c6209ccc4ed75c8191c02704c61bfdb846b8c481d3496126291",
+        "retainedInode": 13973538,
+        "replacementInode": 13978030,
+        "sourceAndReplacementHashVerified": true
+      },
+      {
+        "id": "linux-appimage",
+        "sha256": "5d5a72cac59a014178313e244623431c78898b6ed0e4228a87436654c38d19ac",
+        "retainedInode": 13973529,
+        "replacementInode": 13978031,
+        "sourceAndReplacementHashVerified": true
+      },
+      {
+        "id": "windows-standalone",
+        "sha256": "b690cb3ba1360a068e3ff457ab50fee0281d0c92dcba97ed8df3d2cc4a1ca4fa",
+        "retainedInode": 13973559,
+        "replacementInode": 13978033,
+        "sourceAndReplacementHashVerified": true
+      },
+      {
+        "id": "windows-nsis",
+        "sha256": "237273a457d2766032a145dedc526d72011338f6a9a9b7236fe70d05e07a145e",
+        "retainedInode": 13973552,
+        "replacementInode": 13978035,
+        "sourceAndReplacementHashVerified": true
+      },
+      {
+        "id": "android-apk-debug",
+        "sha256": "43df10670ef3e5bc6dce66d0ef69b7ea9c1178984483317374e6bc4e74a2138b",
+        "retainedInode": 13972089,
+        "replacementInode": 13978036,
+        "sourceAndReplacementHashVerified": true
+      },
+      {
+        "id": "android-aab-release",
+        "sha256": "8557e74469d8b70a73feced80d600eb08cfcb4b005052f603f4c55eb7a65dd92",
+        "retainedInode": 13973195,
+        "replacementInode": 13978043,
+        "sourceAndReplacementHashVerified": true
+      },
+      {
+        "id": "raw-verification-logs",
+        "sha256": "08e00b7db6bd4f98da3e6906c9b02645d3cbe9022f4d6aa9971cb97e6aeb4f71",
+        "retainedInode": 13975460,
+        "replacementInode": 13978048,
+        "sourceAndReplacementHashVerified": true
+      }
+    ],
+    "filesystemRootCause": "unresolved",
+    "fullLfsFsckAfterRegeneration": {
+      "command": "git lfs fsck --objects --pointers HEAD",
+      "observed": "Git LFS fsck OK",
+      "artifactCommit": "e815e289c94d061821fa6b52e8361e1b6f1ffb4d",
+      "recordedAtUtc": "2026-09-13T07:23:01.526092+00:00",
+      "pushGuard": "set -e; push begins only after fsck succeeds"
+    },
+    "publicationAfterFsck": {
+      "originPush": "exit0; 10 LFS objects uploaded, 4.7GB",
+      "githubPush": "exit0; LFS reuses Forgejo objects",
+      "artifactCommit": "e815e289c94d061821fa6b52e8361e1b6f1ffb4d",
+      "remoteAvailabilityReceipt": "sanctissimissa-v1.41.21298-forgejo-lfs-verification.json"
+    }
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "version": "1.41.21298",
+  "artifactCommit": "e815e289c94d061821fa6b52e8361e1b6f1ffb4d",
+  "verifiedAtUtc": "2026-09-13T07:25:46.343100+00:00",
+  "remote": "https://forgejo.robin.mba/rcheung/sanctissimissa.git",
+  "method": "LFS download batch plus same-host GET requesting byte0; verifies download availability, total length and first byte. Initial HEAD probe returned404. Does not claim a second full-content remote SHA256 read.",
+  "objects": [
+    {
+      "path": "dist/sanctissimissa-v1.41.21298-web-pwa.zip",
+      "oid": "57011e7190760ad8758871064001a1001ceda23cf91393af71a5daaaf49b854f",
+      "size": 65503516,
+      "downloadActionAvailable": true,
+      "httpGetStatus": 206,
+      "rangeRequested": "bytes=0-0",
+      "remoteTotalLengthMatches": true,
+      "firstByteMatches": true
+    },
+    {
+      "path": "dist/sanctissimissa-v1.41.21298-linux-amd64.deb",
+      "oid": "13d8199a086a4c6209ccc4ed75c8191c02704c61bfdb846b8c481d3496126291",
+      "size": 118137028,
+      "downloadActionAvailable": true,
+      "httpGetStatus": 206,
+      "rangeRequested": "bytes=0-0",
+      "remoteTotalLengthMatches": true,
+      "firstByteMatches": true
+    },
+    {
+      "path": "dist/sanctissimissa-v1.41.21298-linux-amd64.AppImage",
+      "oid": "5d5a72cac59a014178313e244623431c78898b6ed0e4228a87436654c38d19ac",
+      "size": 188840440,
+      "downloadActionAvailable": true,
+      "httpGetStatus": 206,
+      "rangeRequested": "bytes=0-0",
+      "remoteTotalLengthMatches": true,
+      "firstByteMatches": true
+    },
+    {
+      "path": "dist/sanctissimissa-v1.41.21298-windows-x64-standalone.exe",
+      "oid": "b690cb3ba1360a068e3ff457ab50fee0281d0c92dcba97ed8df3d2cc4a1ca4fa",
+      "size": 252901888,
+      "downloadActionAvailable": true,
+      "httpGetStatus": 206,
+      "rangeRequested": "bytes=0-0",
+      "remoteTotalLengthMatches": true,
+      "firstByteMatches": true
+    },
+    {
+      "path": "dist/sanctissimissa-v1.41.21298-windows-x64-setup.exe",
+      "oid": "237273a457d2766032a145dedc526d72011338f6a9a9b7236fe70d05e07a145e",
+      "size": 96028386,
+      "downloadActionAvailable": true,
+      "httpGetStatus": 206,
+      "rangeRequested": "bytes=0-0",
+      "remoteTotalLengthMatches": true,
+      "firstByteMatches": true
+    },
+    {
+      "path": "dist/sanctissimissa-v1.41.21298-android-universal-debug.apk",
+      "oid": "43df10670ef3e5bc6dce66d0ef69b7ea9c1178984483317374e6bc4e74a2138b",
+      "size": 1528036080,
+      "downloadActionAvailable": true,
+      "httpGetStatus": 206,
+      "rangeRequested": "bytes=0-0",
+      "remoteTotalLengthMatches": true,
+      "firstByteMatches": true
+    },
+    {
+      "path": "dist/sanctissimissa-v1.41.21298-android-universal-release.apk",
+      "oid": "06b0c57315fa3641d4e6162be94a4949dd27ef8b42d78eefbdb3f0a8cd30003e",
+      "size": 1364424837,
+      "downloadActionAvailable": true,
+      "httpGetStatus": 206,
+      "rangeRequested": "bytes=0-0",
+      "remoteTotalLengthMatches": true,
+      "firstByteMatches": true
+    },
+    {
+      "path": "dist/sanctissimissa-v1.41.21298-android-universal-release.aab",
+      "oid": "8557e74469d8b70a73feced80d600eb08cfcb4b005052f603f4c55eb7a65dd92",
+      "size": 545592622,
+      "downloadActionAvailable": true,
+      "httpGetStatus": 206,
+      "rangeRequested": "bytes=0-0",
+      "remoteTotalLengthMatches": true,
+      "firstByteMatches": true
+    },
+    {
+      "path": "dist/sanctissimissa-v1.41.21298-android-native-debug-symbols.zip",
+      "oid": "a8cdab3a5b4a05aa5f7b3d6f0c3acb3afc3ebf66d101227478a3d7fc7f49cb4d",
+      "size": 540956321,
+      "downloadActionAvailable": true,
+      "httpGetStatus": 206,
+      "rangeRequested": "bytes=0-0",
+      "remoteTotalLengthMatches": true,
+      "firstByteMatches": true
+    },
+    {
+      "path": "dist/rubric-runs/sanctissimissa-v1.41.21298-raw-verification-logs.zip",
+      "oid": "08e00b7db6bd4f98da3e6906c9b02645d3cbe9022f4d6aa9971cb97e6aeb4f71",
+      "size": 33738,
+      "downloadActionAvailable": true,
+      "httpGetStatus": 206,
+      "rangeRequested": "bytes=0-0",
+      "remoteTotalLengthMatches": true,
+      "firstByteMatches": true
+    }
+  ],
+  "verifiedBranchRefs": {
+    "origin/master": "e815e289c94d061821fa6b52e8361e1b6f1ffb4d",
+    "github/master": "e815e289c94d061821fa6b52e8361e1b6f1ffb4d"
+  },
+  "branchRefsVerifiedAtUtc": "2026-09-13T07:27:57.142523+00:00"
+}
