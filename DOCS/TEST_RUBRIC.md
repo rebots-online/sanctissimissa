@@ -142,6 +142,23 @@ All artifacts staged in the canonical checkout's `dist/`; version bumped + stamp
 | B-9 | Android on-device pass | OPERATOR | Operator installs the signed APK on a physical device; verifies O-1 (all eight hours render) and P-1 (sidecar persists across app restarts) | HIGH |
 | B-10 | dist/ staging + stamped commit | AUTO | Complete artifact set (apk, aab, symbols zip, deb, AppImage, exe, msi, web bundle, rubric-run report+screencasts) in canonical `dist/`; `v{VERSION}: ` commit per I-25 | HIGH |
 
+### RP amendment — complete same-version release (2026-09-13)
+
+These rows amend B-1/B-4/B-5/B-6/B-8/B-10 for the current RP architecture.
+An unavailable host leaves the relevant row pending. Installer generation,
+script review and actual Store/runtime validation have separate verdicts.
+
+| ID | Requirement | Driver | Steps / PASS criteria | Severity |
+|---|---|---|---|---|
+| RP-V1 | One frozen release across hosts | AUTO | Exercise real release driver: one stamp/source commit/input hashes; Linux leaves Windows native stages pending; Windows continuation uses same identity; changed input or missing resume state is rejected. Cite resulting state and logs. | HIGH |
+| RP-V2 | Complete artifact matrix | AUTO | Hash actual web ZIP, deb, AppImage, cross standalone EXE, NSIS, native EXE/MSI/MSIX, debug APK, production APK/AAB and native symbols. Each embeds canonical identity or the documented MSI/MSIX numeric mapping. No required artifact silently omitted. | HIGH |
+| RP-V3 | Useful native symbols | AUTO | For each AAB ABI, compare unstripped symbol library build identity and prove app source DWARF coverage; inspect ELF LOAD and RELRO 16 KB compatibility and APK ZIP alignment. | HIGH |
+| RP-V4 | Windows native Store packaging | OPERATOR | On native Windows validate signatures, offline installation prerequisites, exact Partner Center identity/publisher and mapped versions. Install/launch applicable native packages and exercise M-1 and O-1. Separate these results from Store certification. | HIGH |
+| RP-V5 | Play delivery contract | OPERATOR | Build BP.1 PAD-backed AAB, verify corpus_pack and intended delivery mode, exercise download/progress/offline reopen through release app. An embedded-only AAB does not pass this row. | HIGH |
+
+Record evidence under a stamped release rubric directory with TC11 screencast
+and timecodes. This amendment creates no completed verdicts.
+
 ## V — Platform parity (collinear rule)
 
 | ID | Requirement | Driver | Steps / PASS criteria | Severity |
