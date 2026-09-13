@@ -15,7 +15,7 @@
     Name="mba.robin.sanctissimissa"
     Publisher="CN=Robin Cheung"
     ProcessorArchitecture="x64"
-    Version="1.40.0.0" />
+    Version="1.41.0.0" />
 
   <Properties>
     <DisplayName>SanctissiMissa</DisplayName>
