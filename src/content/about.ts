@@ -17,7 +17,7 @@ export const ABOUT_CONTENT = {
   origin: originStory.trim(),
 
   purpose: `
-The mission of St. Android's Missal is to provide priests, seminarians, and laity with a comprehensive digital tool for the Traditional Latin Mass and Divine Office. The application supports:
+The mission of SanctissiMissa is to provide priests, seminarians, and laity with a comprehensive digital tool for the Traditional Latin Mass and Divine Office. The application supports:
 
 * Full Missal Reader with bilingual Latin-English text and rubrical color indications
 * Perpetual calendar computed on demand using Butcher's Easter algorithm and 1962 precedence rules
@@ -43,7 +43,7 @@ Special thanks to the monastic communities and scholars who have preserved and t
   `.trim(),
 
   privacy: `
-St. Android's Missal is designed with privacy as a core principle:
+SanctissiMissa is designed with privacy as a core principle:
 
 * **Local-first architecture** — All data, including the liturgical corpus and your journal entries, is stored locally on your device
 * **No cloud synchronization** — The application does not transmit any data to external servers
@@ -57,7 +57,7 @@ Your journal entries and homily planning notes are stored in your browser's loca
   license: `
 Copyright © 2026 Robin L. M. Cheung, MBA. All rights reserved.
 
-The application is proprietary software. The liturgical corpus (Divinum Officium) is used under the MIT License. The application identifier is mba.robin.standroidsmissal.
+The application is proprietary software. The liturgical corpus (Divinum Officium) is used under the MIT License. The application identifier is mba.robin.sanctissimissa.
 
 For licensing inquiries, please contact the developer through the official website.
   `.trim(),

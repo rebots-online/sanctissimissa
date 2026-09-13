@@ -288,7 +288,7 @@ export default function App() {
       <div className="loading">
         <div style={{ textAlign: 'center' }}>
           <span className="rose">✠</span>
-          <h1 className="splash-title">St. Android&apos;s Missal</h1>
+          <h1 className="splash-title">SanctissiMissa</h1>
           <p>Opening the liturgical corpus…</p>
           <p className="splash-meta">
             v{versionInfo.version} · © 2026 Robin L. M. Cheung, MBA
@@ -319,7 +319,7 @@ export default function App() {
           >
             {railCollapsed ? '☰' : railPinned ? '📌' : '☰'}
           </button>
-          <div className="brand">St. Android's Missal</div>
+          <div className="brand">SanctissiMissa</div>
         </div>
         {NAV.map((n) => (
           <button

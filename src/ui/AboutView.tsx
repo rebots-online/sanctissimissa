@@ -53,7 +53,7 @@ function AboutProse({ text }: { text: string }) {
 export default function AboutView() {
   return (
     <div className="content about-workspace">
-      <h2>✠ St. Android&apos;s Missal</h2>
+      <h2>✠ SanctissiMissa</h2>
       <p className="tagline">The Traditional Latin Mass and Divine Office as a navigable map.</p>
 
       <section className="about-section">

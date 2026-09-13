@@ -22,8 +22,8 @@ export default defineConfig(({ mode }) => {
       registerType: 'autoUpdate',
       includeAssets: ['icon.png', 'icon-192.png'],
       manifest: {
-        name: "St. Android's Missal",
-        short_name: "St. Android's Missal",
+        name: "SanctissiMissa",
+        short_name: "SanctissiMissa",
         description: 'Traditional Latin Mass and Divine Office reader',
         theme_color: '#7b1e2b',
         background_color: '#f7f3eb',
@@ -57,7 +57,7 @@ export default defineConfig(({ mode }) => {
           // would force every user to re-download 194 MB on every MINOR bump.
           handler: 'StaleWhileRevalidate',
           options: {
-            cacheName: 'standroid-missal-corpus',
+            cacheName: 'sanctissimissa-corpus',
             expiration: { maxEntries: 1 },
           },
         }],
