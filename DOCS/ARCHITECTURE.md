@@ -1327,3 +1327,18 @@ suite cannot execute from the GitHub mirror while Forgejo is offline because
 `assets/missal.db` is intentionally a Git LFS pointer there; its failures are
 uniform `file is not a database`, not assertions in this change. M-S8 remains
 pending direct observation on a working artifact containing the real corpus.
+
+
+## Shared release parity amendment (2026-09-13)
+
+The current entity table and release flow for `ReleaseState`, `getSourceHead`,
+`stageRunsOnHost`, `PENDING_RELEASE_EXIT_CODE`, `main`, `runCommand`,
+`runReleaseStage`, release entry scripts, Windows cross/native packaging,
+Windows package identity, Android release/linker/symbol packaging, required
+artifact matrix and release regressions are in
+[the release parity contract](ARCHITECTURE/standroidsmissal-v1.39.15371-release-parity-20260913.md).
+It supersedes the earlier successful-skip behavior of windows-msi/windows-msix.
+Linux AppImage/deb, Windows cross EXE/NSIS and native EXE/MSI/MSIX, Android
+APK/AAB/symbol ZIP, and web/PWA share one complete release stamp. Missing
+hosts remain pending; BP.1 Play delivery and native installation/Store
+verification remain explicit release obligations.
