@@ -18,6 +18,8 @@ src-tauri/gen/apple/build/
 *.local
 .DS_Store
 *.log
+# Retained release evidence belongs in tracked root dist/ too (CC12).
+!/dist/**/*.log
 .env
 .env.*
 # The documented template is tracked — it carries keys, never values.

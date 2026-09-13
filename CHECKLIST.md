@@ -1217,7 +1217,7 @@ migration are outside scope. No new version stamp during FI identity edits.
   - **Verify:** node --check on owned .mjs; bash -n on owned shell scripts; node --experimental-strip-types --test tests/releaseState.test.ts; parse corrected JSON/TOML; git diff --check. Full native compilation occurs in coordinated release after all FI tasks are committed.
   - **Accept:** checks exit 0; active producer names align exactly; current version unchanged; renamed source files retained correctly and wrongly named generated files removed. No native Store acceptance implied.
 
-- [X] **FI.3 DurableArtifactCollector** — owns `scripts/collect-artifacts.mjs`; behavioral helper/tests only if added here with named contract before authoring. Read-only package/version/state and build output paths already used by collector, and src-tauri/tauri.conf.json.
+- ✅ **FI.3 DurableArtifactCollector** — owns `scripts/collect-artifacts.mjs`; behavioral helper/tests only if added here with named contract before authoring. Read-only package/version/state and build output paths already used by collector, and src-tauri/tauri.conf.json.
   - **Do:** change product/slug/state/binary/NSIS defaults to SanctissiMissa/sanctissimissa (NSIS SanctissiMissa_<VERSION>_x64-setup.exe). Preserve all required matrix rows and verification. Make same-release partial-to-strict collection resumable: produce web ZIP candidate in ignored src-tauri/target/collector, reuse a destination only when actual SHA256 matches candidate/source, otherwise fail closed without deleting/relabeling. Copy absent artifacts. Stamp generated files sanctissimissa-v<version>-. Refresh matching same-version JSON/XML/notes only after validation; preserve changed predecessor metadata under dist/rubric-runs with stamped timestamped name. Existing --partial stages all available outputs and exact missing list but does not claim completion or mark strict collect complete. Do not invoke native builds or edit release driver in this task.
   - **Verify:** node --check scripts/collect-artifacts.mjs; git diff --check; real collector --partial after coordinated available-host build, then identical repeat confirms retry behavior. Gate source/version checks before mutations, reject malformed JSON.
   - **Accept:** checks pass; first and repeated same-input collections have identical artifact hashes, report exact missing matrix; conflicting destination bytes cause an error. Full release remains incomplete until strict gate succeeds.
@@ -1252,9 +1252,22 @@ FI.1/1a/2 implementation checks observed: TypeScript, 51/51 release-state tests,
 Node/shell and JSON/TOML/XML checks passed. FI.4 tracked dist/config and LFS
 attributes verified; authoritative Forgejo created and source pushed, GitHub
 mirror receives pointers with LFS directed to Forgejo. FI.3 syntax and controlled
-in-memory behavior checked; real artifact/repeat verification awaits FI.5.
+in-memory behavior checked; real v1.41.21298 partial collection and identical
+repeat both passed, reusing all nine artifact hashes and the exact three-file
+native Windows missing matrix.
 
 FI.6 verification observed: 28/28 focused storage/accompaniment tests passed,
 including current-empty/malformed precedence, legacy byte preservation, missing
 legacy non-creation and transaction failures. TypeScript and diff checks passed;
 fake-indexeddb 6.2.5 is dev-only. Native persistence and corpus unchanged.
+
+FI.5 available-host verification observed for v1.41.21298, frozen source
+de26d665db1f0e327e47996fafe6bd2ebc8dfad0: 349/349 tests and web/Linux/cross-Windows/
+Android debug+release/symbols stages passed. Canonical and frozen-checkout partial
+collections agree on nine artifacts and three missing native Windows files.
+APK signatures/package versions and AAB signature/embedded manifest passed;
+four-ABI symbols contain application DWARF with 16 KB LOAD alignment and match
+the packaged allocated ELF sections. Targeted browser identity/glass observation
+passed. Full native Windows/Store/Play acceptance and strict collection remain
+pending; FI.5 stays in progress. See
+dist/sanctissimissa-v1.41.21298-artifact-status.md and its rubric-runs evidence.

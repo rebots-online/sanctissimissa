@@ -1,0 +1,182 @@
+{
+  "project": "SanctissiMissa",
+  "version": "1.41.21298",
+  "source_commit": "de26d665db1f0e327e47996fafe6bd2ebc8dfad0",
+  "recorded_at": "2026-09-13T07:04:48.055570+00:00",
+  "evidence_kind": "android-native-symbol-correspondence",
+  "result": "pass",
+  "scope": "All SHF_ALLOC section records and ELF class, machine and header flags agree across the production APK, AAB and unstripped symbol library for each of the four ABIs.",
+  "archive_hash_provenance": {
+    "path": "dist/sanctissimissa-v1.41.21298-release-manifest.json",
+    "method": "Copied from the existing collector release manifest; archive hashes and the expensive ELF comparison were not recomputed when recording this evidence."
+  },
+  "inputs": [
+    {
+      "label": "APK",
+      "artifact_id": "android-apk-release",
+      "verified_source_path": "src-tauri/gen/android/app/build/outputs/apk/universal/release/sanctissimissa-v1.41.21298-universal-release.apk",
+      "archive_member_template": "lib/{abi}/libsanctissimissa_lib.so",
+      "collected_path": "dist/sanctissimissa-v1.41.21298-android-universal-release.apk",
+      "archive_size_bytes": 1364424837,
+      "archive_sha256": "06b0c57315fa3641d4e6162be94a4949dd27ef8b42d78eefbdb3f0a8cd30003e"
+    },
+    {
+      "label": "AAB",
+      "artifact_id": "android-aab-release",
+      "verified_source_path": "src-tauri/gen/android/app/build/outputs/bundle/universalRelease/sanctissimissa-v1.41.21298-universal-release.aab",
+      "archive_member_template": "base/lib/{abi}/libsanctissimissa_lib.so",
+      "collected_path": "dist/sanctissimissa-v1.41.21298-android-universal-release.aab",
+      "archive_size_bytes": 545592622,
+      "archive_sha256": "8557e74469d8b70a73feced80d600eb08cfcb4b005052f603f4c55eb7a65dd92"
+    },
+    {
+      "label": "symbols",
+      "artifact_id": "android-native-debug-symbols",
+      "verified_source_path": "src-tauri/gen/android/app/build/outputs/native-debug-symbols/universalRelease/sanctissimissa-v1.41.21298-android-native-debug-symbols.zip",
+      "archive_member_template": "{abi}/libsanctissimissa_lib.so",
+      "collected_path": "dist/sanctissimissa-v1.41.21298-android-native-debug-symbols.zip",
+      "archive_size_bytes": 540956321,
+      "archive_sha256": "a8cdab3a5b4a05aa5f7b3d6f0c3acb3afc3ebf66d101227478a3d7fc7f49cb4d"
+    }
+  ],
+  "gnu_build_id_check": {
+    "command": [
+      "/home/robin/Android/Sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf",
+      "--notes",
+      "-"
+    ],
+    "stdin": "Exact library member bytes read with Python zipfile.ZipFile.read; no filesystem extraction.",
+    "invocations": 12,
+    "all_exit_codes": 0,
+    "result": "unverified",
+    "reason": "GNU build IDs are absent in every inspected library; no GNU build-ID correspondence claim is made.",
+    "observed_note_sections": [
+      ".note.android.ident"
+    ]
+  },
+  "allocated_section_check": {
+    "command": [
+      "python3",
+      "-"
+    ],
+    "stdin": "Inline Python script supplied by a shell heredoc; read all 12 exact ZIP members in memory.",
+    "exit_code": 0,
+    "observed_final_output": "ALL_FOUR_ABIS_SHF_ALLOC_CORRESPONDENCE=PASS",
+    "parser": "Bounded Python standard-library struct parser; pyelftools was not installed.",
+    "layout_authority": [
+      {
+        "path": "/usr/include/elf.h",
+        "lines": "22-97",
+        "verified": "Scalar widths and Elf32_Ehdr/Elf64_Ehdr field order."
+      },
+      {
+        "path": "/usr/include/elf.h",
+        "lines": "382-409",
+        "verified": "Elf32_Shdr/Elf64_Shdr field order."
+      },
+      {
+        "path": "/usr/include/elf.h",
+        "lines": "438,471",
+        "verified": "SHT_NOBITS=8 and SHF_ALLOC=(1<<1)."
+      }
+    ],
+    "struct_formats": {
+      "Elf32_Ehdr_after_ident": "HHIIIIIHHHHHH",
+      "Elf64_Ehdr_after_ident": "HHIQQQIHHHHHH",
+      "Elf32_Shdr": "IIIIIIIIII",
+      "Elf64_Shdr": "IIQQQQIIQQ",
+      "byte_order": "Explicit < or > from ELF e_ident[EI_DATA]."
+    },
+    "validation": "Checked ELF magic/class/data/version, ET_DYN, header and section entry sizes, section table bounds, name table type/bounds, terminated UTF-8 names, and allocated-section file bounds. Missing/extended section numbering and compressed allocated sections would abort this bounded parser; none occurred.",
+    "comparison": "Compared every SHF_ALLOC record exactly, including section name, virtual address, numeric type, full flags, size and content digest. Also compared ELF class, machine and header flags.",
+    "content_representation": {
+      "file_backed": {
+        "sha256": "SHA-256 of the exact section bytes"
+      },
+      "SHT_NOBITS": {
+        "nobits_size": "Section size, without reading file bytes."
+      }
+    },
+    "aggregate_definition": "Each record has name,address,type,flags,size,content. Sort records by (name,address,type,flags,size,json.dumps(content,sort_keys=True)); serialize the full records list with json.dumps(records,sort_keys=True,separators=(comma,colon)), encode UTF-8 and compute SHA-256.",
+    "result": "pass"
+  },
+  "abis": [
+    {
+      "abi": "arm64-v8a",
+      "elf_class": 64,
+      "elf_machine": 183,
+      "elf_header_flags": 0,
+      "allocated_sections_per_library": 23,
+      "aggregate_sha256": "b1d1641c8731636bce3c6a43b274214b5d16509dfc5df65bdc2431dc70375da2",
+      "equal_across": [
+        "APK",
+        "AAB",
+        "symbols"
+      ],
+      "gnu_build_ids": {
+        "APK": null,
+        "AAB": null,
+        "symbols": null
+      },
+      "result": "pass"
+    },
+    {
+      "abi": "armeabi-v7a",
+      "elf_class": 32,
+      "elf_machine": 40,
+      "elf_header_flags": 83886592,
+      "allocated_sections_per_library": 22,
+      "aggregate_sha256": "2461335f65c15fbcaa1f64d4e006a8685060cfe2760c33e2cb49a2a4bfed4a8e",
+      "equal_across": [
+        "APK",
+        "AAB",
+        "symbols"
+      ],
+      "gnu_build_ids": {
+        "APK": null,
+        "AAB": null,
+        "symbols": null
+      },
+      "result": "pass"
+    },
+    {
+      "abi": "x86",
+      "elf_class": 32,
+      "elf_machine": 3,
+      "elf_header_flags": 0,
+      "allocated_sections_per_library": 23,
+      "aggregate_sha256": "cc2930bc9561b3197674cadf02d8c7945be8ce00e3ba40c5a2d67a5bf5862da5",
+      "equal_across": [
+        "APK",
+        "AAB",
+        "symbols"
+      ],
+      "gnu_build_ids": {
+        "APK": null,
+        "AAB": null,
+        "symbols": null
+      },
+      "result": "pass"
+    },
+    {
+      "abi": "x86_64",
+      "elf_class": 64,
+      "elf_machine": 62,
+      "elf_header_flags": 0,
+      "allocated_sections_per_library": 23,
+      "aggregate_sha256": "8b57fb669fc908f82086e8631ad081063ffd8971e56a7a3604337d49001b7a3d",
+      "equal_across": [
+        "APK",
+        "AAB",
+        "symbols"
+      ],
+      "gnu_build_ids": {
+        "APK": null,
+        "AAB": null,
+        "symbols": null
+      },
+      "result": "pass"
+    }
+  ],
+  "mutations_during_verification": "None: no extracted files, source edits, artifact modifications or rebuilds."
+}

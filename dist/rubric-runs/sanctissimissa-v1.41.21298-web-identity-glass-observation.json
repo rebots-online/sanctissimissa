@@ -1,0 +1,23 @@
+{
+  "product": "SanctissiMissa",
+  "version": "1.41.21298",
+  "sourceCommit": "de26d665db1f0e327e47996fafe6bd2ebc8dfad0",
+  "surface": "local production preview http://127.0.0.1:4174",
+  "observations": {
+    "title": "SanctissiMissa",
+    "renderedVersion": "v1.41.21298",
+    "corpusLoaded": true,
+    "glassDefaultOff": true,
+    "glassCheckboxPresent": true,
+    "testedThemes": [
+      "skeuomorphic",
+      "slate"
+    ],
+    "inactiveBackdropOn": "saturate(1.4) blur(12px)",
+    "inactiveForegroundFilter": "none",
+    "activeTabBackdrop": "none",
+    "inactiveBackdropOff": "none",
+    "browserErrors": []
+  },
+  "scope": "Targeted browser observation; not full TEST_RUBRIC, native runtime, or Store acceptance."
+}

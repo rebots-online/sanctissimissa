@@ -1,0 +1,3472 @@
+
+> sanctissimissa@1.40.21223 build:release
+> node scripts/release-state.mjs
+
+🚀 Starting fresh release
+[provision-secrets] SAM_KEYSTORE_PROPERTIES -> /home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/keystore.properties (materialized from Admin-Manual pointer)
+🔧 Stamp: npm run stamp
+
+> sanctissimissa@1.40.21223 prestamp
+> node scripts/sync-db.mjs
+
+synced assets/missal.db -> public/missal.db (195137536 bytes)
+
+> sanctissimissa@1.40.21223 stamp
+> node scripts/stamp-version.mjs
+
+Stamping version: 1.41.21298 (versionCode: 100041)
+  ✓ Package.appxmanifest → 1.41.0.0
+  ✓ version.txt → 1.41.21298
+  ✓ version.json → 1.41.21298
+  ✓ package.json → 1.41.21298
+  ✓ package-lock.json → 1.41.21298
+  ✓ src-tauri/tauri.conf.json → 1.41.21298
+  ✓ src-tauri/Cargo.toml → 1.41.21298
+     Locking 1 package to latest compatible version
+    Updating sanctissimissa v1.40.21223 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri) -> v1.41.21298
+note: pass `--verbose` to see 93 unchanged dependencies behind latest
+[master de26d665] v1.41.21298: stamp complete release [skip ci]
+ 8 files changed, 23 insertions(+), 23 deletions(-)
+🔒 Wrote sanctissimissa-release-state.json v1.41.21298
+🔧 Stage: test
+
+> sanctissimissa@1.41.21298 test
+> node --experimental-strip-types --test tests/*.test.ts
+
+(node:2269260) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:2269899) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ SIDECAR_SCHEMA_SQL_V2 creates all sidecar v2 tables (3.497293ms)
+✔ accompaniments carries tombstone + write-metadata + highlight columns (1.476816ms)
+✔ occurrences and settings shapes match the §7.6 DDL (2.8209ms)
+✔ date selector matches only the exact ISO date (1.389195ms)
+✔ temporal selector follows a moveable feast across a year boundary (1.336585ms)
+✔ sancti selector matches by MM-DD and by resolved winner key (0.649173ms)
+✔ season selector is case-insensitive (0.461592ms)
+✔ weekly recurrence matches its weekday (0 = Sunday) (0.586462ms)
+✔ nth-weekday recurrence: First Friday (2.261438ms)
+✔ malformed recurrence rules never match (0.727863ms)
+✔ theme selector never matches a day (themes are facets) (0.507732ms)
+(node:2269900) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ alignPhrase - exact forward Latin to English endpoints (9.449215ms)
+✔ alignPhrase - exact reverse English to Latin endpoints (0.982944ms)
+✔ alignPhrase - normalize reversed endpoints (0.957064ms)
+✔ alignPhrase - reject collapsed selection (0.308531ms)
+✔ alignPhrase - reject out-of-range line index (0.554202ms)
+✔ alignPhrase - reject out-of-range character positions (0.325811ms)
+✔ alignPhrase - reject missing translation (0.300032ms)
+✔ alignPhrase - reject missing source text (0.258931ms)
+✔ alignPhrase - reject negative start position (0.313762ms)
+✔ alignPhrase - repeated source terms (2.438749ms)
+✔ alignPhrase - one-character expansion/contraction (1.241925ms)
+✔ alignPhrase - partial-word expansion/contraction (1.397836ms)
+✔ alignPhrase - full-line-only-when-source-full-line (0.598162ms)
+✔ alignPhrase - multi-line blocks (0.603032ms)
+✔ alignPhrase - countsMatch reporting (0.863213ms)
+✔ alignPhrase - method determination (0.538052ms)
+✔ alignPhrase - both language directions with same selection (1.356855ms)
+✔ alignPhrase - round-trip validation (0.654132ms)
+(node:2269906) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ canon shape: 73 books, full chapter/verse graph (60.858576ms)
+✔ known chapter counts (0.913383ms)
+✔ Gen 1:1 exact text, both languages (0.434471ms)
+✔ psalms use Vulgate/LXX numbering in both languages (0.551462ms)
+✔ deuterocanonicals carry Latin from the vendored supplement (2026-08-17) (75.69762ms)
+✔ CITES edges link liturgy to scripture with quality meta (107.82371ms)
+✔ verses are searchable via FTS and carry embeddings (17.107364ms)
+✔ getBooks: 73 books in canon order, supplement books flagged Latin (6.801505ms)
+✔ getChapter: Gen 1 has 31 ordered bilingual verses (29.692801ms)
+✔ getVerseRange: Ps/22/1-3 returns three verses (1.727026ms)
+✔ citationsOf + liturgyCitingChapter: liturgy↔scripture is bidirectional (121.478022ms)
+(node:2269907) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+▶ BS.1R2 Bible Echo Contract
+  ▶ Source contract tests
+    ✔ align.ts has exactly one PhraseAlignment interface (2.029388ms)
+    ✔ align.ts has at most one PhraseSelectionInput interface (0.671532ms)
+    ✔ SectionReader.tsx imports SelectionEcho from BilingualText.tsx (0.550292ms)
+    ✔ SectionReader.tsx declares livePhraseEcho typed as SelectionEcho | null (0.647393ms)
+    ✔ SectionReader.tsx reciprocal branch consumes dstStart AND dstEnd (0.634762ms)
+    ✔ SectionReader.tsx reciprocal range is NOT carried only by echoVerse (0.638552ms)
+    ✔ SectionReader.tsx has selectionEcho rendering in both panes (count >= 2) (0.839123ms)
+    ✔ SectionReader.tsx does NOT have renderWithSelectionEcho local workaround (0.840544ms)
+    ✔ SectionReader.tsx does NOT have direct <mark className="selection-echo"> workaround (0.843343ms)
+  ✔ Source contract tests (10.231688ms)
+  ▶ Behavioral tests with stub EchoDb
+    ✔ alignPhrase returns valid dstStart/dstEnd within dstLine bounds (4.683278ms)
+    ✔ alignPhrase round-trips to correct substring in dstLine (0.845184ms)
+    ✔ alignPhrase Latin→English returns correct reciprocal language (0.460802ms)
+    ✔ alignPhrase English→Latin returns correct reciprocal language (0.454172ms)
+    ✔ alignPhrase forward endpoints work correctly (0.880793ms)
+    ✔ alignPhrase reverse endpoints work correctly (start > end) (0.550802ms)
+    ✔ alignPhrase expanding selection returns larger range (5.333909ms)
+    ✔ alignPhrase contracting selection returns smaller range (0.663672ms)
+    ✔ alignPhrase full source line maps to full destination line (0.438332ms)
+    ✔ alignPhrase strict sub-phrase never returns whole line (0.363951ms)
+    ✔ alignPhrase one-character selection returns valid range (0.275341ms)
+    ✔ alignPhrase partial-word boundary works (0.323261ms)
+    ✔ alignPhrase handles repeated source phrases (1.007164ms)
+  ✔ Behavioral tests with stub EchoDb (17.462105ms)
+✔ BS.1R2 Bible Echo Contract (28.949207ms)
+(node:2269913) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ reciprocal Latin/English queries choose correct primary (4.202105ms)
+✔ original diacritics retained in output (0.831453ms)
+✔ multiple match spans found and mapped correctly (3.227162ms)
+✔ case-insensitive query matches correctly (0.536552ms)
+✔ missing companion handled gracefully (0.429222ms)
+✔ no result loss when both languages present (0.409622ms)
+✔ empty block returns empty result (0.566612ms)
+✔ empty query returns no matches (0.598282ms)
+✔ Latin preferred on deterministic tie (1.121094ms)
+✔ ligature normalization preserved in original text (1.431725ms)
+✔ companion ordering is primary then other language (0.872113ms)
+✔ best line selection based on match count (0.362342ms)
+✔ clause score used when both languages contain query (0.402651ms)
+(node:2269919) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+▶ bilingual bang-line presentation
+  ✔ preserves the two reported English Ordo rubric translations (3.385323ms)
+  ✔ deduplicates only genuinely equal visible bang-line bodies (0.397922ms)
+  ✔ never renders specials controls through the display branch (0.499812ms)
+  ✔ classifies ordinary lines outside the bang-line branch (0.361671ms)
+  ✔ wires the semantic policy into the interleaved renderer (1.034424ms)
+✔ bilingual bang-line presentation (8.656831ms)
+(node:2269931) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+▶ placeFloatingCallout
+  ✔ places above when there is room above and below prefers above (2.66521ms)
+  ✔ places below when above does not fit but below does (0.422911ms)
+  ✔ chooses side with more room when neither fully fits (0.325891ms)
+  ✔ clamps to viewport inset horizontally (0.285101ms)
+  ✔ clamps to viewport inset horizontally on right edge (0.535412ms)
+  ✔ clamps to viewport inset vertically above (0.321181ms)
+  ✔ clamps to viewport inset vertically below (0.463252ms)
+  ✔ avoids intersecting anchor when both sides have room (0.968563ms)
+  ✔ handles two-line callout size (3.585083ms)
+  ✔ handles five-line callout size (0.525932ms)
+  ✔ prefers above for middle anchor with equal room (0.285521ms)
+  ✔ places below for bottom anchor when above has less room (0.244351ms)
+  ✔ handles custom gap parameter (0.189211ms)
+✔ placeFloatingCallout (13.825931ms)
+(node:2269932) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+▶ BX.1R (1) behavioral idempotence
+  ✔ reconcileCallout returns the same reference when anchor and placement are unchanged (1.862497ms)
+  ✔ reconcileCallout allocates a new reference when the anchor changes (0.994034ms)
+  ✔ reconcileCallout allocates a new reference when the placement changes (0.452152ms)
+  ✔ reconcileCallout allocates when placement was previously undefined (0.282411ms)
+  ✔ placementsEqual is reflexive (0.261561ms)
+  ✔ placementsEqual is symmetric (0.257231ms)
+  ✔ placementsEqual discriminates left, top and side (0.310471ms)
+✔ BX.1R (1) behavioral idempotence (13.51941ms)
+▶ BX.1R (2) SectionReader source-contract loop guard
+  ✔ measurement effect is keyed on the echo identity, never on the whole callout (1.869206ms)
+  ✔ every measurement/resize setCallout updater goes through reconcileCallout (0.898244ms)
+  ✔ resize path re-measures the live anchor element and never a stored hover-time rect (1.418485ms)
+  ✔ a null/detached anchor element clears the callout (0.475902ms)
+✔ BX.1R (2) SectionReader source-contract loop guard (5.39188ms)
+▶ BX.1R (3) termination simulation
+  ✔ reaches a fixed point in exactly one state mutation (0.350861ms)
+✔ BX.1R (3) termination simulation (0.531422ms)
+(node:2269938) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ splitClauses offsets are exact into the original string (2.579419ms)
+✔ splitClauses keeps the delimiter with the preceding clause (0.423422ms)
+✔ splitClauses merges fragments shorter than 25 chars into a neighbour (0.516302ms)
+✔ splitClauses returns [] on empty and whitespace-only input (1.560416ms)
+✔ bestClause is deterministic — same input twice gives identical result (3.191942ms)
+✔ bestClause picks the clause containing the query subject (0.702323ms)
+✔ bestClause returns null on empty text and the sole clause when only one exists (0.668453ms)
+(node:2269945) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ Butcher computus matches known Easter dates (2.169498ms)
+✔ week keys match DO conventions (1.534316ms)
+✔ seasons and colors derive from week keys (0.721093ms)
+✔ 1960 occurrence: privileged Lenten ferias, Sundays, feasts of the Lord (0.895713ms)
+✔ feast-title color fallback: Precious Blood, Cross, Apostles, Cathedra (0.372241ms)
+✔ dateForWeekKey inverts getWeekKey near a reference date (15.624488ms)
+(node:2269951) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ CONCEPTS is a non-empty array (14.774685ms)
+✔ every concept has required fields (0.612483ms)
+✔ concept ids are unique (2.59355ms)
+✔ broader references point to existing concept ids (0.426352ms)
+✔ doxology concept is present and has detection patterns (0.251561ms)
+✔ section-name-based concepts cover major Mass parts (0.345251ms)
+✔ hierarchy forms a valid tree (no cycles) (0.396411ms)
+✔ concordance hits hydrate both languages (21.333379ms)
+✔ vector/nucleated candidate counts are unchanged (1052.861275ms)
+✔ reciprocal companion data exists when stored (0.541322ms)
+(node:2269957) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ embedding is deterministic and self-similar (4.404817ms)
+✔ related texts score higher than unrelated (1.401015ms)
+✔ normalization strips liturgical diacritics (0.429471ms)
+(node:2269965) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ HTML export contains bilingual sections (8.589382ms)
+✔ Markdown export has headings and bilingual content (0.623843ms)
+✔ JSON export is valid JSON with meta and entries (0.578662ms)
+✔ Bang-line control characters are stripped from export (0.922013ms)
+(node:2269972) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ legacy sidecar migrates journal, settings, device and tombstones without changing old bytes (245.981574ms)
+✔ current sidecar wins over legacy and persist/reopen keeps current edits and deletions (48.670431ms)
+✔ opening and persisting a fresh sidecar never creates an absent legacy database (26.253657ms)
+✔ wrong current byte type (string) rejects without falling back or overwriting either store (13.27986ms)
+✔ wrong current byte type (null) rejects without falling back or overwriting either store (12.337036ms)
+✔ wrong current byte type (undefined) rejects without falling back or overwriting either store (8.17314ms)
+✔ wrong current byte type (ArrayBuffer) rejects without falling back or overwriting either store (6.484574ms)
+✔ invalid current SQLite bytes reject without replacing them with valid legacy data (10.735549ms)
+✔ invalid legacy SQLite bytes reject before any migration record is written (6.078683ms)
+✔ a current read transaction aborted after request success rejects without legacy fallback (14.123872ms)
+✔ migration rejects a transaction aborted after put success and leaves legacy bytes available for retry (23.858319ms)
+✔ annotations fall back to legacy, write only the new key and keep an empty new list authoritative (1.740806ms)
+✔ an existing malformed annotation value is guarded and does not fall back to legacy (0.511692ms)
+✔ sidecar annotation import uses only a present current key and remains idempotent after reopen (22.069032ms)
+✔ sidecar import respects a empty current annotation value without resurrecting legacy entries (14.342703ms)
+✔ sidecar import respects a malformed current annotation value without resurrecting legacy entries (16.808023ms)
+✔ sidecar import combines legacy keys only when the current key is absent and stays idempotent (15.860649ms)
+(node:2269979) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ parseDOFile splits sections and keeps qualifiers (2.64967ms)
+✔ parseRank extracts class, number and vide cross-ref (0.708973ms)
+✔ parseCitation understands DO notation in both languages (0.781212ms)
+✔ scripture lookup serves Vulgate Latin and Douay-Rheims English (174.981399ms)
+✔ &Gloria macro expands language-correctly from vendored Prayers.txt (13.354119ms)
+✔ broken include falls back and never throws (5.769561ms)
+(node:2270005) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+▶ BX.2 inspectorLayout
+  ▶ clampInspectorWidth
+    ✔ returns null for null preference (inspector hidden) (5.44377ms)
+    ✔ uses default for non-finite preferences (0.483571ms)
+    ✔ uses default for invalid types (0.504742ms)
+    ✔ enforces minimum width of 280px (0.605403ms)
+    ✔ enforces absolute maximum of 720px (0.648292ms)
+    ✔ enforces viewport fraction maximum (60%) (0.360361ms)
+    ✔ chooses smaller of absolute max and fraction max (1.690897ms)
+    ✔ passes through valid preferences within range (0.412202ms)
+    ✔ is idempotent (clamping the same value twice gives same result) (1.010694ms)
+    ✔ responds deterministically to viewport changes (0.568172ms)
+    ✔ handles viewport changes for stored preferences (2.096168ms)
+    ✔ clamps out-of-range preferences to valid range (0.254131ms)
+    ✔ handles edge case preferences (0.477801ms)
+  ✔ clampInspectorWidth (19.958024ms)
+  ▶ getMaxInspectorWidth
+    ✔ returns 60% of viewport for narrow viewports (0.765473ms)
+    ✔ caps at absolute max of 720px for wide viewports (0.252841ms)
+    ✔ returns integer values (0.263641ms)
+  ✔ getMaxInspectorWidth (1.640856ms)
+  ▶ isNarrowViewport
+    ✔ returns true for viewports below 860px (0.321131ms)
+    ✔ returns false for viewports at or above 860px (0.161831ms)
+  ✔ isNarrowViewport (0.753783ms)
+  ▶ preference bounds validation
+    ✔ all valid preferences are within [MIN_INSPECTOR_WIDTH, MAX_INSPECTOR_WIDTH] (0.630702ms)
+    ✔ fraction maximum never exceeds absolute maximum (0.254601ms)
+  ✔ preference bounds validation (1.900677ms)
+  ▶ deterministic behavior
+    ✔ same inputs always produce same outputs (0.382992ms)
+    ✔ clamp order does not matter for idempotent values (0.17304ms)
+  ✔ deterministic behavior (0.833783ms)
+✔ BX.2 inspectorLayout (27.360062ms)
+(node:2270006) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ Haydock nuclei atomise, rank, evidence, and conserve the vector horizon (2136.493076ms)
+(node:2270012) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ Lenten strip carries the Tract, never the Alleluia (6.351313ms)
+✔ Paschal strip carries the doubled Alleluia, never the Gradual (0.613952ms)
+✔ chants sit in their liturgical slot, after the Epistle (0.487021ms)
+✔ strip is skeleton-only and spans both trunks in order (0.450942ms)
+✔ stationForAnchor inverts proper, numbered and ordo anchors (0.822413ms)
+(node:2270018) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ every proper station maps to a canonical DO section key (1.822807ms)
+✔ subway topology: two trunks, ember loop between Oratio and Lectio (1.261245ms)
+✔ seasonal chant switch: Tractus in Lent, no Alleluia; Paschal alleluia at Easter (0.576472ms)
+(node:2270029) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+▶ massSpecials
+  ✔ never emits !* or bare !& control lines (3.595313ms)
+  ✔ keeps Judica block on ordinary Sunday (Introibo hook false) (0.661413ms)
+  ✔ omits Judica block in Passiontide (0.463472ms)
+  ✔ omits Judica block in Requiem (0.562742ms)
+  ✔ omits !*S incense block when Low Mass (solemn=false) (0.415702ms)
+  ✔ keeps !*S incense block when Solemn (0.385251ms)
+  ✔ shows !*D defunct-only rubric only in Requiem (0.530742ms)
+  ✔ bilingual lockstep drops English with Latin skips (0.992504ms)
+✔ massSpecials (14.640574ms)
+▶ line classifiers
+  ✔ detects specials controls (0.564042ms)
+  ✔ detects scripture citations (1.117554ms)
+✔ line classifiers (2.159988ms)
+(node:2270030) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ lowercases uppercase text (2.61276ms)
+✔ strips combining diacritics via NFD (0.580493ms)
+✔ maps liturgical ligatures (0.409772ms)
+✔ collapses non-letters to spaces (0.579242ms)
+✔ preserves letter content through mixed input (0.358171ms)
+✔ handles empty and whitespace-only input (0.285171ms)
+✔ user input without diacritics matches corpus form (0.496172ms)
+✔ ligature variant matches expanded form (0.322911ms)
+(node:2270038) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ office plane ingested: schema baselines (4.051825ms)
+✔ Sunday Lauds (Pent VI, 2026-07-05) builds full psalmody + frame (19.911654ms)
+✔ Sunday Matins builds invitatory, nocturns, lessons, Te Deum (9.678616ms)
+✔ feast Vespers (Most Precious Blood, 2026-07-01) uses proper antiphons + collect (8.09136ms)
+✔ Compline carries Nunc dimittis and the seasonal Marian antiphon (7.544398ms)
+✔ every hour of an arbitrary week renders non-empty, real text (181.107654ms)
+✔ O-6: Nativity (2025-12-25) proper antiphons + 9 lessons + Te Deum (8.988983ms)
+✔ O-9: Lenten feria (2026-03-06) — no Te Deum, penitential character (8.353221ms)
+✔ O-10: Paschaltide (2026-04-13) — alleluia in antiphons (7.387177ms)
+✔ O-12: Marian antiphon changes by season (15.715958ms)
+✔ O-16: 14 consecutive days (2026-07-05…07-18) — no empty hours, no placeholders (325.467861ms)
+(node:2270045) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ every pericope ref parses <chapter>:<verseStart>[-<verseEnd>] (5.993572ms)
+✔ every pericope book key exists in BOOK_MAP (1.505205ms)
+✔ every referenced cluster id exists in SCENARIO_CLUSTERS (0.906523ms)
+✔ pericope ids are unique and the spine has ≥50 entries (0.395731ms)
+✔ at least one pericope spans all four Gospels (Feeding of the 5000) (0.409632ms)
+✔ spot-check: pericope refs resolve to real Douay-Rheims verses (42.745389ms)
+(node:2270052) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Usage: node release-state.mjs [options]
+
+Options:
+  --help, -h         Show this help message and exit
+  --restart          Copy existing state to outbox and start a fresh stamped release
+  --resume-only      Continue matching existing state; never stamp
+  --clean-only       Copy matching state to outbox; retain the active state
+
+Release stages (run automatically):
+  test               Run the test suite
+  web                Build web/PWA
+  linux              Build Linux deb and AppImage
+  windows            Build Windows x64 standalone PE and NSIS installer
+  windows-msi        Build the MSI installer (Windows host only)
+  windows-msix       Build the MSIX package (Windows host only)
+  android-debug      Build Android debug APK
+  android-release    Build Android release APK and AAB
+  symbols            Package Android native debug symbols
+  collect            Collect and validate all release artifacts
+
+The state file (sanctissimissa-release-state.json) enables resume after interruption:
+- First run: stamps version and writes lock with empty completedStages
+- Subsequent runs: resume at first incomplete stage (no stamp)
+- Mismatched/corrupt locks: fail closed with remediation instructions
+Usage: node release-state.mjs [options]
+
+Options:
+  --help, -h         Show this help message and exit
+  --restart          Copy existing state to outbox and start a fresh stamped release
+  --resume-only      Continue matching existing state; never stamp
+  --clean-only       Copy matching state to outbox; retain the active state
+
+Release stages (run automatically):
+  test               Run the test suite
+  web                Build web/PWA
+  linux              Build Linux deb and AppImage
+  windows            Build Windows x64 standalone PE and NSIS installer
+  windows-msi        Build the MSI installer (Windows host only)
+  windows-msix       Build the MSIX package (Windows host only)
+  android-debug      Build Android debug APK
+  android-release    Build Android release APK and AAB
+  symbols            Package Android native debug symbols
+  collect            Collect and validate all release artifacts
+
+The state file (sanctissimissa-release-state.json) enables resume after interruption:
+- First run: stamps version and writes lock with empty completedStages
+- Subsequent runs: resume at first incomplete stage (no stamp)
+- Mismatched/corrupt locks: fail closed with remediation instructions
+❌ Choose at most one of --restart, --clean-only, --resume-only
+🚀 Starting fresh release
+🔒 Wrote sanctissimissa-release-state.json v2.17.34595
+📦 Archived release state to /home/robin/Desktop/devProjects/sanctissimissa/tests/.tmp/test-1789277934248-h7olx1z30go/dist/rubric-runs/sanctissimissa-v2.17.34595-release-state.json; terminal state retained.
+✅ All artifact build stages complete; release acceptance remains subject to the recorded platform/Store verification gates.
+Use --restart to start a new stamped release.
+🔄 Resuming release v2.17.34595
+Completed stages: test, web
+📦 Archived release state to /home/robin/Desktop/devProjects/sanctissimissa/tests/.tmp/test-1789277934287-pcce1ghnr4/dist/rubric-runs/sanctissimissa-v2.17.34595-release-state.json; terminal state retained.
+✅ All artifact build stages complete; release acceptance remains subject to the recorded platform/Store verification gates.
+Use --restart to start a new stamped release.
+❌ Lock mismatch or corruption detected: Version, source HEAD, or input hashes differ
+Remediation: npm run build:release -- --restart preserves this state and starts fresh.
+❌ Lock mismatch or corruption detected: Version, source HEAD, or input hashes differ
+Remediation: npm run build:release -- --restart preserves this state and starts fresh.
+❌ Lock mismatch or corruption detected: Lock file contains invalid JSON
+Remediation: npm run build:release -- --restart preserves this state and starts fresh.
+🔄 Copied old lock to /home/robin/Desktop/devProjects/sanctissimissa/tests/.tmp/test-1789277934325-cwhgm6qaura/outbox/sanctissimissa/sanctissimissa-v2.17.34595-release-state-restarted-2026-09-13T05-38-54-326Z-7df5fb5e-1a98-4b42-b8e9-b5a67c4bd266.json
+🚀 Starting fresh release
+🔒 Wrote sanctissimissa-release-state.json v2.17.34595
+📦 Archived release state to /home/robin/Desktop/devProjects/sanctissimissa/tests/.tmp/test-1789277934325-cwhgm6qaura/dist/rubric-runs/sanctissimissa-v2.17.34595-release-state.json; terminal state retained.
+✅ All artifact build stages complete; release acceptance remains subject to the recorded platform/Store verification gates.
+Use --restart to start a new stamped release.
+📦 Copied lock to /home/robin/Desktop/devProjects/sanctissimissa/tests/.tmp/test-1789277934355-jtj1h5nsld/outbox/sanctissimissa/sanctissimissa-v2.17.34595-release-state-cleaned-2026-09-13T05-38-54-368Z-8c78956c-f4b3-4c71-ac52-d2bceb574db9.json; active state retained. Use --restart for a fresh release.
+❌ Lock mismatch or corruption detected: Version, source HEAD, or input hashes differ
+Remediation: npm run build:release -- --restart preserves this state and starts fresh.
+🔄 Resuming release v2.17.34595
+Completed stages: test, web, linux, windows, windows-msi, windows-msix, android-debug, android-release, symbols, collect
+📦 Archived release state to /home/robin/Desktop/devProjects/sanctissimissa/tests/.tmp/test-1789277934385-ntesb29byll/dist/rubric-runs/sanctissimissa-v2.17.34595-release-state.json; terminal state retained.
+✅ All artifact build stages complete; release acceptance remains subject to the recorded platform/Store verification gates.
+Use --restart to start a new stamped release.
+🚀 Starting fresh release
+🔒 Wrote sanctissimissa-release-state.json v2.17.34595
+▶ Unit tests: expandHomePath
+  ✔ should expand ~ to home directory (1.951888ms)
+  ✔ should expand ~/path to home/path (0.479552ms)
+  ✔ should pass absolute paths unchanged (0.568192ms)
+  ✔ should pass relative paths unchanged (1.414236ms)
+  ✔ should reject ~user paths (0.987814ms)
+✔ Unit tests: expandHomePath (8.435622ms)
+▶ Unit tests: STAGE_ORDER
+  ✔ should define all required stages in canonical order (2.109628ms)
+  ✔ should have 10 stages total (0.321491ms)
+✔ Unit tests: STAGE_ORDER (3.242342ms)
+▶ Unit tests: printUsage
+  ✔ should be a function (0.403911ms)
+✔ Unit tests: printUsage (0.772043ms)
+▶ Unit tests: main with injected deps
+  ✔ should accept help flag and exit 0 without running commands (4.803818ms)
+  ✔ should accept -h as alias for --help and exit 0 (2.068308ms)
+  ✔ should reject --restart and --clean-only together (1.703107ms)
+  ✔ should run stamp once on fresh release (38.960025ms)
+  ✔ should resume without stamping when lock exists (16.514562ms)
+  ✔ should fail on mismatched version lock (9.184044ms)
+  ✔ should fail on mismatched sourceHead lock (10.48999ms)
+  ✔ should fail on corrupt JSON lock (1.586585ms)
+  ✔ should handle --restart flag (29.752081ms)
+  ✔ should handle --clean-only flag with matching lock (15.196717ms)
+  ✔ should fail --clean-only with mismatched lock (13.991082ms)
+  ✔ should exit 0 when all stages already completed (12.062715ms)
+  ✔ should propagate non-zero exit code from stage failure (21.873581ms)
+✔ Unit tests: main with injected deps (179.551668ms)
+▶ Integration tests: Real CLI spawning
+  ▶ --help flag
+    ✔ should print usage and exit 0 (83.751522ms)
+    ✔ -h should be an alias for --help (83.050788ms)
+    ✔ should not read/write any files when --help is used (59.811162ms)
+  ✔ --help flag (227.250325ms)
+  ▶ Hermetic stub mode with RELEASE_STATE_RUNNER=stub
+    ✔ should log stamp and stages to sanctissimissa-release-stage-events.log on fresh release (87.103764ms)
+    ✔ should resume without stamp when lock exists (80.174589ms)
+    ✔ should handle --restart in stub mode (85.095176ms)
+    ✔ should preserve corrupt lock byte-identically in stub mode (56.177139ms)
+    ✔ should preserve mismatched lock byte-identically in stub mode (63.875828ms)
+  ✔ Hermetic stub mode with RELEASE_STATE_RUNNER=stub (373.18032ms)
+  ▶ BT.2R3 controlled interrupt/resume (two real CLI spawns)
+    ✔ two real CLI spawns prove controlled interrupt then resume (one stamp, each stage once) (157.162148ms)
+    ✔ corrupt interrupt receipt fails closed without mutating the lock (68.603217ms)
+    ✔ mismatched interrupt receipt fails closed without mutating the lock (67.276521ms)
+  ✔ BT.2R3 controlled interrupt/resume (two real CLI spawns) (293.640499ms)
+  ▶ --restart flag with real CLI
+    ✔ should copy existing lock, start fresh and complete in one invocation (85.673661ms)
+    ✔ should exit 0 when no lock file exists (101.198919ms)
+  ✔ --restart flag with real CLI (187.436751ms)
+  ▶ --clean-only flag with real CLI
+    ✔ should copy matching lock to outbox and keep it active (72.33033ms)
+    ✔ should fail closed when version mismatches (76.584127ms)
+❌ Lock mismatch or corruption detected: Lock file contains invalid JSON
+Remediation: npm run build:release -- --restart preserves this state and starts fresh.
+❌ Lock mismatch or corruption detected: Version, source HEAD, or input hashes differ
+Remediation: npm run build:release -- --restart preserves this state and starts fresh.
+❌ Lock mismatch or corruption detected: Version, source HEAD, or input hashes differ
+Remediation: npm run build:release -- --restart preserves this state and starts fresh.
+🚀 Starting fresh release
+🔒 Wrote sanctissimissa-release-state.json v2.17.34595
+⏳ Pending windows-msi: requires another host or earlier required stages.
+⏳ Pending windows-msix: requires another host or earlier required stages.
+⏳ Pending collect: requires another host or earlier required stages.
+⏳ Release v2.17.34595 incomplete: windows-msi, windows-msix, collect
+Continue the same source, version, inputs and state on the required host: npm run build:release -- --resume-only
+🔄 Resuming release v2.17.34595
+Completed stages: test, web, linux, windows, android-debug, android-release, symbols
+⏳ Pending collect: requires another host or earlier required stages.
+⏳ Release v2.17.34595 incomplete: collect
+Continue the same source, version, inputs and state on the required host: npm run build:release -- --resume-only
+🔄 Resuming release v2.17.34595
+Completed stages: test, web, linux, windows, android-debug, android-release, symbols, windows-msi, windows-msix
+📦 Archived release state to /home/robin/Desktop/devProjects/sanctissimissa/tests/.tmp/test-1789277935741-76ptnm6yc75/dist/rubric-runs/sanctissimissa-v2.17.34595-release-state.json; terminal state retained.
+✅ All artifact build stages complete; release acceptance remains subject to the recorded platform/Store verification gates.
+Use --restart to start a new stamped release.
+🔄 Resuming release v2.17.34595
+Completed stages: test, web, linux, windows, android-debug, android-release, symbols, windows-msi, windows-msix, collect
+📦 Archived release state to /home/robin/Desktop/devProjects/sanctissimissa/tests/.tmp/test-1789277935741-76ptnm6yc75/dist/rubric-runs/sanctissimissa-v2.17.34595-release-state.json; terminal state retained.
+✅ All artifact build stages complete; release acceptance remains subject to the recorded platform/Store verification gates.
+Use --restart to start a new stamped release.
+🚀 Starting fresh release
+🔒 Wrote sanctissimissa-release-state.json v2.17.34595
+⏳ Pending linux: requires another host or earlier required stages.
+⏳ Pending windows: requires another host or earlier required stages.
+⏳ Pending android-debug: requires another host or earlier required stages.
+⏳ Pending android-release: requires another host or earlier required stages.
+⏳ Pending symbols: requires another host or earlier required stages.
+⏳ Pending collect: requires another host or earlier required stages.
+⏳ Release v2.17.34595 incomplete: linux, windows, android-debug, android-release, symbols, collect
+Continue the same source, version, inputs and state on the required host: npm run build:release -- --resume-only
+🔄 Resuming release v2.17.34595
+Completed stages: test, web, windows-msi, windows-msix
+📦 Archived release state to /home/robin/Desktop/devProjects/sanctissimissa/tests/.tmp/test-1789277935794-j5az1cw73e/dist/rubric-runs/sanctissimissa-v2.17.34595-release-state.json; terminal state retained.
+✅ All artifact build stages complete; release acceptance remains subject to the recorded platform/Store verification gates.
+Use --restart to start a new stamped release.
+❌ --resume-only requires an existing matching release state; no stamp was run.
+🚀 Starting fresh release
+❌ Previous stamp/commit was interrupted. No second stamp was run; resolve tracked changes, then use --restart to preserve it and start a new invocation.
+❌ Previous stamp/commit was interrupted. No second stamp was run; resolve tracked changes, then use --restart to preserve it and start a new invocation.
+🔄 Copied old lock to /home/robin/Desktop/devProjects/sanctissimissa/tests/.tmp/test-1789277935828-gpb7ysyi84w/outbox/sanctissimissa/sanctissimissa-v2.17.34595-release-state-restarted-2026-09-13T05-38-55-838Z-a54e83bf-9fee-4254-a64f-0cc2273911ea.json
+🚀 Starting fresh release
+🔒 Wrote sanctissimissa-release-state.json v2.18.34596
+📦 Archived release state to /home/robin/Desktop/devProjects/sanctissimissa/tests/.tmp/test-1789277935828-gpb7ysyi84w/dist/rubric-runs/sanctissimissa-v2.18.34596-release-state.json; terminal state retained.
+✅ All artifact build stages complete; release acceptance remains subject to the recorded platform/Store verification gates.
+Use --restart to start a new stamped release.
+❌ Lock mismatch or corruption detected: Lock file has invalid structure
+Remediation: npm run build:release -- --restart preserves this state and starts fresh.
+❌ Lock mismatch or corruption detected: Lock file has invalid structure
+Remediation: npm run build:release -- --restart preserves this state and starts fresh.
+❌ Lock mismatch or corruption detected: Lock file has invalid structure
+Remediation: npm run build:release -- --restart preserves this state and starts fresh.
+❌ Lock mismatch or corruption detected: Lock file has invalid structure
+Remediation: npm run build:release -- --restart preserves this state and starts fresh.
+🔄 Copied old lock to /home/robin/Desktop/devProjects/sanctissimissa/tests/.tmp/test-1789277935863-z8qo4lwbhuk/outbox/sanctissimissa/sanctissimissa-v2.17.34595-release-state-restarted-2026-09-13T05-38-55-864Z-b8ad3781-2579-40be-9f8e-fbbf630e1794.json
+🚀 Starting fresh release
+🔒 Wrote sanctissimissa-release-state.json v2.17.34595
+📦 Archived release state to /home/robin/Desktop/devProjects/sanctissimissa/tests/.tmp/test-1789277935863-z8qo4lwbhuk/dist/rubric-runs/sanctissimissa-v2.17.34595-release-state.json; terminal state retained.
+✅ All artifact build stages complete; release acceptance remains subject to the recorded platform/Store verification gates.
+Use --restart to start a new stamped release.
+❌ Lock mismatch or corruption detected: Version, source HEAD, or input hashes differ
+Remediation: npm run build:release -- --restart preserves this state and starts fresh.
+❌ Lock mismatch or corruption detected: Version, source HEAD, or input hashes differ
+Remediation: npm run build:release -- --restart preserves this state and starts fresh.
+❌ Release builds are forbidden on WSL; use native Linux or Windows.
+❌ This release driver requires native Linux or Windows; no stamp was run.
+🚀 Starting fresh release
+🔒 Wrote sanctissimissa-release-state.json v2.17.34595
+📦 Archived release state to /home/robin/Desktop/devProjects/sanctissimissa/tests/.tmp/test-1789277935907-u77gqzlffj/dist/rubric-runs/sanctissimissa-v2.17.34595-release-state.json; terminal state retained.
+✅ All artifact build stages complete; release acceptance remains subject to the recorded platform/Store verification gates.
+Use --restart to start a new stamped release.
+    ✔ should fail closed when sourceHead mismatches (72.694242ms)
+  ✔ --clean-only flag with real CLI (222.154871ms)
+✔ Integration tests: Real CLI spawning (1304.384528ms)
+▶ Byte-identical nonmutation tests
+  ✔ should preserve corrupt lock byte-identically after failure (1.734417ms)
+  ✔ should preserve version-mismatched lock byte-identically after failure (7.600539ms)
+  ✔ should preserve sourceHead-mismatched lock byte-identically after failure (7.756059ms)
+✔ Byte-identical nonmutation tests (17.378075ms)
+▶ RP.1 shared release across build hosts
+  ✔ uses one stamp through Linux, Windows, then Linux collection (52.513716ms)
+  ✔ can start on Windows and defer Linux targets until a same-version Linux continuation (33.552745ms)
+  ✔ never stamps or writes state when resume-only has no existing state (1.153695ms)
+  ✔ persists an interrupted stamp and rejects ordinary/resume-only retries without stamping again (32.566602ms)
+  ✔ fails closed on structurally invalid state instead of silently starting fresh (2.166858ms)
+  ✔ restart preserves corrupt state byte-for-byte and runs a fresh stamp immediately (24.04794ms)
+  ✔ rejects changed corpus or environment inputs before resuming any stage (17.751397ms)
+  ✔ rejects WSL before stamping (1.024284ms)
+  ✔ rejects an unsupported production host before attempting Git or stamping (0.974604ms)
+  ✔ preserves a previous completed archive before replacing it (22.107523ms)
+  ✔ declares host eligibility without treating unsupported targets as successful (0.755663ms)
+✔ RP.1 shared release across build hosts (189.468359ms)
+(node:2270053) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ canonical book order preserves Genesis before Exodus before Psalms (3.249343ms)
+✔ numeric chapter and verse order within each book (1.946857ms)
+✔ duplicate keys at same verse are preserved without loss (0.821603ms)
+✔ non-verse hits go to final Other group (0.450542ms)
+✔ unknown book keys go to Other group (0.344162ms)
+✔ exact input output multiset equality (3.978525ms)
+✔ empty input returns empty result (0.318201ms)
+✔ only non-verse hits returns only other group (0.635003ms)
+✔ only verse hits returns only bible groups (1.324775ms)
+✔ NT books appear after OT books in canonical order (1.036114ms)
+(node:2270070) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ build-time defaults: app namespace, common scope, org-shared root (2.267909ms)
+✔ resolveStorage: common scope stores under the derived org root (1.481966ms)
+✔ resolveStorage: app scope stores app-private under the namespace (0.268741ms)
+✔ org root derives from the first two labels for other identifier families (0.286021ms)
+✔ empty namespace falls through to the packaged default (0.634843ms)
+(node:2270083) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+▶ Theme registry
+  ✔ has exactly eight families (1.833227ms)
+  ✔ includes the reference identities (0.742203ms)
+  ✔ has truthful picker labels (0.416732ms)
+  ✔ has default family as skeuomorphic (0.277161ms)
+  ✔ migrates legacy family ids on read (0.702463ms)
+✔ Theme registry (6.927186ms)
+▶ Theme matrix structure (family × mode)
+  ✔ has exactly one LIGHT cell and one DARK cell per family (2.380858ms)
+  ✔ every family cell defines all 14 core tokens, in both modes (8.878733ms)
+  ✔ REGRESSION: every family renders DIFFERENT tokens in dark mode (light ≠ dark) (3.407382ms)
+  ✔ families never declare the seasonal accent (data-color stays orthogonal) (2.375169ms)
+  ✔ mode-level element tokens exist once per mode and dark re-derives accent-soft (1.642166ms)
+  ✔ REGRESSION: no global dark block re-declares core family tokens (1.446635ms)
+  ✔ the root element follows the theme scheme (0.521602ms)
+✔ Theme matrix structure (family × mode) (21.885701ms)
+▶ Family idioms
+  ✔ skeuomorphic uses layered repeating-linear gradients for fabric (0.707102ms)
+  ✔ skeuomorphic has weft and warp patterns (0.383691ms)
+  ✔ skeuomorphic has piped/tented-fabric border (0.305561ms)
+  ✔ skeuomorphic has shallow inward tension shadow (0.267771ms)
+  ✔ retro-terminal is a phosphor CRT: mono chrome, green ink, amber rubric, scanlines (0.503812ms)
+  ✔ retro-terminal differs from skeuomorphic in at least four tokens (0.449482ms)
+✔ Family idioms (3.243722ms)
+▶ HelloWord Glow
+  ✔ dark cell uses the exact Midnight Nave palette (0.470201ms)
+  ✔ light cell is a real day-chapel variant (not the midnight palette) (0.315671ms)
+  ✔ has glow-pulse keyframes (0.229881ms)
+  ✔ has slow soft luminance pulse (no flashing, no text glow) (0.679613ms)
+  ✔ pulse colors are tokenized so the light cell pulses its own hue (0.487902ms)
+  ✔ has reduced-motion override that disables animation (0.388091ms)
+✔ HelloWord Glow (3.188783ms)
+▶ Tokenized chrome (no raw colors in shared component rules)
+  ✔ former hardcoded offenders consume tokens only (0.825073ms)
+  ✔ CKEditor chrome maps onto tokens (no stock save/cancel/link/highlight colors) (0.651942ms)
+✔ Tokenized chrome (no raw colors in shared component rules) (1.842407ms)
+▶ Independent theme preference
+  ✔ defaults malformed and missing preferences to parchment/system with glass off (1.977688ms)
+  ✔ migrates both legacy glass palettes while preserving an explicit off preference (0.433022ms)
+  ✔ accepts booleans and the sidecar 1/0 encoding without truthy coercion (0.246401ms)
+  ✔ applies every palette and mode with glass on/off without modifying the seasonal color (1.040994ms)
+✔ Independent theme preference (4.202395ms)
+▶ Theme preference persistence
+  ✔ round-trips local preferences across every palette, mode preference and glass value (3.475213ms)
+  ✔ round-trips sidecar preferences and also updates the normalized local cache (0.736003ms)
+  ✔ valid sidecar fields take precedence while absent and corrupt fields retain local values (0.474802ms)
+  ✔ migrates legacy cache and sidecar values, including sidecar legacy material intent (0.612353ms)
+  ✔ survives corrupt JSON, missing storage and malformed stored objects (0.926253ms)
+  ✔ continues using the sidecar when localStorage access or writes are blocked (0.763792ms)
+  ✔ preserves explicit session choices on reread when storage is blocked and no sidecar exists (0.342541ms)
+  ✔ retains newer session choices over readable stale cache after quota failure until a write succeeds (0.362951ms)
+  ✔ retains the local cache when sidecar persistence rejects and exposes the rejection to its caller (1.853507ms)
+  ✔ normalizes malformed runtime values before writing either store (0.432701ms)
+✔ Theme preference persistence (10.66508ms)
+▶ Theme control and startup integration
+  ✔ offers an independent native checkbox with associated explanatory text (0.349981ms)
+  ✔ shares persistence and handles sidecar failures at the component boundary (0.22415ms)
+  ✔ restores appearance in App and cleans up the system-mode listener (0.2184ms)
+✔ Theme control and startup integration (1.014624ms)
+▶ Palette-independent glass material
+  ✔ gates shared material on glass rather than a particular palette (1.164344ms)
+  ✔ covers inactive tabs with legible labels while preserving the active accent fill (0.559362ms)
+  ✔ limits optional material to supported screens and restores opacity for reduced transparency (0.872083ms)
+✔ Palette-independent glass material (2.84111ms)
+(node:2270084) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+▶ workspaceNavigation (BX.5)
+  ✔ exports NAV and UTIL_NAV (2.45292ms)
+  ✔ NAV has eight primary entries (0.508882ms)
+  ✔ UTIL_NAV has two utility entries (0.315391ms)
+  ✔ separate Journal and Homily Writer routes exist (2.68646ms)
+  ✔ no combined "Journal & Homilies" label exists (0.434252ms)
+  ✔ Settings and About exist in UTIL_NAV (0.353971ms)
+  ✔ all routes have distinct IDs (0.345102ms)
+  ✔ origin story is a tracked file, substantive, and not fabricated (1.460045ms)
+  ✔ about.ts sources the origin story from the tracked file, with no fallback (0.833043ms)
+  ✔ ABOUT_CONTENT has all required authored sections (0.491592ms)
+  ✔ four distinct workspaces: journal, homily, settings, about (0.362271ms)
+  ✔ no aboutOpen state in App (modal removed) (0.264051ms)
+  ✔ ThemePicker owned only by SettingsView (0.200521ms)
+✔ workspaceNavigation (BX.5) (14.314513ms)
+ℹ tests 349
+ℹ suites 38
+ℹ pass 349
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2967.841386
+🔧 Stage: web
+
+> sanctissimissa@1.41.21298 prebuild:vite
+> node scripts/sync-db.mjs
+
+synced assets/missal.db -> public/missal.db (195137536 bytes)
+
+> sanctissimissa@1.41.21298 build:vite
+> node scripts/pre-build-gate.mjs && tsc -b && vite build
+
+GATE PASS: version=1.41.21298, git clean, no duplicate in dist/
+(node:2273683) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+vite v6.4.3 building for production...
+transforming...
+✓ 944 modules transformed.
+rendering chunks...
+[plugin vite:reporter]
+(!) [NUL]/home/robin/Desktop/devProjects/sanctissimissa/node_modules/sql.js/dist/sql-wasm-browser.js?commonjs-es-import is dynamically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/accompaniment/store.ts but also statically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/data/corpusDb.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter]
+(!) /home/robin/Desktop/devProjects/sanctissimissa/node_modules/sql.js/dist/sql-wasm.wasm?url is dynamically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/accompaniment/store.ts but also statically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/data/corpusDb.ts, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist-web/registerSW.js                      0.13 kB
+dist-web/manifest.webmanifest               0.44 kB
+dist-web/index.html                         0.70 kB │ gzip:   0.41 kB
+dist-web/assets/sql-wasm-UFUCzYNW.wasm    659.73 kB │ gzip: 323.01 kB
+dist-web/assets/index-qmwzhumC.css         63.32 kB │ gzip:  12.90 kB
+dist-web/assets/index-6L8esETH.css        222.14 kB │ gzip:  34.88 kB
+dist-web/assets/core-DV6XEvTN.js            0.10 kB │ gzip:   0.11 kB
+dist-web/assets/index-CC3jJH8B.js          15.19 kB │ gzip:   5.94 kB
+dist-web/assets/index-DZfCvmSq.js         454.96 kB │ gzip: 149.54 kB
+dist-web/assets/ckeditor5-DARfDnpa.js   1,027.26 kB │ gzip: 250.25 kB
+✓ built in 6.41s
+
+PWA v1.3.0
+mode      generateSW
+precache  14 entries (2895.77 KiB)
+files generated
+  dist-web/sw.js
+  dist-web/workbox-a3c94b52.js
+🔧 Stage: linux
+(node:2274678) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+        Info Looking up installed tauri packages to check mismatched versions...
+     Running beforeBuildCommand `npm run build:vite`
+
+> sanctissimissa@1.41.21298 prebuild:vite
+> node scripts/sync-db.mjs
+
+synced assets/missal.db -> public/missal.db (195137536 bytes)
+
+> sanctissimissa@1.41.21298 build:vite
+> node scripts/pre-build-gate.mjs && tsc -b && vite build
+
+GATE PASS: version=1.41.21298, git clean, no duplicate in dist/
+(node:2281416) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+vite v6.4.3 building for production...
+transforming...
+✓ 944 modules transformed.
+rendering chunks...
+[plugin vite:reporter]
+(!) [NUL]/home/robin/Desktop/devProjects/sanctissimissa/node_modules/sql.js/dist/sql-wasm-browser.js?commonjs-es-import is dynamically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/accompaniment/store.ts but also statically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/data/corpusDb.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter]
+(!) /home/robin/Desktop/devProjects/sanctissimissa/node_modules/sql.js/dist/sql-wasm.wasm?url is dynamically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/accompaniment/store.ts but also statically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/data/corpusDb.ts, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist-web/registerSW.js                      0.13 kB
+dist-web/manifest.webmanifest               0.44 kB
+dist-web/index.html                         0.70 kB │ gzip:   0.41 kB
+dist-web/assets/sql-wasm-UFUCzYNW.wasm    659.73 kB │ gzip: 323.01 kB
+dist-web/assets/index-qmwzhumC.css         63.32 kB │ gzip:  12.90 kB
+dist-web/assets/index-6L8esETH.css        222.14 kB │ gzip:  34.88 kB
+dist-web/assets/core-DV6XEvTN.js            0.10 kB │ gzip:   0.11 kB
+dist-web/assets/index-CC3jJH8B.js          15.19 kB │ gzip:   5.94 kB
+dist-web/assets/index-DZfCvmSq.js         454.96 kB │ gzip: 149.54 kB
+dist-web/assets/ckeditor5-DARfDnpa.js   1,027.26 kB │ gzip: 250.25 kB
+✓ built in 6.67s
+
+PWA v1.3.0
+mode      generateSW
+precache  14 entries (2895.77 KiB)
+files generated
+  dist-web/sw.js
+  dist-web/workbox-a3c94b52.js
+   Compiling proc-macro2 v1.0.106
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.46
+   Compiling serde_core v1.0.228
+   Compiling serde v1.0.228
+   Compiling smallvec v1.15.2
+   Compiling hashbrown v0.17.1
+   Compiling equivalent v1.0.2
+   Compiling pkg-config v0.3.33
+   Compiling winnow v0.5.40
+   Compiling heck v0.5.0
+   Compiling libc v0.2.186
+   Compiling target-lexicon v0.12.16
+   Compiling version-compare v0.2.1
+   Compiling version_check v0.9.5
+   Compiling thiserror v1.0.69
+   Compiling siphasher v1.0.3
+   Compiling memchr v2.8.2
+   Compiling phf_shared v0.13.1
+   Compiling fastrand v2.4.1
+   Compiling icu_properties_data v2.2.0
+   Compiling icu_normalizer_data v2.2.0
+   Compiling stable_deref_trait v1.2.1
+   Compiling cfg-if v1.0.4
+   Compiling zmij v1.0.21
+   Compiling autocfg v1.5.1
+   Compiling proc-macro-error-attr v1.0.4
+   Compiling syn v1.0.109
+   Compiling phf_generator v0.13.1
+   Compiling proc-macro-error v1.0.4
+   Compiling parking_lot_core v0.9.12
+   Compiling indexmap v2.14.0
+   Compiling futures-core v0.3.32
+   Compiling pin-project-lite v0.2.17
+   Compiling slab v0.4.12
+   Compiling futures-task v0.3.32
+   Compiling typeid v1.0.3
+   Compiling cfg-expr v0.15.8
+   Compiling once_cell v1.21.4
+   Compiling num-conv v0.2.2
+   Compiling time-core v0.1.9
+   Compiling heck v0.4.1
+   Compiling thiserror v2.0.18
+   Compiling futures-channel v0.3.32
+   Compiling syn v2.0.118
+   Compiling phf_codegen v0.13.1
+   Compiling ident_case v1.0.1
+   Compiling erased-serde v0.4.10
+   Compiling writeable v0.6.3
+   Compiling itoa v1.0.18
+   Compiling litemap v0.8.2
+   Compiling strsim v0.11.1
+   Compiling utf8_iter v1.0.4
+   Compiling scopeguard v1.2.0
+   Compiling anyhow v1.0.103
+   Compiling new_debug_unreachable v1.0.6
+   Compiling string_cache_codegen v0.6.1
+   Compiling gio v0.18.4
+   Compiling lock_api v0.4.14
+   Compiling serde_json v1.0.150
+   Compiling getrandom v0.4.3
+   Compiling precomputed-hash v0.1.1
+   Compiling winnow v1.0.3
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling futures-io v0.3.32
+   Compiling ctor-proc-macro v0.0.7
+   Compiling dtoa v1.0.11
+   Compiling log v0.4.33
+   Compiling parking_lot v0.12.5
+   Compiling utf-8 v0.7.6
+   Compiling percent-encoding v2.3.2
+   Compiling dtoa-short v0.3.5
+   Compiling selectors v0.36.1
+   Compiling aho-corasick v1.1.4
+   Compiling indexmap v1.9.3
+   Compiling unic-common v0.9.0
+   Compiling tendril v0.5.0
+   Compiling toml_parser v1.1.2+spec-1.1.0
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling web_atoms v0.2.5
+   Compiling form_urlencoded v1.2.2
+   Compiling unic-char-range v0.9.0
+   Compiling string_cache v0.9.0
+   Compiling camino v1.2.4
+   Compiling byteorder v1.5.0
+   Compiling regex-syntax v0.8.11
+   Compiling unic-char-property v0.9.0
+   Compiling alloc-stdlib v0.2.4
+   Compiling unic-ucd-version v0.9.0
+   Compiling memoffset v0.9.1
+   Compiling servo_arc v0.4.3
+   Compiling schemars v0.8.22
+   Compiling powerfmt v0.2.0
+   Compiling deranged v0.5.8
+   Compiling bitflags v2.13.0
+   Compiling rustc-hash v2.1.3
+   Compiling bit-vec v0.8.0
+   Compiling fnv v1.0.7
+   Compiling hashbrown v0.12.3
+   Compiling brotli-decompressor v5.0.3
+   Compiling bit-set v0.8.0
+   Compiling unic-ucd-ident v0.9.0
+   Compiling quick-xml v0.41.0
+   Compiling semver v1.0.28
+   Compiling serde_spanned v1.1.1
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling uuid v1.23.4
+   Compiling foldhash v0.2.0
+   Compiling rustc_version v0.4.1
+   Compiling toml v1.1.2+spec-1.1.0
+   Compiling base64 v0.22.1
+   Compiling dunce v1.0.5
+   Compiling bytes v1.12.0
+   Compiling cfb v0.7.3
+   Compiling field-offset v0.3.6
+   Compiling dyn-clone v1.0.20
+   Compiling time v0.3.53
+   Compiling same-file v1.0.6
+   Compiling serde-untagged v0.1.9
+   Compiling brotli v8.0.4
+   Compiling walkdir v2.5.0
+   Compiling ctor v0.8.0
+   Compiling gtk v0.18.2
+   Compiling generic-array v0.14.7
+   Compiling shlex v2.0.1
+   Compiling http v1.4.2
+   Compiling infer v0.19.0
+   Compiling glob v0.3.3
+   Compiling find-msvc-tools v0.1.9
+   Compiling toml_datetime v0.7.5+spec-1.1.0
+   Compiling time-macros v0.2.31
+   Compiling x11 v2.21.0
+   Compiling option-ext v0.2.0
+   Compiling cc v1.2.66
+   Compiling regex-automata v0.4.14
+   Compiling typenum v1.20.1
+   Compiling winnow v0.7.15
+   Compiling simd-adler32 v0.3.9
+   Compiling crc32fast v1.5.0
+   Compiling dirs-sys v0.5.0
+   Compiling synstructure v0.13.2
+   Compiling darling_core v0.23.0
+   Compiling serde_derive_internals v0.29.1
+   Compiling embed-resource v3.0.11
+   Compiling bitflags v1.3.2
+   Compiling crossbeam-utils v0.8.21
+   Compiling adler2 v2.0.1
+   Compiling miniz_oxide v0.8.9
+   Compiling tauri-winres v0.3.6
+   Compiling dirs v6.0.0
+   Compiling toml v0.9.12+spec-1.1.0
+   Compiling libdbus-sys v0.2.7
+   Compiling x11-dl v2.21.0
+   Compiling cookie v0.18.1
+   Compiling regex v1.12.4
+   Compiling flate2 v1.1.9
+   Compiling serde_derive v1.0.228
+   Compiling zerofrom-derive v0.1.7
+   Compiling yoke-derive v0.8.2
+   Compiling zerovec-derive v0.11.3
+   Compiling displaydoc v0.2.6
+   Compiling thiserror-impl v1.0.69
+   Compiling phf_macros v0.13.1
+   Compiling futures-macro v0.3.32
+   Compiling thiserror-impl v2.0.18
+   Compiling darling_macro v0.23.0
+   Compiling derive_more-impl v2.1.1
+   Compiling cssparser-macros v0.6.1
+   Compiling darling v0.23.0
+   Compiling serde_with_macros v3.21.0
+   Compiling schemars_derive v0.8.22
+   Compiling zerofrom v0.1.8
+   Compiling phf v0.13.1
+   Compiling crypto-common v0.1.7
+   Compiling yoke v0.8.3
+   Compiling futures-util v0.3.32
+   Compiling block-buffer v0.10.4
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling cssparser v0.36.0
+   Compiling derive_more v2.1.1
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling markup5ever v0.38.0
+   Compiling icu_collections v2.2.0
+   Compiling icu_locale_core v2.2.0
+   Compiling serde_with v3.21.0
+   Compiling html5ever v0.38.0
+   Compiling fdeflate v0.3.7
+   Compiling raw-window-handle v0.6.2
+   Compiling icu_provider v2.2.0
+   Compiling futures-executor v0.3.32
+   Compiling icu_properties v2.2.0
+   Compiling icu_normalizer v2.2.0
+   Compiling dom_query v0.27.0
+   Compiling png v0.17.16
+   Compiling dpi v0.1.2
+   Compiling toml_datetime v0.6.3
+   Compiling serde_spanned v0.6.9
+   Compiling cargo-platform v0.1.9
+   Compiling jsonptr v0.6.3
+   Compiling plist v1.10.0
+   Compiling toml_edit v0.20.2
+   Compiling toml_edit v0.19.15
+   Compiling cargo_metadata v0.19.2
+   Compiling cargo_toml v0.22.3
+   Compiling idna_adapter v1.2.2
+   Compiling json-patch v3.0.1
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling proc-macro-crate v1.3.1
+   Compiling urlpattern v0.3.0
+   Compiling crossbeam-channel v0.5.15
+   Compiling toml v0.8.2
+   Compiling proc-macro-crate v2.0.2
+   Compiling system-deps v6.2.2
+   Compiling tauri-utils v2.9.3
+   Compiling digest v0.10.7
+   Compiling dlopen2_derive v0.4.3
+   Compiling gtk3-macros v0.18.2
+   Compiling wry v0.55.1
+   Compiling glib-macros v0.18.5
+   Compiling tauri-runtime v2.11.3
+   Compiling glib-sys v0.18.1
+   Compiling gobject-sys v0.18.0
+   Compiling gio-sys v0.18.1
+   Compiling gdk-sys v0.18.2
+   Compiling gdk-pixbuf-sys v0.18.0
+   Compiling pango-sys v0.18.0
+   Compiling cairo-sys-rs v0.18.2
+   Compiling atk-sys v0.18.2
+   Compiling gtk-sys v0.18.2
+   Compiling javascriptcore-rs-sys v1.1.1
+   Compiling soup3-sys v0.5.0
+   Compiling webkit2gtk-sys v2.0.2
+   Compiling gdkx11-sys v0.18.2
+   Compiling cpufeatures v0.2.17
+   Compiling sha2 v0.10.9
+   Compiling dlopen2 v0.8.2
+   Compiling dbus v0.9.12
+   Compiling ico v0.5.0
+   Compiling tauri-runtime-wry v2.11.4
+   Compiling getrandom v0.3.4
+   Compiling unicode-segmentation v1.13.3
+   Compiling serialize-to-javascript-impl v0.1.2
+   Compiling serde_repr v0.1.20
+   Compiling tokio v1.52.3
+   Compiling mime v0.3.17
+   Compiling keyboard-types v0.7.0
+   Compiling serialize-to-javascript v0.1.2
+   Compiling gdkwayland-sys v0.18.2
+   Compiling glib v0.18.5
+   Compiling tauri-build v2.6.3
+   Compiling tauri-codegen v2.6.3
+   Compiling tauri v2.11.5
+   Compiling tauri-macros v2.6.3
+   Compiling sanctissimissa v1.41.21298 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri)
+   Compiling cairo-rs v0.18.5
+   Compiling atk v0.18.2
+   Compiling javascriptcore-rs v1.1.2
+   Compiling gdk-pixbuf v0.18.5
+   Compiling pango v0.18.3
+   Compiling soup3 v0.5.0
+   Compiling gdk v0.18.2
+   Compiling gdkx11 v0.18.2
+   Compiling webkit2gtk v2.0.2
+   Compiling tao v0.35.3
+   Compiling muda v0.19.3
+    Finished `release` profile [optimized] target(s) in 8m 50s
+       Built application at: /home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/release/sanctissimissa
+        Info Patching /home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/release/sanctissimissa with bundle type information: deb
+    Bundling SanctissiMissa_1.41.21298_amd64.deb (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/release/bundle/deb/SanctissiMissa_1.41.21298_amd64.deb)
+        Info Patching /home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/release/sanctissimissa with bundle type information: appimage
+    Bundling SanctissiMissa_1.41.21298_amd64.AppImage (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/release/bundle/appimage/SanctissiMissa_1.41.21298_amd64.AppImage)
+    Finished 2 bundles at:
+        /home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/release/bundle/deb/SanctissiMissa_1.41.21298_amd64.deb
+        /home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/release/bundle/appimage/SanctissiMissa_1.41.21298_amd64.AppImage
+
+🔧 Stage: windows
+
+> sanctissimissa@1.41.21298 build:windows:unstamped
+> node scripts/pre-build-gate.mjs && bash scripts/build-windows.sh
+
+GATE PASS: version=1.41.21298, git clean, no duplicate in dist/
+        Info Looking up installed tauri packages to check mismatched versions...
+     Running beforeBuildCommand `npm run build:vite`
+
+> sanctissimissa@1.41.21298 prebuild:vite
+> node scripts/sync-db.mjs
+
+synced assets/missal.db -> public/missal.db (195137536 bytes)
+
+> sanctissimissa@1.41.21298 build:vite
+> node scripts/pre-build-gate.mjs && tsc -b && vite build
+
+GATE PASS: version=1.41.21298, git clean, no duplicate in dist/
+(node:2333104) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+vite v6.4.3 building for production...
+transforming...
+✓ 944 modules transformed.
+rendering chunks...
+[plugin vite:reporter]
+(!) [NUL]/home/robin/Desktop/devProjects/sanctissimissa/node_modules/sql.js/dist/sql-wasm-browser.js?commonjs-es-import is dynamically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/accompaniment/store.ts but also statically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/data/corpusDb.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter]
+(!) /home/robin/Desktop/devProjects/sanctissimissa/node_modules/sql.js/dist/sql-wasm.wasm?url is dynamically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/accompaniment/store.ts but also statically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/data/corpusDb.ts, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist-web/registerSW.js                      0.13 kB
+dist-web/manifest.webmanifest               0.44 kB
+dist-web/index.html                         0.70 kB │ gzip:   0.41 kB
+dist-web/assets/sql-wasm-UFUCzYNW.wasm    659.73 kB │ gzip: 323.01 kB
+dist-web/assets/index-qmwzhumC.css         63.32 kB │ gzip:  12.90 kB
+dist-web/assets/index-6L8esETH.css        222.14 kB │ gzip:  34.88 kB
+dist-web/assets/core-DV6XEvTN.js            0.10 kB │ gzip:   0.11 kB
+dist-web/assets/index-CC3jJH8B.js          15.19 kB │ gzip:   5.94 kB
+dist-web/assets/index-DZfCvmSq.js         454.96 kB │ gzip: 149.54 kB
+dist-web/assets/ckeditor5-DARfDnpa.js   1,027.26 kB │ gzip: 250.25 kB
+✓ built in 5.94s
+
+PWA v1.3.0
+mode      generateSW
+precache  14 entries (2895.77 KiB)
+files generated
+  dist-web/sw.js
+  dist-web/workbox-a3c94b52.js
+   Compiling serde_core v1.0.228
+   Compiling stable_deref_trait v1.2.1
+   Compiling windows-link v0.2.1
+   Compiling serde v1.0.228
+   Compiling windows-link v0.1.3
+   Compiling zerofrom v0.1.8
+   Compiling memchr v2.8.2
+   Compiling litemap v0.8.2
+   Compiling writeable v0.6.3
+   Compiling windows-interface v0.59.3
+   Compiling windows-implement v0.60.2
+   Compiling windows-result v0.3.4
+   Compiling windows-strings v0.4.2
+   Compiling smallvec v1.15.2
+   Compiling utf8_iter v1.0.4
+   Compiling windows-sys v0.61.2
+   Compiling icu_normalizer_data v2.2.0
+   Compiling icu_properties_data v2.2.0
+   Compiling itoa v1.0.18
+   Compiling windows-threading v0.1.0
+   Compiling yoke v0.8.3
+   Compiling zmij v1.0.21
+   Compiling serde_json v1.0.150
+   Compiling percent-encoding v2.3.2
+   Compiling deranged v0.5.8
+   Compiling time-core v0.1.9
+   Compiling powerfmt v0.2.0
+   Compiling num-conv v0.2.2
+   Compiling webview2-com-sys v0.38.2
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling form_urlencoded v1.2.2
+   Compiling typeid v1.0.3
+   Compiling thiserror v2.0.18
+   Compiling unic-char-range v0.9.0
+   Compiling bytes v1.12.0
+   Compiling unic-common v0.9.0
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling aho-corasick v1.1.4
+   Compiling raw-window-handle v0.6.2
+   Compiling regex-syntax v0.8.11
+   Compiling crossbeam-utils v0.8.21
+   Compiling alloc-stdlib v0.2.4
+   Compiling unic-ucd-version v0.9.0
+   Compiling unic-char-property v0.9.0
+   Compiling erased-serde v0.4.10
+   Compiling thiserror v1.0.69
+   Compiling hashbrown v0.17.1
+   Compiling siphasher v1.0.3
+   Compiling equivalent v1.0.2
+   Compiling fnv v1.0.7
+   Compiling windows_x86_64_msvc v0.52.6
+   Compiling byteorder v1.5.0
+   Compiling windows-core v0.61.2
+   Compiling cfg-if v1.0.4
+   Compiling winnow v1.0.3
+   Compiling phf_shared v0.13.1
+   Compiling unic-ucd-ident v0.9.0
+   Compiling cookie v0.18.1
+   Compiling brotli-decompressor v5.0.3
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling http v1.4.2
+   Compiling icu_locale_core v2.2.0
+   Compiling icu_collections v2.2.0
+   Compiling windows-collections v0.2.0
+   Compiling windows-numerics v0.2.0
+   Compiling windows-future v0.2.1
+   Compiling indexmap v2.14.0
+   Compiling toml_parser v1.1.2+spec-1.1.0
+   Compiling quick-xml v0.41.0
+   Compiling time v0.3.53
+   Compiling windows-version v0.1.7
+   Compiling windows v0.61.3
+   Compiling webview2-com-macros v0.8.1
+   Compiling anyhow v1.0.103
+   Compiling parking_lot_core v0.9.12
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling log v0.4.33
+   Compiling dunce v1.0.5
+   Compiling base64 v0.22.1
+   Compiling scopeguard v1.2.0
+   Compiling unicode-segmentation v1.13.3
+   Compiling pin-project-lite v0.2.17
+   Compiling once_cell v1.21.4
+   Compiling lock_api v0.4.14
+   Compiling icu_provider v2.2.0
+   Compiling brotli v8.0.4
+   Compiling icu_normalizer v2.2.0
+   Compiling icu_properties v2.2.0
+   Compiling uuid v1.23.4
+   Compiling regex-automata v0.4.14
+   Compiling dpi v0.1.2
+   Compiling cfb v0.7.3
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling bitflags v2.13.0
+   Compiling serde_spanned v1.1.1
+   Compiling serde-untagged v0.1.9
+   Compiling serde_with v3.21.0
+   Compiling crossbeam-channel v0.5.15
+   Compiling idna_adapter v1.2.2
+   Compiling jsonptr v0.6.3
+   Compiling idna v1.1.0
+   Compiling winapi-util v0.1.11
+   Compiling url v2.5.8
+   Compiling same-file v1.0.6
+   Compiling json-patch v3.0.1
+   Compiling infer v0.19.0
+   Compiling walkdir v2.5.0
+   Compiling plist v1.10.0
+   Compiling toml v1.1.2+spec-1.1.0
+   Compiling phf v0.13.1
+   Compiling ctor v0.8.0
+   Compiling libc v0.2.186
+   Compiling tracing-core v0.1.36
+   Compiling semver v1.0.28
+   Compiling glob v0.3.3
+   Compiling regex v1.12.4
+   Compiling tracing v0.1.44
+   Compiling tauri-runtime v2.11.3
+   Compiling wry v0.55.1
+   Compiling windows-targets v0.52.6
+   Compiling parking_lot v0.12.5
+   Compiling option-ext v0.2.0
+   Compiling tauri-runtime-wry v2.11.4
+   Compiling windows-sys v0.59.0
+   Compiling getrandom v0.3.4
+   Compiling dirs-sys v0.5.0
+   Compiling tauri v2.11.5
+   Compiling softbuffer v0.4.8
+   Compiling urlpattern v0.3.0
+   Compiling keyboard-types v0.7.0
+   Compiling serialize-to-javascript v0.1.2
+   Compiling dirs v6.0.0
+   Compiling tokio v1.52.3
+   Compiling mime v0.3.17
+   Compiling heck v0.5.0
+   Compiling sanctissimissa v1.41.21298 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri)
+   Compiling tauri-utils v2.9.3
+   Compiling window-vibrancy v0.6.0
+   Compiling muda v0.19.3
+   Compiling tao v0.35.3
+   Compiling webview2-com v0.38.2
+warning: linker stderr: lld-link: Cannot use debug info for 'libcmt.lib(new_scalar_nothrow.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(delete_scalar_size.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(std_type_info_static.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(new_array.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(delete_array.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(std_nothrow.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(thread_safe_statics.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(guard_support.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(gs_cookie.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(fltused.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(tlssup.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(throw.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(risctrnsctrl.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(purevirt.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(wcsrchr.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(new_scalar.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(delete_scalar.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(gs_report.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(per_thread_data.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(ehstate.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(frame.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(riscchandler.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(gshandler.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(purevirt_data.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(cpu_disp.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(throw_bad_alloc.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(winapi_downlevel.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(ehhelpers.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(std_exception.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(std_type_info.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(jbcxrval.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(gshandlerseh.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(pesect.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(undname.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(locks.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(dll_dllmain.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(loadcfg.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(gs_support.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(dll_dllmain_stub.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(tncleanup.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(default_local_stdio_options.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(utility.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(dyn_tls_init.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(utility_desktop.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(initsect.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(initializers.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(softmemtag.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(initialization.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(argv_mode.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(ucrt_detection.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(ucrt_stubs.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `sanctissimissa` (lib) generated 1 warning
+warning: linker stderr: lld-link: Cannot use debug info for 'libcmt.lib(new_scalar_nothrow.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(delete_scalar_size.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(std_type_info_static.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(new_array.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(delete_array.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(std_nothrow.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(thread_safe_statics.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(guard_support.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(gs_cookie.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(fltused.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(tlssup.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(throw.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(risctrnsctrl.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(purevirt.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(wcsrchr.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(new_scalar.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(delete_scalar.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(gs_report.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(per_thread_data.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(ehstate.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(frame.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(riscchandler.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(gshandler.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(purevirt_data.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(cpu_disp.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(throw_bad_alloc.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(winapi_downlevel.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(ehhelpers.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(std_exception.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(std_type_info.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(jbcxrval.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(gshandlerseh.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(pesect.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(undname.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(locks.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(exe_main.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(loadcfg.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(utility.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(gs_support.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(matherr.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(argv_mode.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(commit_mode.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(file_mode.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(new_mode.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(thread_locale.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(tncleanup.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(env_mode.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(invalid_parameter_handler.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(denormal_control.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(default_local_stdio_options.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(matherr_detection.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(dyn_tls_init.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(dyn_tls_dtor.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(utility_desktop.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(initsect.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(initializers.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(softmemtag.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libvcruntime.lib(initialization.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libvcruntime.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(ucrt_detection.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+
+         lld-link: Cannot use debug info for 'libcmt.lib(ucrt_stubs.obj)' [LNK4099]
+         >>> failed to load reference 'D:\a\_work\1\s\binaries\amd64ret\lib\amd64\libcmt.amd64.pdb': No such file or directory
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `sanctissimissa` (bin "sanctissimissa") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 9m 47s
+       Built application at: /home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-pc-windows-msvc/release/sanctissimissa.exe
+        Warn Cross-platform compilation is experimental and does not support all features. Please use a matching host system for full compatibility.
+        Warn Signing, by default, is only supported on Windows hosts, but you can specify a custom signing command in `bundler > windows > sign_command`, for now, skipping signing the installer...
+        Info Patching /home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-pc-windows-msvc/release/sanctissimissa.exe with bundle type information: nsis
+        Info Target: x64
+     Running makensis to produce /home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/SanctissiMissa_1.41.21298_x64-setup.exe
+warning 5202: -OUTPUTCHARSET is disabled for non Win32 platforms.
+        Warn Signing, by default, is only supported on Windows hosts, but you can specify a custom signing command in `bundler > windows > sign_command`, for now, skipping signing the installer...
+    Finished 1 bundle at:
+        /home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/SanctissiMissa_1.41.21298_x64-setup.exe
+
+⏳ Pending windows-msi: requires another host or earlier required stages.
+⏳ Pending windows-msix: requires another host or earlier required stages.
+🔧 Stage: android-debug
+[provision-secrets] SAM_KEYSTORE_PROPERTIES -> /home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/keystore.properties (materialized from Admin-Manual pointer)
+(node:2409578) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+        Info Using installed NDK: /home/robin/Android/Sdk/ndk/27.0.12077973
+        Info Looking up installed tauri packages to check mismatched versions...
+     Running beforeBuildCommand `npm run build:vite`
+
+> sanctissimissa@1.41.21298 prebuild:vite
+> node scripts/sync-db.mjs
+
+synced assets/missal.db -> public/missal.db (195137536 bytes)
+
+> sanctissimissa@1.41.21298 build:vite
+> node scripts/pre-build-gate.mjs && tsc -b && vite build
+
+GATE PASS: version=1.41.21298, git clean, no duplicate in dist/
+(node:2416035) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+vite v6.4.3 building for production...
+transforming...
+✓ 944 modules transformed.
+rendering chunks...
+[plugin vite:reporter]
+(!) [NUL]/home/robin/Desktop/devProjects/sanctissimissa/node_modules/sql.js/dist/sql-wasm-browser.js?commonjs-es-import is dynamically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/accompaniment/store.ts but also statically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/data/corpusDb.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter]
+(!) /home/robin/Desktop/devProjects/sanctissimissa/node_modules/sql.js/dist/sql-wasm.wasm?url is dynamically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/accompaniment/store.ts but also statically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/data/corpusDb.ts, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist-web/registerSW.js                      0.13 kB
+dist-web/manifest.webmanifest               0.44 kB
+dist-web/index.html                         0.70 kB │ gzip:   0.41 kB
+dist-web/assets/sql-wasm-UFUCzYNW.wasm    659.73 kB │ gzip: 323.01 kB
+dist-web/assets/index-qmwzhumC.css         63.32 kB │ gzip:  12.90 kB
+dist-web/assets/index-6L8esETH.css        222.14 kB │ gzip:  34.88 kB
+dist-web/assets/core-DV6XEvTN.js            0.10 kB │ gzip:   0.11 kB
+dist-web/assets/index-CC3jJH8B.js          15.19 kB │ gzip:   5.94 kB
+dist-web/assets/index-DZfCvmSq.js         454.96 kB │ gzip: 149.54 kB
+dist-web/assets/ckeditor5-DARfDnpa.js   1,027.26 kB │ gzip: 250.25 kB
+✓ built in 5.05s
+
+PWA v1.3.0
+mode      generateSW
+precache  14 entries (2895.77 KiB)
+files generated
+  dist-web/sw.js
+  dist-web/workbox-a3c94b52.js
+   Compiling proc-macro2 v1.0.106
+   Compiling quote v1.0.46
+   Compiling unicode-ident v1.0.24
+   Compiling libc v0.2.186
+   Compiling serde_core v1.0.228
+   Compiling siphasher v1.0.3
+   Compiling fastrand v2.4.1
+   Compiling icu_properties_data v2.2.0
+   Compiling icu_normalizer_data v2.2.0
+   Compiling serde v1.0.228
+   Compiling stable_deref_trait v1.2.1
+   Compiling parking_lot_core v0.9.12
+   Compiling cfg-if v1.0.4
+   Compiling zmij v1.0.21
+   Compiling smallvec v1.15.2
+   Compiling winnow v1.0.3
+   Compiling phf_shared v0.13.1
+   Compiling memchr v2.8.2
+   Compiling version_check v0.9.5
+   Compiling thiserror v1.0.69
+   Compiling typeid v1.0.3
+   Compiling equivalent v1.0.2
+   Compiling itoa v1.0.18
+   Compiling hashbrown v0.17.1
+   Compiling num-conv v0.2.2
+   Compiling phf_generator v0.13.1
+   Compiling time-core v0.1.9
+   Compiling ident_case v1.0.1
+   Compiling strsim v0.11.1
+   Compiling phf_codegen v0.13.1
+   Compiling thiserror v2.0.18
+   Compiling writeable v0.6.3
+   Compiling litemap v0.8.2
+   Compiling erased-serde v0.4.10
+   Compiling selectors v0.36.1
+   Compiling generic-array v0.14.7
+   Compiling utf8_iter v1.0.4
+   Compiling new_debug_unreachable v1.0.6
+   Compiling indexmap v2.14.0
+   Compiling anyhow v1.0.103
+   Compiling scopeguard v1.2.0
+   Compiling precomputed-hash v0.1.1
+   Compiling lock_api v0.4.14
+   Compiling getrandom v0.4.3
+   Compiling serde_json v1.0.150
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling ctor-proc-macro v0.0.7
+   Compiling log v0.4.33
+   Compiling dtoa v1.0.11
+   Compiling utf-8 v0.7.6
+   Compiling syn v2.0.118
+   Compiling string_cache_codegen v0.6.1
+   Compiling toml_parser v1.1.2+spec-1.1.0
+   Compiling autocfg v1.5.1
+   Compiling percent-encoding v2.3.2
+   Compiling dtoa-short v0.3.5
+   Compiling tendril v0.5.0
+   Compiling form_urlencoded v1.2.2
+   Compiling aho-corasick v1.1.4
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling unic-common v0.9.0
+   Compiling unic-char-range v0.9.0
+   Compiling regex-syntax v0.8.11
+   Compiling parking_lot v0.12.5
+   Compiling camino v1.2.4
+   Compiling byteorder v1.5.0
+   Compiling unic-char-property v0.9.0
+   Compiling alloc-stdlib v0.2.4
+   Compiling unic-ucd-version v0.9.0
+   Compiling servo_arc v0.4.3
+   Compiling futures-core v0.3.32
+   Compiling schemars v0.8.22
+   Compiling rustc-hash v2.1.3
+   Compiling bitflags v2.13.0
+   Compiling string_cache v0.9.0
+   Compiling indexmap v1.9.3
+   Compiling pin-project-lite v0.2.17
+   Compiling bit-vec v0.8.0
+   Compiling fnv v1.0.7
+   Compiling hashbrown v0.12.3
+   Compiling deranged v0.5.8
+   Compiling powerfmt v0.2.0
+   Compiling web_atoms v0.2.5
+   Compiling brotli-decompressor v5.0.3
+   Compiling bit-set v0.8.0
+   Compiling unic-ucd-ident v0.9.0
+   Compiling quick-xml v0.41.0
+   Compiling bytes v1.12.0
+   Compiling dunce v1.0.5
+   Compiling dyn-clone v1.0.20
+   Compiling foldhash v0.2.0
+   Compiling jni-sys v0.3.1
+   Compiling same-file v1.0.6
+   Compiling base64 v0.22.1
+   Compiling walkdir v2.5.0
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling serde_spanned v1.1.1
+   Compiling semver v1.0.28
+   Compiling uuid v1.23.4
+   Compiling http v1.4.2
+   Compiling toml v1.1.2+spec-1.1.0
+   Compiling brotli v8.0.4
+   Compiling time v0.3.53
+   Compiling ctor v0.8.0
+   Compiling cfb v0.7.3
+   Compiling serde-untagged v0.1.9
+   Compiling glob v0.3.3
+   Compiling find-msvc-tools v0.1.9
+   Compiling shlex v2.0.1
+   Compiling rustc_version v0.4.1
+   Compiling toml_edit v0.25.12+spec-1.1.0
+   Compiling regex-automata v0.4.14
+   Compiling cc v1.2.66
+   Compiling toml_datetime v0.7.5+spec-1.1.0
+   Compiling socket2 v0.6.4
+   Compiling infer v0.19.0
+   Compiling mio v1.2.1
+   Compiling time-macros v0.2.31
+   Compiling winnow v0.7.15
+   Compiling simd-adler32 v0.3.9
+   Compiling typenum v1.20.1
+   Compiling crc32fast v1.5.0
+   Compiling synstructure v0.13.2
+   Compiling darling_core v0.23.0
+   Compiling serde_derive_internals v0.29.1
+   Compiling once_cell v1.21.4
+   Compiling option-ext v0.2.0
+   Compiling rustversion v1.0.22
+   Compiling dirs-sys v0.5.0
+   Compiling embed-resource v3.0.11
+   Compiling proc-macro-crate v3.5.0
+   Compiling regex v1.12.4
+   Compiling toml v0.9.12+spec-1.1.0
+   Compiling adler2 v2.0.1
+   Compiling crossbeam-utils v0.8.21
+   Compiling heck v0.5.0
+   Compiling miniz_oxide v0.8.9
+   Compiling tauri-winres v0.3.6
+   Compiling dirs v6.0.0
+   Compiling cookie v0.18.1
+   Compiling cesu8 v1.1.0
+   Compiling raw-window-handle v0.6.2
+   Compiling httparse v1.10.1
+   Compiling futures-task v0.3.32
+   Compiling slab v0.4.12
+   Compiling flate2 v1.1.9
+   Compiling futures-util v0.3.32
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling fdeflate v0.3.7
+   Compiling try-lock v0.2.5
+   Compiling bitflags v1.3.2
+   Compiling tower-service v0.3.3
+   Compiling png v0.17.16
+   Compiling want v0.3.1
+   Compiling serde_derive v1.0.228
+   Compiling zerofrom-derive v0.1.7
+   Compiling yoke-derive v0.8.2
+   Compiling zerovec-derive v0.11.3
+   Compiling displaydoc v0.2.6
+   Compiling phf_macros v0.13.1
+   Compiling thiserror-impl v1.0.69
+   Compiling cssparser-macros v0.6.1
+   Compiling derive_more-impl v2.1.1
+   Compiling darling_macro v0.23.0
+   Compiling thiserror-impl v2.0.18
+   Compiling schemars_derive v0.8.22
+   Compiling jni-sys-macros v0.4.1
+   Compiling num_enum_derive v0.7.6
+   Compiling darling v0.23.0
+   Compiling serde_with_macros v3.21.0
+   Compiling phf v0.13.1
+   Compiling cssparser v0.36.0
+   Compiling jni-sys v0.4.1
+   Compiling derive_more v2.1.1
+   Compiling ndk-sys v0.6.0+11769913
+   Compiling zerofrom v0.1.8
+   Compiling yoke v0.8.3
+   Compiling markup5ever v0.38.0
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling html5ever v0.38.0
+   Compiling num_enum v0.7.6
+   Compiling serde_with v3.21.0
+   Compiling tao-macros v0.1.3
+   Compiling ndk v0.9.0
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling icu_collections v2.2.0
+   Compiling icu_locale_core v2.2.0
+   Compiling dom_query v0.27.0
+   Compiling crossbeam-channel v0.5.15
+   Compiling digest v0.10.7
+   Compiling tracing-core v0.1.36
+   Compiling futures-channel v0.3.32
+   Compiling sync_wrapper v1.0.2
+   Compiling icu_provider v2.2.0
+   Compiling cpufeatures v0.2.17
+   Compiling wry v0.55.1
+   Compiling icu_properties v2.2.0
+   Compiling icu_normalizer v2.2.0
+   Compiling atomic-waker v1.1.2
+   Compiling tower-layer v0.3.3
+   Compiling tauri-runtime v2.11.3
+   Compiling sha2 v0.10.9
+   Compiling tracing v0.1.44
+   Compiling ico v0.5.0
+   Compiling tauri-runtime-wry v2.11.4
+   Compiling getrandom v0.3.4
+   Compiling futures-sink v0.3.32
+   Compiling ipnet v2.12.0
+   Compiling dpi v0.1.2
+   Compiling cargo-platform v0.1.9
+   Compiling jsonptr v0.6.3
+   Compiling plist v1.10.0
+   Compiling cargo_toml v0.22.3
+   Compiling cargo_metadata v0.19.2
+   Compiling serialize-to-javascript-impl v0.1.2
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling json-patch v3.0.1
+   Compiling tokio v1.52.3
+   Compiling combine v4.6.7
+   Compiling serialize-to-javascript v0.1.2
+   Compiling url v2.5.8
+   Compiling serde_repr v0.1.20
+   Compiling mime v0.3.17
+   Compiling http-body v1.0.1
+   Compiling http-body-util v0.1.3
+   Compiling urlpattern v0.3.0
+   Compiling tauri-utils v2.9.3
+   Compiling jni v0.21.1
+   Compiling hyper v1.10.1
+   Compiling tower v0.5.3
+   Compiling tokio-util v0.7.18
+   Compiling tower-http v0.6.11
+   Compiling hyper-util v0.1.20
+   Compiling reqwest v0.13.4
+   Compiling tao v0.35.3
+   Compiling tauri-build v2.6.3
+   Compiling tauri-codegen v2.6.3
+   Compiling tauri v2.11.5
+   Compiling tauri-macros v2.6.3
+   Compiling sanctissimissa v1.41.21298 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2m 01s
+        Info symlinking lib "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/debug/libsanctissimissa_lib.so" in jniLibs dir "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libandroid.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libdl.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "liblog.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libm.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libc.so"
+        Info symlink at "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a/libsanctissimissa_lib.so" points to "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/debug/libsanctissimissa_lib.so"
+w: file:///home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/buildSrc/src/main/java/mba/robin/sanctissimissa/kotlin/BuildTask.kt:53:17 'exec(Action<in ExecSpec!>): ExecResult' is deprecated. Deprecated in Java
+        Info connection; remote_addr=127.0.0.1:42986 conn_id=0
+        Info Using installed NDK: /home/robin/Android/Sdk/ndk/27.0.12077973
+   Compiling wry v0.55.1
+   Compiling tauri v2.11.5
+   Compiling sanctissimissa v1.41.21298 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri)
+   Compiling tauri-runtime-wry v2.11.4
+w: file:///home/robin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.5/mobile/android/src/main/java/app/tauri/AppPlugin.kt:35:37 'onBackPressed(): Unit' is deprecated. Deprecated in Java
+w: file:///home/robin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.5/mobile/android/src/main/java/app/tauri/plugin/Plugin.kt:107:5 'onDestroy(): Unit' is deprecated. use onDestroy(activity: AppCompatActivity) instead
+w: file:///home/robin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.5/mobile/android/src/main/java/app/tauri/plugin/Plugin.kt:112:5 'onRestart(): Unit' is deprecated. use onRestart(activity: AppCompatActivity) instead
+w: file:///home/robin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.5/mobile/android/src/main/java/app/tauri/plugin/PluginMethodData.kt:11:23 Parameter 'methodDecorator' is never used
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 31.51s
+        Info symlinking lib "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/debug/libsanctissimissa_lib.so" in jniLibs dir "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libandroid.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libdl.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "liblog.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libm.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libc.so"
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+3 warnings
+        Info connection; remote_addr=127.0.0.1:34336 conn_id=1
+        Info Using installed NDK: /home/robin/Android/Sdk/ndk/27.0.12077973
+   Compiling stable_deref_trait v1.2.1
+   Compiling serde_core v1.0.228
+   Compiling serde v1.0.228
+   Compiling libc v0.2.186
+   Compiling smallvec v1.15.2
+   Compiling memchr v2.8.2
+   Compiling itoa v1.0.18
+   Compiling zerofrom v0.1.8
+   Compiling writeable v0.6.3
+   Compiling cfg-if v1.0.4
+   Compiling litemap v0.8.2
+   Compiling utf8_iter v1.0.4
+   Compiling siphasher v1.0.3
+   Compiling icu_normalizer_data v2.2.0
+   Compiling icu_properties_data v2.2.0
+   Compiling log v0.4.33
+   Compiling pin-project-lite v0.2.17
+   Compiling percent-encoding v2.3.2
+   Compiling futures-core v0.3.32
+   Compiling yoke v0.8.3
+   Compiling thiserror v1.0.69
+   Compiling zmij v1.0.21
+   Compiling parking_lot_core v0.9.12
+   Compiling scopeguard v1.2.0
+   Compiling phf_shared v0.13.1
+   Compiling new_debug_unreachable v1.0.6
+   Compiling jni-sys v0.3.1
+   Compiling serde_json v1.0.150
+   Compiling lock_api v0.4.14
+   Compiling form_urlencoded v1.2.2
+   Compiling jni-sys v0.4.1
+   Compiling bitflags v2.13.0
+   Compiling precomputed-hash v0.1.1
+   Compiling generic-array v0.14.7
+   Compiling powerfmt v0.2.0
+   Compiling once_cell v1.21.4
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling deranged v0.5.8
+   Compiling base64 v0.22.1
+   Compiling typenum v1.20.1
+   Compiling phf v0.13.1
+   Compiling num-conv v0.2.2
+   Compiling time-core v0.1.9
+   Compiling aho-corasick v1.1.4
+   Compiling web_atoms v0.2.5
+   Compiling typeid v1.0.3
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling utf-8 v0.7.6
+   Compiling socket2 v0.6.4
+   Compiling mio v1.2.1
+   Compiling dtoa v1.0.11
+   Compiling regex-syntax v0.8.11
+   Compiling unic-char-range v0.9.0
+   Compiling unic-common v0.9.0
+   Compiling crossbeam-utils v0.8.21
+   Compiling alloc-stdlib v0.2.4
+   Compiling parking_lot v0.12.5
+   Compiling dtoa-short v0.3.5
+   Compiling unic-char-property v0.9.0
+   Compiling unic-ucd-version v0.9.0
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling tendril v0.5.0
+   Compiling thiserror v2.0.18
+   Compiling icu_collections v2.2.0
+   Compiling icu_locale_core v2.2.0
+   Compiling string_cache v0.9.0
+   Compiling erased-serde v0.4.10
+   Compiling equivalent v1.0.2
+   Compiling hashbrown v0.17.1
+   Compiling futures-task v0.3.32
+   Compiling winnow v1.0.3
+   Compiling cesu8 v1.1.0
+   Compiling raw-window-handle v0.6.2
+   Compiling slab v0.4.12
+   Compiling fnv v1.0.7
+   Compiling byteorder v1.5.0
+   Compiling futures-util v0.3.32
+   Compiling toml_parser v1.1.2+spec-1.1.0
+   Compiling time v0.3.53
+   Compiling httparse v1.10.1
+   Compiling cookie v0.18.1
+   Compiling num_enum v0.7.6
+   Compiling unic-ucd-ident v0.9.0
+   Compiling cssparser v0.36.0
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling brotli-decompressor v5.0.3
+   Compiling indexmap v2.14.0
+   Compiling ndk-sys v0.6.0+11769913
+   Compiling quick-xml v0.41.0
+   Compiling servo_arc v0.4.3
+   Compiling anyhow v1.0.103
+   Compiling derive_more v2.1.1
+   Compiling icu_provider v2.2.0
+   Compiling markup5ever v0.38.0
+   Compiling icu_normalizer v2.2.0
+   Compiling icu_properties v2.2.0
+   Compiling uuid v1.23.4
+   Compiling regex-automata v0.4.14
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling serde_spanned v1.1.1
+   Compiling bytes v1.12.0
+   Compiling dpi v0.1.2
+   Compiling cfb v0.7.3
+   Compiling selectors v0.36.1
+   Compiling rustc-hash v2.1.3
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling try-lock v0.2.5
+   Compiling bit-vec v0.8.0
+   Compiling same-file v1.0.6
+   Compiling tower-service v0.3.3
+   Compiling toml v1.1.2+spec-1.1.0
+   Compiling walkdir v2.5.0
+   Compiling want v0.3.1
+   Compiling serde-untagged v0.1.9
+   Compiling bit-set v0.8.0
+   Compiling http v1.4.2
+   Compiling tokio v1.52.3
+   Compiling combine v4.6.7
+   Compiling jsonptr v0.6.3
+   Compiling infer v0.19.0
+   Compiling brotli v8.0.4
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling json-patch v3.0.1
+   Compiling url v2.5.8
+   Compiling http-body v1.0.1
+   Compiling plist v1.10.0
+   Compiling ndk v0.9.0
+   Compiling html5ever v0.38.0
+   Compiling serde_with v3.21.0
+   Compiling crossbeam-channel v0.5.15
+   Compiling regex v1.12.4
+   Compiling digest v0.10.7
+   Compiling urlpattern v0.3.0
+   Compiling tracing-core v0.1.36
+   Compiling sync_wrapper v1.0.2
+   Compiling futures-channel v0.3.32
+   Compiling ctor v0.8.0
+   Compiling glob v0.3.3
+   Compiling dunce v1.0.5
+   Compiling semver v1.0.28
+   Compiling tower-layer v0.3.3
+   Compiling foldhash v0.2.0
+   Compiling atomic-waker v1.1.2
+   Compiling wry v0.55.1
+   Compiling tracing v0.1.44
+   Compiling tauri-runtime v2.11.3
+   Compiling sha2 v0.10.9
+   Compiling futures-sink v0.3.32
+   Compiling dom_query v0.27.0
+   Compiling option-ext v0.2.0
+   Compiling ipnet v2.12.0
+   Compiling tauri-runtime-wry v2.11.4
+   Compiling dirs-sys v0.5.0
+   Compiling getrandom v0.3.4
+   Compiling tauri v2.11.5
+   Compiling http-body-util v0.1.3
+   Compiling serialize-to-javascript v0.1.2
+   Compiling dirs v6.0.0
+   Compiling mime v0.3.17
+   Compiling heck v0.5.0
+   Compiling sanctissimissa v1.41.21298 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri)
+   Compiling tauri-utils v2.9.3
+   Compiling jni v0.21.1
+   Compiling hyper v1.10.1
+   Compiling tower v0.5.3
+   Compiling tokio-util v0.7.18
+   Compiling tower-http v0.6.11
+   Compiling hyper-util v0.1.20
+   Compiling reqwest v0.13.4
+   Compiling tao v0.35.3
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 38s
+        Info symlinking lib "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/debug/libsanctissimissa_lib.so" in jniLibs dir "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/armeabi-v7a"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/debug/libsanctissimissa_lib.so" requires shared lib "libandroid.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/debug/libsanctissimissa_lib.so" requires shared lib "libdl.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/debug/libsanctissimissa_lib.so" requires shared lib "liblog.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/debug/libsanctissimissa_lib.so" requires shared lib "libm.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/debug/libsanctissimissa_lib.so" requires shared lib "libc.so"
+        Info connection; remote_addr=127.0.0.1:33266 conn_id=2
+        Info Using installed NDK: /home/robin/Android/Sdk/ndk/27.0.12077973
+   Compiling stable_deref_trait v1.2.1
+   Compiling serde_core v1.0.228
+   Compiling serde v1.0.228
+   Compiling libc v0.2.186
+   Compiling smallvec v1.15.2
+   Compiling itoa v1.0.18
+   Compiling memchr v2.8.2
+   Compiling zerofrom v0.1.8
+   Compiling litemap v0.8.2
+   Compiling writeable v0.6.3
+   Compiling cfg-if v1.0.4
+   Compiling siphasher v1.0.3
+   Compiling utf8_iter v1.0.4
+   Compiling icu_properties_data v2.2.0
+   Compiling icu_normalizer_data v2.2.0
+   Compiling log v0.4.33
+   Compiling futures-core v0.3.32
+   Compiling pin-project-lite v0.2.17
+   Compiling percent-encoding v2.3.2
+   Compiling yoke v0.8.3
+   Compiling thiserror v1.0.69
+   Compiling parking_lot_core v0.9.12
+   Compiling zmij v1.0.21
+   Compiling phf_shared v0.13.1
+   Compiling scopeguard v1.2.0
+   Compiling new_debug_unreachable v1.0.6
+   Compiling jni-sys v0.3.1
+   Compiling serde_json v1.0.150
+   Compiling form_urlencoded v1.2.2
+   Compiling jni-sys v0.4.1
+   Compiling lock_api v0.4.14
+   Compiling bitflags v2.13.0
+   Compiling precomputed-hash v0.1.1
+   Compiling generic-array v0.14.7
+   Compiling once_cell v1.21.4
+   Compiling time-core v0.1.9
+   Compiling deranged v0.5.8
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling num-conv v0.2.2
+   Compiling powerfmt v0.2.0
+   Compiling typenum v1.20.1
+   Compiling phf v0.13.1
+   Compiling base64 v0.22.1
+   Compiling aho-corasick v1.1.4
+   Compiling web_atoms v0.2.5
+   Compiling typeid v1.0.3
+   Compiling unic-char-range v0.9.0
+   Compiling unic-common v0.9.0
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling regex-syntax v0.8.11
+   Compiling dtoa v1.0.11
+   Compiling utf-8 v0.7.6
+   Compiling unic-char-property v0.9.0
+   Compiling alloc-stdlib v0.2.4
+   Compiling unic-ucd-version v0.9.0
+   Compiling socket2 v0.6.4
+   Compiling mio v1.2.1
+   Compiling dtoa-short v0.3.5
+   Compiling crossbeam-utils v0.8.21
+   Compiling tendril v0.5.0
+   Compiling thiserror v2.0.18
+   Compiling erased-serde v0.4.10
+   Compiling parking_lot v0.12.5
+   Compiling futures-task v0.3.32
+   Compiling byteorder v1.5.0
+   Compiling slab v0.4.12
+   Compiling cesu8 v1.1.0
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling string_cache v0.9.0
+   Compiling hashbrown v0.17.1
+   Compiling equivalent v1.0.2
+   Compiling raw-window-handle v0.6.2
+   Compiling fnv v1.0.7
+   Compiling icu_collections v2.2.0
+   Compiling icu_locale_core v2.2.0
+   Compiling winnow v1.0.3
+   Compiling httparse v1.10.1
+   Compiling futures-util v0.3.32
+   Compiling cookie v0.18.1
+   Compiling cssparser v0.36.0
+   Compiling num_enum v0.7.6
+   Compiling time v0.3.53
+   Compiling brotli-decompressor v5.0.3
+   Compiling unic-ucd-ident v0.9.0
+   Compiling ndk-sys v0.6.0+11769913
+   Compiling toml_parser v1.1.2+spec-1.1.0
+   Compiling indexmap v2.14.0
+   Compiling quick-xml v0.41.0
+   Compiling servo_arc v0.4.3
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling anyhow v1.0.103
+   Compiling icu_provider v2.2.0
+   Compiling markup5ever v0.38.0
+   Compiling derive_more v2.1.1
+   Compiling selectors v0.36.1
+   Compiling try-lock v0.2.5
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling rustc-hash v2.1.3
+   Compiling icu_properties v2.2.0
+   Compiling icu_normalizer v2.2.0
+   Compiling regex-automata v0.4.14
+   Compiling same-file v1.0.6
+   Compiling bit-vec v0.8.0
+w: file:///home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/java/mba/robin/sanctissimissa/generated/RustWebView.kt:26:18 'setter for databaseEnabled: Boolean' is deprecated. Deprecated in Java
+w: file:///home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/java/mba/robin/sanctissimissa/generated/WryActivity.kt:69:46 'onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+   Compiling tower-service v0.3.3
+   Compiling walkdir v2.5.0
+   Compiling brotli v8.0.4
+   Compiling want v0.3.1
+   Compiling html5ever v0.38.0
+   Compiling ndk v0.9.0
+   Compiling bit-set v0.8.0
+   Compiling digest v0.10.7
+   Compiling crossbeam-channel v0.5.15
+   Compiling uuid v1.23.4
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling serde_spanned v1.1.1
+   Compiling toml v1.1.2+spec-1.1.0
+   Compiling cfb v0.7.3
+   Compiling serde_with v3.21.0
+   Compiling bytes v1.12.0
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling dpi v0.1.2
+   Compiling serde-untagged v0.1.9
+   Compiling plist v1.10.0
+   Compiling url v2.5.8
+   Compiling jsonptr v0.6.3
+   Compiling infer v0.19.0
+   Compiling tracing-core v0.1.36
+   Compiling http v1.4.2
+   Compiling tokio v1.52.3
+   Compiling combine v4.6.7
+   Compiling json-patch v3.0.1
+   Compiling regex v1.12.4
+   Compiling sync_wrapper v1.0.2
+   Compiling futures-channel v0.3.32
+   Compiling ctor v0.8.0
+   Compiling semver v1.0.28
+   Compiling tower-layer v0.3.3
+   Compiling foldhash v0.2.0
+   Compiling glob v0.3.3
+   Compiling atomic-waker v1.1.2
+   Compiling cpufeatures v0.2.17
+   Compiling dunce v1.0.5
+   Compiling wry v0.55.1
+   Compiling http-body v1.0.1
+   Compiling urlpattern v0.3.0
+   Compiling sha2 v0.10.9
+   Compiling tauri-runtime v2.11.3
+   Compiling dom_query v0.27.0
+   Compiling tracing v0.1.44
+   Compiling option-ext v0.2.0
+   Compiling futures-sink v0.3.32
+   Compiling ipnet v2.12.0
+   Compiling dirs-sys v0.5.0
+   Compiling getrandom v0.3.4
+   Compiling tauri-runtime-wry v2.11.4
+   Compiling tauri v2.11.5
+   Compiling http-body-util v0.1.3
+   Compiling serialize-to-javascript v0.1.2
+   Compiling dirs v6.0.0
+   Compiling heck v0.5.0
+   Compiling mime v0.3.17
+   Compiling sanctissimissa v1.41.21298 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri)
+   Compiling tauri-utils v2.9.3
+   Compiling tower v0.5.3
+   Compiling hyper v1.10.1
+   Compiling tokio-util v0.7.18
+   Compiling jni v0.21.1
+   Compiling tower-http v0.6.11
+   Compiling hyper-util v0.1.20
+   Compiling reqwest v0.13.4
+   Compiling tao v0.35.3
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 35s
+        Info symlinking lib "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/debug/libsanctissimissa_lib.so" in jniLibs dir "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/x86"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libandroid.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libdl.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "liblog.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libm.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libc.so"
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+3 warnings
+        Info connection; remote_addr=127.0.0.1:36066 conn_id=3
+        Info Using installed NDK: /home/robin/Android/Sdk/ndk/27.0.12077973
+   Compiling stable_deref_trait v1.2.1
+   Compiling serde_core v1.0.228
+   Compiling serde v1.0.228
+   Compiling libc v0.2.186
+   Compiling smallvec v1.15.2
+   Compiling itoa v1.0.18
+   Compiling memchr v2.8.2
+   Compiling zerofrom v0.1.8
+   Compiling writeable v0.6.3
+   Compiling cfg-if v1.0.4
+   Compiling litemap v0.8.2
+   Compiling siphasher v1.0.3
+   Compiling utf8_iter v1.0.4
+   Compiling icu_properties_data v2.2.0
+   Compiling icu_normalizer_data v2.2.0
+   Compiling log v0.4.33
+   Compiling pin-project-lite v0.2.17
+   Compiling futures-core v0.3.32
+   Compiling percent-encoding v2.3.2
+   Compiling yoke v0.8.3
+   Compiling thiserror v1.0.69
+   Compiling zmij v1.0.21
+   Compiling parking_lot_core v0.9.12
+   Compiling new_debug_unreachable v1.0.6
+   Compiling scopeguard v1.2.0
+   Compiling phf_shared v0.13.1
+   Compiling jni-sys v0.3.1
+   Compiling form_urlencoded v1.2.2
+   Compiling serde_json v1.0.150
+   Compiling jni-sys v0.4.1
+   Compiling lock_api v0.4.14
+   Compiling bitflags v2.13.0
+   Compiling precomputed-hash v0.1.1
+   Compiling generic-array v0.14.7
+   Compiling deranged v0.5.8
+   Compiling typenum v1.20.1
+   Compiling time-core v0.1.9
+   Compiling num-conv v0.2.2
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling base64 v0.22.1
+   Compiling powerfmt v0.2.0
+   Compiling phf v0.13.1
+   Compiling once_cell v1.21.4
+   Compiling web_atoms v0.2.5
+   Compiling typeid v1.0.3
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling dtoa v1.0.11
+   Compiling aho-corasick v1.1.4
+   Compiling mio v1.2.1
+   Compiling socket2 v0.6.4
+   Compiling regex-syntax v0.8.11
+   Compiling unic-char-range v0.9.0
+   Compiling unic-common v0.9.0
+   Compiling utf-8 v0.7.6
+   Compiling crossbeam-utils v0.8.21
+   Compiling unic-char-property v0.9.0
+   Compiling unic-ucd-version v0.9.0
+   Compiling dtoa-short v0.3.5
+   Compiling tendril v0.5.0
+   Compiling parking_lot v0.12.5
+   Compiling alloc-stdlib v0.2.4
+   Compiling thiserror v2.0.18
+   Compiling erased-serde v0.4.10
+   Compiling hashbrown v0.17.1
+   Compiling slab v0.4.12
+   Compiling futures-task v0.3.32
+   Compiling equivalent v1.0.2
+   Compiling byteorder v1.5.0
+   Compiling raw-window-handle v0.6.2
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling string_cache v0.9.0
+   Compiling winnow v1.0.3
+   Compiling fnv v1.0.7
+   Compiling icu_collections v2.2.0
+   Compiling icu_locale_core v2.2.0
+   Compiling cesu8 v1.1.0
+   Compiling futures-util v0.3.32
+   Compiling httparse v1.10.1
+   Compiling cookie v0.18.1
+   Compiling num_enum v0.7.6
+   Compiling brotli-decompressor v5.0.3
+   Compiling cssparser v0.36.0
+   Compiling unic-ucd-ident v0.9.0
+   Compiling ndk-sys v0.6.0+11769913
+   Compiling time v0.3.53
+   Compiling indexmap v2.14.0
+   Compiling toml_parser v1.1.2+spec-1.1.0
+   Compiling quick-xml v0.41.0
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling servo_arc v0.4.3
+   Compiling anyhow v1.0.103
+   Compiling markup5ever v0.38.0
+   Compiling selectors v0.36.1
+   Compiling derive_more v2.1.1
+   Compiling try-lock v0.2.5
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling same-file v1.0.6
+   Compiling rustc-hash v2.1.3
+   Compiling icu_provider v2.2.0
+   Compiling bit-vec v0.8.0
+   Compiling tower-service v0.3.3
+   Compiling ndk v0.9.0
+   Compiling walkdir v2.5.0
+   Compiling html5ever v0.38.0
+   Compiling want v0.3.1
+   Compiling bit-set v0.8.0
+   Compiling brotli v8.0.4
+   Compiling icu_normalizer v2.2.0
+   Compiling icu_properties v2.2.0
+   Compiling regex-automata v0.4.14
+   Compiling uuid v1.23.4
+   Compiling serde_spanned v1.1.1
+   Compiling cfb v0.7.3
+   Compiling bytes v1.12.0
+   Compiling dpi v0.1.2
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling serde_with v3.21.0
+   Compiling digest v0.10.7
+   Compiling crossbeam-channel v0.5.15
+   Compiling serde-untagged v0.1.9
+   Compiling toml v1.1.2+spec-1.1.0
+   Compiling tracing-core v0.1.36
+   Compiling futures-channel v0.3.32
+   Compiling sync_wrapper v1.0.2
+   Compiling jsonptr v0.6.3
+   Compiling http v1.4.2
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling tokio v1.52.3
+   Compiling combine v4.6.7
+   Compiling plist v1.10.0
+   Compiling json-patch v3.0.1
+   Compiling url v2.5.8
+   Compiling infer v0.19.0
+   Compiling ctor v0.8.0
+   Compiling atomic-waker v1.1.2
+   Compiling tower-layer v0.3.3
+   Compiling glob v0.3.3
+   Compiling cpufeatures v0.2.17
+   Compiling semver v1.0.28
+   Compiling dunce v1.0.5
+   Compiling http-body v1.0.1
+   Compiling foldhash v0.2.0
+   Compiling wry v0.55.1
+   Compiling sha2 v0.10.9
+   Compiling regex v1.12.4
+   Compiling dom_query v0.27.0
+   Compiling tauri-runtime v2.11.3
+   Compiling tracing v0.1.44
+   Compiling ipnet v2.12.0
+   Compiling option-ext v0.2.0
+   Compiling futures-sink v0.3.32
+   Compiling tauri-runtime-wry v2.11.4
+   Compiling getrandom v0.3.4
+   Compiling dirs-sys v0.5.0
+   Compiling tauri v2.11.5
+   Compiling http-body-util v0.1.3
+   Compiling serialize-to-javascript v0.1.2
+   Compiling dirs v6.0.0
+   Compiling urlpattern v0.3.0
+   Compiling heck v0.5.0
+   Compiling mime v0.3.17
+   Compiling sanctissimissa v1.41.21298 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri)
+   Compiling tauri-utils v2.9.3
+   Compiling tower v0.5.3
+   Compiling hyper v1.10.1
+   Compiling tokio-util v0.7.18
+   Compiling jni v0.21.1
+   Compiling tower-http v0.6.11
+   Compiling hyper-util v0.1.20
+   Compiling reqwest v0.13.4
+   Compiling tao v0.35.3
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 35s
+        Info symlinking lib "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/debug/libsanctissimissa_lib.so" in jniLibs dir "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/x86_64"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libandroid.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libdl.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "liblog.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libm.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/debug/libsanctissimissa_lib.so" requires shared lib "libc.so"
+
+[Incubating] Problems report is available at: file:///home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+    Finished 1 APK at:
+        /home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk
+
+🔧 Stage: android-release
+[provision-secrets] SAM_KEYSTORE_PROPERTIES -> /home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/keystore.properties (materialized from Admin-Manual pointer)
+(node:2434132) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+        Info Using installed NDK: /home/robin/Android/Sdk/ndk/27.0.12077973
+        Info Looking up installed tauri packages to check mismatched versions...
+     Running beforeBuildCommand `npm run build:vite`
+
+> sanctissimissa@1.41.21298 prebuild:vite
+> node scripts/sync-db.mjs
+
+synced assets/missal.db -> public/missal.db (195137536 bytes)
+
+> sanctissimissa@1.41.21298 build:vite
+> node scripts/pre-build-gate.mjs && tsc -b && vite build
+
+GATE PASS: version=1.41.21298, git clean, no duplicate in dist/
+(node:2440644) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+vite v6.4.3 building for production...
+transforming...
+✓ 944 modules transformed.
+rendering chunks...
+[plugin vite:reporter]
+(!) [NUL]/home/robin/Desktop/devProjects/sanctissimissa/node_modules/sql.js/dist/sql-wasm-browser.js?commonjs-es-import is dynamically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/accompaniment/store.ts but also statically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/data/corpusDb.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter]
+(!) /home/robin/Desktop/devProjects/sanctissimissa/node_modules/sql.js/dist/sql-wasm.wasm?url is dynamically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/accompaniment/store.ts but also statically imported by /home/robin/Desktop/devProjects/sanctissimissa/src/core/data/corpusDb.ts, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist-web/registerSW.js                      0.13 kB
+dist-web/manifest.webmanifest               0.44 kB
+dist-web/index.html                         0.70 kB │ gzip:   0.41 kB
+dist-web/assets/sql-wasm-UFUCzYNW.wasm    659.73 kB │ gzip: 323.01 kB
+dist-web/assets/index-qmwzhumC.css         63.32 kB │ gzip:  12.90 kB
+dist-web/assets/index-6L8esETH.css        222.14 kB │ gzip:  34.88 kB
+dist-web/assets/core-DV6XEvTN.js            0.10 kB │ gzip:   0.11 kB
+dist-web/assets/index-CC3jJH8B.js          15.19 kB │ gzip:   5.94 kB
+dist-web/assets/index-DZfCvmSq.js         454.96 kB │ gzip: 149.54 kB
+dist-web/assets/ckeditor5-DARfDnpa.js   1,027.26 kB │ gzip: 250.25 kB
+✓ built in 5.24s
+
+PWA v1.3.0
+mode      generateSW
+precache  14 entries (2895.77 KiB)
+files generated
+  dist-web/sw.js
+  dist-web/workbox-a3c94b52.js
+   Compiling proc-macro2 v1.0.106
+   Compiling quote v1.0.46
+   Compiling unicode-ident v1.0.24
+   Compiling libc v0.2.186
+   Compiling serde_core v1.0.228
+   Compiling siphasher v1.0.3
+   Compiling fastrand v2.4.1
+   Compiling icu_normalizer_data v2.2.0
+   Compiling icu_properties_data v2.2.0
+   Compiling serde v1.0.228
+   Compiling parking_lot_core v0.9.12
+   Compiling stable_deref_trait v1.2.1
+   Compiling zmij v1.0.21
+   Compiling cfg-if v1.0.4
+   Compiling smallvec v1.15.2
+   Compiling winnow v1.0.3
+   Compiling thiserror v1.0.69
+   Compiling phf_shared v0.13.1
+   Compiling memchr v2.8.2
+   Compiling version_check v0.9.5
+   Compiling typeid v1.0.3
+   Compiling itoa v1.0.18
+   Compiling hashbrown v0.17.1
+   Compiling num-conv v0.2.2
+   Compiling time-core v0.1.9
+   Compiling equivalent v1.0.2
+   Compiling phf_generator v0.13.1
+   Compiling writeable v0.6.3
+   Compiling thiserror v2.0.18
+   Compiling phf_codegen v0.13.1
+   Compiling litemap v0.8.2
+   Compiling erased-serde v0.4.10
+   Compiling ident_case v1.0.1
+   Compiling strsim v0.11.1
+   Compiling selectors v0.36.1
+   Compiling generic-array v0.14.7
+   Compiling utf8_iter v1.0.4
+   Compiling anyhow v1.0.103
+   Compiling new_debug_unreachable v1.0.6
+   Compiling scopeguard v1.2.0
+   Compiling lock_api v0.4.14
+   Compiling indexmap v2.14.0
+   Compiling getrandom v0.4.3
+   Compiling precomputed-hash v0.1.1
+   Compiling serde_json v1.0.150
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling syn v2.0.118
+   Compiling string_cache_codegen v0.6.1
+   Compiling ctor-proc-macro v0.0.7
+   Compiling log v0.4.33
+   Compiling dtoa v1.0.11
+   Compiling utf-8 v0.7.6
+   Compiling percent-encoding v2.3.2
+   Compiling autocfg v1.5.1
+   Compiling toml_parser v1.1.2+spec-1.1.0
+   Compiling form_urlencoded v1.2.2
+   Compiling tendril v0.5.0
+   Compiling dtoa-short v0.3.5
+   Compiling aho-corasick v1.1.4
+   Compiling unic-common v0.9.0
+   Compiling parking_lot v0.12.5
+   Compiling camino v1.2.4
+   Compiling byteorder v1.5.0
+   Compiling regex-syntax v0.8.11
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling unic-char-range v0.9.0
+   Compiling unic-ucd-version v0.9.0
+   Compiling unic-char-property v0.9.0
+   Compiling alloc-stdlib v0.2.4
+   Compiling web_atoms v0.2.5
+   Compiling string_cache v0.9.0
+   Compiling servo_arc v0.4.3
+   Compiling pin-project-lite v0.2.17
+   Compiling futures-core v0.3.32
+   Compiling bitflags v2.13.0
+   Compiling powerfmt v0.2.0
+   Compiling indexmap v1.9.3
+   Compiling deranged v0.5.8
+   Compiling hashbrown v0.12.3
+   Compiling rustc-hash v2.1.3
+   Compiling fnv v1.0.7
+   Compiling bit-vec v0.8.0
+   Compiling schemars v0.8.22
+   Compiling brotli-decompressor v5.0.3
+   Compiling unic-ucd-ident v0.9.0
+   Compiling quick-xml v0.41.0
+   Compiling bit-set v0.8.0
+   Compiling jni-sys v0.3.1
+   Compiling dunce v1.0.5
+   Compiling dyn-clone v1.0.20
+   Compiling foldhash v0.2.0
+   Compiling bytes v1.12.0
+   Compiling same-file v1.0.6
+   Compiling base64 v0.22.1
+   Compiling walkdir v2.5.0
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling serde_spanned v1.1.1
+   Compiling semver v1.0.28
+   Compiling uuid v1.23.4
+   Compiling toml v1.1.2+spec-1.1.0
+   Compiling time v0.3.53
+   Compiling brotli v8.0.4
+   Compiling http v1.4.2
+   Compiling ctor v0.8.0
+   Compiling glob v0.3.3
+   Compiling shlex v2.0.1
+   Compiling cfb v0.7.3
+   Compiling find-msvc-tools v0.1.9
+   Compiling serde-untagged v0.1.9
+   Compiling rustc_version v0.4.1
+   Compiling toml_edit v0.25.12+spec-1.1.0
+   Compiling regex-automata v0.4.14
+   Compiling cc v1.2.66
+   Compiling toml_datetime v0.7.5+spec-1.1.0
+   Compiling mio v1.2.1
+   Compiling infer v0.19.0
+   Compiling socket2 v0.6.4
+   Compiling time-macros v0.2.31
+   Compiling crc32fast v1.5.0
+   Compiling simd-adler32 v0.3.9
+   Compiling winnow v0.7.15
+   Compiling synstructure v0.13.2
+   Compiling darling_core v0.23.0
+   Compiling serde_derive_internals v0.29.1
+   Compiling typenum v1.20.1
+   Compiling rustversion v1.0.22
+   Compiling once_cell v1.21.4
+   Compiling regex v1.12.4
+   Compiling option-ext v0.2.0
+   Compiling dirs-sys v0.5.0
+   Compiling embed-resource v3.0.11
+   Compiling proc-macro-crate v3.5.0
+   Compiling adler2 v2.0.1
+   Compiling crossbeam-utils v0.8.21
+   Compiling heck v0.5.0
+   Compiling toml v0.9.12+spec-1.1.0
+   Compiling miniz_oxide v0.8.9
+   Compiling tauri-winres v0.3.6
+   Compiling dirs v6.0.0
+   Compiling cookie v0.18.1
+   Compiling httparse v1.10.1
+   Compiling cesu8 v1.1.0
+   Compiling futures-task v0.3.32
+   Compiling slab v0.4.12
+   Compiling raw-window-handle v0.6.2
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling futures-util v0.3.32
+   Compiling flate2 v1.1.9
+   Compiling fdeflate v0.3.7
+   Compiling zerofrom-derive v0.1.7
+   Compiling serde_derive v1.0.228
+   Compiling yoke-derive v0.8.2
+   Compiling zerovec-derive v0.11.3
+   Compiling displaydoc v0.2.6
+   Compiling phf_macros v0.13.1
+   Compiling thiserror-impl v1.0.69
+   Compiling derive_more-impl v2.1.1
+   Compiling cssparser-macros v0.6.1
+   Compiling darling_macro v0.23.0
+   Compiling thiserror-impl v2.0.18
+   Compiling phf v0.13.1
+   Compiling schemars_derive v0.8.22
+   Compiling cssparser v0.36.0
+   Compiling jni-sys-macros v0.4.1
+   Compiling darling v0.23.0
+   Compiling serde_with_macros v3.21.0
+   Compiling derive_more v2.1.1
+   Compiling num_enum_derive v0.7.6
+   Compiling zerofrom v0.1.8
+   Compiling yoke v0.8.3
+   Compiling markup5ever v0.38.0
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling html5ever v0.38.0
+   Compiling jni-sys v0.4.1
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling icu_locale_core v2.2.0
+   Compiling icu_collections v2.2.0
+   Compiling serde_with v3.21.0
+   Compiling num_enum v0.7.6
+   Compiling ndk-sys v0.6.0+11769913
+   Compiling bitflags v1.3.2
+   Compiling dom_query v0.27.0
+   Compiling try-lock v0.2.5
+   Compiling tower-service v0.3.3
+   Compiling want v0.3.1
+   Compiling png v0.17.16
+   Compiling icu_provider v2.2.0
+   Compiling ndk v0.9.0
+   Compiling icu_properties v2.2.0
+   Compiling icu_normalizer v2.2.0
+   Compiling jsonptr v0.6.3
+   Compiling cargo-platform v0.1.9
+   Compiling json-patch v3.0.1
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling cargo_metadata v0.19.2
+   Compiling plist v1.10.0
+   Compiling tokio v1.52.3
+   Compiling combine v4.6.7
+   Compiling cargo_toml v0.22.3
+   Compiling url v2.5.8
+   Compiling dpi v0.1.2
+   Compiling http-body v1.0.1
+   Compiling urlpattern v0.3.0
+   Compiling tao-macros v0.1.3
+   Compiling crossbeam-channel v0.5.15
+   Compiling tauri-utils v2.9.3
+   Compiling digest v0.10.7
+   Compiling tracing-core v0.1.36
+   Compiling futures-channel v0.3.32
+   Compiling sync_wrapper v1.0.2
+   Compiling cpufeatures v0.2.17
+   Compiling atomic-waker v1.1.2
+   Compiling tower-layer v0.3.3
+   Compiling tauri-runtime v2.11.3
+   Compiling wry v0.55.1
+   Compiling tracing v0.1.44
+   Compiling sha2 v0.10.9
+   Compiling ico v0.5.0
+   Compiling tauri-runtime-wry v2.11.4
+   Compiling ipnet v2.12.0
+   Compiling getrandom v0.3.4
+   Compiling futures-sink v0.3.32
+   Compiling http-body-util v0.1.3
+   Compiling serialize-to-javascript-impl v0.1.2
+   Compiling tower v0.5.3
+   Compiling hyper v1.10.1
+   Compiling jni v0.21.1
+   Compiling tokio-util v0.7.18
+   Compiling serialize-to-javascript v0.1.2
+   Compiling serde_repr v0.1.20
+   Compiling tower-http v0.6.11
+   Compiling mime v0.3.17
+   Compiling hyper-util v0.1.20
+   Compiling reqwest v0.13.4
+   Compiling tao v0.35.3
+   Compiling tauri-build v2.6.3
+   Compiling tauri-codegen v2.6.3
+   Compiling tauri v2.11.5
+   Compiling tauri-macros v2.6.3
+   Compiling sanctissimissa v1.41.21298 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri)
+    Finished `release` profile [optimized + debuginfo] target(s) in 6m 50s
+        Info symlinking lib "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" in jniLibs dir "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libandroid.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libdl.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "liblog.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libm.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libc.so"
+        Info symlink at "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a/libsanctissimissa_lib.so" points to "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so"
+        Info symlink at "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/armeabi-v7a/libsanctissimissa_lib.so" points to "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/debug/libsanctissimissa_lib.so"
+        Info symlink at "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/x86/libsanctissimissa_lib.so" points to "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/debug/libsanctissimissa_lib.so"
+        Info symlink at "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/x86_64/libsanctissimissa_lib.so" points to "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/debug/libsanctissimissa_lib.so"
+        Info connection; remote_addr=127.0.0.1:48478 conn_id=0
+        Info Using installed NDK: /home/robin/Android/Sdk/ndk/27.0.12077973
+   Compiling sanctissimissa v1.41.21298 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri)
+    Finished `release` profile [optimized + debuginfo] target(s) in 1m 21s
+        Info symlinking lib "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" in jniLibs dir "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libandroid.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libdl.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "liblog.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libm.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libc.so"
+        Info connection; remote_addr=127.0.0.1:45194 conn_id=1
+        Info Using installed NDK: /home/robin/Android/Sdk/ndk/27.0.12077973
+   Compiling stable_deref_trait v1.2.1
+   Compiling serde_core v1.0.228
+   Compiling serde v1.0.228
+   Compiling libc v0.2.186
+   Compiling smallvec v1.15.2
+   Compiling memchr v2.8.2
+   Compiling itoa v1.0.18
+   Compiling zerofrom v0.1.8
+   Compiling litemap v0.8.2
+   Compiling cfg-if v1.0.4
+   Compiling writeable v0.6.3
+   Compiling siphasher v1.0.3
+   Compiling utf8_iter v1.0.4
+   Compiling icu_normalizer_data v2.2.0
+   Compiling icu_properties_data v2.2.0
+   Compiling log v0.4.33
+   Compiling percent-encoding v2.3.2
+   Compiling futures-core v0.3.32
+   Compiling pin-project-lite v0.2.17
+   Compiling yoke v0.8.3
+   Compiling thiserror v1.0.69
+   Compiling parking_lot_core v0.9.12
+   Compiling zmij v1.0.21
+   Compiling new_debug_unreachable v1.0.6
+   Compiling phf_shared v0.13.1
+   Compiling scopeguard v1.2.0
+   Compiling jni-sys v0.3.1
+   Compiling serde_json v1.0.150
+   Compiling form_urlencoded v1.2.2
+   Compiling jni-sys v0.4.1
+   Compiling lock_api v0.4.14
+   Compiling bitflags v2.13.0
+   Compiling precomputed-hash v0.1.1
+   Compiling generic-array v0.14.7
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling powerfmt v0.2.0
+   Compiling typenum v1.20.1
+   Compiling base64 v0.22.1
+   Compiling time-core v0.1.9
+   Compiling deranged v0.5.8
+   Compiling phf v0.13.1
+   Compiling num-conv v0.2.2
+   Compiling once_cell v1.21.4
+   Compiling socket2 v0.6.4
+   Compiling mio v1.2.1
+   Compiling aho-corasick v1.1.4
+   Compiling web_atoms v0.2.5
+   Compiling typeid v1.0.3
+   Compiling unic-char-range v0.9.0
+   Compiling regex-syntax v0.8.11
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling utf-8 v0.7.6
+   Compiling unic-common v0.9.0
+   Compiling parking_lot v0.12.5
+   Compiling dtoa v1.0.11
+   Compiling tendril v0.5.0
+   Compiling unic-ucd-version v0.9.0
+   Compiling alloc-stdlib v0.2.4
+   Compiling unic-char-property v0.9.0
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling dtoa-short v0.3.5
+   Compiling crossbeam-utils v0.8.21
+   Compiling erased-serde v0.4.10
+   Compiling string_cache v0.9.0
+   Compiling icu_locale_core v2.2.0
+   Compiling thiserror v2.0.18
+   Compiling icu_collections v2.2.0
+   Compiling byteorder v1.5.0
+   Compiling futures-task v0.3.32
+   Compiling fnv v1.0.7
+   Compiling winnow v1.0.3
+   Compiling cesu8 v1.1.0
+   Compiling equivalent v1.0.2
+   Compiling raw-window-handle v0.6.2
+   Compiling slab v0.4.12
+   Compiling hashbrown v0.17.1
+   Compiling httparse v1.10.1
+   Compiling time v0.3.53
+   Compiling toml_parser v1.1.2+spec-1.1.0
+   Compiling futures-util v0.3.32
+   Compiling cookie v0.18.1
+   Compiling cssparser v0.36.0
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling num_enum v0.7.6
+   Compiling unic-ucd-ident v0.9.0
+   Compiling brotli-decompressor v5.0.3
+   Compiling ndk-sys v0.6.0+11769913
+   Compiling indexmap v2.14.0
+   Compiling icu_provider v2.2.0
+   Compiling markup5ever v0.38.0
+   Compiling quick-xml v0.41.0
+   Compiling anyhow v1.0.103
+   Compiling selectors v0.36.1
+   Compiling derive_more v2.1.1
+   Compiling icu_properties v2.2.0
+   Compiling icu_normalizer v2.2.0
+   Compiling uuid v1.23.4
+   Compiling regex-automata v0.4.14
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling bytes v1.12.0
+   Compiling dpi v0.1.2
+   Compiling cfb v0.7.3
+   Compiling serde_spanned v1.1.1
+   Compiling servo_arc v0.4.3
+   Compiling rustc-hash v2.1.3
+   Compiling jsonptr v0.6.3
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling same-file v1.0.6
+   Compiling http v1.4.2
+   Compiling idna_adapter v1.2.2
+   Compiling tokio v1.52.3
+   Compiling idna v1.1.0
+   Compiling combine v4.6.7
+   Compiling tower-service v0.3.3
+   Compiling bit-vec v0.8.0
+   Compiling url v2.5.8
+   Compiling try-lock v0.2.5
+   Compiling want v0.3.1
+   Compiling http-body v1.0.1
+   Compiling bit-set v0.8.0
+   Compiling infer v0.19.0
+   Compiling json-patch v3.0.1
+   Compiling serde-untagged v0.1.9
+   Compiling regex v1.12.4
+   Compiling toml v1.1.2+spec-1.1.0
+   Compiling walkdir v2.5.0
+   Compiling urlpattern v0.3.0
+   Compiling plist v1.10.0
+   Compiling brotli v8.0.4
+   Compiling ndk v0.9.0
+   Compiling serde_with v3.21.0
+   Compiling html5ever v0.38.0
+   Compiling crossbeam-channel v0.5.15
+   Compiling digest v0.10.7
+   Compiling tracing-core v0.1.36
+   Compiling sync_wrapper v1.0.2
+   Compiling futures-channel v0.3.32
+   Compiling ctor v0.8.0
+   Compiling foldhash v0.2.0
+   Compiling semver v1.0.28
+   Compiling glob v0.3.3
+   Compiling tower-layer v0.3.3
+   Compiling atomic-waker v1.1.2
+   Compiling dunce v1.0.5
+   Compiling tauri-runtime v2.11.3
+   Compiling wry v0.55.1
+   Compiling dom_query v0.27.0
+   Compiling tracing v0.1.44
+   Compiling sha2 v0.10.9
+   Compiling tower v0.5.3
+   Compiling hyper v1.10.1
+   Compiling option-ext v0.2.0
+   Compiling futures-sink v0.3.32
+   Compiling ipnet v2.12.0
+   Compiling getrandom v0.3.4
+   Compiling tauri-runtime-wry v2.11.4
+   Compiling tokio-util v0.7.18
+   Compiling dirs-sys v0.5.0
+   Compiling tauri v2.11.5
+   Compiling http-body-util v0.1.3
+   Compiling jni v0.21.1
+   Compiling tower-http v0.6.11
+   Compiling serialize-to-javascript v0.1.2
+   Compiling dirs v6.0.0
+   Compiling heck v0.5.0
+   Compiling mime v0.3.17
+   Compiling tauri-utils v2.9.3
+   Compiling hyper-util v0.1.20
+   Compiling sanctissimissa v1.41.21298 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri)
+   Compiling reqwest v0.13.4
+   Compiling tao v0.35.3
+    Finished `release` profile [optimized + debuginfo] target(s) in 6m 23s
+        Info symlinking lib "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/release/libsanctissimissa_lib.so" in jniLibs dir "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/armeabi-v7a"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/release/libsanctissimissa_lib.so" requires shared lib "libandroid.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/release/libsanctissimissa_lib.so" requires shared lib "libdl.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/release/libsanctissimissa_lib.so" requires shared lib "liblog.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/release/libsanctissimissa_lib.so" requires shared lib "libm.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/release/libsanctissimissa_lib.so" requires shared lib "libc.so"
+        Info connection; remote_addr=127.0.0.1:43060 conn_id=2
+        Info Using installed NDK: /home/robin/Android/Sdk/ndk/27.0.12077973
+   Compiling stable_deref_trait v1.2.1
+   Compiling serde_core v1.0.228
+   Compiling serde v1.0.228
+   Compiling libc v0.2.186
+   Compiling smallvec v1.15.2
+   Compiling itoa v1.0.18
+   Compiling memchr v2.8.2
+   Compiling zerofrom v0.1.8
+   Compiling cfg-if v1.0.4
+   Compiling writeable v0.6.3
+   Compiling litemap v0.8.2
+   Compiling siphasher v1.0.3
+   Compiling utf8_iter v1.0.4
+   Compiling icu_normalizer_data v2.2.0
+   Compiling icu_properties_data v2.2.0
+   Compiling log v0.4.33
+   Compiling futures-core v0.3.32
+   Compiling percent-encoding v2.3.2
+   Compiling pin-project-lite v0.2.17
+   Compiling yoke v0.8.3
+   Compiling thiserror v1.0.69
+   Compiling parking_lot_core v0.9.12
+   Compiling zmij v1.0.21
+   Compiling new_debug_unreachable v1.0.6
+   Compiling phf_shared v0.13.1
+   Compiling scopeguard v1.2.0
+   Compiling serde_json v1.0.150
+   Compiling form_urlencoded v1.2.2
+   Compiling jni-sys v0.3.1
+   Compiling jni-sys v0.4.1
+   Compiling lock_api v0.4.14
+   Compiling bitflags v2.13.0
+   Compiling precomputed-hash v0.1.1
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling generic-array v0.14.7
+   Compiling typenum v1.20.1
+   Compiling time-core v0.1.9
+   Compiling base64 v0.22.1
+   Compiling num-conv v0.2.2
+   Compiling powerfmt v0.2.0
+   Compiling phf v0.13.1
+   Compiling deranged v0.5.8
+   Compiling once_cell v1.21.4
+   Compiling aho-corasick v1.1.4
+   Compiling socket2 v0.6.4
+   Compiling mio v1.2.1
+   Compiling web_atoms v0.2.5
+   Compiling typeid v1.0.3
+   Compiling dtoa v1.0.11
+   Compiling regex-syntax v0.8.11
+   Compiling unic-char-range v0.9.0
+   Compiling unic-common v0.9.0
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling utf-8 v0.7.6
+   Compiling parking_lot v0.12.5
+   Compiling alloc-stdlib v0.2.4
+   Compiling unic-ucd-version v0.9.0
+   Compiling dtoa-short v0.3.5
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling tendril v0.5.0
+   Compiling unic-char-property v0.9.0
+   Compiling crossbeam-utils v0.8.21
+   Compiling icu_collections v2.2.0
+   Compiling thiserror v2.0.18
+   Compiling erased-serde v0.4.10
+   Compiling string_cache v0.9.0
+   Compiling icu_locale_core v2.2.0
+   Compiling winnow v1.0.3
+   Compiling slab v0.4.12
+   Compiling raw-window-handle v0.6.2
+   Compiling futures-task v0.3.32
+   Compiling fnv v1.0.7
+   Compiling cesu8 v1.1.0
+   Compiling equivalent v1.0.2
+   Compiling byteorder v1.5.0
+   Compiling hashbrown v0.17.1
+   Compiling httparse v1.10.1
+   Compiling toml_parser v1.1.2+spec-1.1.0
+   Compiling futures-util v0.3.32
+   Compiling cookie v0.18.1
+   Compiling unic-ucd-ident v0.9.0
+   Compiling num_enum v0.7.6
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling time v0.3.53
+   Compiling cssparser v0.36.0
+   Compiling brotli-decompressor v5.0.3
+   Compiling ndk-sys v0.6.0+11769913
+   Compiling quick-xml v0.41.0
+   Compiling anyhow v1.0.103
+   Compiling markup5ever v0.38.0
+   Compiling icu_provider v2.2.0
+   Compiling indexmap v2.14.0
+   Compiling servo_arc v0.4.3
+   Compiling icu_normalizer v2.2.0
+   Compiling icu_properties v2.2.0
+   Compiling selectors v0.36.1
+   Compiling derive_more v2.1.1
+   Compiling regex-automata v0.4.14
+   Compiling uuid v1.23.4
+   Compiling bytes v1.12.0
+   Compiling dpi v0.1.2
+   Compiling cfb v0.7.3
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling serde_spanned v1.1.1
+   Compiling jsonptr v0.6.3
+   Compiling bit-vec v0.8.0
+   Compiling rustc-hash v2.1.3
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling idna_adapter v1.2.2
+   Compiling http v1.4.2
+   Compiling idna v1.1.0
+   Compiling tokio v1.52.3
+   Compiling combine v4.6.7
+   Compiling try-lock v0.2.5
+   Compiling tower-service v0.3.3
+   Compiling same-file v1.0.6
+   Compiling url v2.5.8
+   Compiling walkdir v2.5.0
+   Compiling http-body v1.0.1
+   Compiling regex v1.12.4
+   Compiling want v0.3.1
+   Compiling plist v1.10.0
+   Compiling json-patch v3.0.1
+   Compiling infer v0.19.0
+   Compiling bit-set v0.8.0
+   Compiling urlpattern v0.3.0
+   Compiling toml v1.1.2+spec-1.1.0
+   Compiling serde-untagged v0.1.9
+   Compiling brotli v8.0.4
+   Compiling ndk v0.9.0
+   Compiling serde_with v3.21.0
+   Compiling html5ever v0.38.0
+   Compiling crossbeam-channel v0.5.15
+   Compiling digest v0.10.7
+   Compiling tracing-core v0.1.36
+   Compiling sync_wrapper v1.0.2
+   Compiling futures-channel v0.3.32
+   Compiling ctor v0.8.0
+   Compiling cpufeatures v0.2.17
+   Compiling glob v0.3.3
+   Compiling foldhash v0.2.0
+   Compiling semver v1.0.28
+   Compiling tower-layer v0.3.3
+   Compiling atomic-waker v1.1.2
+   Compiling dunce v1.0.5
+   Compiling tauri-runtime v2.11.3
+   Compiling tracing v0.1.44
+   Compiling dom_query v0.27.0
+   Compiling sha2 v0.10.9
+   Compiling jni v0.21.1
+   Compiling tower v0.5.3
+   Compiling hyper v1.10.1
+   Compiling wry v0.55.1
+   Compiling ipnet v2.12.0
+   Compiling option-ext v0.2.0
+   Compiling futures-sink v0.3.32
+   Compiling getrandom v0.3.4
+   Compiling tauri-runtime-wry v2.11.4
+   Compiling dirs-sys v0.5.0
+   Compiling tokio-util v0.7.18
+   Compiling tauri v2.11.5
+   Compiling http-body-util v0.1.3
+   Compiling serialize-to-javascript v0.1.2
+   Compiling dirs v6.0.0
+   Compiling tower-http v0.6.11
+   Compiling heck v0.5.0
+   Compiling mime v0.3.17
+   Compiling sanctissimissa v1.41.21298 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri)
+   Compiling tauri-utils v2.9.3
+   Compiling hyper-util v0.1.20
+   Compiling reqwest v0.13.4
+   Compiling tao v0.35.3
+    Finished `release` profile [optimized + debuginfo] target(s) in 6m 50s
+        Info symlinking lib "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/release/libsanctissimissa_lib.so" in jniLibs dir "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/x86"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libandroid.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libdl.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/release/libsanctissimissa_lib.so" requires shared lib "liblog.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libm.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libc.so"
+        Info connection; remote_addr=127.0.0.1:33880 conn_id=3
+        Info Using installed NDK: /home/robin/Android/Sdk/ndk/27.0.12077973
+   Compiling stable_deref_trait v1.2.1
+   Compiling serde_core v1.0.228
+   Compiling serde v1.0.228
+   Compiling libc v0.2.186
+   Compiling smallvec v1.15.2
+   Compiling memchr v2.8.2
+   Compiling itoa v1.0.18
+   Compiling zerofrom v0.1.8
+   Compiling writeable v0.6.3
+   Compiling cfg-if v1.0.4
+   Compiling litemap v0.8.2
+   Compiling utf8_iter v1.0.4
+   Compiling siphasher v1.0.3
+   Compiling icu_normalizer_data v2.2.0
+   Compiling icu_properties_data v2.2.0
+   Compiling log v0.4.33
+   Compiling percent-encoding v2.3.2
+   Compiling futures-core v0.3.32
+   Compiling pin-project-lite v0.2.17
+   Compiling yoke v0.8.3
+   Compiling thiserror v1.0.69
+   Compiling zmij v1.0.21
+   Compiling parking_lot_core v0.9.12
+   Compiling new_debug_unreachable v1.0.6
+   Compiling phf_shared v0.13.1
+   Compiling scopeguard v1.2.0
+   Compiling jni-sys v0.3.1
+   Compiling serde_json v1.0.150
+   Compiling form_urlencoded v1.2.2
+   Compiling lock_api v0.4.14
+   Compiling jni-sys v0.4.1
+   Compiling precomputed-hash v0.1.1
+   Compiling bitflags v2.13.0
+   Compiling generic-array v0.14.7
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling powerfmt v0.2.0
+   Compiling num-conv v0.2.2
+   Compiling time-core v0.1.9
+   Compiling once_cell v1.21.4
+   Compiling typenum v1.20.1
+   Compiling phf v0.13.1
+   Compiling deranged v0.5.8
+   Compiling base64 v0.22.1
+   Compiling web_atoms v0.2.5
+   Compiling aho-corasick v1.1.4
+   Compiling typeid v1.0.3
+   Compiling regex-syntax v0.8.11
+   Compiling mio v1.2.1
+   Compiling socket2 v0.6.4
+   Compiling unic-common v0.9.0
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling utf-8 v0.7.6
+   Compiling dtoa v1.0.11
+   Compiling unic-char-range v0.9.0
+   Compiling parking_lot v0.12.5
+   Compiling dtoa-short v0.3.5
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling tendril v0.5.0
+   Compiling unic-char-property v0.9.0
+   Compiling icu_collections v2.2.0
+   Compiling string_cache v0.9.0
+   Compiling icu_locale_core v2.2.0
+   Compiling crossbeam-utils v0.8.21
+   Compiling alloc-stdlib v0.2.4
+   Compiling unic-ucd-version v0.9.0
+   Compiling thiserror v2.0.18
+   Compiling erased-serde v0.4.10
+   Compiling futures-task v0.3.32
+   Compiling equivalent v1.0.2
+   Compiling winnow v1.0.3
+   Compiling cesu8 v1.1.0
+   Compiling fnv v1.0.7
+   Compiling slab v0.4.12
+   Compiling raw-window-handle v0.6.2
+   Compiling byteorder v1.5.0
+   Compiling hashbrown v0.17.1
+   Compiling futures-util v0.3.32
+   Compiling httparse v1.10.1
+   Compiling time v0.3.53
+   Compiling toml_parser v1.1.2+spec-1.1.0
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling cookie v0.18.1
+   Compiling num_enum v0.7.6
+   Compiling brotli-decompressor v5.0.3
+   Compiling unic-ucd-ident v0.9.0
+   Compiling cssparser v0.36.0
+   Compiling ndk-sys v0.6.0+11769913
+   Compiling quick-xml v0.41.0
+   Compiling icu_provider v2.2.0
+   Compiling markup5ever v0.38.0
+   Compiling indexmap v2.14.0
+   Compiling anyhow v1.0.103
+   Compiling icu_normalizer v2.2.0
+   Compiling icu_properties v2.2.0
+   Compiling uuid v1.23.4
+   Compiling regex-automata v0.4.14
+   Compiling serde_spanned v1.1.1
+   Compiling bytes v1.12.0
+   Compiling dpi v0.1.2
+   Compiling cfb v0.7.3
+   Compiling jsonptr v0.6.3
+   Compiling idna_adapter v1.2.2
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling selectors v0.36.1
+   Compiling http v1.4.2
+   Compiling idna v1.1.0
+   Compiling tokio v1.52.3
+   Compiling url v2.5.8
+   Compiling combine v4.6.7
+   Compiling servo_arc v0.4.3
+   Compiling derive_more v2.1.1
+   Compiling same-file v1.0.6
+   Compiling tower-service v0.3.3
+   Compiling http-body v1.0.1
+   Compiling rustc-hash v2.1.3
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling try-lock v0.2.5
+   Compiling bit-vec v0.8.0
+   Compiling want v0.3.1
+   Compiling regex v1.12.4
+   Compiling bit-set v0.8.0
+   Compiling toml v1.1.2+spec-1.1.0
+   Compiling walkdir v2.5.0
+   Compiling infer v0.19.0
+   Compiling serde-untagged v0.1.9
+   Compiling urlpattern v0.3.0
+   Compiling json-patch v3.0.1
+   Compiling plist v1.10.0
+   Compiling ndk v0.9.0
+   Compiling brotli v8.0.4
+   Compiling serde_with v3.21.0
+   Compiling html5ever v0.38.0
+   Compiling crossbeam-channel v0.5.15
+   Compiling digest v0.10.7
+   Compiling tracing-core v0.1.36
+   Compiling sync_wrapper v1.0.2
+   Compiling futures-channel v0.3.32
+   Compiling ctor v0.8.0
+   Compiling foldhash v0.2.0
+   Compiling tower-layer v0.3.3
+   Compiling dunce v1.0.5
+   Compiling atomic-waker v1.1.2
+   Compiling cpufeatures v0.2.17
+   Compiling semver v1.0.28
+   Compiling glob v0.3.3
+   Compiling sha2 v0.10.9
+   Compiling wry v0.55.1
+   Compiling dom_query v0.27.0
+   Compiling tracing v0.1.44
+   Compiling tauri-runtime v2.11.3
+   Compiling ipnet v2.12.0
+   Compiling futures-sink v0.3.32
+   Compiling option-ext v0.2.0
+   Compiling getrandom v0.3.4
+   Compiling dirs-sys v0.5.0
+   Compiling tauri-runtime-wry v2.11.4
+   Compiling tauri v2.11.5
+   Compiling http-body-util v0.1.3
+   Compiling serialize-to-javascript v0.1.2
+   Compiling dirs v6.0.0
+   Compiling mime v0.3.17
+   Compiling hyper v1.10.1
+   Compiling tower v0.5.3
+   Compiling tokio-util v0.7.18
+   Compiling heck v0.5.0
+   Compiling sanctissimissa v1.41.21298 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri)
+   Compiling jni v0.21.1
+   Compiling tower-http v0.6.11
+   Compiling tauri-utils v2.9.3
+   Compiling hyper-util v0.1.20
+   Compiling reqwest v0.13.4
+   Compiling tao v0.35.3
+    Finished `release` profile [optimized + debuginfo] target(s) in 7m 40s
+        Info symlinking lib "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/release/libsanctissimissa_lib.so" in jniLibs dir "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/x86_64"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libandroid.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libdl.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "liblog.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libm.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libc.so"
+w: file:///home/robin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.5/mobile/android/src/main/java/app/tauri/AppPlugin.kt:35:37 'onBackPressed(): Unit' is deprecated. Deprecated in Java
+w: file:///home/robin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.5/mobile/android/src/main/java/app/tauri/plugin/Plugin.kt:107:5 'onDestroy(): Unit' is deprecated. use onDestroy(activity: AppCompatActivity) instead
+w: file:///home/robin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.5/mobile/android/src/main/java/app/tauri/plugin/Plugin.kt:112:5 'onRestart(): Unit' is deprecated. use onRestart(activity: AppCompatActivity) instead
+w: file:///home/robin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-2.11.5/mobile/android/src/main/java/app/tauri/plugin/PluginMethodData.kt:11:23 Parameter 'methodDecorator' is never used
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+3 warnings
+w: file:///home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/java/mba/robin/sanctissimissa/generated/RustWebView.kt:26:18 'setter for databaseEnabled: Boolean' is deprecated. Deprecated in Java
+w: file:///home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/java/mba/robin/sanctissimissa/generated/WryActivity.kt:69:46 'onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+3 warnings
+
+[Incubating] Problems report is available at: file:///home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+        Info connection; remote_addr=127.0.0.1:46704 conn_id=4
+        Info Using installed NDK: /home/robin/Android/Sdk/ndk/27.0.12077973
+    Finished `release` profile [optimized + debuginfo] target(s) in 0.52s
+        Info symlinking lib "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" in jniLibs dir "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/arm64-v8a"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libandroid.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libdl.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "liblog.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libm.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/aarch64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libc.so"
+        Info connection; remote_addr=127.0.0.1:46706 conn_id=5
+        Info Using installed NDK: /home/robin/Android/Sdk/ndk/27.0.12077973
+   Compiling sanctissimissa v1.41.21298 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri)
+    Finished `release` profile [optimized + debuginfo] target(s) in 1m 51s
+        Info symlinking lib "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/release/libsanctissimissa_lib.so" in jniLibs dir "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/armeabi-v7a"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/release/libsanctissimissa_lib.so" requires shared lib "libandroid.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/release/libsanctissimissa_lib.so" requires shared lib "libdl.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/release/libsanctissimissa_lib.so" requires shared lib "liblog.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/release/libsanctissimissa_lib.so" requires shared lib "libm.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/armv7-linux-androideabi/release/libsanctissimissa_lib.so" requires shared lib "libc.so"
+        Info connection; remote_addr=127.0.0.1:40842 conn_id=6
+        Info Using installed NDK: /home/robin/Android/Sdk/ndk/27.0.12077973
+   Compiling sanctissimissa v1.41.21298 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri)
+    Finished `release` profile [optimized + debuginfo] target(s) in 1m 26s
+        Info symlinking lib "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/release/libsanctissimissa_lib.so" in jniLibs dir "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/x86"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libandroid.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libdl.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/release/libsanctissimissa_lib.so" requires shared lib "liblog.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libm.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/i686-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libc.so"
+        Info connection; remote_addr=127.0.0.1:35630 conn_id=7
+        Info Using installed NDK: /home/robin/Android/Sdk/ndk/27.0.12077973
+   Compiling sanctissimissa v1.41.21298 (/home/robin/Desktop/devProjects/sanctissimissa/src-tauri)
+    Finished `release` profile [optimized + debuginfo] target(s) in 1m 26s
+        Info symlinking lib "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/release/libsanctissimissa_lib.so" in jniLibs dir "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/src/main/jniLibs/x86_64"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libandroid.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libdl.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "liblog.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libm.so"
+        Info "/home/robin/Desktop/devProjects/sanctissimissa/src-tauri/target/x86_64-linux-android/release/libsanctissimissa_lib.so" requires shared lib "libc.so"
+
+[Incubating] Problems report is available at: file:///home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+    Finished 1 APK at:
+        /home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release.apk
+
+    Finished 1 AAB at:
+        /home/robin/Desktop/devProjects/sanctissimissa/src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab
+
+🔧 Stage: symbols
+
+> sanctissimissa@1.41.21298 package:android-symbols
+> bash scripts/package-android-symbols.sh
+
+arm64-v8a: application DWARF and 16 KB LOAD alignment verified
+armeabi-v7a: application DWARF and 16 KB LOAD alignment verified
+x86: application DWARF and 16 KB LOAD alignment verified
+x86_64: application DWARF and 16 KB LOAD alignment verified
+Native debug symbols → src-tauri/gen/android/app/build/outputs/native-debug-symbols/universalRelease/sanctissimissa-v1.41.21298-android-native-debug-symbols.zip
+⏳ Pending collect: requires another host or earlier required stages.
+⏳ Release v1.41.21298 incomplete: windows-msi, windows-msix, collect
+Continue the same source, version, inputs and state on the required host: npm run build:release -- --resume-only

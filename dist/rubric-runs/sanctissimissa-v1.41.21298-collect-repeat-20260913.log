@@ -1,0 +1,36 @@
+
+> sanctissimissa@1.41.21298 collect-artifacts
+> node scripts/collect-artifacts.mjs --partial
+
+  ⏭  windows-native-standalone: unavailable or unverified — Required build stage is still pending: windows-msi
+  ⏭  windows-msi: unavailable or unverified — Required build stage is still pending: windows-msi
+  ⏭  windows-msix: unavailable or unverified — Required build stage is still pending: windows-msix
+  ⚠ no DOCS/CHANGELOG.md section for v1.41.21298 — manifests will carry empty change notes.
+  adding: assets/ (stored 0%)
+  adding: assets/sql-wasm-UFUCzYNW.wasm (deflated 51%)
+  adding: assets/index-CC3jJH8B.js (deflated 61%)
+  adding: assets/index-6L8esETH.css (deflated 84%)
+  adding: assets/index-DZfCvmSq.js (deflated 67%)
+  adding: assets/index-qmwzhumC.css (deflated 80%)
+  adding: assets/ckeditor5-DARfDnpa.js (deflated 76%)
+  adding: assets/core-DV6XEvTN.js (deflated 5%)
+  adding: icon-192.png (deflated 0%)
+  adding: icon.png (deflated 0%)
+  adding: index.html (deflated 45%)
+  adding: manifest.webmanifest (deflated 47%)
+  adding: missal.db (deflated 67%)
+  adding: registerSW.js (deflated 19%)
+  adding: sw.js (deflated 47%)
+  adding: workbox-a3c94b52.js (deflated 66%)
+  ⟳ web-pwa: preparing a candidate with zip
+  ✓ web-pwa → dist/sanctissimissa-v1.41.21298-web-pwa.zip (matching bytes reused)
+  ✓ linux-deb → dist/sanctissimissa-v1.41.21298-linux-amd64.deb (matching bytes reused)
+  ✓ linux-appimage → dist/sanctissimissa-v1.41.21298-linux-amd64.AppImage (matching bytes reused)
+  ✓ windows-standalone → dist/sanctissimissa-v1.41.21298-windows-x64-standalone.exe (matching bytes reused)
+  ✓ windows-nsis → dist/sanctissimissa-v1.41.21298-windows-x64-setup.exe (matching bytes reused)
+  ✓ android-apk-debug → dist/sanctissimissa-v1.41.21298-android-universal-debug.apk (matching bytes reused)
+  ✓ android-apk-release → dist/sanctissimissa-v1.41.21298-android-universal-release.apk (matching bytes reused)
+  ✓ android-aab-release → dist/sanctissimissa-v1.41.21298-android-universal-release.aab (matching bytes reused)
+  ✓ android-native-debug-symbols → dist/sanctissimissa-v1.41.21298-android-native-debug-symbols.zip (matching bytes reused)
+
+Collected 9 coherent artifacts for v1.41.21298; partial inventory, 3 required artifact(s) missing or unverified; strict collection remains pending.

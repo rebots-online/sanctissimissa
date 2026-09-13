@@ -1,0 +1,55 @@
+{
+  "version": "1.41.21298",
+  "sourceCommit": "de26d665db1f0e327e47996fafe6bd2ebc8dfad0",
+  "collectorRuns": [
+    "canonical-first",
+    "canonical-identical-repeat",
+    "frozen-identical-repeat"
+  ],
+  "artifactCount": 9,
+  "artifactBytes": 4700421118,
+  "allArtifactHashesMatch": true,
+  "missingIds": [
+    "windows-native-standalone",
+    "windows-msi",
+    "windows-msix"
+  ],
+  "tests": {
+    "passed": 349,
+    "failed": 0
+  },
+  "linuxDeb": {
+    "package": "sanctissi-missa",
+    "version": "1.41.21298",
+    "architecture": "amd64",
+    "desktopName": "SanctissiMissa",
+    "desktopExec": "sanctissimissa"
+  },
+  "windowsCrossExe": {
+    "embeddedProductName": "SanctissiMissa",
+    "embeddedFileVersion": "1.41.21298",
+    "embeddedProductVersion": "1.41.21298",
+    "signed": false
+  },
+  "aabManifest": {
+    "package": "mba.robin.sanctissimissa",
+    "versionName": "1.41.21298",
+    "versionCode": 100041,
+    "applicationLabel": "@string/app_name",
+    "activityNames": [
+      "mba.robin.sanctissimissa.MainActivity"
+    ],
+    "tool": "Google bundletool 1.18.1",
+    "toolSource": "https://github.com/google/bundletool/releases/tag/1.18.1",
+    "toolSha256": "675786493983787ffa11550bdb7c0715679a44e1643f3ff980a529e9c822595c"
+  },
+  "releaseComplete": false,
+  "limitations": [
+    "Native Windows EXE/MSI/MSIX and strict collection pending",
+    "Full TEST_RUBRIC and native runtime/Store acceptance not attested",
+    "Play delivery BP.1 incomplete",
+    "Frozen source has no v1.41.21298 changelog section; human changes are recorded in stamped artifact status"
+  ],
+  "rawLogArchive": "sanctissimissa-v1.41.21298-raw-verification-logs.zip",
+  "readableLogNormalization": "Trailing whitespace removed; untouched original log bytes preserved in rawLogArchive."
+}
