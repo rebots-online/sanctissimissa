@@ -6,7 +6,7 @@
  */
 
 import { describe, it } from 'node:test';
-import { strictEqual, ok, doesNotMatch } from 'node:assert';
+import { strictEqual, deepStrictEqual, ok, doesNotMatch, rejects } from 'node:assert';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -16,7 +16,13 @@ import {
   DEFAULT_FAMILY,
   LEGACY_FAMILY_ALIASES,
   normalizeFamily,
+  normalizeThemePreference,
+  readThemePreference,
+  writeThemePreference,
+  applyTheme,
   type ThemeFamily,
+  type ThemePreference,
+  type ThemeSettingsStore,
 } from '../src/core/theme/themes.ts';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -104,8 +110,8 @@ describe('Theme registry', () => {
     const labels = THEME_FAMILIES.map((f) => f.label);
     ok(labels.includes('Parchment (skeuomorphic)'));
     ok(labels.includes('Sanctissimissa'));
-    ok(labels.includes('Glass — acrylic'));
-    ok(labels.includes('Glass — clear'));
+    ok(labels.includes('Slate'));
+    ok(labels.includes('Minimal'));
     ok(labels.includes('Retro-futurist'));
     ok(labels.includes('Brutalist'));
     ok(labels.includes('Retro Terminal (CRT)'));
@@ -121,6 +127,9 @@ describe('Theme registry', () => {
     strictEqual(normalizeFamily('neo-brutalist'), RETRO_TERMINAL_FAMILY);
     strictEqual(normalizeFamily('retro-terminal'), RETRO_TERMINAL_FAMILY);
     strictEqual(normalizeFamily('bogus'), DEFAULT_FAMILY);
+    strictEqual(normalizeFamily('__proto__'), DEFAULT_FAMILY);
+    strictEqual(normalizeFamily('glass-acrylic'), 'slate');
+    strictEqual(normalizeFamily('glass-clear'), 'minimal');
   });
 });
 
@@ -349,30 +358,289 @@ describe('Tokenized chrome (no raw colors in shared component rules)', () => {
   });
 });
 
-describe('ThemePicker persistence', () => {
-  it('preserves corrupt JSON guarded fallback', () => {
-    const themePickerPath = join(__dirname, '../src/ui/ThemePicker.tsx');
-    const themePickerContent = readFileSync(themePickerPath, 'utf-8');
+const DEFAULT_PREFERENCE: ThemePreference = { family: 'skeuomorphic', mode: 'system', glass: false };
+const THEME_CACHE_KEY = 'sam.theme.v1';
 
-    ok(themePickerContent.includes('try {'), 'Must have try-catch for JSON parsing');
-    ok(themePickerContent.includes('catch'), 'Must have catch block for corrupt JSON');
-    ok(themePickerContent.includes('JSON.parse(raw)'), 'Must parse raw localStorage value');
+async function withGlobals(overrides: Record<string, PropertyDescriptor>, run: () => void | Promise<void>): Promise<void> {
+  const originals = new Map(Object.keys(overrides).map((key) => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
+  try {
+    for (const [key, descriptor] of Object.entries(overrides)) {
+      Object.defineProperty(globalThis, key, { configurable: true, ...descriptor });
+    }
+    await run();
+  } finally {
+    for (const [key, descriptor] of originals) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else Reflect.deleteProperty(globalThis, key);
+    }
+  }
+}
+
+function browserStorage(raw: string | null = null) {
+  const values = new Map<string, string>();
+  if (raw !== null) values.set(THEME_CACHE_KEY, raw);
+  return {
+    values,
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => { values.set(key, value); },
+  };
+}
+
+function sidecarStorage(initial: Record<string, string> = {}) {
+  const values = new Map(Object.entries(initial));
+  let persistCount = 0;
+  const sidecar: ThemeSettingsStore = {
+    getSetting: (key) => values.get(key) ?? null,
+    setSetting: (key, value) => { values.set(key, value); },
+    persist: async () => { persistCount++; },
+  };
+  return { values, sidecar, persistCount: () => persistCount };
+}
+
+describe('Independent theme preference', () => {
+  it('defaults malformed and missing preferences to parchment/system with glass off', () => {
+    for (const raw of [null, undefined, [], 'slate', 1, true, {}, { family: {}, mode: [], glass: 1 }]) {
+      deepStrictEqual(normalizeThemePreference(raw), DEFAULT_PREFERENCE);
+    }
+    deepStrictEqual(normalizeThemePreference({ family: 'invalid', mode: 'invalid', glass: 'true' }), DEFAULT_PREFERENCE);
   });
 
-  it('preserves sidecar persistence behavior', () => {
-    const themePickerPath = join(__dirname, '../src/ui/ThemePicker.tsx');
-    const themePickerContent = readFileSync(themePickerPath, 'utf-8');
-
-    ok(themePickerContent.includes('sidecar.getSetting'), 'Must use sidecar.getSetting');
-    ok(themePickerContent.includes('sidecar.setSetting'), 'Must use sidecar.setSetting');
-    ok(themePickerContent.includes('localStorage.setItem'), 'Must fallback to localStorage');
+  it('migrates both legacy glass palettes while preserving an explicit off preference', () => {
+    for (const [legacy, family] of [['glass-acrylic', 'slate'], ['glass-clear', 'minimal']]) {
+      deepStrictEqual(normalizeThemePreference({ family: legacy, mode: 'dark' }), { family, mode: 'dark', glass: true });
+      for (const glass of [false, '0']) {
+        deepStrictEqual(normalizeThemePreference({ family: legacy, mode: 'light', glass }), { family, mode: 'light', glass: false });
+      }
+    }
+    deepStrictEqual(normalizeThemePreference({ family: 'neo-brutalist' }), { family: 'retro-terminal', mode: 'system', glass: false });
   });
 
-  it('validates + normalizes family IDs through the registry', () => {
-    const themePickerPath = join(__dirname, '../src/ui/ThemePicker.tsx');
-    const themePickerContent = readFileSync(themePickerPath, 'utf-8');
+  it('accepts booleans and the sidecar 1/0 encoding without truthy coercion', () => {
+    for (const glass of [true, '1']) strictEqual(normalizeThemePreference({ glass }).glass, true);
+    for (const glass of [false, '0', 'false', 'true', 1, {}, []]) strictEqual(normalizeThemePreference({ glass }).glass, false);
+  });
 
-    ok(themePickerContent.includes('normalizeFamily'), 'Must validate/normalize family IDs via the registry');
-    ok(themePickerContent.includes('DEFAULT_FAMILY'), 'Must fall back to DEFAULT_FAMILY for invalid IDs');
+  it('applies every palette and mode with glass on/off without modifying the seasonal color', async () => {
+    const dataset: Record<string, string> = { color: 'red' };
+    await withGlobals({ document: { value: { documentElement: { dataset } } } }, () => {
+      for (const { id: family } of THEME_FAMILIES) {
+        for (const mode of ['light', 'dark'] as const) {
+          for (const glass of [false, true]) {
+            applyTheme(family, mode, glass);
+            deepStrictEqual(dataset, { color: 'red', theme: family, mode, glass: String(glass) });
+          }
+        }
+      }
+      applyTheme('skeuomorphic', 'light');
+      strictEqual(dataset.glass, 'false', 'Omitting the optional material must turn it off');
+    });
+  });
+});
+
+describe('Theme preference persistence', () => {
+  it('round-trips local preferences across every palette, mode preference and glass value', async () => {
+    const storage = browserStorage();
+    await withGlobals({ localStorage: { value: storage } }, async () => {
+      for (const { id: family } of THEME_FAMILIES) {
+        for (const mode of ['light', 'dark', 'system'] as const) {
+          for (const glass of [false, true]) {
+            const preference = { family, mode, glass };
+            await writeThemePreference(null, preference);
+            deepStrictEqual(readThemePreference(null), preference);
+          }
+        }
+      }
+      deepStrictEqual([...storage.values.keys()], [THEME_CACHE_KEY], 'Reuse the existing cache namespace');
+    });
+  });
+
+  it('round-trips sidecar preferences and also updates the normalized local cache', async () => {
+    const storage = browserStorage();
+    const { sidecar, values, persistCount } = sidecarStorage();
+    await withGlobals({ localStorage: { value: storage } }, async () => {
+      const preference: ThemePreference = { family: 'brutalist', mode: 'light', glass: true };
+      await writeThemePreference(sidecar, preference);
+      deepStrictEqual(readThemePreference(sidecar), preference);
+      deepStrictEqual(readThemePreference(null), preference);
+      deepStrictEqual(Object.fromEntries(values), { 'theme.family': 'brutalist', 'theme.mode': 'light', 'theme.glass': '1' });
+      await writeThemePreference(sidecar, { ...preference, glass: false });
+      strictEqual(values.get('theme.glass'), '0');
+      strictEqual(persistCount(), 2);
+    });
+  });
+
+  it('valid sidecar fields take precedence while absent and corrupt fields retain local values', async () => {
+    const cached: ThemePreference = { family: 'hello-word-glow', mode: 'dark', glass: true };
+    await withGlobals({ localStorage: { value: browserStorage(JSON.stringify(cached)) } }, () => {
+      deepStrictEqual(readThemePreference(sidecarStorage().sidecar), cached);
+      deepStrictEqual(readThemePreference(sidecarStorage({ 'theme.family': 'slate' }).sidecar), { ...cached, family: 'slate' });
+      deepStrictEqual(readThemePreference(sidecarStorage({ 'theme.mode': 'system', 'theme.glass': '0' }).sidecar), { ...cached, mode: 'system', glass: false });
+      deepStrictEqual(readThemePreference(sidecarStorage({ 'theme.family': 'invalid', 'theme.mode': 'invalid', 'theme.glass': 'true' }).sidecar), cached);
+      const corrupt = sidecarStorage().sidecar;
+      corrupt.getSetting = (() => ({ invalid: true })) as unknown as ThemeSettingsStore['getSetting'];
+      deepStrictEqual(readThemePreference(corrupt), cached);
+    });
+  });
+
+  it('migrates legacy cache and sidecar values, including sidecar legacy material intent', async () => {
+    const storage = browserStorage(JSON.stringify({ family: 'glass-clear', mode: 'dark' }));
+    await withGlobals({ localStorage: { value: storage } }, async () => {
+      deepStrictEqual(readThemePreference(null), { family: 'minimal', mode: 'dark', glass: true });
+      await writeThemePreference(null, { family: 'minimal', mode: 'dark', glass: false });
+      deepStrictEqual(readThemePreference(sidecarStorage({ 'theme.family': 'glass-acrylic' }).sidecar), { family: 'slate', mode: 'dark', glass: true });
+      deepStrictEqual(readThemePreference(sidecarStorage({ 'theme.family': 'glass-acrylic', 'theme.glass': '0' }).sidecar), { family: 'slate', mode: 'dark', glass: false });
+      storage.setItem(THEME_CACHE_KEY, JSON.stringify({ family: 'glass-clear', mode: 'light', glass: false }));
+      deepStrictEqual(readThemePreference(null), { family: 'minimal', mode: 'light', glass: false });
+    });
+  });
+
+  it('survives corrupt JSON, missing storage and malformed stored objects', async () => {
+    for (const raw of [null, '{broken', 'null', '[]', '42', '{"family":1,"mode":false,"glass":{}}']) {
+      await withGlobals({ localStorage: { value: browserStorage(raw) } }, () => {
+        deepStrictEqual(readThemePreference(null), DEFAULT_PREFERENCE);
+      });
+    }
+    await withGlobals({ localStorage: { value: undefined } }, async () => {
+      deepStrictEqual(readThemePreference(null), DEFAULT_PREFERENCE);
+      await writeThemePreference(null, DEFAULT_PREFERENCE);
+    });
+  });
+
+  it('continues using the sidecar when localStorage access or writes are blocked', async () => {
+    const preference: ThemePreference = { family: 'retro-terminal', mode: 'dark', glass: true };
+    for (const descriptor of [
+      { get: () => { throw new Error('Storage blocked'); } },
+      { value: { getItem: () => { throw new Error('Read blocked'); }, setItem: () => { throw new Error('Quota exceeded'); } } },
+    ]) {
+      await withGlobals({ localStorage: { value: browserStorage() } }, async () => {
+        await writeThemePreference(null, DEFAULT_PREFERENCE);
+        deepStrictEqual(readThemePreference(null), DEFAULT_PREFERENCE);
+      });
+      await withGlobals({ localStorage: descriptor }, async () => {
+        const { sidecar, persistCount } = sidecarStorage();
+        deepStrictEqual(readThemePreference(null), DEFAULT_PREFERENCE);
+        await writeThemePreference(sidecar, preference);
+        deepStrictEqual(readThemePreference(sidecar), preference);
+        strictEqual(persistCount(), 1);
+      });
+    }
+  });
+
+  it('preserves explicit session choices on reread when storage is blocked and no sidecar exists', async () => {
+    const preference: ThemePreference = { family: 'hello-word-glow', mode: 'dark', glass: true };
+    await withGlobals({ localStorage: { get: () => { throw new Error('Storage blocked'); } } }, async () => {
+      await writeThemePreference(null, preference);
+      deepStrictEqual(readThemePreference(null), preference, 'System-mode listeners must retain the live explicit selection');
+    });
+  });
+
+  it('retains newer session choices over readable stale cache after quota failure until a write succeeds', async () => {
+    const storage = browserStorage();
+    const preference: ThemePreference = { family: 'brutalist', mode: 'dark', glass: true };
+    await withGlobals({ localStorage: { value: storage } }, async () => {
+      await writeThemePreference(null, DEFAULT_PREFERENCE);
+      const save = storage.setItem;
+      storage.setItem = () => { throw new Error('Quota exceeded'); };
+      await writeThemePreference(null, preference);
+      strictEqual(storage.getItem(THEME_CACHE_KEY), JSON.stringify(DEFAULT_PREFERENCE), 'Failed writes leave readable stale bytes');
+      deepStrictEqual(readThemePreference(null), preference);
+      deepStrictEqual(readThemePreference(null), preference, 'A successful read must not clear the unsaved preference');
+
+      storage.setItem = save;
+      await writeThemePreference(null, preference);
+      storage.setItem(THEME_CACHE_KEY, JSON.stringify(DEFAULT_PREFERENCE));
+      deepStrictEqual(readThemePreference(null), DEFAULT_PREFERENCE, 'Successful writes restore ordinary cache reads');
+    });
+  });
+
+  it('retains the local cache when sidecar persistence rejects and exposes the rejection to its caller', async () => {
+    const storage = browserStorage();
+    const { sidecar } = sidecarStorage();
+    sidecar.persist = async () => { throw new Error('Disk unavailable'); };
+    await withGlobals({ localStorage: { value: storage } }, async () => {
+      const preference: ThemePreference = { family: 'sanctissimissa', mode: 'system', glass: true };
+      await rejects(writeThemePreference(sidecar, preference), /Disk unavailable/);
+      deepStrictEqual(readThemePreference(null), preference);
+    });
+  });
+
+  it('normalizes malformed runtime values before writing either store', async () => {
+    const storage = browserStorage();
+    const { sidecar } = sidecarStorage();
+    await withGlobals({ localStorage: { value: storage } }, async () => {
+      await writeThemePreference(sidecar, { family: 'glass-acrylic', mode: 'invalid', glass: '0' } as unknown as ThemePreference);
+      const expected = { family: 'slate', mode: 'system', glass: false };
+      deepStrictEqual(readThemePreference(sidecar), expected);
+      deepStrictEqual(readThemePreference(null), expected);
+    });
+  });
+});
+
+describe('Theme control and startup integration', () => {
+  const picker = readFileSync(join(__dirname, '../src/ui/ThemePicker.tsx'), 'utf-8');
+  const app = readFileSync(join(__dirname, '../src/App.tsx'), 'utf-8');
+
+  it('offers an independent native checkbox with associated explanatory text', () => {
+    ok(/type\s*=\s*["']checkbox["']/.test(picker));
+    ok(picker.includes('Frosted glass'));
+    ok(picker.includes('theme-glass-toggle') && picker.includes('theme-glass-help'));
+    ok(picker.includes('useId') && picker.includes('aria-describedby'));
+    ok(picker.includes('Text and controls stay clear.'));
+  });
+
+  it('shares persistence and handles sidecar failures at the component boundary', () => {
+    ok(picker.includes('readThemePreference(sidecar)'));
+    ok(/writeThemePreference\([\s\S]*?\.catch\(/.test(picker));
+    doesNotMatch(picker, /JSON\.parse|localStorage\./, 'ThemePicker must use the shared persistence layer');
+  });
+
+  it('restores appearance in App and cleans up the system-mode listener', () => {
+    ok(app.includes('readThemePreference(sidecar)'));
+    ok(app.includes("matchMedia('(prefers-color-scheme: dark)')"));
+    ok(/addEventListener\(['"]change['"]/.test(app));
+    ok(/removeEventListener\(['"]change['"]/.test(app));
+    ok(app.includes("preference.mode === 'system' ? systemMode() : preference.mode"), 'System changes must honor an explicit mode');
+  });
+});
+
+describe('Palette-independent glass material', () => {
+  const rules = [...cssContent.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+    .map((match) => ({ selector: match[1].trim(), body: match[2] }));
+  const glassRules = rules.filter(({ selector }) => /\[data-glass\s*=\s*['"]true['"]\]/.test(selector));
+
+  it('gates shared material on glass rather than a particular palette', () => {
+    ok(glassRules.length > 0, 'An independent material selector must exist');
+    for (const { selector, body } of glassRules) {
+      doesNotMatch(selector, /\[data-theme\s*=/, 'Glass cannot depend on a family value');
+      doesNotMatch(body, /(?:^|[;\n])\s*(?:filter|opacity)\s*:/, 'Keep text and controls sharp');
+    }
+    doesNotMatch(cssContent, /\[data-theme\s*=\s*['"]glass-(?:acrylic|clear)['"]\]/);
+    ok(glassRules.some(({ body }) => /backdrop-filter\s*:/.test(body)));
+    ok(glassRules.some(({ body }) => /-webkit-backdrop-filter\s*:/.test(body)));
+    ok(glassRules.some(({ body }) => /color-mix\([^;]+transparent/s.test(body)), 'Material must derive translucency from palette tokens');
+  });
+
+  it('covers inactive tabs with legible labels while preserving the active accent fill', () => {
+    const inactiveTabs = glassRules.filter(({ selector }) => /\.settings-tabs\s+button:not\(\.active\)/.test(selector));
+    ok(inactiveTabs.length > 0);
+    ok(inactiveTabs.some(({ body }) => /color\s*:\s*var\(--ink\)/.test(body)));
+    ok(glassRules.some(({ selector, body }) => /:focus-visible/.test(selector) && /outline\s*:/.test(body)));
+    const activeTabs = rules.find(({ selector }) => selector === 'button.active');
+    ok(activeTabs && /background\s*:\s*var\(--accent\)/.test(activeTabs.body));
+  });
+
+  it('limits optional material to supported screens and restores opacity for reduced transparency', () => {
+    ok(/@media\s+screen\s*\{/.test(cssContent), 'Print retains opaque baseline fills');
+    ok(/@supports\s*\(\(backdrop-filter\s*:[\s\S]*?or\s*\(-webkit-backdrop-filter\s*:/.test(cssContent));
+    const reduced = cssContent.match(/@media\s*\(prefers-reduced-transparency\s*:\s*reduce\)\s*\{\s*html\[data-glass\s*=\s*['"]true['"]\]\s*\{([^}]+)\}/);
+    ok(reduced, 'Reduced transparency requires an explicit opaque fallback');
+    ok(/--glass-strength\s*:\s*100%/.test(reduced[1]));
+    ok(/--glass-chrome-strength\s*:\s*100%/.test(reduced[1]));
+    ok(/--glass-backdrop\s*:\s*none/.test(reduced[1]));
+    for (const family of ['slate', 'minimal'] as const) {
+      for (const block of [lightBlock(family), darkBlock(family)]) {
+        doesNotMatch(tokenValue(block, '--card') ?? '', /rgba?\(|transparent/, 'Former glass palettes must have opaque base cards');
+      }
+    }
   });
 });

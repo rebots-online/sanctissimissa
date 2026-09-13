@@ -1,4 +1,4 @@
-# Theme matrix — 8 families × light/dark
+# Theme matrix — 8 palettes × light/dark, optional frosted glass
 
 The single source of truth for the theming system (extends ARCHITECTURE.md decision 13).
 `tests/themes.test.ts` enforces everything on this page.
@@ -6,7 +6,8 @@ The single source of truth for the theming system (extends ARCHITECTURE.md decis
 ## How a theme works
 
 A theme is a `(family, mode)` pair stamped on `<html>` as `data-theme` / `data-mode`
-(`src/core/theme/themes.ts`, `applyTheme()`). The seasonal liturgical accent is a third,
+(`src/core/theme/themes.ts`, `applyTheme()`). An independent `data-glass` boolean adds
+frosted surfaces to any palette. The seasonal liturgical accent remains an independent,
 **orthogonal** attribute `data-color` — **no family may ever declare `--accent`**; hue follows
 the day, structure follows the family.
 
@@ -45,15 +46,15 @@ Dark cell = deep warm ink surfaces (from the journal sidecar prototype).
 Elevated white cards on the parchment framework (§7.7); gold-bordered propers.
 The original light+dark reference pair.
 
-### glass-acrylic
+### slate — "Slate" (formerly `glass-acrylic`)
 
-Frosted slate glass, `backdrop-filter: blur(8px)` cards. Dark = deep slate glass
-(`#0b1220` surface, translucent `rgba(15,23,42,.72)` cards).
+Cool slate palette. Dark uses `#0b1220` page surfaces and `#0f172a` cards.
+Glass is controlled by the independent checkbox; the base cards are opaque.
 
-### glass-clear
+### minimal — "Minimal" (formerly `glass-clear`)
 
-Ultra-clear glass, crisp edges. Dark = near-black smoke
-(`#05070c` surface, `rgba(255,255,255,.06)` cards).
+Neutral surfaces with crisp edges. Dark uses `#05070c` page surfaces and
+`#14161b` cards. Glass is controlled by the independent checkbox.
 
 ### retro-futurist
 
@@ -82,6 +83,30 @@ Subway-line glow pulse (`glow-pulse` 4s, tokenized `--glow-*` colors so each mod
 its own hue) and Marian violet accents. **Dark**: the original Midnight Nave palette
 (`#07111f` / `#0b1f3a` / `#63e6ff`). **Light**: day chapel — pale ice-blue
 (`#eef6fb` surface, `#9bd7ea` borders, `#0b1f3a` ink).
+
+## Optional material: Frosted glass
+
+Settings → Appearance has a native **Frosted glass** checkbox below the family
+and mode controls. It defaults off for new preferences. Enabling it adds
+palette-tinted translucent panels, inactive Settings tabs, navigation and reader
+cards with a 12px backdrop blur. Text stays sharp and the active tab retains its
+seasonal accent. Changing palette or mode preserves the checkbox value.
+
+The material uses current theme tokens and a subtle palette-derived backdrop;
+it never replaces the seasonal accent or the family's typography. Supported
+browsers use standard/prefixed backdrop-filter. Reduced-transparency preferences,
+unsupported browsers and print use opaque surfaces without the optional blur.
+
+Preferences stay in the existing stores: `theme.family`, `theme.mode`, and
+`theme.glass` (`'1'`/`'0'`) in the sidecar; `sam.theme.v1` caches
+`{ family, mode, glass }` locally for startup. App restores the settings before
+the user visits Appearance. Valid sidecar fields take precedence on hydration.
+Legacy `glass-acrylic` and `glass-clear` migrate to Slate and Minimal with glass
+on unless an explicit saved glass value overrides it; both use the same frosted
+material. `neo-brutalist` still migrates to Retro Terminal.
+
+The complete contract and migration cases live in
+[the optional-glass decision](ARCHITECTURE/standroidsmissal-v1.39.15371-optional-glass-20260913.md).
 
 ## Editor (CKEditor 5)
 

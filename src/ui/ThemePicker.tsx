@@ -1,102 +1,49 @@
 /**
- * ThemePicker — compact rail widget (BJ.1): theme-family select + a
- * light/dark/system mode toggle. Persists to sidecar settings
- * (`theme.family` / `theme.mode`) when a sidecar is provided, else to
- * localStorage `sam.theme.v1` until BC.1 merges. Not mounted here — BO.3
- * wires it into the rail.
+ * Appearance controls: palette, light/dark/system mode, and optional glass.
+ * Shared persistence keeps Settings and the app's startup restoration aligned.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import {
   THEME_FAMILIES,
-  DEFAULT_FAMILY,
-  normalizeFamily,
   applyTheme,
+  readThemePreference,
+  writeThemePreference,
   systemMode,
   type ThemeFamily,
+  type ThemePreference,
+  type ThemeSettingsStore,
 } from '../core/theme/themes.ts';
 
-/** Structural slice of SidecarDb — no import from accompaniment code (I-10(b)). */
-interface SettingsStore {
-  getSetting(key: string): string | null;
-  setSetting(key: string, value: string): void;
-  persist(): Promise<void>;
-}
-
 interface Props {
-  sidecar: SettingsStore | null;
-}
-
-type ModePref = 'light' | 'dark' | 'system';
-
-const LS_KEY = 'sam.theme.v1';
-
-function readPersisted(sidecar: SettingsStore | null): { family: ThemeFamily; mode: ModePref } {
-  let family: string | null = null;
-  let mode: string | null = null;
-  if (sidecar) {
-    family = sidecar.getSetting('theme.family');
-    mode = sidecar.getSetting('theme.mode');
-  } else {
-    try {
-      const raw = localStorage.getItem(LS_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as { family?: unknown; mode?: unknown };
-        if (typeof parsed.family === 'string') family = parsed.family;
-        if (typeof parsed.mode === 'string') mode = parsed.mode;
-      }
-    } catch {
-      /* absent or corrupt → defaults */
-    }
-  }
-  return {
-    // normalizeFamily also migrates renamed ids (e.g. persisted 'neo-brutalist')
-    family: family !== null ? normalizeFamily(family) : DEFAULT_FAMILY,
-    mode: mode === 'light' || mode === 'dark' || mode === 'system' ? mode : 'system',
-  };
+  sidecar: ThemeSettingsStore | null;
 }
 
 export default function ThemePicker({ sidecar }: Props) {
-  const [init] = useState(() => readPersisted(sidecar));
-  const [family, setFamily] = useState<ThemeFamily>(init.family);
-  const [mode, setMode] = useState<ModePref>(init.mode);
-  const [hydratedSidecar, setHydratedSidecar] = useState<SettingsStore | null>(null);
+  const [preference, setPreference] = useState<ThemePreference>(() => readThemePreference(sidecar));
+  const [hydratedSidecar, setHydratedSidecar] = useState<ThemeSettingsStore | null | undefined>(undefined);
+  const glassHelpId = useId();
+  const { family, mode, glass } = preference;
 
   useEffect(() => {
-    if (!sidecar) {
-      setHydratedSidecar(null);
-      return;
-    }
-
-    const storedFamily = sidecar.getSetting('theme.family');
-    const storedMode = sidecar.getSetting('theme.mode');
-    if (storedFamily !== null) {
-      setFamily(normalizeFamily(storedFamily));
-    }
-    if (storedMode === 'light' || storedMode === 'dark' || storedMode === 'system') {
-      setMode(storedMode);
-    }
+    setPreference(readThemePreference(sidecar));
     setHydratedSidecar(sidecar);
   }, [sidecar]);
 
   useEffect(() => {
-    applyTheme(family, mode === 'system' ? systemMode() : mode);
-    if (sidecar) {
-      if (hydratedSidecar !== sidecar) return;
-      sidecar.setSetting('theme.family', family);
-      sidecar.setSetting('theme.mode', mode);
-      void sidecar.persist();
-    } else {
-      try {
-        localStorage.setItem(LS_KEY, JSON.stringify({ family, mode }));
-      } catch {
-        /* storage unavailable (private mode) — theme still applies */
-      }
-    }
-  }, [family, mode, sidecar, hydratedSidecar]);
+    // A newly available sidecar must hydrate before old state can overwrite it.
+    if (hydratedSidecar !== sidecar) return;
+    applyTheme(preference.family, preference.mode === 'system' ? systemMode() : preference.mode, preference.glass);
+    void writeThemePreference(sidecar, preference).catch(() => {
+      // The local cache and live appearance remain usable if sidecar persistence fails.
+    });
+  }, [preference, sidecar, hydratedSidecar]);
 
   const cycleMode = () =>
-    setMode((m) => (m === 'light' ? 'dark' : m === 'dark' ? 'system' : 'light'));
+    setPreference((current) => ({
+      ...current,
+      mode: current.mode === 'light' ? 'dark' : current.mode === 'dark' ? 'system' : 'light',
+    }));
   const glyph = mode === 'light' ? '☀︎' : mode === 'dark' ? '☾' : '◐';
 
   return (
@@ -104,7 +51,10 @@ export default function ThemePicker({ sidecar }: Props) {
       <select
         aria-label="Theme family"
         value={family}
-        onChange={(e) => setFamily(e.target.value as ThemeFamily)}
+        onChange={(e) => {
+          const nextFamily = e.target.value as ThemeFamily;
+          setPreference((current) => ({ ...current, family: nextFamily }));
+        }}
       >
         {THEME_FAMILIES.map((f) => (
           <option key={f.id} value={f.id}>
@@ -115,6 +65,21 @@ export default function ThemePicker({ sidecar }: Props) {
       <button type="button" onClick={cycleMode} title={`Mode: ${mode} — click to change`}>
         {glyph} {mode}
       </button>
+      <label className="theme-glass-toggle">
+        <input
+          type="checkbox"
+          checked={glass}
+          aria-describedby={glassHelpId}
+          onChange={(e) => {
+            const nextGlass = e.target.checked;
+            setPreference((current) => ({ ...current, glass: nextGlass }));
+          }}
+        />
+        Frosted glass
+      </label>
+      <p className="theme-glass-help" id={glassHelpId}>
+        Adds translucent, softly blurred backgrounds to this theme. Text and controls stay clear.
+      </p>
     </div>
   );
 }

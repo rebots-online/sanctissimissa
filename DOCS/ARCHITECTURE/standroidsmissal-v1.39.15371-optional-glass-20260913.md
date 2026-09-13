@@ -55,12 +55,13 @@ Line anchors name the pre-edit region; signatures and file paths are binding.
 | ThemeModePreference / ThemePreference | src/core/theme/themes.ts:17 | Export 'light' \| 'dark' \| 'system'; object { family: ThemeFamily; mode: ThemeModePreference; glass: boolean } |
 | ThemeSettingsStore | src/core/theme/themes.ts:17 | Export structural store { getSetting(key: string): string \| null; setSetting(key: string, value: string): void; persist(): Promise<void> } |
 | normalizeThemePreference | src/core/theme/themes.ts:38 | Export (raw: unknown): ThemePreference; pure validation and legacy migration; accepts glass boolean or sidecar '1'/'0'; malformed object/default guard |
+| sessionThemePreference / sessionThemePreferenceUnsaved | src/core/theme/themes.ts:38 | Module-local ThemePreference or null; live fallback when browser storage throws or the last cache write failed; unsaved boolean clears on successful cache write so OS scheme changes cannot restore stale preferences |
 | readThemePreference | src/core/theme/themes.ts:38 | Export (sidecar: ThemeSettingsStore \| null): ThemePreference; guarded JSON read and fieldwise sidecar precedence as above |
 | writeThemePreference | src/core/theme/themes.ts:38 | Export (sidecar: ThemeSettingsStore \| null, preference: ThemePreference): Promise<void>; cache + existing sidecar keys, awaits persist |
 | applyTheme | src/core/theme/themes.ts:49 | (family: ThemeFamily, mode: ThemeMode, glass?: boolean): void; default false; stamps data-theme, data-mode, data-glass='true'/'false'; never changes data-color |
 | ThemePicker | src/ui/ThemePicker.tsx:68 | Existing sidecar prop now uses ThemeSettingsStore; single ThemePreference state; read shared helper on mount/sidecar hydration; write after hydration; show native checkbox and linked help |
 | App theme restoration | src/App.tsx:85 | Effect restores with readThemePreference/applyTheme at mount and sidecar change; subscribe to system scheme with cleanup and reread current preference when it fires |
-| Optional glass CSS | src/styles.css:953 | Rename family selectors, make base cards opaque, remove family-specific blur; shared html[data-glass='true'] material after existing component rules, scoped to @supports and normal transparency and screen |
+| Optional glass CSS | src/styles.css:953 | Rename family selectors, make base cards opaque, remove family-specific blur; shared html[data-glass='true'] material after existing component rules, scoped to @supports and screen, with explicit reduced-transparency reset |
 | Glass surface set | src/styles.css:1524 | .rail, .masthead, .bilingual .latin/.english, .reader-section, .exegesis, .exegesis .hit, .cal-cell, .hour-card, .ctx-menu, .lore-callout, .settings-workspace .settings-section/.theme-picker/.theme-preview and .settings-tabs button:not(.active); tokens match existing surface roles |
 | Checkbox CSS | src/styles.css:1541 | .theme-glass-toggle, .theme-glass-help; wrapped label and width-limited helper, accent-color, visible focus |
 | Theme regression suite | tests/themes.test.ts:1 | Existing node:test suite retains palette/mode/accent checks; adds normalization, migration, store precedence/roundtrip, DOM-attribute independence and glass CSS fallbacks |
@@ -79,3 +80,23 @@ modes. Labels and focus remain sharp, selected tab remains obvious, inactive
 tabs/panels visibly frost. Uncheck restores base surfaces. Reload on Holy Mass
 and reopen Settings to observe persisted choice; also check narrow layout.
 Record browser observations separately from automated acceptance.
+
+
+## Browser observations — 2026-09-13, native Linux asrock
+
+The real app and corpus ran locally through npm run dev. All eight palette
+choices were exercised in both light and dark mode: inactive Settings tabs
+computed a 12px backdrop blur, their foreground filter remained none, and the
+active tab retained its seasonal accent fill. Slate was visually inspected.
+
+The checkbox started unchecked with fresh preferences. Space toggled it with a
+visible focus outline. Both on and off persisted after a reload on Holy Mass,
+before reopening Settings. Explicit light mode survived an emulated OS dark-mode
+change. At a 390px viewport, the checkbox and wrapped help stayed within the
+viewport (control right edge 332px).
+
+Reduced-transparency emulation removed blur and produced a fully opaque tab
+background after the normal color transition settled; print emulation also
+removed blur. All emulation/viewport overrides were reset. Browser console
+reported no errors during these checks. These observations supplement the
+permanent automated gates; they are not CHECKLIST acceptance predicates.

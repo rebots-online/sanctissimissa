@@ -25,6 +25,7 @@ import AboutView from './ui/AboutView.tsx';
 import ResizableInspectorLayout from './ui/ResizableInspectorLayout.tsx';
 import TrayPanel from './ui/TrayPanel.tsx';
 import { useNarrow } from './ui/BilingualText.tsx';
+import { applyTheme, readThemePreference, systemMode } from './core/theme/themes.ts';
 
 type View = 'map' | 'reader' | 'annotations' | 'calendar' | 'office' | 'bible' | 'journal' | 'homily' | 'settings' | 'about';
 
@@ -86,6 +87,18 @@ export default function App() {
   const [pendingAccId, setPendingAccId] = useState<string | null>(null);
   const [capture, setCapture] = useState<{ quote: string; quoteAlt?: string; anchor: string | null } | null>(null);
   const [trayOpen, setTrayOpen] = useState(false);
+
+  useEffect(() => {
+    const restoreTheme = () => {
+      const preference = readThemePreference(sidecar);
+      applyTheme(preference.family, preference.mode === 'system' ? systemMode() : preference.mode, preference.glass);
+    };
+    restoreTheme();
+    const systemPreference = typeof matchMedia === 'undefined'
+      ? null : matchMedia('(prefers-color-scheme: dark)');
+    systemPreference?.addEventListener('change', restoreTheme);
+    return () => systemPreference?.removeEventListener('change', restoreTheme);
+  }, [sidecar]);
 
   useEffect(() => {
     loadCorpusBytes()
