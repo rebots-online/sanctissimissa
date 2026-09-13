@@ -15,6 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert';
 import { spawn } from 'node:child_process';
+import { createHash } from 'node:crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,6 +28,8 @@ import {
   STAGE_ORDER,
   main,
   printUsage,
+  PENDING_RELEASE_EXIT_CODE,
+  stageRunsOnHost,
 } from '../scripts/release-state.mjs';
 
 // Type for spawn result
@@ -244,14 +247,14 @@ describe('Unit tests: main with injected deps', () => {
     assert.ok(commandsRun.includes('stamp'));
     assert.strictEqual(commandsRun.filter(c => c === 'stamp').length, 1);
 
-    // Lock should be archived after completion (not in root)
-    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), false);
+    // Terminal lock remains in root and has an archive copy
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), true);
 
     // Archived lock should exist in dist/rubric-runs
     const distDir = path.join(tempDir, 'dist', 'rubric-runs');
     assert.ok(fs.existsSync(distDir));
     const archiveFiles = fs.readdirSync(distDir);
-    const archiveFile = archiveFiles.find(f => f.startsWith('release-state-v2.17.34595'));
+    const archiveFile = archiveFiles.find(f => f.startsWith('standroidsmissal-v2.17.34595-release-state'));
     assert.ok(archiveFile);
 
     // Verify archived lock contents
@@ -290,11 +293,11 @@ describe('Unit tests: main with injected deps', () => {
     assert.deepStrictEqual(commandsRun, expectedStages);
 
     // Lock should be archived
-    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), false);
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), true);
     const distDir = path.join(tempDir, 'dist', 'rubric-runs');
     assert.ok(fs.existsSync(distDir));
     const archiveFiles = fs.readdirSync(distDir);
-    assert.ok(archiveFiles.some(f => f.startsWith('release-state-v2.17.34595')));
+    assert.ok(archiveFiles.some(f => f.startsWith('standroidsmissal-v2.17.34595-release-state')));
   });
 
   it('should fail on mismatched version lock', async () => {
@@ -392,12 +395,12 @@ describe('Unit tests: main with injected deps', () => {
 
     const exitCode = await main(['node', 'test', '--restart'], stubDeps);
     assert.strictEqual(exitCode, 0);
-    assert.strictEqual(commandsRun.length, 0);
+    assert.deepStrictEqual(commandsRun, ['stamp', ...CANONICAL_STAGE_ORDER]);
 
-    // Lock should be moved to outbox
-    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), false);
+    // Previous lock is preserved in outbox; active state remains
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), true);
     const outboxFiles = fs.readdirSync(outboxDir);
-    assert.ok(outboxFiles.some(f => f.startsWith('standroidsmissal-release-state-v')));
+    assert.ok(outboxFiles.some(f => f.startsWith('standroidsmissal-v')));
   });
 
   it('should handle --clean-only flag with matching lock', async () => {
@@ -425,10 +428,10 @@ describe('Unit tests: main with injected deps', () => {
     assert.strictEqual(exitCode, 0);
     assert.strictEqual(commandsRun.length, 0);
 
-    // Lock should be moved to outbox
-    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), false);
+    // Previous lock is preserved in outbox; active state remains
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), true);
     const outboxFiles = fs.readdirSync(outboxDir);
-    assert.ok(outboxFiles.some(f => f.startsWith('standroidsmissal-release-state-v')));
+    assert.ok(outboxFiles.some(f => f.startsWith('standroidsmissal-v')));
   });
 
   it('should fail --clean-only with mismatched lock', async () => {
@@ -624,14 +627,14 @@ describe('Integration tests: Real CLI spawning', () => {
 
       assert.strictEqual(result.code, 0);
 
-      // Lock should be moved
-      assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), false);
+      // Active lock remains after the copy
+      assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), true);
       const outboxFiles = fs.readdirSync(outboxDir);
-      assert.ok(outboxFiles.some(f => f.startsWith('standroidsmissal-release-state-v')));
+      assert.ok(outboxFiles.some(f => f.startsWith('standroidsmissal-v')));
 
-      // No commands should be logged
+      // Restart runs a new complete release in this same invocation.
       const logContent = readRunCommandLog(tempDir);
-      assert.strictEqual(logContent.trim(), '');
+      assert.deepStrictEqual(logContent.trim().split('\n'), ['stamp', ...CANONICAL_STAGE_ORDER]);
     });
 
     it('should preserve corrupt lock byte-identically in stub mode', async () => {
@@ -789,7 +792,7 @@ describe('Integration tests: Real CLI spawning', () => {
   });
 
   describe('--restart flag with real CLI', () => {
-    it('should move existing lock to outbox and exit 0', async () => {
+    it('should copy existing lock, start fresh and complete in one invocation', async () => {
       const lock: ReleaseState = {
         version: '2.17.34595',
         sourceHead: 'abc123def456',
@@ -802,31 +805,32 @@ describe('Integration tests: Real CLI spawning', () => {
       fs.mkdirSync(outboxDir, { recursive: true });
 
       const result = await spawnCli(['--restart'], {
+        RELEASE_STATE_RUNNER: 'stub',
         RELEASE_STATE_FIXTURE: tempDir,
         HOME: tempDir,
       }, tempDir);
 
       assert.strictEqual(result.code, 0);
-      assert.ok(result.stdout.includes('Moved old lock') || result.stdout.includes('ℹ️'));
+      assert.ok(result.stdout.includes('Copied old lock') || result.stdout.includes('ℹ️'));
 
-      // Lock should be removed from root
-      assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), false);
+      // Terminal lock should remain in root
+      assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), true);
 
       // Lock should be in outbox
       const outboxFiles = fs.readdirSync(outboxDir);
-      assert.ok(outboxFiles.some(f => f.startsWith('standroidsmissal-release-state-v')));
+      assert.ok(outboxFiles.some(f => f.startsWith('standroidsmissal-v')));
     });
 
     it('should exit 0 when no lock file exists', async () => {
-      const result = await spawnCli(['--restart'], {}, tempDir);
+      const result = await spawnCli(['--restart'], { RELEASE_STATE_RUNNER: 'stub', RELEASE_STATE_FIXTURE: tempDir }, tempDir);
 
       assert.strictEqual(result.code, 0);
-      assert.ok(result.stdout.includes('No lock file found'));
+      assert.ok(result.stdout.includes('Starting fresh release'));
     });
   });
 
   describe('--clean-only flag with real CLI', () => {
-    it('should move matching lock to outbox and exit 0', async () => {
+    it('should copy matching lock to outbox and keep it active', async () => {
       const lock: ReleaseState = {
         version: '2.17.34595',
         sourceHead: 'abc123def456',
@@ -844,11 +848,11 @@ describe('Integration tests: Real CLI spawning', () => {
       }, tempDir);
 
       assert.strictEqual(result.code, 0);
-      assert.ok(result.stdout.includes('Moved lock'));
+      assert.ok(result.stdout.includes('Copied lock'));
 
-      assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), false);
+      assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), true);
       const outboxFiles = fs.readdirSync(outboxDir);
-      assert.ok(outboxFiles.some(f => f.startsWith('standroidsmissal-release-state-v')));
+      assert.ok(outboxFiles.some(f => f.startsWith('standroidsmissal-v')));
     });
 
     it('should fail closed when version mismatches', async () => {
@@ -964,5 +968,169 @@ describe('Byte-identical nonmutation tests', () => {
 
     const afterContent = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf-8');
     assert.strictEqual(afterContent, originalContent);
+  });
+});
+
+describe('RP.1 shared release across build hosts', () => {
+  let tempDir: string;
+  let cleanup: () => void;
+  const commands: string[] = [];
+  const runner = async (name: string) => { commands.push(name); return 0; };
+
+  beforeEach(() => {
+    const t = createTempDir();
+    tempDir = t.dir;
+    cleanup = t.cleanup;
+    commands.length = 0;
+    setupMockGit(tempDir, 'abc123def456');
+    setupVersion(tempDir, '2.17.34595');
+  });
+
+  afterEach(() => cleanup());
+
+  it('uses one stamp through Linux, Windows, then Linux collection', async () => {
+    const deps = { fixtureDir: tempDir, runCommand: runner };
+    assert.strictEqual(await main(['node', 'test'], { ...deps, platform: 'linux' }), PENDING_RELEASE_EXIT_CODE);
+    assert.deepStrictEqual(commands, ['stamp', 'test', 'web', 'linux', 'windows', 'android-debug', 'android-release', 'symbols']);
+    const linuxState = readLock(tempDir);
+    assert.deepStrictEqual(linuxState.completedStages, commands.slice(1));
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'dist', 'rubric-runs')), false);
+
+    assert.strictEqual(await main(['node', 'test', '--resume-only'], { ...deps, platform: 'win32' }), 2);
+    assert.deepStrictEqual(commands.slice(8), ['windows-msi', 'windows-msix']);
+    assert.strictEqual(readLock(tempDir).completedStages.includes('collect'), false);
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'dist', 'rubric-runs')), false);
+    assert.strictEqual(await main(['node', 'test', '--resume-only'], { ...deps, platform: 'linux' }), 0);
+    assert.deepStrictEqual(commands.slice(10), ['collect']);
+    assert.strictEqual(commands.filter(name => name === 'stamp').length, 1);
+    assert.strictEqual(readLock(tempDir).version, linuxState.version);
+    assert.strictEqual(readLock(tempDir).sourceHead, linuxState.sourceHead);
+    const completedBytes = fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'));
+    const count = commands.length;
+    assert.strictEqual(await main(['node', 'test', '--resume-only'], { ...deps, platform: 'win32' }), 0);
+    assert.strictEqual(commands.length, count);
+    assert.ok(fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json')).equals(completedBytes));
+  });
+
+  it('can start on Windows and defer Linux targets until a same-version Linux continuation', async () => {
+    const deps = { fixtureDir: tempDir, runCommand: runner };
+    assert.strictEqual(await main(['node', 'test'], { ...deps, platform: 'win32' }), 2);
+    assert.deepStrictEqual(commands, ['stamp', 'test', 'web', 'windows-msi', 'windows-msix']);
+    assert.strictEqual(await main(['node', 'test', '--resume-only'], { ...deps, platform: 'linux' }), 0);
+    assert.deepStrictEqual(commands.slice(5), ['linux', 'windows', 'android-debug', 'android-release', 'symbols', 'collect']);
+  });
+
+  it('never stamps or writes state when resume-only has no existing state', async () => {
+    assert.strictEqual(await main(['node', 'test', '--resume-only'], { fixtureDir: tempDir, runCommand: runner }), 1);
+    assert.deepStrictEqual(commands, []);
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), false);
+  });
+
+  it('persists an interrupted stamp and rejects ordinary/resume-only retries without stamping again', async () => {
+    const interruptedRunner = async (name: string) => {
+      commands.push(name);
+      assert.strictEqual(name, 'stamp');
+      // The durable predecessor must exist before the stamper can mutate anything.
+      assert.strictEqual(readLock(tempDir).stampPending, true);
+      setupVersion(tempDir, '2.18.34596');
+      return 9;
+    };
+    await assert.rejects(main(['node', 'test'], { fixtureDir: tempDir, runCommand: interruptedRunner }), /Stamp failed with exit code 9/);
+    const statePath = path.join(tempDir, 'standroidsmissal-release-state.json');
+    const failedState = fs.readFileSync(statePath);
+    assert.strictEqual(readLock(tempDir).version, '2.17.34595');
+    assert.deepStrictEqual(readLock(tempDir).completedStages, []);
+    for (const args of [[], ['--resume-only']]) {
+      assert.strictEqual(await main(['node', 'test', ...args], { fixtureDir: tempDir, runCommand: runner }), 1);
+      assert.ok(fs.readFileSync(statePath).equals(failedState));
+    }
+    assert.deepStrictEqual(commands, ['stamp']);
+
+    assert.strictEqual(await main(['node', 'test', '--restart'], { fixtureDir: tempDir, runCommand: runner }), 0);
+    assert.strictEqual(commands.filter(name => name === 'stamp').length, 2);
+    assert.strictEqual(readLock(tempDir).stampPending, undefined);
+    const outbox = path.join(tempDir, 'outbox', 'standroidsmissal');
+    const archived = fs.readdirSync(outbox).find(name => name.includes('release-state-restarted'));
+    assert.ok(archived);
+    assert.ok(fs.readFileSync(path.join(outbox, archived)).equals(failedState));
+  });
+
+  it('fails closed on structurally invalid state instead of silently starting fresh', async () => {
+    for (const invalid of ['null', '{}', '{"version":"2.17.34595"}', JSON.stringify({
+      version: '2.17.34595', sourceHead: 'abc123def456', startedAt: '2026-09-13T00:00:00Z', completedStages: ['collect'],
+    })]) {
+      fs.writeFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), invalid);
+      assert.strictEqual(await main(['node', 'test'], { fixtureDir: tempDir, runCommand: runner }), 1);
+      assert.strictEqual(fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), 'utf8'), invalid);
+    }
+    assert.deepStrictEqual(commands, []);
+  });
+
+  it('restart preserves corrupt state byte-for-byte and runs a fresh stamp immediately', async () => {
+    const bytes = '{invalid old state';
+    fs.writeFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'), bytes);
+    assert.strictEqual(await main(['node', 'test', '--restart'], { fixtureDir: tempDir, runCommand: runner }), 0);
+    const outbox = path.join(tempDir, 'outbox', 'standroidsmissal');
+    const oldState = fs.readdirSync(outbox).find(name => name.includes('release-state-restarted'));
+    assert.ok(oldState);
+    assert.strictEqual(fs.readFileSync(path.join(outbox, oldState), 'utf8'), bytes);
+    assert.deepStrictEqual(commands, ['stamp', ...CANONICAL_STAGE_ORDER]);
+  });
+
+  it('rejects changed corpus or environment inputs before resuming any stage', async () => {
+    fs.mkdirSync(path.join(tempDir, 'assets'));
+    fs.writeFileSync(path.join(tempDir, 'assets', 'missal.db'), 'frozen corpus');
+    const state: ReleaseState = {
+      version: '2.17.34595', sourceHead: 'abc123def456', startedAt: '2026-09-13T00:00:00Z', completedStages: ['test'],
+      inputHashes: { 'assets/missal.db': createHash('sha256').update('frozen corpus').digest('hex'), '.env': 'absent' },
+    };
+    writeLock(tempDir, state);
+    fs.writeFileSync(path.join(tempDir, 'assets', 'missal.db'), 'changed corpus');
+    assert.strictEqual(await main(['node', 'test', '--resume-only'], { fixtureDir: tempDir, runCommand: runner }), 1);
+    assert.deepStrictEqual(readLock(tempDir), state);
+    fs.writeFileSync(path.join(tempDir, 'assets', 'missal.db'), 'frozen corpus');
+    fs.writeFileSync(path.join(tempDir, '.env'), 'CHANGED=true');
+    assert.strictEqual(await main(['node', 'test', '--resume-only'], { fixtureDir: tempDir, runCommand: runner }), 1);
+    assert.deepStrictEqual(commands, []);
+    assert.deepStrictEqual(readLock(tempDir), state);
+  });
+
+  it('rejects WSL before stamping', async () => {
+    assert.strictEqual(await main(['node', 'test'], {
+      fixtureDir: tempDir, runCommand: runner, platform: 'linux', env: { WSL_DISTRO_NAME: 'Ubuntu' },
+    }), 1);
+    assert.deepStrictEqual(commands, []);
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), false);
+  });
+
+  it('rejects an unsupported production host before attempting Git or stamping', async () => {
+    assert.strictEqual(await main(['node', 'test'], {
+      platform: 'darwin', env: { RELEASE_ROOT: tempDir },
+    }), 1);
+    assert.strictEqual(fs.readFileSync(path.join(tempDir, 'version.txt'), 'utf8'), '2.17.34595');
+    assert.strictEqual(fs.existsSync(path.join(tempDir, 'standroidsmissal-release-state.json')), false);
+  });
+
+  it('preserves a previous completed archive before replacing it', async () => {
+    const archiveDir = path.join(tempDir, 'dist', 'rubric-runs');
+    fs.mkdirSync(archiveDir, { recursive: true });
+    const archive = path.join(archiveDir, 'standroidsmissal-v2.17.34595-release-state.json');
+    fs.writeFileSync(archive, 'prior archive bytes');
+    assert.strictEqual(await main(['node', 'test'], { fixtureDir: tempDir, runCommand: runner }), 0);
+    const outbox = path.join(tempDir, 'outbox', 'standroidsmissal');
+    const prior = fs.readdirSync(outbox).find(name => name.includes('release-state-before-archive'));
+    assert.ok(prior);
+    assert.strictEqual(fs.readFileSync(path.join(outbox, prior), 'utf8'), 'prior archive bytes');
+    assert.ok(fs.readFileSync(archive).equals(fs.readFileSync(path.join(tempDir, 'standroidsmissal-release-state.json'))));
+  });
+
+  it('declares host eligibility without treating unsupported targets as successful', () => {
+    assert.strictEqual(stageRunsOnHost('windows-msi', 'linux'), false);
+    assert.strictEqual(stageRunsOnHost('windows-msix', 'win32'), true);
+    assert.strictEqual(stageRunsOnHost('android-release', 'win32'), false);
+    assert.strictEqual(stageRunsOnHost('collect', 'win32'), false);
+    assert.strictEqual(stageRunsOnHost('collect', 'linux'), true);
+    assert.strictEqual(stageRunsOnHost('test', 'darwin'), false);
+    assert.strictEqual(stageRunsOnHost('made-up-stage', 'linux'), false);
   });
 });

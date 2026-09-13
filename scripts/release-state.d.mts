@@ -13,6 +13,8 @@ export interface ReleaseState {
   sourceHead: string;
   startedAt: string;
   completedStages: string[];
+  inputHashes?: Record<string, string>;
+  stampPending?: boolean;
 }
 
 /**
@@ -39,10 +41,17 @@ export const INTERRUPT_EXIT_CODE: 70;
  */
 export const RECEIPT_MISMATCH_EXIT_CODE: 71;
 
+/** Required stages remain pending on another build host. */
+export const PENDING_RELEASE_EXIT_CODE: 2;
+
+export function stageRunsOnHost(stage: string, platform: string): boolean;
+
 /**
  * Dependency injection interface for hermetic testing
  */
 export interface ReleaseDeps {
+  /** Explicit host selection; omitted hermetic runs execute every stage. */
+  platform?: string;
   /**
    * Unified command runner for stamp and stages.
    * Injected in tests to avoid real builds.

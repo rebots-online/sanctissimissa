@@ -12,7 +12,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { createHash, randomUUID } from 'node:crypto';
+import { execFileSync, execSync } from 'node:child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -76,7 +78,19 @@ function readVersion(root) {
  * @param {string} root - The root directory
  * @returns {string} The current git HEAD commit hash
  */
-function getSourceHead(root) {
+function getSourceHead(root, fixture = false) {
+  try {
+    const topLevel = execFileSync('git', ['rev-parse', '--show-toplevel'], {
+      cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+    }).trim();
+    if (fs.realpathSync(topLevel) !== fs.realpathSync(root)) throw new Error('Release root is not the Git checkout root');
+    return execFileSync('git', ['rev-parse', '--verify', 'HEAD'], {
+      cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+    }).trim();
+  } catch (error) {
+    if (!fixture) throw error;
+  }
+  // Small hermetic fixtures intentionally have no real object database.
   const gitDir = path.join(root, '.git');
   const headPath = path.join(gitDir, 'HEAD');
   let headRef = fs.readFileSync(headPath, 'utf-8').trim();
@@ -95,13 +109,15 @@ function getSourceHead(root) {
  * @property {string} sourceHead - The git HEAD commit hash
  * @property {string} startedAt - ISO 8601 timestamp when release started
  * @property {string[]} completedStages - Array of completed stage names
+ * @property {Record<string, string>} [inputHashes] - Frozen corpus/env hashes
+ * @property {boolean} [stampPending] - Stamp/commit has not completed
  */
 
 /**
- * Read and parse the release lock file, or return null if not present/invalid
+ * Read and validate the release lock file, or return null only when absent.
  * @param {string} lockPath - The lock file path
  * @returns {ReleaseState|null} The parsed release state or null
- * @throws {Error} If the lock file exists but contains corrupt JSON
+ * @throws {Error} If the lock file contains corrupt JSON or invalid structure
  */
 function readLock(lockPath) {
   if (!fs.existsSync(lockPath)) {
@@ -114,13 +130,23 @@ function readLock(lockPath) {
 
     // Validate structure
     if (
-      typeof parsed.version !== 'string' ||
-      typeof parsed.sourceHead !== 'string' ||
+      parsed === null || typeof parsed !== 'object' || Array.isArray(parsed) ||
+      typeof parsed.version !== 'string' || !/^\d+\.\d+\.\d+$/.test(parsed.version) ||
+      typeof parsed.sourceHead !== 'string' || !parsed.sourceHead ||
       typeof parsed.startedAt !== 'string' ||
+      !Number.isFinite(Date.parse(parsed.startedAt)) ||
       !Array.isArray(parsed.completedStages) ||
-      !parsed.completedStages.every(s => typeof s === 'string')
+      !parsed.completedStages.every(s => STAGE_ORDER.includes(s)) ||
+      new Set(parsed.completedStages).size !== parsed.completedStages.length ||
+      (parsed.stampPending !== undefined && typeof parsed.stampPending !== 'boolean') ||
+      (parsed.stampPending === true && parsed.completedStages.length !== 0) ||
+      (parsed.completedStages.includes('collect') && parsed.completedStages.length !== STAGE_ORDER.length) ||
+      (parsed.inputHashes !== undefined && (
+        parsed.inputHashes === null || typeof parsed.inputHashes !== 'object' || Array.isArray(parsed.inputHashes) ||
+        !Object.values(parsed.inputHashes).every(value => typeof value === 'string' && /^(?:[a-f0-9]{64}|absent)$/.test(value))
+      ))
     ) {
-      return null;
+      throw new Error('Lock file has invalid structure');
     }
 
     return parsed;
@@ -138,8 +164,18 @@ function readLock(lockPath) {
  * @param {ReleaseState} state - The release state to write
  * @param {string} lockPath - The lock file path
  */
-function writeLock(state, lockPath) {
-  const tempPath = `${lockPath}.tmp`;
+function preserveState(lockPath, version, reason, outboxDir) {
+  fs.mkdirSync(outboxDir, { recursive: true });
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const archivedPath = path.join(outboxDir,
+    `standroidsmissal-v${version}-${reason}-${timestamp}-${randomUUID()}.json`);
+  fs.copyFileSync(lockPath, archivedPath, fs.constants.COPYFILE_EXCL);
+  return archivedPath;
+}
+
+function writeLock(state, lockPath, outboxDir) {
+  if (fs.existsSync(lockPath)) preserveState(lockPath, state.version, 'release-state-before-update', outboxDir);
+  const tempPath = `${lockPath}.${randomUUID()}.tmp`;
   fs.writeFileSync(tempPath, JSON.stringify(state, null, 2), 'utf-8');
   fs.renameSync(tempPath, lockPath);
 }
@@ -149,7 +185,7 @@ function writeLock(state, lockPath) {
  * @param {string} stage - The stage name to mark complete
  * @param {string} lockPath - The lock file path
  */
-function markStageComplete(stage, lockPath) {
+function markStageComplete(stage, lockPath, outboxDir) {
   const lock = readLock(lockPath);
   if (!lock) {
     throw new Error('Cannot mark stage complete: no valid lock file');
@@ -164,7 +200,7 @@ function markStageComplete(stage, lockPath) {
     completedStages: [...lock.completedStages, stage],
   };
 
-  writeLock(updated, lockPath);
+  writeLock(updated, lockPath, outboxDir);
 }
 
 /**
@@ -173,11 +209,37 @@ function markStageComplete(stage, lockPath) {
  * @param {string} root - The root directory
  * @returns {boolean} True if the lock matches current version and sourceHead
  */
-function lockMatchesCurrent(lock, root) {
+function lockMatchesCurrent(lock, root, fixture) {
   const currentVersion = readVersion(root);
-  const currentHead = getSourceHead(root);
+  const currentHead = getSourceHead(root, fixture);
 
-  return lock.version === currentVersion && lock.sourceHead === currentHead;
+  if (lock.version !== currentVersion || lock.sourceHead !== currentHead) return false;
+  if (!fixture || lock.inputHashes) {
+    const current = getInputHashes(root);
+    return Object.entries(current).every(([name, hash]) => lock.inputHashes?.[name] === hash);
+  }
+  return true;
+}
+
+function getInputHashes(root) {
+  return Object.fromEntries(['assets/missal.db', '.env'].map(name => {
+    const filename = path.join(root, name);
+    if (!fs.existsSync(filename)) {
+      if (name === '.env') return [name, 'absent'];
+      throw new Error('Release input assets/missal.db is missing');
+    }
+    return [name, createHash('sha256').update(fs.readFileSync(filename)).digest('hex')];
+  }));
+}
+
+function isFixture(deps) {
+  return Boolean(deps?.runCommand || deps?.fixtureDir || (deps?.env || process.env).RELEASE_STATE_FIXTURE);
+}
+
+function getOutboxDir(deps) {
+  const env = deps?.env || process.env;
+  const home = deps?.env?.HOME || deps?.fixtureDir || env.RELEASE_STATE_FIXTURE || env.HOME || os.homedir();
+  return expandHomePath('~/outbox/standroidsmissal', home);
 }
 
 /**
@@ -189,8 +251,15 @@ export const STAGE_ORDER = [
   'android-debug', 'android-release', 'symbols', 'collect',
 ];
 
-/** The WiX and winapp toolchains do not cross-build; those stages need Windows. */
-const IS_WINDOWS_HOST = process.platform === 'win32';
+export const PENDING_RELEASE_EXIT_CODE = 2;
+
+export function stageRunsOnHost(stage, platform) {
+  if (!STAGE_ORDER.includes(stage)) return false;
+  if (stage === 'collect') return platform === 'linux';
+  if (['test', 'web'].includes(stage)) return ['linux', 'win32'].includes(platform);
+  if (['windows-msi', 'windows-msix'].includes(stage)) return platform === 'win32';
+  return platform === 'linux';
+}
 
 /**
  * Interrupt receipt filename
@@ -356,16 +425,41 @@ async function runCommand(name, deps, root) {
   // Real command execution. Child stdout/stderr stay attached to the invoking
   // terminal: never background a build and never redirect its only evidence
   // to a disposable log file.
-  const { execSync } = await import('node:child_process');
+  if (isFixture(deps)) throw new Error('Fixture execution requires an injected runner or RELEASE_STATE_RUNNER=stub');
+  const childEnv = { ...process.env, ...env, FORCE_COLOR: env.FORCE_COLOR || '1' };
+  childEnv.ANDROID_HOME ||= path.join(os.homedir(), 'Android', 'Sdk');
+  childEnv.ANDROID_SDK_ROOT = childEnv.ANDROID_HOME;
+  childEnv.NDK_HOME ||= path.join(childEnv.ANDROID_HOME, 'ndk', '27.0.12077973');
+  if (!childEnv.JAVA_HOME && process.platform === 'linux') {
+    const javaPath = execSync('command -v java', { encoding: 'utf8', env: childEnv }).trim();
+    childEnv.JAVA_HOME = path.dirname(path.dirname(fs.realpathSync(javaPath)));
+  }
   const inherited = {
     cwd: root,
     stdio: 'inherit',
-    env: { ...process.env, FORCE_COLOR: process.env.FORCE_COLOR || '1' },
+    env: childEnv,
   };
 
+  // npm's Windows shim is absent in node_modules copied from Linux. Each host
+  // must install its own CLI before running a production stage or the stamp.
+  const tauriShim = path.join(root, 'node_modules', '.bin', process.platform === 'win32' ? 'tauri.cmd' : 'tauri');
+  if (!fs.existsSync(tauriShim)) {
+    execSync('npm ci', inherited);
+    if (!fs.existsSync(tauriShim)) throw new Error('npm ci did not install the host-local Tauri CLI shim');
+  }
+
   if (name === 'stamp') {
+    execFileSync(process.execPath, ['scripts/provision-secrets.mjs'], inherited);
     console.log('🔧 Stamp: npm run stamp');
     execSync('npm run stamp', inherited);
+    execFileSync('cargo', ['update', '--workspace', '--offline'], { ...inherited, cwd: path.join(root, 'src-tauri') });
+    const versionFiles = [
+      'Package.appxmanifest', 'version.txt', 'version.json', 'package.json', 'package-lock.json',
+      'src-tauri/Cargo.toml', 'src-tauri/Cargo.lock', 'src-tauri/tauri.conf.json',
+    ];
+    execFileSync('git', ['add', '--', ...versionFiles], inherited);
+    execFileSync('git', ['commit', '--only', '-m',
+      `v${readVersion(root)}: stamp complete release [skip ci]`, '--', ...versionFiles], inherited);
     return 0;
   }
 
@@ -381,41 +475,33 @@ async function runCommand(name, deps, root) {
     },
     linux: () => {
       console.log('🔧 Stage: linux');
-      execSync('./node_modules/.bin/tauri build --bundles deb,appimage --ci', inherited);
+      execSync('npm exec -- tauri build --bundles deb,appimage --ci', inherited);
     },
     windows: () => {
       console.log('🔧 Stage: windows');
       execSync('npm run build:windows:unstamped', inherited);
     },
-    // The MSI and MSIX were never part of this pipeline: the `windows` stage
-    // builds `--no-bundle`, so it emits the standalone PE and nothing else.
-    // Whatever shipped as an installer at v1.25 was produced out of band and
-    // staged without being installed — which is the defect being corrected.
     'windows-msi': () => {
       console.log('🔧 Stage: windows-msi');
-      if (!IS_WINDOWS_HOST) {
-        console.log('   ⏭  skipped — the WiX bundler requires a Windows host.');
-        return;
-      }
-      execSync('./node_modules/.bin/tauri build --target x86_64-pc-windows-msvc --bundles msi --ci', inherited);
+      execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-File',
+        'scripts/standroidsmissal-v1.39.15371-windows-native-20260913.ps1', '-Kind', 'MSI'], inherited);
     },
     'windows-msix': () => {
       console.log('🔧 Stage: windows-msix');
-      if (!IS_WINDOWS_HOST) {
-        console.log('   ⏭  skipped — the winapp CLI requires a Windows host.');
-        return;
-      }
-      execSync('bash scripts/build-windows-msix.sh', inherited);
+      execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-File',
+        'scripts/standroidsmissal-v1.39.15371-windows-native-20260913.ps1', '-Kind', 'MSIX'], inherited);
     },
     'android-debug': () => {
       console.log('🔧 Stage: android-debug');
-      execSync('./node_modules/.bin/tauri android build --debug --apk --ci', inherited);
+      execFileSync(process.execPath, ['scripts/provision-secrets.mjs'], inherited);
+      execSync('npm exec -- tauri android build --debug --apk --ci', inherited);
     },
     'android-release': () => {
       console.log('🔧 Stage: android-release');
-      execSync('./node_modules/.bin/tauri android build --apk --aab --ci', {
+      execFileSync(process.execPath, ['scripts/provision-secrets.mjs'], inherited);
+      execSync('npm exec -- tauri android build --apk --aab --ci', {
         ...inherited,
-        env: { ...inherited.env, CARGO_PROFILE_RELEASE_STRIP: 'false' },
+        env: { ...inherited.env, CARGO_PROFILE_RELEASE_DEBUG: '2', CARGO_PROFILE_RELEASE_STRIP: 'false' },
       });
     },
     symbols: () => {
@@ -450,12 +536,21 @@ export async function runReleaseStage(stage, deps, root, lockPath) {
     throw new Error(`Unknown stage: ${stage}`);
   }
 
+  root ||= getRoot(deps);
+  lockPath ||= getLockPath(root);
+  const platform = deps?.platform ?? (isFixture(deps) ? undefined : process.platform);
+  if (platform && !stageRunsOnHost(stage, platform)) return PENDING_RELEASE_EXIT_CODE;
+  const lock = readLock(lockPath);
+  if (lock?.stampPending) throw new Error('Cannot run a release stage while stamp/commit is pending');
+  if (stage === 'collect' && STAGE_ORDER.some(s => s !== 'collect' && !lock?.completedStages.includes(s))) {
+    return PENDING_RELEASE_EXIT_CODE;
+  }
   const exitCode = await runCommand(stage, deps, root);
   if (exitCode !== 0) {
     throw new Error(`Stage ${stage} failed with exit code ${exitCode}`);
   }
 
-  markStageComplete(stage, lockPath);
+  markStageComplete(stage, lockPath, getOutboxDir(deps));
   return 0;
 }
 
@@ -467,14 +562,15 @@ export function printUsage() {
 
 Options:
   --help, -h         Show this help message and exit
-  --restart          Move existing lock to ~/outbox/standroidsmissal/ and start fresh
-  --clean-only       Move existing lock to outbox if it matches current state
+  --restart          Copy existing state to outbox and start a fresh stamped release
+  --resume-only      Continue matching existing state; never stamp
+  --clean-only       Copy matching state to outbox; retain the active state
 
 Release stages (run automatically):
   test               Run the test suite
   web                Build web/PWA
   linux              Build Linux deb and AppImage
-  windows            Build Windows x64 standalone PE
+  windows            Build Windows x64 standalone PE and NSIS installer
   windows-msi        Build the MSI installer (Windows host only)
   windows-msix       Build the MSIX package (Windows host only)
   android-debug      Build Android debug APK
@@ -495,175 +591,156 @@ The state file (standroidsmissal-release-state.json) enables resume after interr
  * @returns {Promise<number>} Exit code (0 for success, non-zero for failure)
  */
 export async function main(argv, deps = {}) {
-  const processObj = deps?.process || process;
-  const fsObj = deps?.fs || fs;
-  const pathObj = deps?.path || path;
-  const env = deps?.env || process.env;
-
+  const env = deps.env || process.env;
   const args = argv.slice(2);
-  const restartFlag = args.includes('--restart');
-  const cleanOnlyFlag = args.includes('--clean-only');
-  const helpFlag = args.includes('--help') || args.includes('-h');
-
-  const root = getRoot(deps);
-  const lockPath = getLockPath(root);
-  const distRubricRuns = getDistRubricRuns(root);
-
-  if (helpFlag) {
+  if (args.includes('--help') || args.includes('-h')) {
     printUsage();
     return 0;
   }
-
-  if (restartFlag && cleanOnlyFlag) {
-    console.error('❌ Cannot specify both --restart and --clean-only');
+  const restartFlag = args.includes('--restart');
+  const cleanOnlyFlag = args.includes('--clean-only');
+  const resumeOnlyFlag = args.includes('--resume-only');
+  if (args.some(arg => !['--restart', '--clean-only', '--resume-only'].includes(arg)) ||
+      [restartFlag, cleanOnlyFlag, resumeOnlyFlag].filter(Boolean).length > 1) {
+    console.error('❌ Choose at most one of --restart, --clean-only, --resume-only');
     return 1;
   }
 
-  const outboxDir = expandHomePath('~/outbox/standroidsmissal', env.HOME);
-
-  // Handle --restart: move old lock to outbox and exit
-  if (restartFlag) {
-    const lock = readLock(lockPath);
-    if (lock) {
-      fsObj.mkdirSync(outboxDir, { recursive: true });
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const archivedPath = pathObj.join(
-        outboxDir,
-        `standroidsmissal-release-state-v${lock.version}-restarted-${timestamp}.json`,
-      );
-      fsObj.renameSync(lockPath, archivedPath);
-      console.log(`🔄 Moved old lock to ${archivedPath}`);
-    } else {
-      console.log('ℹ️  No lock file found');
-    }
-    return 0;
+  const root = getRoot(deps);
+  const lockPath = getLockPath(root);
+  const outboxDir = getOutboxDir(deps);
+  const fixture = isFixture(deps);
+  if (env.WSL_INTEROP || env.WSL_DISTRO_NAME || (!fixture && /microsoft/i.test(os.release()))) {
+    console.error('❌ Release builds are forbidden on WSL; use native Linux or Windows.');
+    return 1;
+  }
+  if (!fixture && !['linux', 'win32'].includes(deps.platform ?? process.platform)) {
+    console.error('❌ This release driver requires native Linux or Windows; no stamp was run.');
+    return 1;
   }
 
-  // Handle --clean-only: just move old lock to outbox (for manual intervention)
-  if (cleanOnlyFlag) {
-    const lock = readLock(lockPath);
-    if (!lock) {
-      console.log('ℹ️  No lock file found');
-      return 0;
-    }
-
-    fsObj.mkdirSync(outboxDir, { recursive: true });
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const archivedPath = pathObj.join(
-      outboxDir,
-      `standroidsmissal-release-state-v${lock.version}-cleaned-${timestamp}.json`,
-    );
-
-    if (!lockMatchesCurrent(lock, root)) {
-      console.error('❌ Lock mismatch or corruption detected');
-      console.error(`Lock version: ${lock.version}`);
-      console.error(`Lock sourceHead: ${lock.sourceHead}`);
-      console.error(`Current version: ${readVersion(root)}`);
-      console.error(`Current sourceHead: ${getSourceHead(root)}`);
-      console.error('');
-      console.error('Remediation: run `npm run build:release --restart` to move this lock');
-      console.error('to the outbox and start a fresh stamp, or manually inspect and resolve.');
-      return 1;
-    }
-
-    fsObj.renameSync(lockPath, archivedPath);
-    console.log(`🧹 Moved lock to ${archivedPath}`);
-    return 0;
-  }
-
-  // Normal execution path
   let lock;
   try {
     lock = readLock(lockPath);
   } catch (error) {
-    // Corrupt lock file
-    if (error instanceof SyntaxError || error.message.includes('invalid JSON')) {
-      console.error('❌ Lock mismatch or corruption detected');
-      console.error('Lock file contains invalid JSON');
-      console.error('');
-      console.error('Remediation: run `npm run build:release --restart` to move this lock');
-      console.error('to the outbox and start a fresh stamp, or manually inspect and resolve.');
+    if (!restartFlag) {
+      console.error('❌ Lock mismatch or corruption detected:', error.message);
+      console.error('Remediation: npm run build:release -- --restart preserves this state and starts fresh.');
       return 1;
     }
-    throw error;
   }
 
-  if (!lock) {
-    // Fresh release: stamp once and write new lock
-    console.log('🚀 Starting fresh release');
-    const exitCode = await runCommand('stamp', deps, root);
-    if (exitCode !== 0) {
-      throw new Error(`Stamp failed with exit code ${exitCode}`);
-    }
+  if (resumeOnlyFlag && !lock) {
+    console.error('❌ --resume-only requires an existing matching release state; no stamp was run.');
+    return 1;
+  }
+  if (lock?.stampPending && !restartFlag) {
+    console.error('❌ Previous stamp/commit was interrupted. No second stamp was run; resolve tracked changes, then use --restart to preserve it and start a new invocation.');
+    return 1;
+  }
 
-    const newLock = {
-      version: readVersion(root),
-      sourceHead: getSourceHead(root),
-      startedAt: new Date().toISOString(),
-      completedStages: [],
-    };
-
-    writeLock(newLock, lockPath);
-    console.log(`🔒 Wrote standroidsmissal-release-state.json v${newLock.version}`);
-    lock = newLock;
-  } else {
-    // Existing lock: validate match
-    if (!lockMatchesCurrent(lock, root)) {
-      console.error('❌ Lock mismatch or corruption detected');
-      console.error(`Lock version: ${lock.version}`);
-      console.error(`Lock sourceHead: ${lock.sourceHead}`);
-      console.error(`Current version: ${readVersion(root)}`);
-      console.error(`Current sourceHead: ${getSourceHead(root)}`);
-      console.error('');
-      console.error('Remediation: run `npm run build:release --restart` to move this lock');
-      console.error('to the outbox and start a fresh stamp, or manually inspect and resolve.');
+  if (!fixture) {
+    getSourceHead(root);
+    const dirty = execFileSync('git', ['status', '--porcelain', '--untracked-files=no'], {
+      cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+    }).trim();
+    if (dirty) {
+      console.error('❌ Commit tracked changes before building a recorded release source snapshot.');
       return 1;
     }
-
-    console.log(`🔄 Resuming release v${lock.version}`);
-    console.log(`Started at: ${lock.startedAt}`);
-    console.log(`Completed stages: ${lock.completedStages.join(', ') || 'none'}`);
   }
 
-  // Determine stages to run
-  const completedStages = lock.completedStages;
-  const pendingStages = STAGE_ORDER.filter(s => !completedStages.includes(s));
+  if (restartFlag && fs.existsSync(lockPath)) {
+    const archivedPath = preserveState(lockPath, lock?.version || readVersion(root), 'release-state-restarted', outboxDir);
+    console.log(`🔄 Copied old lock to ${archivedPath}`);
+    lock = null;
+  }
 
-  if (pendingStages.length === 0) {
-    console.log('✅ All stages already completed');
+  if (cleanOnlyFlag && !lock) {
+    console.log('ℹ️  No lock file found');
     return 0;
   }
 
-  console.log(`⏭️  Stages to run: ${pendingStages.join(', ')}`);
-
-  // Run pending stages
-  for (const stage of pendingStages) {
+  if (lock) {
     try {
-      await runReleaseStage(stage, deps, root, lockPath);
+      if (!lockMatchesCurrent(lock, root, fixture)) throw new Error('Version, source HEAD, or input hashes differ');
     } catch (error) {
-      console.error(`❌ Stage ${stage} failed:`, error.message);
-      throw error;
+      console.error('❌ Lock mismatch or corruption detected:', error.message);
+      console.error('Remediation: npm run build:release -- --restart preserves this state and starts fresh.');
+      return 1;
     }
+    if (cleanOnlyFlag) {
+      const archivedPath = preserveState(lockPath, lock.version, 'release-state-cleaned', outboxDir);
+      console.log(`📦 Copied lock to ${archivedPath}; active state retained. Use --restart for a fresh release.`);
+      return 0;
+    }
+    console.log(`🔄 Resuming release v${lock.version}`);
+    console.log(`Completed stages: ${lock.completedStages.join(', ') || 'none'}`);
+  } else {
+    // Validate non-Git inputs before burning a version or altering old state.
+    if (!fixture) {
+      if (fs.existsSync(path.join(root, 'release.lock'))) {
+        console.error('❌ Legacy release.lock freezes the version. Preserve and resolve it before starting a new stamped release.');
+        return 1;
+      }
+      getInputHashes(root);
+    }
+    console.log('🚀 Starting fresh release');
+    const predecessor = {
+      version: readVersion(root),
+      sourceHead: getSourceHead(root, fixture),
+      startedAt: new Date().toISOString(),
+      completedStages: [],
+      stampPending: true,
+      ...(!fixture ? { inputHashes: getInputHashes(root) } : {}),
+    };
+    writeLock(predecessor, lockPath, outboxDir);
+    const exitCode = await runCommand('stamp', deps, root);
+    if (exitCode !== 0) throw new Error(`Stamp failed with exit code ${exitCode}`);
+    lock = {
+      version: readVersion(root),
+      sourceHead: getSourceHead(root, fixture),
+      startedAt: predecessor.startedAt,
+      completedStages: [],
+      ...(!fixture ? { inputHashes: getInputHashes(root) } : {}),
+    };
+    writeLock(lock, lockPath, outboxDir);
+    console.log(`🔒 Wrote standroidsmissal-release-state.json v${lock.version}`);
   }
 
-  // Archive completed lock to dist/rubric-runs after successful collect
-  const finalLock = readLock(lockPath);
-  if (!finalLock) {
-    throw new Error('Cannot archive lock: no valid lock file');
+  for (const stage of STAGE_ORDER) {
+    if (lock.completedStages.includes(stage)) continue;
+    const result = await runReleaseStage(stage, deps, root, lockPath);
+    if (result === PENDING_RELEASE_EXIT_CODE) {
+      console.log(`⏳ Pending ${stage}: requires another host or earlier required stages.`);
+    }
+    lock = readLock(lockPath);
   }
 
-  fsObj.mkdirSync(distRubricRuns, { recursive: true });
-  const archivePath = pathObj.join(distRubricRuns, `release-state-v${finalLock.version}.json`);
-  fsObj.writeFileSync(archivePath, JSON.stringify(finalLock, null, 2), 'utf-8');
-  fsObj.unlinkSync(lockPath);
-  console.log(`📦 Archived release state to ${archivePath}`);
+  const pendingStages = STAGE_ORDER.filter(stage => !lock.completedStages.includes(stage));
+  if (pendingStages.length) {
+    console.log(`⏳ Release v${lock.version} incomplete: ${pendingStages.join(', ')}`);
+    console.log('Continue the same source, version, inputs and state on the required host: npm run build:release -- --resume-only');
+    return PENDING_RELEASE_EXIT_CODE;
+  }
 
-  console.log('✅ Release complete');
+  // Keep the terminal state so another invocation cannot accidentally stamp again.
+  const distRubricRuns = getDistRubricRuns(root);
+  fs.mkdirSync(distRubricRuns, { recursive: true });
+  const archivePath = path.join(distRubricRuns, `standroidsmissal-v${lock.version}-release-state.json`);
+  const lockBytes = fs.readFileSync(lockPath);
+  if (!fs.existsSync(archivePath) || !fs.readFileSync(archivePath).equals(lockBytes)) {
+    if (fs.existsSync(archivePath)) preserveState(archivePath, lock.version, 'release-state-before-archive', outboxDir);
+    fs.copyFileSync(lockPath, archivePath);
+  }
+  console.log(`📦 Archived release state to ${archivePath}; terminal state retained.`);
+  console.log('✅ All artifact build stages complete; release acceptance remains subject to the recorded platform/Store verification gates.');
+  console.log('Use --restart to start a new stamped release.');
   return 0;
 }
 
 // Only run main when executed directly (isMain guard)
-const isMain = import.meta.url === `file://${process.argv[1]}`;
+const isMain = Boolean(process.argv[1]) && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
 if (isMain) {
   main(process.argv)
     .then(exitCode => {

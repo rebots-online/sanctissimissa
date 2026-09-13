@@ -18,17 +18,23 @@ import {
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { homedir } from 'node:os';
-import { basename, dirname, join, resolve } from 'node:path';
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = resolve(ROOT, 'dist');
 const WEBDIST = resolve(ROOT, 'dist-web');
 const SLUG = 'standroidsmissal';
-const versionJson = JSON.parse(readFileSync(resolve(ROOT, 'version.json'), 'utf8'));
+function readJson(path) {
+  try { return JSON.parse(readFileSync(path, 'utf8').replace(/^\uFEFF/, '')); }
+  catch { throw new Error(`Missing or invalid JSON: ${path}`); }
+}
+const versionJson = readJson(resolve(ROOT, 'version.json'));
 const VERSION = versionJson.version;
 const VERSION_CODE = String(versionJson.versionCode);
 const PREFIX = `${SLUG}-v${VERSION}`;
+const [windowsMajor, windowsMinor] = VERSION.split('.');
+const WINDOWS_VERSIONS = { canonical: VERSION, msi: `${windowsMajor}.${windowsMinor}.0`, msix: `${windowsMajor}.${windowsMinor}.0.0` };
 
 if (readFileSync(resolve(ROOT, 'version.txt'), 'utf8').trim() !== VERSION) {
   throw new Error('version.txt and version.json disagree');
@@ -41,11 +47,9 @@ mkdirSync(DIST, { recursive: true });
 /**
  * Per-host collection (`--partial` / `RELEASE_PARTIAL=1`).
  *
- * The ten-artifact set cannot be produced by any single machine: the Linux
- * deb/AppImage need a Linux host, while the MSI and MSIX need Windows (WiX and
- * the winapp CLI do not cross-build). Collecting strictly therefore ALWAYS
- * throws on whichever host you run it — which is why release artifacts have
- * been left orphaned in `target/` instead of landing in the tracked `dist/`.
+ * Linux produces deb/AppImage and cross EXE/NSIS; native Windows produces
+ * EXE/MSI/MSIX. Strict collection requires both hosts' same-release outputs
+ * and the native verification receipt to have been gathered into this checkout.
  *
  * In partial mode a missing artifact is recorded with its reason and skipped,
  * the manifest is marked `partial`, and `missing[]` names exactly what still
@@ -77,6 +81,35 @@ function optional(id, platform, kind, build) {
   }
 }
 
+// A native receipt ties installer-format versions and exact binary hashes to
+// the frozen full release, so an old mapped-version MSI cannot be collected.
+function nativeWindowsArtifact(kind) {
+  const target = resolve(ROOT, 'src-tauri/target/windows-native');
+  const receipt = readJson(join(target, `${PREFIX}-windows-native-metadata.json`));
+  const state = readJson(resolve(ROOT, 'standroidsmissal-release-state.json'));
+  const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
+  if (receipt.version !== VERSION || receipt.sourceHead !== head ||
+      state.version !== VERSION || state.sourceHead !== head ||
+      receipt.msiVersion !== WINDOWS_VERSIONS.msi || receipt.msixVersion !== WINDOWS_VERSIONS.msix ||
+      receipt.verification?.signatures !== true) {
+    throw new Error('Native Windows receipt does not match the frozen release or package verification');
+  }
+  const artifact = receipt.artifacts?.[kind];
+  if (!artifact || typeof artifact.path !== 'string' || isAbsolute(artifact.path) ||
+      /^[A-Za-z]:|^\\\\/.test(artifact.path) || !/^[a-f0-9]{64}$/.test(artifact.sha256)) {
+    throw new Error(`Native Windows receipt has no valid ${kind} artifact`);
+  }
+  const path = resolve(target, artifact.path.replaceAll('\\', '/'));
+  const inside = relative(target, path);
+  if (!inside || inside === '..' || inside.startsWith(`..${sep}`) || isAbsolute(inside)) {
+    throw new Error('Native Windows receipt path escapes its target directory');
+  }
+  if (!existsSync(path) || !statSync(path).isFile() || sha256(path) !== artifact.sha256) {
+    throw new Error(`Native Windows ${kind} does not match its release receipt hash`);
+  }
+  return path;
+}
+
 const sources = [
   {
     id: 'linux-deb', platform: 'linux', kind: 'deb',
@@ -94,6 +127,27 @@ const sources = [
     id: 'windows-standalone', platform: 'windows', kind: 'exe',
     source: optional('windows-standalone', 'windows', 'exe', () => resolve(ROOT, 'src-tauri/target/x86_64-pc-windows-msvc/release/st-androids-missal.exe')),
     filename: `${PREFIX}-windows-x64-standalone.exe`,
+  },
+  {
+    id: 'windows-nsis', platform: 'windows', kind: 'nsis',
+    source: optional('windows-nsis', 'windows', 'nsis', () => exactOne(resolve(ROOT, 'src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis'),
+      (f) => f === `St. Android's Missal_${VERSION}_x64-setup.exe`, 'Windows NSIS')),
+    filename: `${PREFIX}-windows-x64-setup.exe`,
+  },
+  {
+    id: 'windows-native-standalone', platform: 'windows', kind: 'exe-native',
+    source: optional('windows-native-standalone', 'windows', 'exe-native', () => nativeWindowsArtifact('exe')),
+    filename: `${PREFIX}-windows-x64-native-standalone.exe`,
+  },
+  {
+    id: 'windows-msi', platform: 'windows', kind: 'msi',
+    source: optional('windows-msi', 'windows', 'msi', () => nativeWindowsArtifact('msi')),
+    filename: `${PREFIX}-windows-x64.msi`, installer_version: WINDOWS_VERSIONS.msi,
+  },
+  {
+    id: 'windows-msix', platform: 'windows', kind: 'msix',
+    source: optional('windows-msix', 'windows', 'msix', () => nativeWindowsArtifact('msix')),
+    filename: `${PREFIX}-windows-x64.msix`, installer_version: WINDOWS_VERSIONS.msix,
   },
   {
     id: 'android-apk-debug', platform: 'android', kind: 'apk-debug',
@@ -120,41 +174,6 @@ const sources = [
     filename: `${PREFIX}-android-native-debug-symbols.zip`,
   },
 ];
-
-const nsisDir = resolve(ROOT, 'src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis');
-if (existsSync(nsisDir)) {
-  const nsisMatches = readdirSync(nsisDir).filter((f) => f.endsWith('.exe') && f.includes(VERSION));
-  if (nsisMatches.length === 1) {
-    sources.push({
-      id: 'windows-nsis', platform: 'windows', kind: 'nsis',
-      source: join(nsisDir, nsisMatches[0]),
-      filename: `${PREFIX}-windows-x64-setup.exe`,
-    });
-  }
-}
-
-const msiDir = resolve(ROOT, 'src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi');
-if (existsSync(msiDir)) {
-  const msiMatches = readdirSync(msiDir).filter((f) => f.endsWith('.msi') && f.includes(VERSION));
-  if (msiMatches.length === 1) {
-    sources.push({
-      id: 'windows-msi', platform: 'windows', kind: 'msi',
-      source: join(msiDir, msiMatches[0]),
-      filename: `${PREFIX}-windows-x64.msi`,
-    });
-  }
-}
-
-// MSIX is built by `npm run build:windows:msix` (winapp CLI, not Tauri's
-// bundler) and emitted at the repo root as standroidsmissal-v<ver>-windows-x64.msix.
-const msixPath = resolve(ROOT, `${PREFIX}-windows-x64.msix`);
-if (existsSync(msixPath)) {
-  sources.push({
-    id: 'windows-msix', platform: 'windows', kind: 'msix',
-    source: msixPath,
-    filename: `${PREFIX}-windows-x64.msix`,
-  });
-}
 
 // `optional()` yields null for anything this host cannot produce (partial mode).
 const present = sources.filter((a) => a.source !== null);
@@ -229,6 +248,8 @@ for (const artifact of sources) {
     platform: artifact.platform,
     kind: artifact.kind,
     filename: artifact.filename,
+    ...(artifact.platform === 'windows' ? { canonical_version: VERSION } : {}),
+    ...(artifact.installer_version ? { installer_version: artifact.installer_version } : {}),
   });
   console.log(`  ✓ ${artifact.id} → dist/${artifact.filename}`);
 }
@@ -360,7 +381,11 @@ const manifest = {
   source: { commit: sourceCommit, branch: execFileSync('git', ['branch', '--show-current'], { cwd: ROOT, encoding: 'utf8' }).trim() },
   change_notes: changeNotes,
   artifacts: copied,
-  verification: { sha256_command: 'sha256sum <filename>', android_signatures_verified: androidVerified },
+  windows_versions: WINDOWS_VERSIONS,
+  verification: { sha256_command: 'sha256sum <filename>', android_signatures_verified: androidVerified,
+    windows_package_signatures_verified: ['windows-native-standalone', 'windows-msi', 'windows-msix'].every((id) => copied.some((artifact) => artifact.id === id)),
+    windows_store_runtime: 'unverified', windows_store_acceptance: 'unverified',
+    android_play_delivery: 'unverified (BP.1)' },
 };
 
 const jsonName = `release-manifest-v${VERSION}.json`;
@@ -371,6 +396,8 @@ const xmlEscape = (s) => String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt
 const xmlArtifacts = copied.map((a) =>
   `  <artifact id="${xmlEscape(a.id)}" platform="${xmlEscape(a.platform)}" kind="${xmlEscape(a.kind)}"><filename>${xmlEscape(a.filename)}</filename><size_bytes>${a.size_bytes}</size_bytes><sha256>${a.sha256}</sha256></artifact>`
 ).join('\n');
+const xmlVerification = `  <windows_versions canonical="${xmlEscape(VERSION)}" msi="${xmlEscape(WINDOWS_VERSIONS.msi)}" msix="${xmlEscape(WINDOWS_VERSIONS.msix)}"/>\n` +
+  `  <verification windows_store_runtime="unverified" windows_store_acceptance="unverified" android_play_delivery="unverified (BP.1)"/>`;
 const xmlHighlights = changeNotes.highlights
   .map((h) => `    <highlight>${xmlEscape(h)}</highlight>`)
   .join('\n');
@@ -379,7 +406,7 @@ const xmlChangeNotes =
   (xmlHighlights ? `${xmlHighlights}\n` : '') +
   `  </change_notes>`;
 writeFileSync(join(DIST, `release-manifest-v${VERSION}.xml`),
-  `<?xml version="1.0" encoding="UTF-8"?>\n<release schema="mba.robin.release-manifest.v1" version="${xmlEscape(VERSION)}" versionCode="${VERSION_CODE}">\n${xmlChangeNotes}\n${xmlArtifacts}\n</release>\n`);
+  `<?xml version="1.0" encoding="UTF-8"?>\n<release schema="mba.robin.release-manifest.v1" version="${xmlEscape(VERSION)}" versionCode="${VERSION_CODE}">\n${xmlChangeNotes}\n${xmlVerification}\n${xmlArtifacts}\n</release>\n`);
 writeFileSync(join(DIST, `RELEASE_NOTES-v${VERSION}.md`),
   `# St. Android's Missal v${VERSION}\n\n${changeNotes.markdown}\n\n---\n\n` +
   `Built from commit ${sourceCommit}. See the adjacent release manifest for exact ` +
