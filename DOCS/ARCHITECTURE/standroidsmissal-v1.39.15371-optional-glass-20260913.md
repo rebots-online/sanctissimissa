@@ -100,3 +100,16 @@ background after the normal color transition settled; print emulation also
 removed blur. All emulation/viewport overrides were reset. Browser console
 reported no errors during these checks. These observations supplement the
 permanent automated gates; they are not CHECKLIST acceptance predicates.
+
+
+## Automated and production-build observations
+
+On source commit `26f08d23`, the focused theme suite passed 46/46 tests, the
+complete suite passed 321/321 tests (37 suites), TypeScript exited 0, and
+`npm run build` passed its clean-source/duplicate/version gates and built the
+web/PWA in 5.57 seconds. The existing sql.js static/dynamic import warnings
+were non-fatal. A production preview showed all eight palette choices and the
+checkbox; an inactive tab computed 12px backdrop blur and foreground filter none.
+The final preference implementation passed an independent read-only review,
+including blocked reads, quota-failed cache writes and successful-write recovery.
+No public deployment or native release was performed.
