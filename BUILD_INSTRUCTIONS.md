@@ -1,20 +1,30 @@
-# St. Android's Missal — Build and Release Instructions
+# SanctissiMissa — Build and Release Instructions
 
 Canonical project recipe. Operator access and credential custody remain in
-`/home/robin/Admin-Manual/PROJECTS/BUILD-INSTRUCTIONS-StAndroidsMissal.md`.
+`/home/robin/Admin-Manual/PROJECTS/BUILD-INSTRUCTIONS-SanctissiMissa.md`.
 Release coordination follows Admin-Manual CC14 v1.1 and the
-[RP contract](DOCS/ARCHITECTURE/standroidsmissal-v1.39.15371-release-parity-20260913.md).
+[RP contract](DOCS/ARCHITECTURE/sanctissimissa-v1.39.15371-release-parity-20260913.md).
 
 ## Checkout and identity
 
-- Product: St. Android's Missal; package ID `mba.robin.standroidsmissal`.
-- Slug: `standroidsmissal`; canonical version: `version.txt`; mirror: `version.json`.
+SanctissiMissa has been a distinct fork since `009aedd8` (2026-09-04).
+StAndroidsMissal is frozen; its historical release names and runbook describe
+that predecessor, not the active application.
+
+- Product: SanctissiMissa; package ID `mba.robin.sanctissimissa`.
+- Slug: `sanctissimissa`; canonical version: `version.txt`; mirror: `version.json`.
 - Verified native Linux checkout: `/home/robin/Desktop/devProjects/sanctissimissa`
   on `asrock`. Do not build on WSL or assume older checkout paths exist.
-- This source-only checkpoint ignores provisioned corpus and `dist/`. Preserve
-  release files locally and follow project AGENTS.md for storage/pushes; restoring
-  the full Forgejo/LFS checkout is a separate migration. The configured source
-  remote is currently `origin`; inspect `git remote -v` before publishing.
+- Fork checkpoint `009aedd8` was source-only. The current release contract
+  restores tracked root `dist/` with binaries backed by Forgejo LFS; all durable
+  release outputs belong there. Provisioned corpus inputs remain separate and
+  are not supplied by the source checkpoint.
+- Authoritative `origin`: `https://forgejo.robin.mba/rcheung/sanctissimissa.git`.
+  Code/pointer mirror `github`: `https://github.com/rebots-online/sanctissimissa.git`.
+  `.lfsconfig` routes LFS to
+  `https://forgejo.robin.mba/rcheung/sanctissimissa.git/info/lfs`. Use configured
+  HTTPS remotes, preserving incoming work; never publish this fork to the frozen
+  predecessor repository.
 - CI remains dormant. These commands are local release commands.
 
 ## One complete release, one version
@@ -37,7 +47,7 @@ They are recorded in release metadata alongside the full application version.
 
 ## Prerequisites
 
-Common: Node >=22.6, npm, Rust stable, Git, provisioned `assets/missal.db`, local
+Common: Node >=22.6, npm, Rust stable, Git with Git LFS, provisioned `assets/missal.db`, local
 `.env` if used. Commit source/tooling before starting; the driver separately
 commits its own exact version stamp before any build gate runs.
 
@@ -79,7 +89,7 @@ npm run build:release
 ```
 
 `build_all.sh` and `npm run build:all` delegate to the same Node driver. The
-ignored `standroidsmissal-release-state.json` stores the common version, stamp
+ignored `sanctissimissa-release-state.json` stores the common version, stamp
 commit, source-input hashes and completed stages. A subsequent plain invocation
 resumes that state. Completed state remains as an idempotent terminal record.
 To deliberately begin a different release:
@@ -116,14 +126,17 @@ records full version/source commit, installer mappings, paths and hashes.
 
 Copy the entire native target directory and updated release state back to the
 canonical Linux checkout; preserve predecessor files before replacement. Resume
-there with `--resume-only`. Final collection requires every platform stage and
+there with `npm run build:release -- --resume-only`. Final collection requires every platform stage and
 all required files. A native host's completed-stage record alone does not supply
 its artifacts. Source/input changes require a new full release, not continued
 reuse of the old stamp.
 
 ## Required artifact set
 
-All filenames begin `standroidsmissal-v<full-version>-`:
+Root `dist/` is the mandatory durable home for every release output, including
+platform bundles, manifests, release notes and verification receipts. Binary
+patterns in `.gitattributes` use Forgejo LFS; readable metadata stays ordinary Git.
+All filenames begin `sanctissimissa-v<full-version>-`:
 
 | Platform | Required suffixes |
 |---|---|
@@ -134,8 +147,9 @@ All filenames begin `standroidsmissal-v<full-version>-`:
 | Android | `android-universal-debug.apk`, `android-universal-release.apk`, `android-universal-release.aab`, `android-native-debug-symbols.zip` |
 
 The collector requires NSIS and native Windows packages; they are not optional
-extras. Explicit partial collection is diagnostic and identifies missing items.
-It does not complete a release. Preserve existing same-version output before
+extras. `npm run collect-artifacts -- --partial` preserves available release
+outputs in root `dist/` and explicitly identifies missing items. It is diagnostic
+and does not complete a release. Preserve existing same-version output before
 rebuilding. Vite owns disposable `dist-web/` and may empty that directory; it
 never owns the durable native artifact directory `dist/`.
 

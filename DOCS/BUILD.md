@@ -1,4 +1,4 @@
-# Build Instructions
+# SanctissiMissa Build Instructions
 
 The authoritative build and release recipe is the project-root
 [`BUILD_INSTRUCTIONS.md`](../BUILD_INSTRUCTIONS.md).

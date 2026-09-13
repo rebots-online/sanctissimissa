@@ -1,7 +1,9 @@
 # Peer sidecar sync — DHT-primary, operator-free multi-device user data
 
 **Status:** design (pre-architecture entity table for mesh code).  
-**Origin product:** St. Android's Missal (`mba.robin.standroidsmissal`).  
+**Historical origin product:** St. Android's Missal (`mba.robin.standroidsmissal`), now frozen.
+
+**Current fork:** SanctissiMissa (`mba.robin.sanctissimissa`); this inherited functional contract applies to the active fork.
 **Admin-Manual:** `DOCS/CONCEPTS/peer-sidecar-sync.md` (portable).  
 **Related:** stream-DHT, decent-network matchmaking, BILLING_CONVENTIONS, ARCHITECTURE §7.6 sidecar.
 

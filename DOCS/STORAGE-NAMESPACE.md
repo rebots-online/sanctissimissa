@@ -26,9 +26,9 @@ need no code change.
 | `VITE_APP_NAMESPACE` | `mba.robin.sanctissimissa` | the app's identifier family; must match `src-tauri/tauri.conf.json` `identifier` |
 | `VITE_STORAGE_SCOPE` | `common` | `common` → org-shared root `mba.robin`; `app` → app-private `<VITE_APP_NAMESPACE>` |
 
-Copy `.env.example` → `.env` (gitignored) to override. Working in the
-original `StAndroidsMissal` checkout? Same keys, that checkout's namespace,
-as applicable.
+Copy `.env.example` → `.env` (gitignored) to override the storage scope. This
+contract governs the distinct SanctissiMissa fork. StAndroidsMissal is frozen;
+its historical namespace is not the active application identity.
 
 ## Resolution
 
@@ -66,6 +66,6 @@ no data movement, nothing deleted.
 ## Future consumers (same contract, no new keys)
 
 - Companion `OnDeviceEngine` model weights (§7.6): store under the resolved
-  root so HelloWord / EnZIME / Missal share one Gemma download.
+  root so HelloWord / EnZIME / SanctissiMissa share one Gemma download.
 - Decision-19 module downloads: the versioned module cache lives under
   `<root>/modules/<module-id>/v<version>/`.

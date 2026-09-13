@@ -1,4 +1,4 @@
-# Optional frosted glass — 2026-09-13
+# SanctissiMissa optional frosted glass — 2026-09-13
 
 Operator request: replace the separate glass themes with a checkbox that applies
 the material to any theme. This extends decision 13 and supersedes the glass
@@ -6,12 +6,20 @@ family/material portions of BJ.1/BJ.2 and BX.3.
 
 ## Mapping evidence and scope
 
-PROJECT_INDEX.md/json are absent and .codegraph is empty; the codegraph query
-reported no index. Targeted reads of the existing theme registry, ThemePicker,
-App startup, theme CSS and theme tests established the integration points below.
-No index was regenerated. The existing Settings Appearance surface supplies the
-design: add a native labelled checkbox below its family and mode controls, with
-helper text below it. No new screen or interaction pattern is introduced.
+The initial mapping found an uninitialized CodeGraph and proceeded with targeted
+source reads of the theme registry, ThemePicker, App startup, CSS and tests.
+**Correction (2026-09-13): bypassing initialization was a workflow failure, not
+an approved exception.** Missing or uninitialized graphs require `codegraph
+init -i`, followed by graph queries before source navigation. The graph has
+since been initialized and used: the documentation correction observed a healthy
+139-file / 1,701-node index, and `codegraph node README.md` returned no symbol.
+Markdown is outside its indexed language coverage, which justifies targeted
+document reads; it does not justify bypassing the graph for application code.
+The original source observations are not a new verification of the implementation.
+
+The existing Settings Appearance surface supplies the design: add a native
+labelled checkbox below its family and mode controls, with helper text below it.
+No new screen or interaction pattern is introduced.
 
 ## Decisions
 

@@ -1,9 +1,10 @@
-# St. Android's Missal
+# SanctissiMissa
 
 **The Traditional Latin Mass and Divine Office as a navigable subway map.**
 
-St. Android's Missal is the next-major-version rewrite of
-[SanctissiMissa / "Hello, Word"](https://helloword.robin.mba). It preserves the skeleton
+SanctissiMissa is the active, distinct fork of the now-frozen StAndroidsMissal
+project, established by commit `009aedd8` on 2026-09-04. Its earlier lineage
+includes [Hello, Word](https://helloword.robin.mba). It preserves the skeleton
 structure of the Mass — expanded and visualized as a subway-style map to navigate the
 whole — and re-realizes László Kiss' Divinum Officium flat-text corpus (whose embedded
 `@` / `$` / `&` / `vide` directives construct the prayers) as **graph and vector
@@ -25,25 +26,27 @@ databases**, serving a beautiful, exegetical UI:
 
 ## Platforms and current release outputs
 
-- Web/PWA: versioned offline ZIP, deployed to `https://standroid.robin.mba`
+- Web/PWA: versioned offline ZIP; active mounts at [sanctissimissa.robin.mba](https://sanctissimissa.robin.mba) and [sanctissimissa.surge.sh](https://sanctissimissa.surge.sh)
 - Linux x64: `.deb` and AppImage
-- Windows 11 x64: standalone PE `.exe`
+- Windows 11 x64: cross-built standalone/NSIS `.exe`; native EXE/MSI/MSIX require a Windows host
 - Android: production-signed release APK and Play-uploadable AAB
 - Android diagnostics: native debug-symbol archive; the debug APK is retained
   for diagnostics only and never satisfies release acceptance
 
-NSIS, MSI, MSIX, RPM, and Snap packages are not currently produced. Microsoft
-Store packaging requires a separate Windows-host package pass. All builds are
-**local** — CI remains dormant until explicitly activated. See
-`BUILD_INSTRUCTIONS.md` § CI/CD for the proposed self-hosted runner recipe
-(GitHub Actions and Forgejo Actions) pending runner provisioning.
+The complete release contract requires native Windows packaging and verification;
+RPM and Snap are not part of the required set. All builds are **local** — CI
+remains dormant until explicitly activated. See `BUILD_INSTRUCTIONS.md` for
+platform obligations and release completion criteria.
 
 ## Prerequisites
 
 - **Node.js ≥ 22.6** (`--experimental-strip-types` for TS test files + ingest)
 - **Rust** (stable, via [rustup](https://rustup.rs))
 - **Linux native:** `libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev libsoup-3.0-dev build-essential pkg-config libssl-dev`
-- **Git LFS** for the tracked release set in `dist/`
+- **Provisioned corpus:** `assets/missal.db` and required `VENDORED/` inputs; the
+  fork checkpoint does not supply the large corpus
+- **Git LFS** for durable release binaries in tracked root `dist/`, backed by
+  the SanctissiMissa Forgejo repository; the GitHub mirror retains pointers
 - **Android:** SDK platform 36, build-tools 36.1.0, NDK 27.0.12077973,
   `cargo-ndk`, a compatible JDK, and all four Rust Android targets
 - **Windows cross-build:** `cargo-xwin`
@@ -55,9 +58,14 @@ constraints. `DOCS/BUILD.md` is retained as a compatibility pointer.
 
 ## Quick start
 
+Product identity: `SanctissiMissa`; slug `sanctissimissa`; app identifier
+`mba.robin.sanctissimissa`. Provision the corpus before running the app; access,
+storage and deployment instructions are in
+`/home/robin/Admin-Manual/PROJECTS/BUILD-INSTRUCTIONS-SanctissiMissa.md`.
+
 ```bash
 npm ci                # install the locked dependency graph
-npm run ingest        # rebuild missal.db from VENDORED/ (optional — committed)
+npm run ingest        # optional rebuild after provisioning the VENDORED/ inputs
 npm test              # run the complete current test suite
 npm run dev           # web dev server (port 5173)
 npm run tauri dev     # desktop shell
@@ -96,16 +104,21 @@ Production Android signing requires the ignored
 `src-tauri/gen/android/keystore.properties`, provisioned from Admin-Manual.
 Neither credentials nor keystore bytes belong in this repository.
 
-Artifacts are collected in `dist/` with compliant filenames:
+Every durable release output is collected in tracked root `dist/`; binary
+artifacts use Forgejo LFS. Filename patterns include:
 ```
-standroidsmissal-v1.18.35665-linux-amd64.deb
-standroidsmissal-v1.18.35665-linux-amd64.AppImage
-standroidsmissal-v1.18.35665-windows-x64-standalone.exe
-standroidsmissal-v1.18.35665-web-pwa.zip
-standroidsmissal-v1.18.35665-android-universal-debug.apk
-standroidsmissal-v1.18.35665-android-universal-release.apk
-standroidsmissal-v1.18.35665-android-universal-release.aab
-standroidsmissal-v1.18.35665-android-native-debug-symbols.zip
+sanctissimissa-v<version>-linux-amd64.deb
+sanctissimissa-v<version>-linux-amd64.AppImage
+sanctissimissa-v<version>-windows-x64-standalone.exe
+sanctissimissa-v<version>-windows-x64-setup.exe
+sanctissimissa-v<version>-windows-x64-native-standalone.exe
+sanctissimissa-v<version>-windows-x64.msi
+sanctissimissa-v<version>-windows-x64.msix
+sanctissimissa-v<version>-web-pwa.zip
+sanctissimissa-v<version>-android-universal-debug.apk
+sanctissimissa-v<version>-android-universal-release.apk
+sanctissimissa-v<version>-android-universal-release.aab
+sanctissimissa-v<version>-android-native-debug-symbols.zip
 ```
 
 The release driver collects only after every platform succeeds and emits
@@ -120,11 +133,11 @@ Canonical source: `version.txt`; `version.json` is the generated mirror.
 - `DOCS/BUILD.md` — compatibility pointer to the root recipe
 - `DOCS/ARCHITECTURE.md` — authoritative entity table, data flows, decisions
 - `DOCS/CORPUS-SCHEMA.md` — corpus schema, concept taxonomy, text normalization
-- `DOCS/ARCHITECTURE/StAndroidsMissal-v1.md` — entity table, data flows, decisions
+- `DOCS/ARCHITECTURE/StAndroidsMissal-v1.md` — inherited, frozen v0.1 historical baseline
 - `CHECKLIST.md` — execution contract and audit trail
 
 Corpus source only is licenced MIT: [Divinum Officium](https://github.com/DivinumOfficium/divinum-officium)
 (MIT), by László Kiss and contributors. Latin is the normative reference language.
 
-The St. Android Missal and Breviary in the Extraordinary Form is proprietary software: unauthorized copying, use, or distribution is prohibited.
+SanctissiMissa is proprietary software: unauthorized copying, use, or distribution is prohibited.
 Copyright © 2026 Robin L. M. Cheung, MBA. All rights reserved.

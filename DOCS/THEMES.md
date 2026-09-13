@@ -106,7 +106,7 @@ on unless an explicit saved glass value overrides it; both use the same frosted
 material. `neo-brutalist` still migrates to Retro Terminal.
 
 The complete contract and migration cases live in
-[the optional-glass decision](ARCHITECTURE/standroidsmissal-v1.39.15371-optional-glass-20260913.md).
+[the optional-glass decision](ARCHITECTURE/sanctissimissa-v1.39.15371-optional-glass-20260913.md).
 
 ## Editor (CKEditor 5)
 

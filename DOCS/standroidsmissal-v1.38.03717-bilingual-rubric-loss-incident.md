@@ -1,5 +1,14 @@
 # St. Android's Missal v1.38.03717 — bilingual rubric-loss incident
 
+**Inherited predecessor record:** this report belongs to the frozen
+StAndroidsMissal repair `f6918337`. It was imported into the distinct
+SanctissiMissa fork by merge `ab567321`, after fork checkpoint `009aedd8`.
+The recorded names, remotes, test results and pending status below describe
+that repair; they are not current SanctissiMissa access or release status.
+The functional rubric-preservation invariant remains in current architecture
+§12 and test rubric M-S8. Active identity and deployment guidance are in
+`BUILD_INSTRUCTIONS.md` and the SanctissiMissa Admin-Manual runbook.
+
 - **Incident UUID:** `urn:uuid:6a39f30e-ee25-46b2-9afa-a621ea6dc87c`
 - **Status:** implementation and automated non-corpus verification complete;
   working-artifact M-S8 pending the Forgejo LFS corpus

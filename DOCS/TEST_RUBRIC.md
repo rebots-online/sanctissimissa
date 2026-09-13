@@ -1,6 +1,6 @@
-# TEST_RUBRIC — St. Android's Missal (SC4 / I-19 gauntlet)
+# TEST_RUBRIC — SanctissiMissa (SC4 / I-19 gauntlet)
 
-**Build identity under test:** `mba.robin.standroidsmissal` · version pinned at run time from `package.json` (must equal `src-tauri/tauri.conf.json` + `src-tauri/Cargo.toml`).
+**Build identity under test:** `mba.robin.sanctissimissa` · version pinned at run time from `package.json` (must equal `src-tauri/tauri.conf.json` + `src-tauri/Cargo.toml`).
 **Environments:** web (Chromium via Playwright), Linux desktop (Tauri, this host), Android (device/emulator), Windows (cross-built artifacts; install-run on a Windows host).
 **Authored at PLAN** (GR-1), sibling to `CHECKLIST.md`. **Executed only after every CHECKLIST task is ✅** (GR-2).
 
@@ -131,7 +131,7 @@ All artifacts staged in the canonical checkout's `dist/`; version bumped + stamp
 
 | ID | Requirement | Driver | Steps / PASS criteria | Severity |
 |---|---|---|---|---|
-| B-1 | Version identity | AUTO | One version string across package.json / tauri.conf.json / Cargo.toml; identifier `mba.robin.standroidsmissal` in all manifests | HIGH |
+| B-1 | Version identity | AUTO | One version string across package.json / tauri.conf.json / Cargo.toml; identifier `mba.robin.sanctissimissa` in all manifests | HIGH |
 | B-2 | Web bundle | AUTO | `npm run build` exit 0; `dist/` web bundle serves and passes M-1 smoke visually | HIGH |
 | B-3 | Linux deb + AppImage | AUTO | `tauri build` produces both; deb installs on this host; AppImage launches; app opens corpus and renders 2026-07-05 Mass + Laudes | HIGH |
 | B-4 | Android APK + AAB + debug-symbols zip | COND (Android SDK/NDK on host or CI runner) | `tauri android build` release: signed APK + AAB produced; native debug symbols zipped (`dist/…-native-debug-symbols.zip`); APK installs and passes M-1/O-1 on device/emulator | HIGH |
@@ -185,7 +185,7 @@ and timecodes. This amendment creates no completed verdicts.
 | M-S4 | Solemn vs Low incense | AUTO | `mass.solemn=0` omits Incensatio; `mass.solemn=1` shows solemn incense block | HIGH |
 | M-S5 | Callout not on citation | AUTO | Hover/hold over `!Ps. 42` citation does not park callout on reading line; placement above/below anchor | HIGH |
 | M-S6 | Meaning pins Ordinary | AUTO | Select “Introíbo ad altáre Dei” → Meaning shows pinned “In the Ordinary of the Mass” / Incipit before distant Office lessons | HIGH |
-| M-S7 | Production Incipit | AUTO | https://standroid.robin.mba (or current host) after deploy of this version matches M-S1–M-S2 stills | HIGH |
+| M-S7 | Production Incipit | AUTO | https://sanctissimissa.robin.mba (or the documented SanctissiMissa Surge mount) after deploy of this version matches M-S1–M-S2 stills | HIGH |
 | M-S8 | Narrow bilingual rubrics | AUTO | At a viewport below 1100 CSS px, open Mass Incipit: every distinct Latin leading-`!` rubric is immediately followed by its English translation (including `Sacerdos paratus…` and `Deinde, junctis…`); identical visible bang-lines render once; no `!*`/`!&` controls appear | HIGH |
 
 **Evidence:** stills + screencast under `dist/rubric-runs/v…/` from **working release artifacts**, not dev-server-only. Smoke tests are not part of this process.

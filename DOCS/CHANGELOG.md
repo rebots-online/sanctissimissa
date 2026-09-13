@@ -1,6 +1,14 @@
-# Changelog
+# SanctissiMissa changelog
 
 User-facing change notes, one section per released version, newest first.
+
+**Lineage:** SanctissiMissa is the distinct fork established at `009aedd8`
+(2026-09-04); StAndroidsMissal is frozen. The v1.38 and older sections below
+retain predecessor release facts, filenames and operational observations.
+The v1.38 section was imported from predecessor repair `f6918337` by merge
+`ab567321`; it is not a SanctissiMissa deployment instruction. Current build
+and deployment guidance lives in `BUILD_INSTRUCTIONS.md` and the SanctissiMissa
+Admin-Manual runbook.
 
 **This file is a build input, not just documentation.** `scripts/collect-artifacts.mjs`
 reads the section whose heading matches the version being collected and embeds
