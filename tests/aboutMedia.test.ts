@@ -172,3 +172,46 @@ function mountsStrictlyIncreasingInterior(mounts: { afterBlock: number }[], bloc
   }
   return true;
 }
+
+describe('AM.03/AM.04 figure + lightbox wiring (source-parse)', () => {
+  const view = readFileSync('./src/ui/AboutView.tsx', 'utf-8');
+  const css = readFileSync('./src/styles.css', 'utf-8');
+
+  test('Origin Story passes ABOUT_MEDIA through planMediaMounts-driven figures', () => {
+    assert.match(view, /import ABOUT_MEDIA from '\.\.\/content\/aboutMedia\.ts'/);
+    assert.match(view, /import \{[^}]*planMediaMounts[^}]*\} from '\.\.\/content\/aboutMediaPlan\.ts'/);
+    assert.match(view, /text=\{ABOUT_CONTENT\.origin\} media=\{ABOUT_MEDIA\}/);
+  });
+
+  test('figure anatomy: sides, well, caption, keyboard open, lazy photo, metadata video', () => {
+    assert.match(view, /about-media-\$\{side\}/);
+    assert.match(view, /role="button"/);
+    assert.match(view, /loading="lazy"/);
+    assert.match(view, /preload="metadata"/);
+    assert.match(view, /<figcaption>\{caption\}<\/figcaption>/);
+    assert.match(view, /about-media-play/);
+  });
+
+  test('lightbox: dialog semantics, close affordances, arrows, zoom/pan, video controls', () => {
+    assert.match(view, /role="dialog"/);
+    assert.match(view, /aria-modal="true"/);
+    assert.match(view, /e\.key === 'Escape'/);
+    assert.match(view, /e\.key === 'ArrowLeft'/);
+    assert.match(view, /e\.key === 'ArrowRight'/);
+    assert.match(view, /about-lightbox-close/);
+    assert.match(view, /onDoubleClick/);
+    assert.match(view, /onPointerMove/);
+    assert.match(view, /<video src=\{medium\.url\} controls autoPlay loop muted playsInline/);
+    assert.match(view, /document\.body\.style\.overflow = 'hidden'/);
+  });
+
+  test('floats reflow (no per-block clear), hover is fine-pointer only, mobile keeps floats', () => {
+    assert.match(css, /\.about-workspace \.about-media \{[\s\S]{0,120}float: right;/);
+    assert.match(css, /\.about-workspace \.about-media-left \{[\s\S]{0,80}float: left;/);
+    assert.doesNotMatch(css, /\.about-prose-block::after/);
+    assert.match(css, /\.about-workspace \.about-prose::after[\s\S]{0,120}clear: both/);
+    assert.match(css, /@media \(pointer: fine\)[\s\S]*?\.about-media:hover[\s\S]*?translateY\(-3px\)/);
+    assert.match(css, /@media \(max-width: 720px\)[\s\S]*?\.about-media \{[\s\S]{0,80}width: 44%;/);
+    assert.match(css, /prefers-reduced-motion: reduce/);
+  });
+});

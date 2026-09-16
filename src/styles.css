@@ -1683,6 +1683,202 @@ html[data-mode='dark'] .settings-workspace .theme-picker button {
   font-family: var(--sans);
 }
 
+/* ── About media montage + lightbox (Stanza AM; Stitch UI_ROOT) ── */
+.about-workspace .about-prose::after {
+  content: "";
+  display: table;
+  clear: both; /* floats persist across blocks; cleared once at prose end */
+}
+.about-workspace .about-media {
+  position: relative;
+  float: right;
+  margin: 6px 0 14px 18px;
+  width: clamp(220px, 34%, 380px);
+  padding: 7px;
+  background: var(--vellum);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(34, 28, 20, 0.05);
+  overflow: hidden;
+  cursor: zoom-in;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.about-workspace .about-media-left {
+  float: left;
+  margin: 6px 18px 14px 0;
+}
+.about-workspace .about-media-well {
+  display: block;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--parchment-deep, #ece2cc);
+}
+.about-workspace .about-media img,
+.about-workspace .about-media video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+.about-workspace .about-media video {
+  aspect-ratio: 16 / 9;
+}
+.about-workspace .about-media-play {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(20, 18, 15, 0.72);
+  color: var(--parchment);
+  font-size: 11px;
+  pointer-events: none;
+}
+.about-workspace .about-media figcaption {
+  margin-top: 6px;
+  text-align: center;
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--ink-faint);
+}
+@media (pointer: fine) {
+  .about-workspace .about-media:hover,
+  .about-workspace .about-media:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(34, 28, 20, 0.12);
+    border-color: var(--gold);
+  }
+}
+@media (max-width: 720px) {
+  .about-workspace .about-media {
+    width: 44%;
+  }
+}
+
+/* AboutLightbox — full-screen viewer over a --scrim backdrop */
+.about-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  background: var(--scrim);
+  animation: about-lightbox-in 0.18s ease-out;
+}
+.about-lightbox-scrim {
+  position: absolute;
+  inset: 0;
+}
+.about-lightbox-bar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px 10px;
+  color: var(--parchment);
+  font-family: var(--sans);
+  font-size: 12px;
+}
+.about-lightbox-count {
+  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.about-lightbox-caption {
+  flex: 1;
+  text-align: center;
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.about-lightbox-close,
+.about-lightbox-nav {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(246, 240, 226, 0.35);
+  background: rgba(34, 28, 20, 0.8);
+  color: var(--parchment);
+  font-size: 15px;
+  cursor: pointer;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.about-lightbox-nav {
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+}
+.about-lightbox-stage {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 18px;
+}
+.about-lightbox-frame {
+  max-width: min(920px, 90vw);
+  max-height: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid rgba(246, 240, 226, 0.25);
+  background: rgba(20, 18, 15, 0.9);
+  touch-action: none;
+  animation: about-lightbox-zoom 0.18s ease-out;
+}
+.about-lightbox-frame.zoomed {
+  cursor: grab;
+}
+.about-lightbox-frame img,
+.about-lightbox-frame video {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 140px);
+  width: auto;
+  height: auto;
+}
+.about-lightbox-frame.zoomed img {
+  will-change: transform;
+}
+.about-lightbox-hint {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 8px 0 14px;
+  color: rgba(246, 240, 226, 0.6);
+  font-family: var(--sans);
+  font-size: 11px;
+}
+@keyframes about-lightbox-in {
+  from { opacity: 0; }
+}
+@keyframes about-lightbox-zoom {
+  from { transform: scale(0.92); opacity: 0.4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .about-workspace .about-media,
+  .about-lightbox,
+  .about-lightbox-frame {
+    transition: none;
+    animation: none;
+  }
+}
+
 /* ── Typography for narrative/editor/calendar prose (BX.5) ────── */
 /* Journal and Homily Writer inherit serif from body; buttons/labels/metadata use sans */
 .content.settings-workspace,
