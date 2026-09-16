@@ -2203,6 +2203,8 @@ tsc strict clean.
 
 ## AM.05 — Build integration (assets + PWA media caching)
 
+Status: [X] implemented 2026-09-15 (this commit; build verification follows).
+
 Dependencies: AM.03, AM.04. Read/modify only `vite.config.ts`,
 `tests/aboutMedia.test.ts`; read `src/content/aboutMedia.ts`. Confirm Vite emits
 `mov`/`m4v` as assets; add `assetsInclude` only if not. Extend the PWA workbox

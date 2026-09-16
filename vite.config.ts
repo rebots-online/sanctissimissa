@@ -37,9 +37,22 @@ export default defineConfig(({ mode }) => {
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{html,js,css,png,wasm}'],
+        // Montage images precache with the app (offline-first); videos stay out
+        // of the precache and ride the media runtime route below (Stanza AM.05).
+        globPatterns: ['**/*.{html,js,css,png,jpg,jpeg,gif,webp,avif,wasm}'],
         cleanupOutdatedCaches: true,
         runtimeCaching: [{
+          urlPattern: /\.(mp4|webm|mov|m4v)$/,
+          // Hashed media assets are immutable, so CacheFirst is safe and keeps
+          // large backstory videos out of the install-time precache: offline
+          // after first view, matching MEDIA-PLAN's offline-first rule without
+          // punishing first load.
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'sanctissimissa-media',
+            expiration: { maxEntries: 32 },
+          },
+        },{
           urlPattern: /\/missal\.db$/,
           // The corpus URL is stable across releases, so the CACHE must be the
           // thing that notices a new one. It previously used CacheFirst under a
@@ -76,6 +89,9 @@ export default defineConfig(({ mode }) => {
     },
   },
   envPrefix: ['VITE_', 'TAURI_'],
+  // M4V is not one of Vite's default asset types; MOV is belt-and-braces for
+  // WebView-codec-dependent uploads (Stanza AM.05).
+  assetsInclude: ['**/*.m4v', '**/*.mov'],
   build: {
     // Web output lives in a clean, disposable `dist-web/` (gitignored via the
     // `dist-*/` rule) so Tauri's `frontendDist` embeds ONLY the web surface and

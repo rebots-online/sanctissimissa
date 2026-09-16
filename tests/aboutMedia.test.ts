@@ -241,3 +241,18 @@ describe('AM.06 derivative-corpus attribution (source-parse)', () => {
     assert.ok(!about.includes('is used under the MIT License'));
   });
 });
+
+describe('AM.05 build integration (source-parse)', () => {
+  const vite = readFileSync('./vite.config.ts', 'utf-8');
+
+  test('montage images precache; videos ride a CacheFirst runtime route', () => {
+    assert.match(vite, /globPatterns: \['\*\*\/\*\.\{html,js,css,png,jpg,jpeg,gif,webp,avif,wasm\}'\]/);
+    assert.match(vite, /urlPattern: \/\\\.\(mp4\|webm\|mov\|m4v\)\$\//);
+    assert.match(vite, /handler: 'CacheFirst'/);
+    assert.match(vite, /cacheName: 'sanctissimissa-media'/);
+  });
+
+  test('M4V/MOV emit as assets', () => {
+    assert.match(vite, /assetsInclude: \['\*\*\/\*\.m4v', '\*\*\/\*\.mov'\]/);
+  });
+});
