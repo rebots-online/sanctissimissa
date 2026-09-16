@@ -1,0 +1,18 @@
+{
+  "version": "1.42.25336",
+  "sourceHead": "898e8413b33c9a99ce088032deb3ebd73c90327c",
+  "startedAt": "2026-09-16T00:56:11.993Z",
+  "completedStages": [
+    "test",
+    "web",
+    "linux",
+    "windows",
+    "android-debug",
+    "android-release",
+    "symbols"
+  ],
+  "inputHashes": {
+    "assets/missal.db": "7286cd357d43b75132d83aabbf8c64cb0dc7b3c44f6fd1e016729a592a14d2fa",
+    ".env": "feba9c288524fd7fe3ce6a6eb5f51c5897ba278c73a13f60bb781e27057e2700"
+  }
+}

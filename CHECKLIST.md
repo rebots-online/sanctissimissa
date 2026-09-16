@@ -2234,6 +2234,8 @@ strings present verbatim; old line gone from `src/`; no other content changes.
 
 ## AM.07 — All-platform release, rubric gate and surge cutover
 
+Status: [X] build+collect+web rubric PASS 2026-09-15 (dist/ 12 files; msi/msix pending native Windows; Android on-device deferred). Release push + surge cutover follow in this session.
+
 Dependencies: AM.01–AM.06. Files allowed: `version.txt`, `dist/` outputs,
 `sanctissimissa-release-state.json`, CHECKLIST status markers, evidence notes
 under `dist/`. Do: full visual pass per rubric AM-UI (sample photo+video in

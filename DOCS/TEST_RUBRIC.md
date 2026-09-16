@@ -250,7 +250,7 @@ passing fixture does not mark any row passed.
 
 ## AM — About media montage & derivative attribution (stanza AM; ARCHITECTURE/ABOUT-MEDIA-20260915)
 
-Authored 2026-09-15 for the AM tasks. **Not executed.** Run after AM.01–AM.07;
+Authored 2026-09-15 for the AM tasks. **Executed 2026-09-15 (web)** — AM-UI PASS; evidence: `dist/rubric-runs/RUBRIC-RUN-v1.42.25336-web.md`. Android on-device verification deferred to the operator (no emulator on the build host; identical bundle verified on web + Linux desktop launch). Re-run protocol for later rounds: run after AM.01–AM.07;
 direct operator/UI observations, not idempotent CHECKLIST Accept clauses. This
 row set is the production gate for the AM release: cutover to
 sanctissimissa.surge.sh proceeds only when AM-UI passes on web, and the
