@@ -6,6 +6,12 @@
 > LS is dependency-ordered; the old “one parallel wave”, “grep-only verification”,
 > historical BQ/BU.2 gates and missing-key unlock instructions do not apply to LS.
 > All 21 LS/BS-S/CH tasks are pending. Design/research delivery is not app delivery.
+>
+> **Co-active request: Stanza AM — About media montage & derivative attribution (2026-09-15).**
+> Executed against [Stanza AM below](#stanza-am--about-media-montage--derivative-attribution);
+> AM touches only the About surface, `content/` enumeration and its own tests — no LS files.
+> Per-task commits push to `github` (Forgejo `origin` is down with the M3 host, 2026-09-14);
+> the AM release cuts over to sanctissimissa.surge.sh only when rubric row AM-UI passes.
 
 **Identity boundary:** SanctissiMissa is the distinct active fork from `009aedd8`
 (2026-09-04), with slug `sanctissimissa` and identifier `mba.robin.sanctissimissa`.
@@ -2080,3 +2086,153 @@ Print/export: render a real run-sheet DOM containing date, celebration/profile, 
 Verify: `npx --no-install tsc -b --pretty false`; `node --experimental-strip-types --test tests/chantPlan.test.ts tests/massReference.test.ts`. Accept: exit0 for strict project compilation and deterministic backend tests including assignment completeness/edit validation, rehearsal permutation, deep-copy independence/provenance, revision fields, no private note in congregation JSON and inclusion only in explicit director JSON. Frontend compile resolves exact shared types and both exports. Operator verification protocol (not a CHECKLIST Accept): use both generated routes, open/save/reload/copy a plan, set assignments/rehearsal order, inspect congregation/director print previews, download and inspect each JSON, add a reference bookmark/highlight/comment/recording through SectionReader, and confirm unsupported recorder/audio states remain visible. Record outcomes without substituting them for automated gates.
 
 Release distinction: CH1–CH6 implement functional planning/reference/learning surfaces and backend with the stated starter data. Downloadable scores, licensed practice audio, full-year propers, official local calendars and liturgical editorial review remain separately measured content readiness, not hidden application functionality. Tests must not label missing corpus/media as completed or make a complete-annual-library claim. No publisher/store operation is authorized by this annex.
+
+# Stanza AM — About media montage & derivative attribution
+
+Operator request 2026-09-14/15. Governed by the adopted
+[About media architecture](DOCS/ARCHITECTURE/about-media-20260915.md) (AM-1) and the
+[AM-UI rubric row](DOCS/TEST_RUBRIC.md); design source frozen under
+`LIBS/UI/STITCH/sanctissimissa-about-20260915/` (Stitch screen
+`dd4c40efd3ee4d2ab5079ceea8fbdc09`). AM is co-active with LS and shares no files
+with it. All AM tasks are dependency-ordered; each task commits and pushes to
+`github` once its Verify passes. Release/deploy execution (AM.07) follows the
+Admin-Manual runbook: one version for the complete platform set, cutover to
+`sanctissimissa.surge.sh` gated on AM-UI, rollback revision recorded.
+
+## AM frozen design source
+
+Root: `LIBS/UI/STITCH/sanctissimissa-about-20260915/` (**UI_ROOT**).
+
+| Export | Screen ID | Addressable elements | Target component |
+|---|---|---|---|
+| `about.html` | `dd4c40efd3ee4d2ab5079ceea8fbdc09` | `figure.figure-float-right` / `figure.figure-float-left`, `.figure-card` (hover lift, `cursor: zoom-in`), `figcaption` (accent dot + caption), 4:3 media well, lightbox stage (scrim, `2 of 4` counter, ‹ › buttons, ✕ close, caption line, filmstrip dots), `.def-grid` Version & Build card | `AboutMediaFigure`, `AboutLightbox`, `AboutView`, `.about-workspace` CSS extensions |
+
+Adaptation rule: preserve the export's selector vocabulary mapped to app tokens;
+omit the specimen nav rail and CDN fonts; specimen prose/photos are placeholders —
+the shipped page renders `content/origin-story.md` and real operator media only.
+
+## AM.01 — Enumeration module and pure media helpers
+
+Dependencies: none. Read/modify only new `src/content/aboutMediaPlan.ts`, new
+`src/content/aboutMedia.ts`, new `tests/aboutMedia.test.ts`; read
+`src/content/about.ts` (glob-relative path only). `aboutMediaPlan.ts` is pure
+Node-importable (no Vite constructs): `MEDIA_GLOB_EXTENSIONS` (photo
+`jpg jpeg png gif webp avif`, video `mp4 webm mov m4v`), `kindFor(filename)` →
+`'photo' | 'video' | null`, `naturalNameCompare` (`Intl.Collator` numeric),
+`captionFor(filename)` (stem, hyphens/underscores → spaces). `aboutMedia.ts`
+performs `import.meta.glob('../../content/*.{…}', { query: '?url', import: 'default', eager: true })`
+over exactly those extensions, exports `AboutMedium = { url; kind; name }` and
+`ABOUT_MEDIA` sorted by `naturalNameCompare`, with the drop-in-rule header
+comment (add files to `content/`, rebuild — no code changes; subfolders ignored;
+MP4/WebM recommended, MOV/M4V codec-dependent). Zero media today ⇒ `ABOUT_MEDIA`
+is `[]`; no placeholder surfaces.
+
+Verify: `node --experimental-strip-types --test tests/aboutMedia.test.ts`. Accept:
+exit0 — kind mapping incl. case-insensitivity and unknown-extension null; natural
+order (`2` < `10`, `img-b` after `img-a`); caption humanization; and source-parse
+assertions that `aboutMedia.ts` contains the exact glob pattern with all ten
+extensions and the drop-in comment. The test never imports `aboutMedia.ts`
+(Vite glob is build-time only).
+
+## AM.02 — Placement planner
+
+Dependencies: AM.01. Read/modify only `src/content/aboutMediaPlan.ts`,
+`tests/aboutMedia.test.ts`. Add `planMediaMounts(blockCount, media): Mount[]`
+with `Mount = { medium; afterBlock; side: 'right' | 'left' }`:
+`afterBlock(i) = clamp(round((i+1)·blockCount/(n+1)) − 1, 0, blockCount−1)`
+made strictly increasing (collisions shift right); `side(i) = i % 2 === 0 ? 'right' : 'left'`;
+media beyond `blockCount` mount sequentially after the final block continuing the
+alternation; `blockCount <= 0` or empty media ⇒ `[]`.
+
+Verify: `node --experimental-strip-types --test tests/aboutMedia.test.ts`. Accept:
+exit0 — B=7,M=2 mounts after blocks 1 and 4 (0-indexed) right-then-left; B=7,M=4
+spread across interior gaps alternating right-first; M > B overflow tail keeps
+alternation; sides always start right; strictly increasing afterBlock; degenerate
+inputs return `[]`.
+
+## AM.03 — AboutMediaFigure and Origin Story integration
+
+Dependencies: AM.01, AM.02. Read/modify only `src/ui/AboutView.tsx`,
+`src/styles.css`, `tests/aboutMedia.test.ts`; read UI_ROOT `about.html`,
+`src/content/about.ts`. `AboutProse` accepts optional `media: AboutMedium[]`:
+blocks render exactly as before, and between blocks the planned mounts render
+`AboutMediaFigure` (`figure.about-media.about-media-right|-left` with
+`tabindex=0`, Enter/Space opens lightbox): photo `img loading="lazy"`
+`alt=captionFor(name)`; video `video preload="metadata" muted loop playsinline`
++ `about-media-play` affordance; `figcaption` = `captionFor(name)`. Figures
+mount between blocks, never inside `<p>`. CSS under the existing
+`.about-workspace` scope: `.about-media` float + mirrored margins
+(`6px 0 14px 18px` mirrored), `width: clamp(220px, 34%, 380px)`, vellum card,
+`--card-border`, app radius, `overflow: hidden`; 4:3 photo / 16:9 video wells
+(`object-fit: cover`); caption muted small sans; hover per UI_ROOT `.figure-card`
+(`@media (pointer: fine)` translateY(-3px) + shadow + `cursor: zoom-in`); below
+720px width ≈ 44%, floats retained; `prefers-reduced-motion` disables the
+transition. Zero media ⇒ output byte-identical to pre-AM.
+
+Verify: `node --experimental-strip-types --test tests/aboutMedia.test.ts` plus
+`npx --no-install tsc -b --pretty false`. Accept: exit0 — tsc strict; tests
+source-parse that `AboutProse` receives `ABOUT_MEDIA`, figure classes exist for
+both sides, and empty media renders no `figure` elements; dev-server spot render
+mounts figures between blocks (operator AM-UI does the visual pass).
+
+## AM.04 — AboutLightbox
+
+Dependencies: AM.03. Read/modify only `src/ui/AboutView.tsx`, `src/styles.css`,
+`tests/aboutMedia.test.ts`; read UI_ROOT `about.html` lightbox stage. Add
+`AboutLightbox` in `AboutView.tsx`: fixed overlay `div.about-lightbox`
+(`role=dialog`, `aria-modal`, focus moved to ✕ on open, restored on close),
+`--scrim` backdrop, zoom-in entrance (`scale(.92)→1`, reduced-motion off),
+counter `i+1 of n` + caption line, ‹ › with wrap, ✕ / Esc / scrim-click close,
+double-click/double-tap toggles 1×⇄2× with drag pan while zoomed; photo shows
+`img`; video shows `video controls autoplay loop muted`. Body scroll locked
+while open. Figures' click/tap/Enter/Space open the lightbox at that medium.
+
+Verify: `npx --no-install tsc -b --pretty false` and
+`node --experimental-strip-types --test tests/aboutMedia.test.ts`. Accept: exit0 —
+tests source-parse overlay role, close affordances and zoom toggle handlers;
+tsc strict clean.
+
+## AM.05 — Build integration (assets + PWA media caching)
+
+Dependencies: AM.03, AM.04. Read/modify only `vite.config.ts`,
+`tests/aboutMedia.test.ts`; read `src/content/aboutMedia.ts`. Confirm Vite emits
+`mov`/`m4v` as assets; add `assetsInclude` only if not. Extend the PWA workbox
+config with a runtime `CacheFirst` route for `mp4|webm|mov|m4v` responses
+(images remain in the precache); no precache growth from video.
+
+Verify: `npm run build:vite` after placing a temporary tiny sample photo+video in
+`content/` (removed before commit); `node --experimental-strip-types --test tests/aboutMedia.test.ts`.
+Accept: exit0 — build succeeds with media present and absent; hashed media URLs
+appear in `dist-web/assets`; `dist-web/manifest.webmanifest`/sw precache gains
+the image but not the video; the video URL matches the runtime cache route.
+
+## AM.06 — Derivative-corpus attribution rewording
+
+Dependencies: none (may run before AM.03). Read/modify only
+`src/ui/AboutView.tsx` (Corpus `dd`), `src/content/about.ts` (acknowledgements
+bullet, license paragraph), `tests/aboutMedia.test.ts`. Exact strings from the
+AM contract §6: metadata line `Derivative of Divinum Officium (László Kiss, MIT): gap-filled and cross-translated from the Clementine Vulgate and Douay–Rheims, then re-realized as a graph + vector SQLite corpus`;
+Kiss bullet `**László Kiss** — Divinum Officium (MIT), vendored in VENDORED/divinum-officium/ as the base corpus. Ingest-time gap-fill and cross-translation mean the shipped corpus is a derivative of Kiss's work, not a mirror of it.`;
+license `The liturgical corpus is a derivative work built on Divinum Officium (László Kiss, MIT-licensed): extended at ingest from the Clementine Vulgate and Douay–Rheims and re-realized as a graph + vector SQLite database.`
+
+Verify: `node --experimental-strip-types --test tests/aboutMedia.test.ts` and
+`grep -r "vendored, re-realized" src/` returns nothing. Accept: exit0 — all three
+strings present verbatim; old line gone from `src/`; no other content changes.
+
+## AM.07 — All-platform release, rubric gate and surge cutover
+
+Dependencies: AM.01–AM.06. Files allowed: `version.txt`, `dist/` outputs,
+`sanctissimissa-release-state.json`, CHECKLIST status markers, evidence notes
+under `dist/`. Do: full visual pass per rubric AM-UI (sample photo+video in
+`content/`, then removed); `npm run build:release` (stamps one version — MINOR
+bump from `1.41.21298` — and builds web/PWA + ZIP, Linux AppImage + .deb,
+Windows standalone + NSIS, Android signed .apk + .aab + 4-ABI symbols from the
+frozen sourceHead); `npm run collect-artifacts`; Linux AppImage smoke and
+Android-emulator APK smoke of the About page; record AM-UI observations. Only if
+AM-UI passes: version-prefixed release commit (`v1.42.<build>: about media
+montage and derivative-corpus attribution`), push `github`, then surge preview →
+verify → `cutover` to `sanctissimissa.surge.sh` (record new prod revision;
+rollback `1789268201856`). Forgejo/nginx untouched while the M3 host is down.
+Verify/Accept: release-state stages complete; AM-UI row recorded pass; surge
+serves the new version; any failure stops before cutover and loops back to the
+failing task — never a partial deploy.

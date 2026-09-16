@@ -29,8 +29,8 @@ operator media only.
 
 | Entity | Type | File:line | St | Role |
 |---|---|---|---|---|
-| `ABOUT_MEDIA` / `AboutMedium` | module/type | `src/content/aboutMedia.ts` | P-AM | Build-time enumeration of backstory media in `content/` |
-| `planMediaMounts(blockCount, media)` | function | `src/content/aboutMedia.ts` | P-AM | Even-spacing placement; right-first alternation; overflow tail |
+| `ABOUT_MEDIA` / `AboutMedium` | module/type | `src/content/aboutMedia.ts` | P-AM | Build-time enumeration of backstory media in `content/` (Vite glob; not Node-importable by design) |
+| `MEDIA_GLOB_EXTENSIONS` / `kindFor` / `naturalNameCompare` / `captionFor` / `planMediaMounts(blockCount, media)` | constants/functions | `src/content/aboutMediaPlan.ts` | P-AM | Pure, Node-importable helpers: kind map, natural order, caption humanization, even-spacing placement with right-first alternation and overflow tail |
 | `AboutMediaFigure` | component | `src/ui/AboutView.tsx` | P-AM | Float figure (`photo`/`video`), caption, open-lightbox affordance |
 | `AboutLightbox` | component | `src/ui/AboutView.tsx` | P-AM | Overlay dialog: zoom-in entrance, ‹ › nav, ✕/Esc/scrim close, 1×/2× zoom + pan, video controls |
 | `AboutView` (amended) | component | `src/ui/AboutView.tsx` | S→P-AM | Origin Story interleaves figures between prose blocks; Corpus `dd` reworded |
