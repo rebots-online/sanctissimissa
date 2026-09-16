@@ -270,3 +270,5 @@ desktop/Android smoke observations are recorded.
 Release report must separately state functioning application features, reviewed
 content/territories, populated media coverage and active distribution channels.
 No blanket SHIP-READY claim while any applicable row is unrun or failing.
+
+| AM-PWA | Returning-visitor transition (CC16): in a browser carrying the previous release's service worker, after cutover the app self-applies the update — an automatic one-shot reload when no unsaved editor state exists, or the "↻ Update ready — reload" chip while an editor holds unsaved work (clicking it lands the new version). No broken transitional state: a stale shell that fails to lazy-load a chunk self-heals via the recovery reload. Fresh-visitor load unaffected; no release comms instruct force-reloads. |

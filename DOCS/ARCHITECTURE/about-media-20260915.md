@@ -92,3 +92,16 @@ Basis: V0.7 gap-fill chain (`DOCS/CORPUS-SCHEMA.md`), routes S/A/C
 - PWA: images enter the existing precache; `mp4|webm|mov|m4v` get a runtime
   `CacheFirst` media route (offline after first view, precache unbloat ed).
 - `vite.config.ts` `assetsInclude` for `mov`/`m4v` only if not emitted by default.
+
+## 8. PWA self-applying updates (AM.08, convention CC16)
+
+Incident-driven amendment (2026-09-16): SW-carrying visitors kept the old
+shell across cutovers. Entities: `UPDATE_READY_EVENT`/`RELOAD_ONCE_KEY`/
+`UNSAVED_WORK_SELECTOR`/`isChunkLoadFailure` in `src/pwa/pwaUpdatePlan.ts`
+(pure, Node-importable); `initSelfApplyingUpdates`/`busyWithUnsavedWork`/
+`reloadOnce`/`applyPendingUpdate` in `src/pwa/pwaUpdate.ts` (Vite-only,
+imports `virtual:pwa-register`); `.sam-update-chip` in `App.tsx` +
+`styles.css`. Behavior contract per Admin-Manual CC16: autoUpdate + hourly
+checks; one-shot `controllerchange` auto-reload, deferred to the chip only
+while unsaved editor state exists; stale-chunk recovery reload; rubric row
+AM-PWA gates the release cutover on a returning-visitor transition check.

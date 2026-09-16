@@ -2251,3 +2251,26 @@ rollback `1789268201856`). Forgejo/nginx untouched while the M3 host is down.
 Verify/Accept: release-state stages complete; AM-UI row recorded pass; surge
 serves the new version; any failure stops before cutover and loops back to the
 failing task — never a partial deploy.
+
+## AM.08 — PWA self-applying updates (CC16)
+
+Incident 2026-09-16: after the v1.42.25336 cutover, SW-carrying visitors kept
+the v1.39 shell and a broken transitional page; operator: "you cannot expect
+users to keep actively forcing reloads." Convention adopted as Admin-Manual
+CC16 (DOCS/CICD_CONVENTIONS.md + pwa-self-applying-updates.md).
+
+Status: [X] implemented 2026-09-16 (this commit; release follows).
+
+Dependencies: AM.01–AM.07 (delivered). Read/modify only `src/pwa/pwaUpdate.ts`,
+new `src/pwa/pwaUpdatePlan.ts`, `src/main.tsx`, `src/App.tsx`,
+`src/vite-env.d.ts`, `src/styles.css`, new `tests/pwaUpdate.test.ts`, the AM
+contract §8, `DOCS/TEST_RUBRIC.md` (AM-PWA row), this stanza. Do:
+`registerSW` autoUpdate + hourly `registration.update()`; guarded one-shot
+`controllerchange` auto-reload that defers to a `.sam-update-chip` ONLY while
+`.ck-editor`/`[contenteditable]`/lightbox is live; chunk-load-failure
+recovery reload (one-shot, guard re-arms 15s after healthy load). Verify:
+`node --experimental-strip-types --test tests/pwaUpdate.test.ts` and the full
+suite; `npx --no-install tsc -b --pretty false`. Accept: exit0 — pure helper
+tests (chunk-failure patterns, constants) and source-parse asserts for the
+registration wiring, chip, recovery listeners, hourly check, and that no
+user-facing text instructs a force reload.

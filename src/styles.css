@@ -1879,6 +1879,28 @@ html[data-mode='dark'] .settings-workspace .theme-picker button {
   }
 }
 
+/* ── CC16 self-update chip (AM.08) — shown only when a deferred reload waits ── */
+.sam-update-chip {
+  position: fixed;
+  right: 16px;
+  bottom: 44px;
+  z-index: 95;
+  padding: 8px 14px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  background: var(--rail);
+  color: var(--parchment);
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(34, 28, 20, 0.35);
+}
+.sam-update-chip:hover {
+  background: var(--gold);
+  color: var(--ink);
+}
+
 /* ── Typography for narrative/editor/calendar prose (BX.5) ────── */
 /* Journal and Homily Writer inherit serif from body; buttons/labels/metadata use sans */
 .content.settings-workspace,

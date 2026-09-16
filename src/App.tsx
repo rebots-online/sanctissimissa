@@ -4,6 +4,7 @@ import { loadCorpusBytes } from './core/data/loadCorpus.ts';
 import { resolveDay } from './core/data/liturgicalDay.ts';
 import { dateForWeekKey } from './core/calendar/computus.ts';
 import versionInfo from '../version.json';
+import { UPDATE_READY_EVENT, applyPendingUpdate } from './pwa/pwaUpdate.ts';
 import type { DayInfo } from './core/data/types.ts';
 import { stationForAnchor, type Station } from './core/model/massOrdo.ts';
 import SubwayMap, { type MapMode } from './ui/SubwayMap.tsx';
@@ -87,6 +88,13 @@ export default function App() {
   const [pendingAccId, setPendingAccId] = useState<string | null>(null);
   const [capture, setCapture] = useState<{ quote: string; quoteAlt?: string; anchor: string | null } | null>(null);
   const [trayOpen, setTrayOpen] = useState(false);
+  const [updateReady, setUpdateReady] = useState(false);
+
+  useEffect(() => {
+    const onUpdateReady = () => setUpdateReady(true);
+    window.addEventListener(UPDATE_READY_EVENT, onUpdateReady);
+    return () => window.removeEventListener(UPDATE_READY_EVENT, onUpdateReady);
+  }, []);
 
   useEffect(() => {
     const restoreTheme = () => {
@@ -522,6 +530,13 @@ export default function App() {
         v{versionInfo.version}
       </div>
 
+      {/* CC16: deferred self-update chip — shown only when a new worker took
+          over while unsaved editor work was on screen. */}
+      {updateReady && (
+        <button className="sam-update-chip" onClick={() => { setUpdateReady(false); applyPendingUpdate(); }}>
+          ↻ Update ready — reload
+        </button>
+      )}
 
     </div>
   );
