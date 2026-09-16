@@ -22,6 +22,20 @@
 > old mandatory corpus SQLite split is not an LS prerequisite. The rest of this
 > master remains an inherited contract/audit trail, not a newly reverified release.
 
+> **About media montage & derivative-attribution contract — 2026-09-15 (AM-1).**
+> Co-active with LS-1; touches only the About surface and `content/` enumeration.
+> The adopted [About media architecture](ARCHITECTURE/about-media-20260915.md) governs
+> this wave: build-time enumeration of backstory media in `content/`
+> (`ABOUT_MEDIA`, zero-code-change drop-in), `planMediaMounts` regular spacing with
+> right-first alternating floats and text reflow, an `AboutLightbox` overlay
+> (hover-lift inline; click/tap opens; zoom/pan, arrows, Esc), and the
+> derivative-corpus attribution rewording (AboutView metadata line, Kiss
+> acknowledgement, license paragraph). Stitch screen
+> `dd4c40efd3ee4d2ab5079ceea8fbdc09` is frozen under
+> `LIBS/UI/STITCH/sanctissimissa-about-20260915/`.
+> [CHECKLIST stanza AM](../CHECKLIST.md#stanza-am--about-media-montage--derivative-attribution)
+> carries the execution contract.
+
 **Status:** current master contract, with inherited release history · **Supersedes:** `DOCS/ARCHITECTURE/StAndroidsMissal-v1.md` (retained as the v0.1 historical record) · **Identifier:** `mba.robin.sanctissimissa` · **Version string:** one string across `package.json` / `src-tauri/tauri.conf.json` / `src-tauri/Cargo.toml`
 
 ## 1. Overview
