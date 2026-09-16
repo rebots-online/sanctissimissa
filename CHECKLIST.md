@@ -2234,7 +2234,7 @@ strings present verbatim; old line gone from `src/`; no other content changes.
 
 ## AM.07 — All-platform release, rubric gate and surge cutover
 
-Status: [X] build+collect+web rubric PASS 2026-09-15 (dist/ 12 files; msi/msix pending native Windows; Android on-device deferred). Release push + surge cutover follow in this session.
+Status: ✅ verified 2026-09-15/16 — release v1.42.25336 built (all host stages), artifacts in dist/ (12 files), AM-UI PASS (dist/rubric-runs/RUBRIC-RUN-v1.42.25336-web.md), release commit f7e7205d pushed to github (LFS pointers; objects pending Forgejo return), production cutover sanctissimissa.surge.sh revision 1789524494714 (rollback 1789268201856); msi/msix pending native Windows; Android on-device deferred to operator; M3 nginx resync pending host return.
 
 Dependencies: AM.01–AM.06. Files allowed: `version.txt`, `dist/` outputs,
 `sanctissimissa-release-state.json`, CHECKLIST status markers, evidence notes
