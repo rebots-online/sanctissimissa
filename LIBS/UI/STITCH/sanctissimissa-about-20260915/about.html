@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<!-- ============================================================================
+  DESIGN SPECIMEN — FROZEN STITCH EXPORT (adapted), project AM, 2026-09-15.
+
+  Source: Google Stitch project 14487439725465174200 ("SanctissiMissa — About
+  Media Montage"), screen dd4c40efd3ee4d2ab5079ceea8fbdc09, design system
+  a5b8c45f4d454c7f9a8fc5e3d3e6fde4 (built from the frozen LS DESIGN.md).
+  Verbatim export: original/generated/about-dd4c40efd3ee4d2ab5079ceea8fbdc09.html
+
+  THIS FILE IS A DESIGN SPECIMEN, NOT PRODUCT EVIDENCE. Adaptations vs the
+  verbatim export (LS-wave convention):
+    1. Conspicuous design-specimen banner added below.
+    2. Photographs and origin-story prose are STITCH-GENERATED PLACEHOLDERS.
+       The shipped About page renders the operator's tracked
+       content/origin-story.md and operator-provided media from content/.
+    3. Corrected: footer said "St. Android Missal Project" (predecessor
+       identity) → "SanctissiMissa Project".
+    4. Corrected: invented URN identifier → mba.robin.sanctissimissa; version
+       row marked SPECIMEN (live values come from version.json at runtime).
+    5. Corrected: license paragraph claimed the software shell is MIT — the
+       application is proprietary; only the corpus lineage is MIT-based.
+    6. Timeline chip "Anno Domini 2024–2026" → "Early 2010s – present" to
+       match the operator's actual account.
+    7. Image srcs rewritten to local original/generated/media/*.jpg so the
+       specimen renders offline; the export hotlinks aida-public URLs.
+  Wiring rule (TC12): preserve markup, layout and selectors
+  (.figure-float-right, .figure-float-left, .figure-card, figcaption,
+  .dropcap, .ornament-rule, .def-grid, lightbox stage structure); replace
+  specimen handlers with application state; omit the specimen top nav rail —
+  the app already owns navigation.
+============================================================================ -->
+<html lang="en" data-theme="skeuomorphic" data-mode="light" data-color="white">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help · About — SanctissiMissa (DESIGN SPECIMEN)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #221c14;
+      --ink-soft: #4a4034;
+      --ink-faint: #8a7d6a;
+      --parchment: #f6f0e2;
+      --parchment-deep: #ece2cc;
+      --parchment-subtle: #fbf7ee;
+      --vellum: #fdfbf7;
+      --gold: #a97e13;
+      --gold-bright: #d4a017;
+      --gold-soft: rgba(169, 126, 19, 0.15);
+      --rubric: #9c2733;
+      --rail: #2b241b;
+      --rail-text: #d9cdb8;
+      --line-catechumens: #a97e13;
+      --line-faithful: #7a1f2b;
+      --line-office: #274b69;
+      --serif: 'Newsreader', Iowan Old Style, Palatino Linotype, Palatino, Georgia, serif;
+      --display: 'Cinzel', serif;
+      --sans: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--parchment);
+      color: var(--ink);
+      font-family: var(--serif);
+      margin: 0;
+      padding: 0;
+      line-height: 1.72;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-serif-reading {
+      font-family: var(--serif);
+    }
+    .font-display {
+      font-family: var(--display);
+    }
+    .font-ui {
+      font-family: var(--sans);
+    }
+
+    /* Floating figures text-wrap specifications */
+    .figure-float-right {
+      float: right;
+      margin: 0.5rem 0 1.5rem 2.25rem;
+      width: 320px;
+    }
+    .figure-float-left {
+      float: left;
+      margin: 0.5rem 2.25rem 1.5rem 0;
+      width: 320px;
+    }
+
+    .figure-card {
+      background: var(--vellum);
+      border: 1px solid var(--parchment-deep);
+      border-radius: 6px;
+      padding: 7px;
+      box-shadow: 0 2px 8px rgba(34, 28, 20, 0.05);
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: zoom-in;
+    }
+    .figure-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(34, 28, 20, 0.12);
+      border-color: var(--gold);
+    }
+
+    .dropcap::first-letter {
+      font-family: var(--display);
+      float: left;
+      font-size: 3.85rem;
+      line-height: 0.82;
+      padding-top: 4px;
+      padding-right: 12px;
+      padding-bottom: 2px;
+      color: var(--rubric);
+      font-weight: 700;
+    }
+
+    .ornament-rule {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: var(--gold);
+      margin: 2.75rem 0;
+    }
+    .ornament-rule::before,
+    .ornament-rule::after {
+      content: "";
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--parchment-deep), var(--gold), transparent);
+      flex: 1;
+    }
+    .ornament-rule::after {
+      background: linear-gradient(to left, transparent, var(--parchment-deep), var(--gold), transparent);
+    }
+
+    /* Definition list styling */
+    .def-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      row-gap: 1.1rem;
+      column-gap: 2rem;
+    }
+
+    /* Subtle subtle page corner texture effect */
+    .parchment-texture {
+      background-image:
+        radial-gradient(ellipse at 10% 5%, rgba(255, 255, 255, 0.6) 0%, transparent 60%),
+        radial-gradient(ellipse at 90% 95%, rgba(169, 126, 19, 0.05) 0%, transparent 70%);
+    }
+
+    /* Design-specimen notice (adaptation 1) — not part of the exported design */
+    .specimen-banner {
+      background: #3a2a06;
+      color: #f3e8c8;
+      font-family: var(--sans);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-align: center;
+      padding: 10px 16px;
+      border-bottom: 2px solid var(--gold);
+    }
+    .specimen-banner strong { color: #ffd970; }
+  </style>
+</head>
+<body class="parchment-texture min-h-screen">
+
+  <!-- Adaptation 1: conspicuous design-specimen notice -->
+  <div class="specimen-banner">
+    <strong>DESIGN SPECIMEN — FROZEN STITCH EXPORT (2026-09-15).</strong>
+    Not product evidence. Prose and photographs are AI-generated placeholders; the shipped
+    About page renders the operator's tracked <code>content/origin-story.md</code> and
+    operator-provided media from <code>content/</code>. See the header comment for the full
+    adaptation list.
+  </div>
+
+  <!-- Persistent Liturgical Navigation Rail (collapsed aesthetic reading bar) -->
+  <!-- Specimen chrome only — the application owns navigation; omit this rail when wiring. -->
+  <header class="border-b border-[#ece2cc] bg-[#fbf7ee]/90 backdrop-blur sticky top-0 z-30 px-8 py-3.5 flex items-center justify-between text-[#4a4034]">
+    <div class="flex items-center space-x-6">
+      <a href="#reader" class="flex items-center gap-2 font-display text-base tracking-widest text-[#221c14] hover:text-[#9c2733] transition-colors">
+        <span class="text-[#9c2733] text-lg font-bold">✠</span>
+        <span class="font-bold">SanctissiMissa</span>
+      </a>
+      <span class="text-xs font-ui px-2 py-0.5 rounded border border-[#ece2cc] bg-[#f6f0e2] text-[#8a7d6a] tracking-wide">
+        DESIGN SPECIMEN · STITCH EXPORT
+      </span>
+    </div>
+
+    <nav class="flex items-center space-x-6 text-xs font-ui uppercase tracking-wider text-[#8a7d6a]">
+      <a href="#map" class="hover:text-[#221c14] transition-colors">Subway Map</a>
+      <a href="#reader" class="hover:text-[#221c14] transition-colors">Reader</a>
+      <a href="#office" class="hover:text-[#221c14] transition-colors">Divine Office</a>
+      <a href="#calendar" class="hover:text-[#221c14] transition-colors">Calendar</a>
+      <span class="w-px h-3.5 bg-[#ece2cc]"></span>
+      <span class="text-[#9c2733] font-semibold border-b border-[#9c2733] pb-0.5">Help · About</span>
+    </nav>
+  </header>
+
+  <!-- Main Scrollable Long-form Reading Article Container -->
+  <main class="max-w-4xl mx-auto px-6 py-12 lg:py-16">
+
+    <!-- Article Header -->
+    <header class="text-center mb-14">
+      <div class="inline-flex items-center justify-center w-8 h-8 rounded-full border border-[#d4a017]/40 bg-[#fdfbf7] text-[#9c2733] text-lg mb-4 shadow-sm">
+        ✠
+      </div>
+      <h1 class="font-display text-4xl sm:text-5xl font-bold tracking-wide text-[#221c14] mb-3">
+        SanctissiMissa
+      </h1>
+      <p class="font-serif-reading italic text-xl sm:text-2xl text-[#4a4034] max-w-xl mx-auto leading-relaxed">
+        “The Traditional Latin Mass and Divine Office as a navigable map.”
+      </p>
+
+      <div class="ornament-rule max-w-md mx-auto">
+        <span class="text-xs uppercase tracking-[0.25em] font-ui text-[#8a7d6a]">Prooemium &amp; Historia</span>
+      </div>
+    </header>
+
+    <!-- Section: Origin Story (placeholder prose — see specimen banner) -->
+    <article class="relative text-[#221c14] text-[1.125rem] leading-[1.78]">
+
+      <div class="flex items-baseline justify-between border-b border-[#ece2cc] pb-2 mb-8">
+        <h2 class="font-display text-2xl font-bold tracking-wide text-[#221c14]">
+          Origin Story
+        </h2>
+        <!-- Adaptation 6: timeline chip corrected to the operator's actual account -->
+        <span class="font-ui text-xs tracking-widest text-[#8a7d6a] uppercase">Toronto, Ontario · Early 2010s – present</span>
+      </div>
+
+      <!-- Paragraph 1 + Figure 1 (RIGHT FLOAT) -->
+      <figure class="figure-float-right figure-card group">
+        <div class="aspect-[4/3] overflow-hidden rounded-[3px] bg-[#ece2cc]">
+          <img
+            src="original/generated/media/fig-1.jpg"
+            alt="St. Lawrence Martyr parish church in Toronto (specimen placeholder)"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        </div>
+        <figcaption class="mt-2 text-center font-ui text-[0.75rem] tracking-wide text-[#8a7d6a] flex items-center justify-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#a97e13]"></span>
+          St. Lawrence Martyr, Toronto
+        </figcaption>
+      </figure>
+
+      <p class="dropcap mb-6">
+        It began on a frigid November morning when I first stepped beneath the limestone arches of an old parish in downtown Toronto. The scent of seasoned beeswax and century-old incense hung dense in the air, filtered through the morning sun that slanted high across the clerestory. I was not raised in this liturgical tradition, nor had I ever heard the Roman Canon whispered behind the altar rails. Yet as the priest climbed the altar steps and the choir concluded the opening chant, an unexpected gravity settled over the nave. The silence was not empty; it was filled with prayer that had echoed across continents and centuries without rupture.
+      </p>
+
+      <!-- Paragraph 2 -->
+      <p class="mb-6">
+        Within months of attending regularly, the parish suffered a quiet loss: the veteran altar server, a gentle octogenarian who had served the early Sunday Mass for forty-two years, passed away peacefully in his sleep. The pastor posted an appeal in the vestry for volunteers. Knowing only scraps of High School Latin and feeling entirely unequal to the solemnity of the sanctuary, I nonetheless offered my hands. The training was quiet, exacting, and conducted mostly on cold marble steps before dawn, where every genuflection, head-bow, and bell-ring was timed to the secret rhythm of the celebrant’s whispered prayers.
+      </p>
+
+      <!-- Paragraph 3 + Figure 2 (LEFT FLOAT) -->
+      <figure class="figure-float-left figure-card group">
+        <div class="aspect-[4/3] overflow-hidden rounded-[3px] bg-[#ece2cc]">
+          <img
+            src="original/generated/media/fig-2.jpg"
+            alt="Cassock, surplice, and missal laid out for training (specimen placeholder)"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        </div>
+        <figcaption class="mt-2 text-center font-ui text-[0.75rem] tracking-wide text-[#8a7d6a] flex items-center justify-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#9c2733]"></span>
+          First training session &amp; vesture
+        </figcaption>
+      </figure>
+
+      <p class="mb-6">
+        Learning Ecclesiastical Latin ceased to be an academic pursuit; it became a bodily imperative. Memorizing the <em>Confiteor</em> and the responses to the <em>Introibo ad altare Dei</em> required re-tuning my tongue to antique vowels and cadence. I spent evenings with dog-eared grammar notebooks, reciting server dialogues until the responses flowed with instinctive reverence. It was during these quiet drills that I realized Latin was not a barrier erected between the faithful and the altar, but an acoustic vault that sheltered sacred mysteries from the mutability of everyday conversation.
+      </p>
+
+      <!-- Paragraph 4 -->
+      <p class="mb-6">
+        Yet for all this preparation, standing at the foot of the altar during my first Low Mass (<em>Missa Lecta</em>) was a disorienting trial. Unlike the sung High Mass whose chants announce each transition across the nave, the Low Mass unfolds in an unbroken, profound hush. The priest turned pages without audible ceremony; the bell rang at intervals that felt sudden unless you were scrutinizing the angle of his shoulders or the whisper of his chasuble. In the pews, newcomers and even lifelong worshippers repeatedly fumbled through thick 1,800-page hand missals, leafing through multiple silk ribbons trying desperately to reconcile where the priest was with the text before them.
+      </p>
+
+      <!-- Paragraph 5 + Figure 3 (RIGHT FLOAT) -->
+      <figure class="figure-float-right figure-card group">
+        <div class="aspect-[4/3] overflow-hidden rounded-[3px] bg-[#ece2cc]">
+          <img
+            src="original/generated/media/fig-3.jpg"
+            alt="Missa Lecta quiet sanctuary and altar cards (specimen placeholder)"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        </div>
+        <figcaption class="mt-2 text-center font-ui text-[0.75rem] tracking-wide text-[#8a7d6a] flex items-center justify-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#a97e13]"></span>
+          Missa Lecta altar &amp; tabernacle
+        </figcaption>
+      </figure>
+
+      <p class="mb-6">
+        The disorientation was not spiritual—it was architectural. The traditional liturgy is not a linear book to be read cover-to-cover; it is a multi-branching topography. There is an immutable backbone: the <em>Ordinarium Missae</em>, accompanied by shifting junctions where the <em>Proprium</em> of the day (Introit, Collect, Epistle, Gospel, Secret, Postcommunion) docks seamlessly according to the liturgical calendar. When you lose your place during the silent Canon, turning fifty pages back and forth under dim stained glass feels like searching for an exit without a schematic map.
+      </p>
+
+      <!-- Paragraph 6 + Figure 4 (LEFT FLOAT) -->
+      <figure class="figure-float-left figure-card group">
+        <div class="aspect-[4/3] overflow-hidden rounded-[3px] bg-[#ece2cc]">
+          <img
+            src="original/generated/media/fig-4.jpg"
+            alt="Notebook sketch of the Latin Mass as a subway transit map (specimen placeholder)"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        </div>
+        <figcaption class="mt-2 text-center font-ui text-[0.75rem] tracking-wide text-[#8a7d6a] flex items-center justify-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#274b69]"></span>
+          The Subway Map sketch
+        </figcaption>
+      </figure>
+
+      <p class="mb-6">
+        One evening at my drafting desk, while staring at Harry Beck’s iconic 1931 London Underground map alongside an open copy of the 1962 Roman Missal, the epiphany snapped into focus. Liturgical rites have stations, interchanges, and terminal points. The Mass of the Catechumens is an ascending transit line running from the foot of the altar through the Gloria and Gospel; the Offertory is a transfer station into the solemn ring of the Mass of the Faithful; and the Canon is an unbroken arterial route culminating at the Consummatum and Communion. If transit systems could render complex spatial networks into intuitive topological schematics, the ancient liturgy deserved no less.
+      </p>
+
+      <!-- Paragraph 7 (Clearfix / concluding thought) -->
+      <p class="clear-both pt-2 mb-10">
+        I resolved to design SanctissiMissa not as another digital book with paginated faux-leather covers, but as a living transit map of holy time. Latin remains the sovereign normative rail, with vernacular English providing a modular sidecar. Every station on the map—from the initial <em>Judica me</em> to the Last Gospel of St. John—is an interactive node leading into the authoritative text. Whether you are an experienced altar server kneeling in the sanctuary or an inquisitive seeker stepping into the quiet nave for the first time, you are never lost: you can trace exactly where you stand in the timeless procession of the Mass.
+      </p>
+
+      <!-- Divider -->
+      <div class="ornament-rule my-12">
+        <span class="text-[#a97e13]">❦ ❦ ❦</span>
+      </div>
+
+    </article>
+
+    <!-- IN-PAGE DEMONSTRATION OF MEDIA LIGHTBOX OVERLAY STATE -->
+    <!-- Authentic overlay presentation showing the second photo enlarged over dimmed backdrop -->
+    <section class="my-16">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#9c2733]"></span>
+          <h3 class="font-ui text-xs uppercase tracking-widest font-semibold text-[#8a7d6a]">
+            Active Screen State · Media Lightbox Overlay (Modal Preview)
+          </h3>
+        </div>
+        <span class="font-ui text-xs text-[#8a7d6a] bg-[#fbf7ee] px-2.5 py-1 rounded border border-[#ece2cc]">
+          Tap photo to expand / ESC to dismiss
+        </span>
+      </div>
+
+      <!-- Lightbox container framing showing darkened scrim and enlarged figure -->
+      <div class="relative overflow-hidden rounded-xl border border-[#3a3228] shadow-2xl bg-[#14120f]/95 p-6 sm:p-10 text-[#f6f0e2]">
+
+        <!-- Scrim ambient glow -->
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(40,32,24,0.6)_0%,rgba(15,13,10,0.95)_100%)] pointer-events-none"></div>
+
+        <!-- Top Lightbox Bar -->
+        <div class="relative z-10 flex items-center justify-between pb-5 border-b border-[#332c23] text-xs font-ui text-[#d9cdb8]">
+          <div class="flex items-center space-x-3">
+            <span class="px-2 py-0.5 rounded bg-[#2b241b] text-[#a97e13] border border-[#4a3e2e] font-mono">2 of 4</span>
+            <span class="tracking-wide text-[#b5a793]">Plate II — Vesting Prayers &amp; Server Surplice</span>
+          </div>
+
+          <button class="w-8 h-8 rounded-full bg-[#2b241b] hover:bg-[#3d3326] border border-[#4a3e2e] flex items-center justify-center text-lg text-[#d9cdb8] hover:text-white transition-colors" title="Close lightbox (Escape)">
+            ✕
+          </button>
+        </div>
+
+        <!-- Center Stage with Nav Buttons and Photo -->
+        <div class="relative z-10 my-8 flex items-center justify-between gap-4">
+          <!-- Left arrow -->
+          <button class="hidden sm:flex w-11 h-11 rounded-full bg-[#221c14]/80 hover:bg-[#a97e13] text-[#f6f0e2] border border-[#4a3e2e] items-center justify-center text-xl transition-colors shadow-lg" title="Previous figure (Left Arrow)">
+            ‹
+          </button>
+
+          <!-- Enlarged Center Photo Card with zoom entrance feel -->
+          <div class="max-w-xl mx-auto bg-[#1b1712] p-2 rounded-lg border border-[#443829] shadow-[0_20px_50px_rgba(0,0,0,0.8)] transform transition-transform">
+            <img
+              src="original/generated/media/fig-2.jpg"
+              alt="Close-up of cassock, surplice, altar missal, and sacristy bell (specimen placeholder)"
+              class="w-full h-auto max-h-[440px] object-cover rounded"
+            />
+            <!-- Caption line under enlarged photo -->
+            <div class="pt-3.5 pb-1 px-2 flex items-center justify-between text-xs font-ui text-[#d9cdb8]">
+              <span class="font-serif-reading italic text-sm text-[#f6f0e2]">
+                “Vestio me, Domine, novum hominem...” — Altar server cassock and missal before morning training.
+              </span>
+              <span class="text-[#8a7d6a] text-[11px] uppercase tracking-wider font-mono">Missa Sancti Laurentii</span>
+            </div>
+          </div>
+
+          <!-- Right arrow -->
+          <button class="hidden sm:flex w-11 h-11 rounded-full bg-[#221c14]/80 hover:bg-[#a97e13] text-[#f6f0e2] border border-[#4a3e2e] items-center justify-center text-xl transition-colors shadow-lg" title="Next figure (Right Arrow)">
+            ›
+          </button>
+        </div>
+
+        <!-- Bottom Filmstrip Indicators -->
+        <div class="relative z-10 pt-2 flex items-center justify-center space-x-3 font-ui text-xs text-[#8a7d6a]">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#4a3e2e]"></span>
+          <span class="w-3 h-3 rounded-full bg-[#a97e13] ring-2 ring-[#a97e13]/40"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-[#4a3e2e]"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-[#4a3e2e]"></span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Section: Version & Build Metadata -->
+    <section class="mt-20 pt-10 border-t-2 border-[#ece2cc]">
+
+      <div class="mb-8">
+        <h2 class="font-display text-2xl font-bold tracking-wide text-[#221c14] mb-1">
+          Version &amp; Build
+        </h2>
+        <p class="font-ui text-xs text-[#8a7d6a] tracking-wide uppercase">
+          Production Provenance &amp; Corpus Graph Verification
+        </p>
+      </div>
+
+      <!-- Two-column Definition List Card -->
+      <div class="bg-[#fbf7ee] border border-[#ece2cc] rounded-lg p-6 sm:p-8 shadow-sm">
+        <dl class="def-grid text-sm">
+
+          <!-- Adaptation 4: specimen values marked; live values come from version.json -->
+          <dt class="font-ui uppercase tracking-wider text-xs font-semibold text-[#8a7d6a] pt-0.5">
+            Version
+          </dt>
+          <dd class="font-mono text-sm font-medium text-[#221c14] flex items-center gap-2">
+            <span>1.41.21298</span>
+            <span class="px-2 py-0.5 rounded text-[11px] font-ui bg-[#e9dfc9] text-[#4a4034] border border-[#d8ccb0]">
+              SPECIMEN VALUE — live values from version.json
+            </span>
+          </dd>
+
+          <dt class="font-ui uppercase tracking-wider text-xs font-semibold text-[#8a7d6a] pt-0.5">
+            Built
+          </dt>
+          <dd class="font-serif-reading text-base text-[#221c14]">
+            Stamp-time build date · <span class="font-ui text-xs text-[#8a7d6a]">SPECIMEN</span>
+          </dd>
+
+          <dt class="font-ui uppercase tracking-wider text-xs font-semibold text-[#8a7d6a] pt-0.5">
+            Corpus
+          </dt>
+          <dd class="font-serif-reading text-[0.98rem] text-[#221c14] leading-relaxed">
+            Derivative of Divinum Officium (László Kiss, MIT): gap-filled and cross-translated from the Clementine Vulgate and Douay–Rheims, then re-realized as a graph + vector SQLite corpus.
+          </dd>
+
+          <dt class="font-ui uppercase tracking-wider text-xs font-semibold text-[#8a7d6a] pt-0.5">
+            Identifier
+          </dt>
+          <dd class="font-mono text-xs text-[#4a4034] tracking-tight bg-[#f6f0e2] p-2.5 rounded border border-[#ece2cc] select-all break-all">
+            mba.robin.sanctissimissa
+          </dd>
+
+        </dl>
+      </div>
+
+      <!-- License & Legal Notes -->
+      <!-- Adaptation 5: corrected licensing (application is proprietary; corpus lineage MIT-based) -->
+      <div class="mt-8 text-sm text-[#4a4034] leading-relaxed font-serif-reading">
+        <h4 class="font-ui uppercase text-xs font-bold tracking-widest text-[#8a7d6a] mb-2">License</h4>
+        <p class="mb-4">
+          The application is proprietary software. The liturgical corpus is a derivative work built
+          on Divinum Officium (László Kiss, MIT-licensed): extended at ingest from the public-domain
+          Clementine Vulgate and Douay–Rheims and re-realized as a graph + vector SQLite database.
+          Liturgical classifications follow the <em>Codex Rubricarum</em> of 1960.
+        </p>
+      </div>
+
+      <!-- Footer Sign-off -->
+      <!-- Adaptation 3: corrected predecessor identity "St. Android Missal Project" -->
+      <footer class="mt-14 pt-6 border-t border-[#ece2cc] flex flex-col sm:flex-row items-center justify-between text-xs font-ui text-[#8a7d6a] gap-4">
+        <div>
+          © 2026 Robin L. M. Cheung, MBA. All rights reserved.
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-[#3f7a52]"></span>
+            Corpus graph + vector SQLite
+          </span>
+          <span>·</span>
+          <span>SanctissiMissa Project</span>
+        </div>
+      </footer>
+
+    </section>
+
+  </main>
+
+</body>
+</html>

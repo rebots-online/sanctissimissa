@@ -1,0 +1,48 @@
+{
+  "project": "SanctissiMissa — About Media Montage",
+  "projectId": "14487439725465174200",
+  "retrievedAt": "2026-09-15T20:30:00-04:00",
+  "transport": "Stitch MCP (https://stitch.googleapis.com/mcp) via ~/.claude.json mcpServers.stitch import, driven directly over JSON-RPC",
+  "designSystem": {
+    "assetId": "a5b8c45f4d454c7f9a8fc5e3d3e6fde4",
+    "displayName": "St. Android's Missal",
+    "source": "upload_design_md + create_design_system_from_design_md over LIBS/UI/STITCH/sanctissimissa-library-20260913/original/DESIGN.md (frozen LS design-system spec)"
+  },
+  "generation": {
+    "tool": "generate_screen_from_text",
+    "deviceType": "DESKTOP",
+    "model": "default",
+    "brief": "DOCS/PROPOSALS/about-media-montage-2026-09-15.md §8",
+    "sessionId": "639789409867629796"
+  },
+  "screens": [
+    {
+      "file": "about.html",
+      "screenId": "dd4c40efd3ee4d2ab5079ceea8fbdc09",
+      "title": "Help · About — SanctissiMissa",
+      "screenType": "DESIGN",
+      "size": "2560x8386",
+      "sourceSha256": "ed4d7404c6c4ea5c8392db18eec4d4300bda73684bc22836c0189e91de3c6fe4",
+      "sha256": "b05ce05a176cb0b8a4b5f0aee30ac3ed8ec57204d044ab5dcb9af31305edefa9",
+      "status": "design-specimen",
+      "adaptations": [
+        "conspicuous design-specimen banner added",
+        "placeholder prose/photographs marked (shipped page renders content/origin-story.md + operator media from content/)",
+        "footer identity corrected: 'St. Android Missal Project' → 'SanctissiMissa Project'",
+        "invented URN identifier → mba.robin.sanctissimissa; version row marked SPECIMEN",
+        "license paragraph corrected: application is proprietary, corpus lineage MIT-based",
+        "timeline chip corrected to 'Early 2010s – present'",
+        "image srcs rewritten to local original/generated/media/*.jpg"
+      ]
+    }
+  ],
+  "assets": [
+    { "file": "original/generated/about-dd4c40efd3ee4d2ab5079ceea8fbdc09-screenshot.png", "sha256": "3ff854ea3d651f84f78b0f86464c9b1a07773d6cf7398846c60859b3af892a03" },
+    { "file": "original/generated/media/fig-1.jpg", "screenId": "2eed877cc36d4b1892a444a85324fc7c", "sha256": "8a09338e802c1687819d14999e4b70f67698771e7e245609a94ff89725699d27" },
+    { "file": "original/generated/media/fig-2.jpg", "screenId": "ed0bb9459daf46a5a3c6bafda0ea1888", "sha256": "09e2dad908642062162c38a5df812d61b7803ba8da9b40dd5c2b52230febfcc3" },
+    { "file": "original/generated/media/fig-3.jpg", "screenId": "3cd67bfd20a6491a892f4a89c9c242d9", "sha256": "ae3f548ff301b6c26a73237184a8fad57a13b26461adc0ed8137f4761685fa8c" },
+    { "file": "original/generated/media/fig-4.jpg", "screenId": "4cb9acb67bd044f6a89aec40de6c4fc2", "sha256": "1c7c4e5828f9e53bec6fa03123775a850070765bb0f62562570e2563e67a51c0" },
+    { "file": "original/DESIGN.md", "sha256": "88994e8057a9c960244ac49b32d20bc81b6c7776911983c616d5618ad9adf756" }
+  ],
+  "specimenMediaNote": "The four AI-generated photographs are SPECIMEN placeholders for the montage figures, not operator photographs. They exist so the specimen renders offline; the shipped page mounts only real media the operator drops into content/."
+}
