@@ -2113,6 +2113,8 @@ the shipped page renders `content/origin-story.md` and real operator media only.
 
 ## AM.01 — Enumeration module and pure media helpers
 
+Status: [X] implemented 2026-09-15 (commit 76aaa65b).
+
 Dependencies: none. Read/modify only new `src/content/aboutMediaPlan.ts`, new
 `src/content/aboutMedia.ts`, new `tests/aboutMedia.test.ts`; read
 `src/content/about.ts` (glob-relative path only). `aboutMediaPlan.ts` is pure
@@ -2136,6 +2138,8 @@ extensions and the drop-in comment. The test never imports `aboutMedia.ts`
 
 ## AM.02 — Placement planner
 
+Status: [X] implemented 2026-09-15 (commit 95854ce0).
+
 Dependencies: AM.01. Read/modify only `src/content/aboutMediaPlan.ts`,
 `tests/aboutMedia.test.ts`. Add `planMediaMounts(blockCount, media): Mount[]`
 with `Mount = { medium; afterBlock; side: 'right' | 'left' }`:
@@ -2152,6 +2156,8 @@ alternation; sides always start right; interior afterBlock strictly increasing
 inputs return `[]`.
 
 ## AM.03 — AboutMediaFigure and Origin Story integration
+
+Status: [X] implemented 2026-09-15 (commit 01959db9, with AM.04).
 
 Dependencies: AM.01, AM.02. Read/modify only `src/ui/AboutView.tsx`,
 `src/styles.css`, `tests/aboutMedia.test.ts`; read UI_ROOT `about.html`,
@@ -2177,6 +2183,8 @@ both sides, and empty media renders no `figure` elements; dev-server spot render
 mounts figures between blocks (operator AM-UI does the visual pass).
 
 ## AM.04 — AboutLightbox
+
+Status: [X] implemented 2026-09-15 (commit 01959db9, with AM.03).
 
 Dependencies: AM.03. Read/modify only `src/ui/AboutView.tsx`, `src/styles.css`,
 `tests/aboutMedia.test.ts`; read UI_ROOT `about.html` lightbox stage. Add
@@ -2208,6 +2216,8 @@ appear in `dist-web/assets`; `dist-web/manifest.webmanifest`/sw precache gains
 the image but not the video; the video URL matches the runtime cache route.
 
 ## AM.06 — Derivative-corpus attribution rewording
+
+Status: [X] implemented 2026-09-15 (commit 88f46b17; Corpus metadata line in 01959db9).
 
 Dependencies: none (may run before AM.03). Read/modify only
 `src/ui/AboutView.tsx` (Corpus `dd`), `src/content/about.ts` (acknowledgements
