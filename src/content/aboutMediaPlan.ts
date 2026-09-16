@@ -68,3 +68,33 @@ export function captionFor(filename: string): string {
   if (stem.length === 0 || /^\d+$/.test(stem)) return filename; // prefix-only stem: keep the original
   return stem.charAt(0).toUpperCase() + stem.slice(1);
 }
+
+/**
+ * Even-spacing placement for the montage (AM.02): the i-th of n media mounts
+ * after prose block round((i+1)·blockCount/(n+1)) − 1 (clamped inside the
+ * story, collisions shifted right so positions strictly increase), alternating
+ * sides RIGHT first. Media beyond blockCount mounts sequentially after the
+ * final block, continuing the alternation. Figures mount between blocks —
+ * never inside a paragraph — so text reflows around the float.
+ */
+export function planMediaMounts(blockCount: number, media: AboutMedium[]): Mount[] {
+  if (blockCount <= 0 || media.length === 0) return [];
+  const mounts: Mount[] = [];
+  const interior = Math.max(blockCount - 1, 1);
+  let prev = -1;
+  for (let i = 0; i < media.length; i++) {
+    let afterBlock: number;
+    if (i < blockCount - 1 || blockCount === 1) {
+      afterBlock = Math.min(
+        interior - 1,
+        Math.max(0, Math.round(((i + 1) * blockCount) / (media.length + 1)) - 1),
+      );
+      if (afterBlock <= prev) afterBlock = Math.min(prev + 1, interior - 1);
+    } else {
+      afterBlock = blockCount - 1; // overflow tail after the final block
+    }
+    prev = afterBlock;
+    mounts.push({ medium: media[i], afterBlock, side: i % 2 === 0 ? 'right' : 'left' });
+  }
+  return mounts;
+}

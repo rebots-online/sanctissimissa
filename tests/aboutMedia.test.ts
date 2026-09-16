@@ -15,7 +15,13 @@ import {
   kindFor,
   naturalNameCompare,
   captionFor,
+  planMediaMounts,
+  type AboutMedium,
 } from '../src/content/aboutMediaPlan.ts';
+
+function media(names: string[]): AboutMedium[] {
+  return names.map((name) => ({ url: `/assets/${name}`, kind: kindFor(name) ?? 'photo', name }));
+}
 
 describe('AM.01 kindFor', () => {
   test('maps every mounted extension', () => {
@@ -85,3 +91,84 @@ describe('AM.01 enumeration contract (source-parse)', () => {
     assert.doesNotMatch(source, /function captionFor/);
   });
 });
+
+describe('AM.02 planMediaMounts', () => {
+  test('spaces two media evenly through seven blocks, right first', () => {
+    const mounts = planMediaMounts(7, media(['01-a.jpg', '02-b.jpg']));
+    assert.deepEqual(
+      mounts.map((m) => [m.afterBlock, m.side]),
+      [
+        [1, 'right'],
+        [4, 'left'],
+      ],
+    );
+  });
+
+  test('spreads four media across interior gaps alternating right-first', () => {
+    const mounts = planMediaMounts(7, media(['1.jpg', '2.jpg', '3.jpg', '4.jpg']));
+    assert.deepEqual(
+      mounts.map((m) => [m.afterBlock, m.side]),
+      [
+        [0, 'right'],
+        [2, 'left'],
+        [3, 'right'],
+        [5, 'left'],
+      ],
+    );
+    assert.ok(mountsStrictlyIncreasingInterior(mounts, 7));
+  });
+
+  test('overflow media mounts sequentially after the final block, alternating', () => {
+    const mounts = planMediaMounts(2, media(['1.jpg', '2.jpg', '3.jpg', '4.jpg']));
+    assert.deepEqual(
+      mounts.map((m) => [m.afterBlock, m.side]),
+      [
+        [0, 'right'],
+        [1, 'left'],
+        [1, 'right'],
+        [1, 'left'],
+      ],
+    );
+  });
+
+  test('shifts collisions right and keeps the interior strictly increasing', () => {
+    const mounts = planMediaMounts(5, media(['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg']));
+    assert.deepEqual(mounts.map((m) => m.afterBlock), [0, 1, 2, 3, 4, 4]);
+    assert.ok(mountsStrictlyIncreasingInterior(mounts, 5));
+  });
+
+  test('single block mounts everything after it, alternating', () => {
+    const mounts = planMediaMounts(1, media(['1.jpg', '2.jpg']));
+    assert.deepEqual(
+      mounts.map((m) => [m.afterBlock, m.side]),
+      [
+        [0, 'right'],
+        [0, 'left'],
+      ],
+    );
+  });
+
+  test('degenerate inputs return an empty plan', () => {
+    assert.deepEqual(planMediaMounts(7, []), []);
+    assert.deepEqual(planMediaMounts(0, media(['1.jpg'])), []);
+    assert.deepEqual(planMediaMounts(-3, media(['1.jpg'])), []);
+  });
+
+  test('passes media through untouched', () => {
+    const items = media(['01-first-day.jpg', '02_Missa_Lecta.mp4']);
+    const mounts = planMediaMounts(7, items);
+    assert.equal(mounts[0].medium.kind, 'photo');
+    assert.equal(mounts[1].medium.kind, 'video');
+    assert.equal(mounts[1].medium.url, '/assets/02_Missa_Lecta.mp4');
+  });
+});
+
+/** Interior (pre-tail) afterBlock values strictly increase; tail repeats the final block. */
+function mountsStrictlyIncreasingInterior(mounts: { afterBlock: number }[], blockCount: number): boolean {
+  const tailStart = mounts.findIndex((m) => m.afterBlock === blockCount - 1 && blockCount > 1);
+  const interior = tailStart === -1 ? mounts : mounts.slice(0, tailStart + 1);
+  for (let i = 1; i < interior.length; i++) {
+    if (interior[i].afterBlock <= interior[i - 1].afterBlock) return false;
+  }
+  return true;
+}

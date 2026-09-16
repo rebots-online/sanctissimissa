@@ -2147,7 +2147,8 @@ alternation; `blockCount <= 0` or empty media ⇒ `[]`.
 Verify: `node --experimental-strip-types --test tests/aboutMedia.test.ts`. Accept:
 exit0 — B=7,M=2 mounts after blocks 1 and 4 (0-indexed) right-then-left; B=7,M=4
 spread across interior gaps alternating right-first; M > B overflow tail keeps
-alternation; sides always start right; strictly increasing afterBlock; degenerate
+alternation; sides always start right; interior afterBlock strictly increasing
+(the overflow tail repeats the final block index in sequence); degenerate
 inputs return `[]`.
 
 ## AM.03 — AboutMediaFigure and Origin Story integration
