@@ -33,7 +33,7 @@ The corpus is fully self-contained; nothing references outside the repository. A
   acknowledgements: `
 This project stands on the shoulders of many contributors:
 
-* **László Kiss** — The Divinum Officium corpus, MIT-licensed and vendored in VENDORED/divinum-officium/
+* **László Kiss** — Divinum Officium (MIT), vendored in VENDORED/divinum-officium/ as the base corpus. Ingest-time gap-fill and cross-translation mean the shipped corpus is a derivative of Kiss's work, not a mirror of it.
 * **The Tauri team** — Cross-platform application framework
 * **The React and Vite communities** — Modern frontend tooling
 * **sql.js** — SQLite compiled to WebAssembly
@@ -57,7 +57,7 @@ Your journal entries and homily planning notes are stored in your browser's loca
   license: `
 Copyright © 2026 Robin L. M. Cheung, MBA. All rights reserved.
 
-The application is proprietary software. The liturgical corpus (Divinum Officium) is used under the MIT License. The application identifier is mba.robin.sanctissimissa.
+The application is proprietary software. The liturgical corpus is a derivative work built on Divinum Officium (László Kiss, MIT-licensed): extended at ingest from the Clementine Vulgate and Douay–Rheims and re-realized as a graph + vector SQLite database. The application identifier is mba.robin.sanctissimissa.
 
 For licensing inquiries, please contact the developer through the official website.
   `.trim(),

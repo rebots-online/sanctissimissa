@@ -215,3 +215,29 @@ describe('AM.03/AM.04 figure + lightbox wiring (source-parse)', () => {
     assert.match(css, /prefers-reduced-motion: reduce/);
   });
 });
+
+describe('AM.06 derivative-corpus attribution (source-parse)', () => {
+  const about = readFileSync('./src/content/about.ts', 'utf-8');
+  const view = readFileSync('./src/ui/AboutView.tsx', 'utf-8');
+  const corpusLine =
+    'Derivative of Divinum Officium (László Kiss, MIT): gap-filled and cross-translated from the Clementine Vulgate and Douay–Rheims, then re-realized as a graph + vector SQLite corpus';
+
+  test('metadata line, Kiss bullet and license paragraph use the contract wording', () => {
+    assert.ok(view.includes(corpusLine));
+    assert.ok(
+      about.includes(
+        "**László Kiss** — Divinum Officium (MIT), vendored in VENDORED/divinum-officium/ as the base corpus. Ingest-time gap-fill and cross-translation mean the shipped corpus is a derivative of Kiss's work, not a mirror of it.",
+      ),
+    );
+    assert.ok(
+      about.includes(
+        'The liturgical corpus is a derivative work built on Divinum Officium (László Kiss, MIT-licensed): extended at ingest from the Clementine Vulgate and Douay–Rheims and re-realized as a graph + vector SQLite database.',
+      ),
+    );
+  });
+
+  test('the old mirror-style attribution is gone', () => {
+    assert.ok(!view.includes('vendored, re-realized'));
+    assert.ok(!about.includes('is used under the MIT License'));
+  });
+});
