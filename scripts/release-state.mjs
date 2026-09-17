@@ -16,6 +16,9 @@ import fs from 'node:fs';
 // deep stack for every stage's child cargo (upstream hint: 16777216; doubled
 // twice for headroom).
 process.env.RUST_MIN_STACK ||= '67108864';
+// Cross-compile rustc SIGSEGVs under full 16-way parallelism (memory pressure
+// during LTO codegen) — bound cargo jobs for stability over speed.
+process.env.CARGO_BUILD_JOBS ||= '6';
 import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
