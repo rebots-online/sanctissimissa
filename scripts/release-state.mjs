@@ -470,7 +470,11 @@ async function runCommand(name, deps, root) {
   const stageCommands = {
     test: () => {
       console.log('🔧 Stage: test');
-      execSync('npm test', inherited);
+      // Bounded concurrency: 16-core hosts otherwise spawn ~15 children each
+      // loading the 195MB corpus DB, and the transient memory spike kills a
+      // child (observed 2026-09-17: interpretiveNuclei file-level failure in
+      // two consecutive trains while passing standalone).
+      execSync('npm test -- --test-concurrency=4', inherited);
     },
     web: () => {
       console.log('🔧 Stage: web');
