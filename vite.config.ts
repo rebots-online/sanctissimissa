@@ -37,6 +37,10 @@ export default defineConfig(({ mode }) => {
         ],
       },
       workbox: {
+        // CP.9: WebLLM rides the main chunk (6+ MB after minification). It is
+        // part of the offline-first Companion, so it precaches like the rest —
+        // the raised limit is deliberate, not a workaround.
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
         // Montage images precache with the app (offline-first); videos stay out
         // of the precache and ride the media runtime route below (Stanza AM.05).
         globPatterns: ['**/*.{html,js,css,png,jpg,jpeg,gif,webp,avif,wasm}'],
