@@ -2,7 +2,7 @@
   "name": "sanctissimissa",
   "productName": "SanctissiMissa",
   "private": true,
-  "version": "1.51.28028",
+  "version": "1.52.28047",
   "type": "module",
   "description": "Traditional Latin Mass and Divine Office as a navigable subway map — graph + vector liturgical corpus, exegetical reader, perpetual calendar. Tauri 2 multiplatform.",
   "scripts": {
