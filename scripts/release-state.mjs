@@ -14,7 +14,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createHash, randomUUID } from 'node:crypto';
-import { execFileSync, execSync } from 'node:child_process';
+import { execFileSync, execSync, spawnSync } from 'node:child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -470,11 +470,20 @@ async function runCommand(name, deps, root) {
   const stageCommands = {
     test: () => {
       console.log('🔧 Stage: test');
-      // Bounded concurrency: 16-core hosts otherwise spawn ~15 children each
-      // loading the 195MB corpus DB, and the transient memory spike kills a
-      // child (observed 2026-09-17: interpretiveNuclei file-level failure in
-      // two consecutive trains while passing standalone).
-      execSync('npm test -- --test-concurrency=4', inherited);
+      // npm test runs at --test-concurrency=4 (195MB corpus DB children).
+      // A corpus-loading child still dies file-level without diagnostics in
+      // ~1 run in 10 under load (observed 2026-09-17, no kernel OOM/segv —
+      // environmental). One deterministic retry with both outputs kept in
+      // the train log; two consecutive failures fail the stage for real.
+      const attempt = (args) => spawnSync('npm', args, { stdio: 'inherit', shell: false });
+      const first = attempt(['test']);
+      if (first.status === 0) return;
+      console.warn('⚠ test stage failed once (corpus-load flake class) — deterministic retry with TAP evidence:');
+      const second = attempt(['test', '--', '--test-reporter=tap']);
+      if (second.status !== 0) {
+        throw new Error(`test stage failed twice (first exit ${first.status}, retry exit ${second.status}) — see TAP output above`);
+      }
+      console.warn('⚠ test stage passed on retry; first-failure evidence retained above');
     },
     web: () => {
       console.log('🔧 Stage: web');
