@@ -2428,7 +2428,7 @@ dependencies = [
 
 [[package]]
 name = "sanctissimissa"
-version = "1.43.25452"
+version = "1.44.26998"
 dependencies = [
  "serde",
  "serde_json",
