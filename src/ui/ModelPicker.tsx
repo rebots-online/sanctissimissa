@@ -171,7 +171,9 @@ export default function ModelPicker({ hook, compact = false }: ModelPickerProps)
   if (compact) {
     const st = selected ? state.states[selected.id] : 'loading';
     const label =
-      st === 'ready'
+      state.error
+        ? 'Models \u2717'
+        : st === 'ready'
         ? (selected?.displayName ?? 'Model')
         : st === 'downloading'
           ? `${state.progress[selected?.id ?? ''] ?? 0}%`

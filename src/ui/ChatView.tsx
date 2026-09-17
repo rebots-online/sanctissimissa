@@ -301,9 +301,8 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
           <div className="chat-log" ref={listRef}>
             {messages.length === 0 && (
               <p className="chat-hello">
-                ℣. Pax et gaudium. Ask about the propers, a feast, or a passage. Replies stream from the on-device
-                engine — this preview build runs a deterministic stand-in; the TurboQuant engine arrives with its
-                stanza.
+                ℣. Pax et gaudium. Ask about the propers, a feast, or a passage — answers stream from the model
+                running on this device; pick one with the Models menu above if none is downloaded yet.
               </p>
             )}
             {messages.map((m, i) => (

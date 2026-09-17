@@ -12,7 +12,7 @@ import { DesktopModelLibrary, WebModelLibrary } from '../model-store/store.ts';
 import { DownloadManager } from '../model-store/download-manager.ts';
 import type { ModelAsset } from '../model-store/types.ts';
 
-import catalogUrl from '../../../reusable-chatbot/model-registry/data/atomic-chat-catalog.json.gz?url';
+import catalogUrl from '../../../reusable-chatbot/model-registry/data/atomic-chat-catalog.json?url';
 
 export type TauriGlobals = { invoke: TauriInvoke };
 
@@ -29,10 +29,8 @@ export async function probeCapabilities(invoke?: TauriInvoke): Promise<Capabilit
 export async function loadCatalogRows(url: string = catalogUrl): Promise<CatalogRow[]> {
   const response = await fetch(url);
   if (!response.ok) throw new Error(`catalog snapshot unavailable: HTTP ${response.status}`);
-  const gzip = new DecompressionStream('gzip') as unknown as ReadableWritablePair<Uint8Array, Uint8Array>;
-  const stream = (await response.blob()).stream().pipeThrough(gzip);
-  const json = await new Response(stream).json() as { models_flat?: CatalogRow[] } | CatalogRow[];
-  const rows = Array.isArray(json) ? json : (json.models_flat ?? []);
+  const json = await response.json() as { models?: CatalogRow[]; models_flat?: CatalogRow[] } | CatalogRow[];
+  const rows = Array.isArray(json) ? json : (json.models ?? json.models_flat ?? []);
   if (rows.length === 0) throw new Error('vendored catalog snapshot is empty — re-vendor (PROVENANCE.md)');
   return rows;
 }
