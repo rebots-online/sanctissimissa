@@ -15,6 +15,9 @@ test "$(tr -d '\r\n' < version.txt)" = "$VERSION"
 PREFIX="sanctissimissa-v${VERSION}"
 RELEASE=src-tauri/target/x86_64-pc-windows-msvc/release
 NSIS_PROJ="$RELEASE/nsis/x64"
+# rustc SIGSEGV (stack overflow) on the cross-compile of the app lib —
+# give it a deep stack (upstream diagnostic: RUST_MIN_STACK=16777216).
+export RUST_MIN_STACK=67108864
 mkdir -p "$RELEASE"
 ATTEMPT="$(date -u +%Y%m%dT%H%M%SZ)-$$"
 BUILD_LOG="$RELEASE/${PREFIX}-windows-cross-${ATTEMPT}.log"
