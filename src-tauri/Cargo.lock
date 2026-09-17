@@ -2432,6 +2432,7 @@ version = "1.45.27008"
 dependencies = [
  "serde",
  "serde_json",
+ "sha2",
  "tauri",
  "tauri-build",
 ]

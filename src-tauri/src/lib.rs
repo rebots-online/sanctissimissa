@@ -66,10 +66,23 @@ fn save_sidecar(
     std::fs::write(dir.join("sidecar.db"), bytes).map_err(|e| e.to_string())
 }
 
+mod model_store;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![load_corpus, load_sidecar, save_sidecar])
+        .invoke_handler(tauri::generate_handler![
+            load_corpus,
+            load_sidecar,
+            save_sidecar,
+            model_store::model_lookup,
+            model_store::model_begin,
+            model_store::model_chunk,
+            model_store::model_finish,
+            model_store::model_remove,
+            model_store::model_lock,
+            model_store::model_unlock
+        ])
         .run(tauri::generate_context!())
         .expect("error while running SanctissiMissa");
 }
