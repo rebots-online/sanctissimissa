@@ -197,7 +197,7 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
       {!(open && dock === 'fullscreen') && <ChatBadge open={open} onToggle={() => setOpen((o) => !o)} />}
       {open && (
         <section
-          className={`chat-panel dock-${dock}`}
+          className={`chat-panel ${dock}`}
           role="complementary"
           aria-label="Companion chat"
           style={panelStyle}

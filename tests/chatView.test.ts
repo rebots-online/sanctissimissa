@@ -66,7 +66,7 @@ test('CP.5: ChatView implements all six placement modes with persisted geometry'
   for (const mode of ['dock-left', 'dock-right', 'floating', 'inline', 'fullscreen', 'sheet']) {
     assert.ok(chatView.includes(`'${mode}'`), `mode ${mode} present`);
   }
-  assert.ok(chatView.includes('dock-${dock}'), 'panel class derives from the dock mode');
+  assert.ok(chatView.includes('chat-panel ${dock}'), 'panel class derives from the dock mode');
   assert.ok(chatView.includes(`'chat.dock'`));
   assert.ok(chatView.includes(`'chat.rect'`));
   assert.ok(chatView.includes(`'chat.dockWidth'`));
