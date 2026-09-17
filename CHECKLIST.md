@@ -630,6 +630,8 @@ _2026-07-11 status: engine shipped as `src/core/liturgy/conditionals.ts` (OB.1 g
 - [ ] **BI.2** `CompanionMemory`: lore table + distillation loop (idle/save; size-capped; user-visible/editable) + vector recall over `sidecar_embeddings` (embedText) fused with theme/date facets.
 - [ ] **BI.3** `CompanionView` rail chat: context = persona+lore+memories+position+CITES; replies cite deep links; save-insight → accompaniment(`generated`).
 - [ ] **BI.4** RC config against contract vocabulary (`companion_ondevice`, `companion_hosted`, `institutional`) via RC plugin/MCP or dashboard (key per I-15); `FeatureId` gates wired. On-device model run = TEST_RUBRIC operator row.
+  - Executed 2026-09-17 (RC-side config half): full commerce catalog created per the RevenueCat commerce product wave amendment (2026-09-17) in `DOCS/ARCHITECTURE.md` and `content/library/commerce.seed.json` — 70 entitlements (`companion_ondevice`, `study_library_all`, `reference_<editionId>` for 60 paid works + 8 collections), 80 products (76 non-consumable, 2 library subscriptions, 2 $ROCHE consumable credit packs), offerings `companion_unlock` + `bookstore` with packages, and dashboard graphical paywalls. `FeatureId` gates remain unwired until G1 exists — this half of BI.4 stays open.
+- [ ] **BI.4a** Play-side commerce obligations (operator): create matching product IDs in Google Play Console for the `mba.robin.sanctissimissa` app, link the Play app in RevenueCat, verify sandbox purchase → entitlement, and record RC internal `rcProductId`/`rcEntitlementId` back into `content/library/commerce.seed.json`. Acceptance: sandbox purchase grants `companion_ondevice` and one `reference_*` entitlement; free Haydock untouched.
 
 ---
 

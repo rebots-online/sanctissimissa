@@ -1462,3 +1462,55 @@ Linux AppImage/deb, Windows cross EXE/NSIS and native EXE/MSI/MSIX, Android
 APK/AAB/symbol ZIP, and web/PWA share one complete release stamp. Missing
 hosts remain pending; BP.1 Play delivery and native installation/Store
 verification remain explicit release obligations.
+
+
+## RevenueCat commerce product wave amendment (2026-09-17)
+
+**Operator instruction (2026-09-17):** create the complete commerce catalog in
+RevenueCat — every catalogue item, not a pilot subset. This executes the
+operator-provisioning step named in
+`DOCS/ARCHITECTURE/bookstore-service-20260913.md` §11 and CHECKLIST BI.4 via
+the RevenueCat plugin/MCP and dashboard.
+
+**Authoritative machine-readable table:**
+`content/library/commerce.seed.json` (committed; generated from
+`content/library/catalogue.seed.json`). It is the single source for product
+IDs, entitlement lookup keys, prices, offering/package composition, and the
+post-creation RevenueCat internal IDs (`rcProductId`, `rcEntitlementId`),
+which are recorded back into it after creation. Conventions:
+
+- **Edition IDs / slugs:** `kebab(title-up-to-first-comma)-en`; on collision
+  the full title slug, then a `-cNNN` suffix; ASCII NFKD, en/em-dash → hyphen.
+  Collections use their existing kebab id as the edition id.
+- **Entitlement lookup keys** follow bookstore contract §2 exactly:
+  `reference_<editionId>` per paid edition/collection; `study_library_all`
+  global; `companion_ondevice` per §7.6. 70 entitlements total.
+- **Product IDs** (mba.robin namespace): `mba.robin.sanctissimissa.iap.book.<editionId>`,
+  `…iap.bundle.<bundleId>`, `…iap.companion_ondevice`,
+  `…sub.study_library_all_monthly|_annual`, `…consumable.roche_credits_500|_1100`.
+  80 products total.
+- **Free policy unchanged:** Haydock (C002) is permanently free — no product,
+  no entitlement, never charged even inside a bundle; personal study tools and
+  lore stay free; a Companion purchase is optional and never gates a core
+  workflow (§9.4). 60 of 61 works are paid candidates at USD 2.99; collections
+  1.99; bundles 9.99; all-library subscription 2.99/mo or 14.99/yr; Companion
+  one-time unlock 9.99 (non-consumable, grants `companion_ondevice`).
+- **$ROCHE credits (new):** sold only as RevenueCat consumable credit packs
+  (500 credits = 4.99 USD; 1,100 credits = 9.99 USD), granting no entitlement.
+  Redemption parity 100 ROCHE ≈ 1 USD: works 300, collections 200, bundles
+  1000 ROCHE. Companion and library subscriptions are cash-only. The credit
+  balance ledger and redemption grants are future app-side work following the
+  `DOCS/ENTITLEMENT-SYNC.md` bridge pattern; RevenueCat never holds balances.
+- **Offerings:** `companion_unlock` (lifetime package) and `bookstore` (all
+  product packages). The existing `default` offering is untouched. Each new
+  offering carries one dashboard graphical paywall ("Companion Unlock",
+  "Bookstore") with honest copy per LS.06 — real prices and terms, no invented
+  discounts, no fake ownership; the Bookstore paywall states cash or $ROCHE
+  credits.
+
+**Sales gate unchanged:** products existing in RevenueCat does not put any
+text on sale. Editions remain `candidate` pending exact-edition rights review;
+nothing is delivered until the bookstore service publishes signed packages for
+`ready` editions (BS-S flow). Google Play product creation in Play Console,
+Play app linkage, and sandbox purchase verification are explicit pending
+operator obligations (BI.4a); web checkout wiring remains LS.08/LS.09.
