@@ -82,8 +82,8 @@ test('CP.5: badge is the default surface and honors prefers-reduced-motion', () 
   assert.ok(chatView.includes('<ChatBadge'));
   assert.ok(chatBadge.includes("matchMedia('(prefers-reduced-motion: reduce)')"));
   assert.ok(chatBadge.includes('gesture-${gesture}'), 'gesture class derives cross/wave states');
+  assert.ok(chatBadge.includes("from '../core/chat/gestures.ts'"), 'gestures come from the scheduler module');
   assert.ok(chatBadge.includes('✠'), 'cross-signing glyph');
-  assert.ok(chatBadge.includes('wave'));
 });
 
 test('CP.5: badge mounts globally — every workspace carries the companion', () => {
