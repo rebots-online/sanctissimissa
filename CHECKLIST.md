@@ -12,6 +12,14 @@
 > AM touches only the About surface, `content/` enumeration and its own tests — no LS files.
 > Per-task commits push to `github` (Forgejo `origin` is down with the M3 host, 2026-09-14);
 > the AM release cuts over to sanctissimissa.surge.sh only when rubric row AM-UI passes.
+>
+> **Co-active request: Stanza CP — Companion chatbot: core, engines, ChatView (2026-09-16).**
+> Executed against [Stanza CP below](#stanza-cp--companion-chatbot-core-engines-chatview-2026-09-16),
+> derived 1:1 from the re-baselined §7.6/§9.4/decision-22/§10.2 (commit `00f86ae2`) per
+> `DOCS/WORKFLOWS/workflow_LS-companion-20260916.md`. CP.0 owns `SettingsView.tsx` and is the
+> standing release gate (placeholder Settings tabs halted the v1.43 lineage). CP.1 runs first —
+> it preserves the stranded msi4090 commit `dcfca61b`. CP shares no files with LS except
+> `src/core/storage/` (read-only); LS keeps the library/bookstore UI.
 
 **Identity boundary:** SanctissiMissa is the distinct active fork from `009aedd8`
 (2026-09-04), with slug `sanctissimissa` and identifier `mba.robin.sanctissimissa`.
@@ -520,7 +528,7 @@ _2026-07-11 status: engine shipped as `src/core/liturgy/conditionals.ts` (OB.1 g
 - [ ] **BH.1** `MissalWidgetProvider.kt` (today's feast + readings; deep-link intent; data JSON + daily refresh); PWA shortcuts on web. Device render = TEST_RUBRIC operator row.
 
 ## Stanza B-I — Companion (journey companion + lore memory)
-- [ ] **BI.1** `CompanionEngine` interface + `OnDeviceEngine` (LiteRT-LM Gemma 4 E2B; WebGPU on web) + `HostedEngine` (metered proxy); entitlement-selected tier; trial = client-side cap on activation.
+- [ ] **BI.1** ~~`CompanionEngine` + `OnDeviceEngine` (LiteRT-LM Gemma 4 E2B) + `HostedEngine`~~ **Superseded** (operator decisions 2026-09-07 + 2026-09-16 re-baseline): `IInferenceEngine` (probe/init/generate/batchScore/kvStats/reset/close) + TurboQuant backends on every viable platform — WebGPU (TQ-compressed-KV attention in WGSL, from `VENDORED/turboquant-wasm`) + `turboquant-wasm` WASM-SIMD fallback on web/PWA · native Tauri (Rust C-ABI → `AtomicBot-ai/atomic-llama-cpp-turboquant`) on desktop · Android NDK where probed viable. KV policy turbo3/turbo3 (turbo4 fallback, turbo2 constrained); weights independent of KV format. Models from the Atomic Chat catalogs fused with `probe()` truth, never hardcoded. `HostedEngine` deferred. Executed as **Stanza CP**.
 - [ ] **BI.2** `CompanionMemory`: lore table + distillation loop (idle/save; size-capped; user-visible/editable) + vector recall over `sidecar_embeddings` (embedText) fused with theme/date facets.
 - [ ] **BI.3** `CompanionView` rail chat: context = persona+lore+memories+position+CITES; replies cite deep links; save-insight → accompaniment(`generated`).
 - [ ] **BI.4** RC config against contract vocabulary (`companion_ondevice`, `companion_hosted`, `institutional`) via RC plugin/MCP or dashboard (key per I-15); `FeatureId` gates wired. On-device model run = TEST_RUBRIC operator row.
@@ -2274,3 +2282,61 @@ suite; `npx --no-install tsc -b --pretty false`. Accept: exit0 — pure helper
 tests (chunk-failure patterns, constants) and source-parse asserts for the
 registration wiring, chip, recovery listeners, hourly check, and that no
 user-facing text instructs a force reload.
+
+---
+
+## Stanza CP — Companion chatbot: core, engines, ChatView (2026-09-16)
+
+Derived 1:1 from the re-baselined `DOCS/ARCHITECTURE.md` §7.6 + §9.4 rows +
+decision 22 + §10.2 `SettingsView` row (commit `00f86ae2`); executes
+`DOCS/WORKFLOWS/workflow_LS-companion-20260916.md` Phases 3–4. Dependency
+order: CP.1 → CP.2 → CP.3 → CP.4; CP.0 and CP.5 are independent of CP.3/CP.4
+(CP.5 runs against a mock engine) and may land any time after CP.1. Every
+green task: commit + push to `github` immediately. CP shares no files with
+Stanza LS except `src/core/storage/root.ts` (read-only).
+
+- [ ] **CP.0 — Settings six-tab real controls (RELEASE GATE; operator 2026-09-16).**
+  Files: `src/ui/SettingsView.tsx`, `src/styles.css`, `tests/settingsSurface.test.ts`;
+  read-only patterns: `src/ui/TrayPanel.tsx`, `src/ui/JournalView.tsx`, `src/core/accompaniment/store.ts`.
+  Entities: `mass.form`, `mass.roleLens`, `mode`, sidecar snapshot export/import, live gate state, real source listing.
+  **Do:** every tab presents real wired controls or real state — no static-description-only tab.
+  Missal: `mass.form` radios (lecta/cantata/sollemnis) + `mass.roleLens` controls writing the same keys `TrayPanel` consumes; delete the legacy `mass.solemn` checkbox (TrayPanel already derives it). Journal: `mode` priest/laity radio (the key `JournalView` reads). Sync: working sidecar snapshot **export** (download bytes) + **import** (restore into `SidecarDb`, then reload state). Account: live gate/entitlement state readout — billing unconfigured ⇒ state reads "all features ungated" and Restore is honestly disabled with the reason (no fake controls). Library: real attached-source listing read from the actual corpus (no fake catalog buttons).
+  **Verify:** `node --experimental-strip-types --test tests/settingsSurface.test.ts`; full `npm test`; `npx --no-install tsc -b --pretty false`.
+  **Accept:** source-parse test proves each of the six tabs renders a wired control or real state; zero static-only tabs; visual pass on all six tabs; rubric row for Settings no longer blocked.
+
+- [ ] **CP.1 — Land the stranded reusable-chatbot core (preserve `dcfca61b`).**
+  Files: `reusable-chatbot/**`, `VENDORED/turboquant-wasm/**`, `tests/turboquant-policy.test.ts`, `package.json`, `package-lock.json`.
+  **Do:** `git fetch robin@192.168.0.173:/opt/devProjects/sanctissimissa dcfca61b`, then checkout exactly the code hunks of `dcfca61b` onto master (`git checkout dcfca61b -- reusable-chatbot VENDORED/turboquant-wasm tests/turboquant-policy.test.ts` + restore the `package.json` dependency hunk manually — its CHECKLIST/ARCHITECTURE hunks are superseded and must NOT come along); `npm install` (turboquant-wasm@0.4.1); confirm tsconfig excludes `VENDORED/`.
+  **Verify:** `node --experimental-strip-types --test tests/turboquant-policy.test.ts` (6/6); full `npm test`; `npx --no-install tsc -b --pretty false`.
+  **Accept:** all green; commit + push immediately; msi4090 untouched; no ARCH/CHECKLIST text from `dcfca61b` enters master; the stranded commit now exists on GitHub.
+
+- [ ] **CP.2 — Content-addressed model store on the decision-22 plane.**
+  Files: `src/core/model-store/{types.ts,store.ts}` (new), `tests/modelStore.test.ts`; read-only: `src/core/storage/root.ts`.
+  Entities: `ModelStore { resolve(): Promise<ModelStoreRoot>; has(sha256): Promise<boolean>; openStream(sha256): Promise<ReadableStream|Uint8Array>; ingest(bytes, expectedSha256): Promise<ModelRef>; list(): Promise<ModelRef[]>; remove(sha256): Promise<void> }`, `ModelRef { sha256, bytes, completeAt, source }`.
+  **Do:** layout `models/sha256/<hash>/<file>` under the resolved decision-22 root (web/OPFS under the per-origin scope; desktop via `scopeDir` IPC); SHA256 verified at ingest; `.complete` commit marker (mirror the VENDORED model-loader pattern) so partial writes never resolve; incomplete artifacts resume, tampered/truncated artifacts are discarded and re-requested.
+  **Verify:** `node --experimental-strip-types --test tests/modelStore.test.ts` against a temp-dir fake root + fixtures: ingest→list→open; tamper→reject; truncate→no `.complete`; remove.
+  **Accept:** a tampered artifact can never resolve complete; the same content key works on every platform; no per-app path appears in any key.
+
+- [ ] **CP.3 — WebGPU TurboQuant engine extraction (real sampler).**
+  Files: `reusable-chatbot/engines/webgpu/**` (new); read-only: `VENDORED/turboquant-wasm/reference/**`, `reusable-chatbot/core/**`, CP.2 store.
+  **Do:** generalize the vendored demo engine — architecture constants from the GGUF header (delete the hardcoded Gemma-3 block), replace argmax-only sampling with a real sampler (temperature, top-p, stop sequences), KV cache stays engine-owned in the worker, weights stream from the CP.2 store, `probe()` reports true adapter limits and the `subgroups` gate.
+  **Verify:** `tests/webgpuEngine.test.ts` — config parsing + probe fallback unit tests (no GPU in CI); full `npm test`; `npx tsc -b`; real-device generation = TEST_RUBRIC operator row.
+  **Accept:** honest "unsupported" on no-`subgroups` devices (never a pretend mode); no tensor crosses `postMessage`; streaming generation runs a Gemma-class GGUF end to end on a probe-passing device.
+
+- [ ] **CP.4 — Model registry (Atomic Chat catalogs + probe fusion).**
+  Files: `reusable-chatbot/model-registry/{catalog.ts,rank.ts,data/}` (new; manifests vendored with PROVENANCE), `tests/modelRegistry.test.ts`.
+  **Do:** consume `rebots-online/atomic-chat-conf` recommended/staff-picks + `models/inference-profiles.json` + `rebots-online/atomic-chat-model-catalog`; fuse with live `probe()` truth; rank by deployability (capability + quality + task fit + Atomic priority + TQ compat + context − memory pressure − latency − unsupported-runtime penalty); resolve to `EngineConfig` pointing at CP.2 content keys.
+  **Verify:** unit tests over fixture manifests, incl. marking unsupported-runtime models instead of forcing them.
+  **Accept:** zero model-specific hardcoding; the ranked pick changes correctly when probe truth changes.
+
+- [ ] **CP.5 — ChatView: intercom badge → dockable/resizeable panel (mock-engine first).**
+  Files: `src/ui/ChatView.tsx`, `src/ui/ChatBadge.tsx` (new), `src/core/chat/session.ts` (new — ChatController adapter + deterministic mock engine), `src/App.tsx` (mount points), `src/styles.css`, `tests/chatView.test.ts`.
+  **Do:** default surface = **intercom-style badge porthole** — circular, low-chrome, persistent on every workspace, animated in the kintsugi/natally house style (breathing glow), occasional idle gestures (**signing with a cross ✠, waving**) on a jittered timer, `prefers-reduced-motion` → static states. Badge expands to a **fully dockable + resizeable** chat panel: dock-left, dock-right, floating (drag), inline, fullscreen, mobile bottom-sheet; mode + geometry persisted (`chat.dock`, `chat.rect` sidecar settings); turns stream through `ChatController` against the mock engine (CP.3/CP.4 plug in behind the same `IInferenceEngine`).
+  **Verify:** `node --experimental-strip-types --test tests/chatView.test.ts` (dock-mode/geometry persistence; gesture scheduler respects reduced-motion; cancellation); full `npm test`; `npx tsc -b`; visual pass across workspaces.
+  **Accept:** badge visible on every workspace at every dock mode without layout break; reduced-motion honored; mock engine streams cancellable turns; no Settings/LS files touched.
+
+- [ ] **CP.6 — Companion semantics (BI.2–BI.4 reconciliation).** `CompanionMemory` (lore + distillation + vector recall), context assembly (persona + lore + memories + position + CITES), cited replies, save-insight → accompaniment(`generated`), RC gates `companion_ondevice`/`companion_hosted`. Expand to self-contained tasks when CP.3/CP.4 land.
+
+- [ ] **CP.7 — Native Tauri adapter (`atomic-llama-cpp-turboquant`).** Rust → C ABI → persistent session streamed over a Channel; no per-token IPC. Deferred until the CP.3 engine pattern stabilizes.
+
+- [ ] **CP.8 — Android NDK + shared-store mechanism.** **Gated** on the decision-22 open decision (public media dir vs `android:sharedUserId` vs signature-permission provider — operator call); then NDK build of the same fork where the device probe supports it.
