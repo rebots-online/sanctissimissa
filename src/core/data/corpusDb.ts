@@ -68,6 +68,20 @@ export class CorpusDb {
     return new CorpusDb(new SQL.Database(bytes));
   }
 
+  /** Real attached commentary-source listing with block counts (Settings › Library, CP.0). */
+  commentarySources(): { source: string; blocks: number }[] {
+    const counts = new Map<string, number>();
+    for (const r of this.all("SELECT key FROM nodes WHERE kind = 'commentary'")) {
+      const key = String(r.key);
+      if (!key.startsWith('commentary:')) continue;
+      const source = key.slice('commentary:'.length).split('/')[0] ?? '';
+      if (source) counts.set(source, (counts.get(source) ?? 0) + 1);
+    }
+    return [...counts]
+      .map(([source, blocks]) => ({ source, blocks }))
+      .sort((a, b) => a.source.localeCompare(b.source));
+  }
+
   private all(sql: string, params: unknown[] = []): Record<string, unknown>[] {
     const stmt = this.db.prepare(sql);
     try {

@@ -507,7 +507,9 @@ export default function App() {
               {view === 'homily' && !sidecar && (
                 <div className="content"><p>Opening your homily planner…</p></div>
               )}
-              {view === 'settings' && <SettingsView sidecar={sidecar} />}
+              {view === 'settings' && (
+                <SettingsView sidecar={sidecar} corpus={db} onOpenJournal={() => setView('journal')} />
+              )}
               {view === 'about' && <AboutView />}
             </>
           }

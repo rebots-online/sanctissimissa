@@ -228,6 +228,35 @@ export class SidecarDb {
     }
   }
 
+  /**
+   * Validate snapshot bytes as a SanctissiMissa sidecar and persist them to the
+   * platform store (Settings › Sync import, CP.0). The app reloads afterwards;
+   * `open()` then boots from the restored bytes.
+   */
+  static async importBytes(bytes: Uint8Array): Promise<void> {
+    const SQL = await initSql();
+    const probe = new SQL.Database(bytes);
+    try {
+      const tables = probe.exec(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('settings','accompaniments')",
+      );
+      const names = new Set(tables.flatMap((r) => r.values.map((v) => String(v[0]))));
+      if (!names.has('settings') || !names.has('accompaniments')) {
+        throw new Error('Not a SanctissiMissa sidecar snapshot — required tables missing');
+      }
+    } finally {
+      probe.close();
+    }
+    if (isTauri()) {
+      const { invoke } = await import('@tauri-apps/api/core');
+      await invoke('save_sidecar', { bytes: Array.from(bytes), scopeDir: storageRootName() });
+    } else if (typeof indexedDB !== 'undefined') {
+      await idbPut(bytes);
+    } else {
+      throw new Error('No sidecar persistence backend on this platform');
+    }
+  }
+
   private all(sql: string, params: unknown[] = []): Record<string, unknown>[] {
     const stmt = this.db.prepare(sql);
     try {

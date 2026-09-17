@@ -2473,3 +2473,52 @@ button.mstation, button.mstation.active, button.mstation.open {
     }
   }
 }
+
+/* CP.0 — Settings real controls (six tabs, no static-only surfaces) */
+.settings-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0 16px;
+  max-width: 480px;
+}
+.settings-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border, #ccc);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.settings-radio.active {
+  border-color: var(--gold, #b08d3e);
+  background: var(--card, rgba(176, 141, 62, 0.08));
+  font-weight: 600;
+}
+.settings-radio input { accent-color: var(--gold, #b08d3e); }
+.settings-actions {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+.settings-button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #ccc);
+  background: var(--card, #faf7f0);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+.settings-button:hover:not(:disabled):not(.disabled) { border-color: var(--gold, #b08d3e); }
+.settings-button:disabled,
+.settings-button.disabled { opacity: 0.5; cursor: not-allowed; }
+.settings-button.file { display: inline-flex; align-items: center; }
+.settings-state {
+  margin: 8px 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px dashed var(--border, #ccc);
+}
