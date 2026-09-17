@@ -121,7 +121,6 @@ const sourceStages = {
   'windows-native-standalone': 'windows-msi',
   'windows-msi': 'windows-msi',
   'windows-msix': 'windows-msix',
-  'android-apk-debug': 'android-debug',
   'android-apk-release': 'android-release',
   'android-aab-release': 'android-release',
   'android-native-debug-symbols': 'symbols',
@@ -217,12 +216,6 @@ const sources = [
     filename: `${PREFIX}-windows-x64.msix`, installer_version: WINDOWS_VERSIONS.msix,
   },
   {
-    id: 'android-apk-debug', platform: 'android', kind: 'apk-debug',
-    source: optional('android-apk-debug', 'android', 'apk-debug', () => exactOne(resolve(ROOT, 'src-tauri/gen/android/app/build/outputs/apk/universal/debug'),
-      (f) => f === `${PREFIX}-universal-debug.apk`, 'Android debug APK')),
-    filename: `${PREFIX}-android-universal-debug.apk`,
-  },
-  {
     id: 'android-apk-release', platform: 'android', kind: 'apk-release',
     source: optional('android-apk-release', 'android', 'apk-release', () => exactOne(resolve(ROOT, 'src-tauri/gen/android/app/build/outputs/apk/universal/release'),
       (f) => f === `${PREFIX}-universal-release.apk`, 'Android release APK')),
@@ -257,9 +250,11 @@ sources.push(...present.filter((a) => existsSync(a.source)));
 // partial host. Validate inputs first; the ZIP is built in a disposable target
 // directory and never updates an existing archive in place.
 const webReady = optional('web-pwa', 'web', 'pwa-zip', () => {
+  // registerSW.js no longer emitted since AM.08: registration is bundled via
+  // virtual:pwa-register (src/pwa/pwaUpdate.ts initSelfApplyingUpdates).
   for (const required of [
     'index.html', 'assets', 'icon.png', 'icon-192.png', 'manifest.webmanifest',
-    'registerSW.js', 'sw.js', 'missal.db',
+    'sw.js', 'missal.db',
   ]) {
     if (!existsSync(join(WEBDIST, required))) throw new Error(`Web build missing dist-web/${required}`);
   }

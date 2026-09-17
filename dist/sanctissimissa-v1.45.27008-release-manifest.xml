@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<release schema="mba.robin.release-manifest.v1" version="1.45.27008" versionCode="100045" status="partial">
+  <change_notes source="DOCS/CHANGELOG.md" present="true">
+    <highlight>A new companion badge — a small animated porthole that occasionally signs itself with a cross or waves — is present on every screen; tap it for a dockable, resizeable chat panel that remembers where you left it.</highlight>
+    <highlight>The companion streams replies on device; this build runs a deterministic preview engine while the TurboQuant engine stanza completes.</highlight>
+    <highlight>Settings: the Missal tab now offers the full Mass form (Low, Cantata, Solemn) and role lens; the Journal tab gains the priest/laity exposure mode; Sync exports and restores a snapshot of your journal, homilies and preferences; Account and Library show live, truthful state instead of placeholder text.</highlight>
+    <highlight>Release engineering: the debug-Android build stage is retired and the web PWA collection follows the new self-applying service-worker registration.</highlight>
+  </change_notes>
+  <windows_versions canonical="1.45.27008" msi="1.45.0" msix="1.45.0.0"/>
+  <verification windows_store_runtime="unverified" windows_store_acceptance="unverified" android_play_delivery="unverified (BP.1)"/>
+  <artifact id="web-pwa" platform="web" kind="pwa-zip"><filename>sanctissimissa-v1.45.27008-web-pwa.zip</filename><size_bytes>65514534</size_bytes><sha256>76cb334bac881fc1e1b8efc7952fb043b3099723440551463124ce663e1f128c</sha256></artifact>
+  <artifact id="linux-deb" platform="linux" kind="deb"><filename>sanctissimissa-v1.45.27008-linux-amd64.deb</filename><size_bytes>118147328</size_bytes><sha256>ee1931c1bb50ed1fda54fc4682d5f38a490a9505ecc9362cc02d23a4988fdb29</sha256></artifact>
+  <artifact id="linux-appimage" platform="linux" kind="appimage"><filename>sanctissimissa-v1.45.27008-linux-amd64.AppImage</filename><size_bytes>188914168</size_bytes><sha256>5c2f83939638e6fefc35b4926cdd387261b4a9f11221c2112d78b8b04d1ab3be</sha256></artifact>
+  <artifact id="windows-standalone" platform="windows" kind="exe"><filename>sanctissimissa-v1.45.27008-windows-x64-standalone.exe</filename><size_bytes>252911616</size_bytes><sha256>7eacde13830b1bb8b2b8096dc32c3e8fdc059b381fd3d88f25d7aa5e43ebbcb4</sha256></artifact>
+  <artifact id="windows-nsis" platform="windows" kind="nsis"><filename>sanctissimissa-v1.45.27008-windows-x64-setup.exe</filename><size_bytes>96043023</size_bytes><sha256>307976d16d4e50d6c371cd89f1ac103f8a02d8ab8b6a644531a42312ffac6fcd</sha256></artifact>
+  <artifact id="android-apk-release" platform="android" kind="apk-release"><filename>sanctissimissa-v1.45.27008-android-universal-release.apk</filename><size_bytes>1364483849</size_bytes><sha256>1455b97fd5a9e9c532f11bbf27f226eff2bf317168e1b89b892ef7c1c5c38ac2</sha256></artifact>
+  <artifact id="android-aab-release" platform="android" kind="aab-release"><filename>sanctissimissa-v1.45.27008-android-universal-release.aab</filename><size_bytes>545635752</size_bytes><sha256>e921d1c05f920facfca17e278ed0d3243d4550aa14209e281f6984cdd21e5b8e</sha256></artifact>
+  <artifact id="android-native-debug-symbols" platform="android" kind="native-debug-symbols"><filename>sanctissimissa-v1.45.27008-android-native-debug-symbols.zip</filename><size_bytes>541003883</size_bytes><sha256>7caded2f09e6040c74801565e6fd66432ca2d333b6ba770553b46eef29b5e914</sha256></artifact>
+  <missing>
+    <artifact id="windows-native-standalone" platform="windows" kind="exe-native">Required build stage is still pending: windows-msi</artifact>
+    <artifact id="windows-msi" platform="windows" kind="msi">Required build stage is still pending: windows-msi</artifact>
+    <artifact id="windows-msix" platform="windows" kind="msix">Required build stage is still pending: windows-msix</artifact>
+  </missing>
+</release>

@@ -22,6 +22,15 @@ them one sentence each and written for a reader of the app, not of the diff.
 
 ---
 
+## v1.45.27008 — 2026-09-17
+
+The Companion arrives, and every Settings tab becomes real.
+
+- A new companion badge — a small animated porthole that occasionally signs itself with a cross or waves — is present on every screen; tap it for a dockable, resizeable chat panel that remembers where you left it.
+- The companion streams replies on device; this build runs a deterministic preview engine while the TurboQuant engine stanza completes.
+- Settings: the Missal tab now offers the full Mass form (Low, Cantata, Solemn) and role lens; the Journal tab gains the priest/laity exposure mode; Sync exports and restores a snapshot of your journal, homilies and preferences; Account and Library show live, truthful state instead of placeholder text.
+- Release engineering: the debug-Android build stage is retired and the web PWA collection follows the new self-applying service-worker registration.
+
 ## v1.38.03717 — 2026-09-01
 
 English stage directions return to the narrow bilingual reader.
