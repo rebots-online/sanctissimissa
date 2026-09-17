@@ -22,7 +22,7 @@ BUILD_STARTED="$RELEASE/${PREFIX}-windows-cross-${ATTEMPT}.marker"
 touch "$BUILD_STARTED"
 set +e
 ./node_modules/.bin/tauri build --runner cargo-xwin \
-  --target x86_64-pc-windows-msvc --bundles nsis --ci --no-default-features 2>&1 | tee "$BUILD_LOG"
+  --target x86_64-pc-windows-msvc --bundles nsis --ci 2>&1 | tee "$BUILD_LOG"
 BUILD_STATUS=${PIPESTATUS[0]}
 set -e
 if [ "$BUILD_STATUS" -ne 0 ]; then
