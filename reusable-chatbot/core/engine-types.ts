@@ -78,4 +78,24 @@ export interface IInferenceEngine {
   kvStats(session: SessionId): Promise<KvCacheStats>;
   reset(session: SessionId): Promise<void>;
   close(session: SessionId): Promise<void>;
+
+  // §7.8.1 runner-ABI extensions (decision 23). Optional so the deterministic
+  // mock and the existing controller keep conforming unchanged; real providers
+  // implement them. Handles stay opaque and KV stays engine-owned throughout.
+  /** Prefill the KV cache so the first user turn streams instantly. */
+  warmup?(session: SessionId, request: GenerateRequest): Promise<void>;
+  /** Cancel an in-flight streaming generation; the session stays usable. */
+  cancel?(session: SessionId): void;
+  /** Liveness probe — device loss is reported here, not thrown at random. */
+  health?(session: SessionId): Promise<{ healthy: boolean; detail?: string }>;
+  /** Will-this-config-fit truth for the registry/picker before any download. */
+  estimateMemory?(config: EngineConfig): Promise<{
+    weightsBytes: number;
+    kvBytesPerToken: number;
+    maxContextTokens: number;
+  }>;
+  /** Embedding over the loaded model (companion recall), when supported. */
+  embed?(session: SessionId, texts: string[]): Promise<Float32Array[]>;
+  /** Prompt-only tokenization (context budgeting), when supported. */
+  tokenize?(session: SessionId, text: string): Promise<number[]>;
 }
