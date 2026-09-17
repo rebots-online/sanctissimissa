@@ -10,6 +10,12 @@
  */
 
 import fs from 'node:fs';
+
+// rustc SIGSEGVs (stack overflow) compiling the app lib with llama-cpp-2 in
+// release+LTO on linux and the android/windows cross targets — give rustc a
+// deep stack for every stage's child cargo (upstream hint: 16777216; doubled
+// twice for headroom).
+process.env.RUST_MIN_STACK ||= '67108864';
 import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
