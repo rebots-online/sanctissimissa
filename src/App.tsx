@@ -22,6 +22,7 @@ import JournalSidecar from './ui/JournalSidecar.tsx';
 import JournalView from './ui/JournalView.tsx';
 import HomilyPlanner from './ui/HomilyPlanner.tsx';
 import SettingsView from './ui/SettingsView.tsx';
+import ChatView from './ui/ChatView.tsx';
 import AboutView from './ui/AboutView.tsx';
 import ResizableInspectorLayout from './ui/ResizableInspectorLayout.tsx';
 import TrayPanel from './ui/TrayPanel.tsx';
@@ -526,6 +527,9 @@ export default function App() {
       {(view === 'reader' || view === 'office') && (
         <TrayPanel sidecar={sidecar} open={trayOpen} onToggle={() => setTrayOpen((o) => !o)} />
       )}
+
+      {/* CP.5: Companion intercom badge — present on every workspace. */}
+      <ChatView sidecar={sidecar} />
 
       {/* Mandatory app chrome: version bottom-right on every surface. */}
       <div className="version-tag" title={`Build ${versionInfo.buildNumber} · ${versionInfo.buildDate}`}>

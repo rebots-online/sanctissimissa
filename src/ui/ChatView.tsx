@@ -1,0 +1,291 @@
+/**
+ * ChatView — Companion surface (CP.5, operator directive 2026-09-16).
+ * Default presentation is the ChatBadge intercom porthole; it expands to a
+ * fully dockable + resizeable chat panel: dock-left, dock-right, floating
+ * (header drag + corner resize), inline, fullscreen, and the mobile bottom
+ * sheet. Mode + geometry persist via sidecar settings chat.dock /
+ * chat.rect / chat.dockWidth. Turns stream through ChatController over the
+ * mock engine (CP.3 WebGPU TurboQuant / CP.4 registry plug in unchanged).
+ */
+
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { PointerEvent as ReactPointerEvent } from 'react';
+import ChatBadge from './ChatBadge.tsx';
+import { createChatSession } from '../core/chat/session.ts';
+
+type DockMode = 'dock-left' | 'dock-right' | 'floating' | 'inline' | 'fullscreen' | 'sheet';
+
+const DOCK_MODES: { id: DockMode; label: string; glyph: string }[] = [
+  { id: 'dock-left', label: 'Dock left', glyph: '⇤' },
+  { id: 'dock-right', label: 'Dock right', glyph: '⇥' },
+  { id: 'floating', label: 'Floating', glyph: '❐' },
+  { id: 'inline', label: 'Inline', glyph: '▤' },
+  { id: 'fullscreen', label: 'Fullscreen', glyph: '⛶' },
+];
+
+interface SettingsStore {
+  getSetting(key: string): string | null;
+  setSetting(key: string, value: string): void;
+  persist(): Promise<void>;
+}
+
+interface Rect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+const DEFAULT_RECT: Rect = { x: 120, y: 96, w: 380, h: 520 };
+const DOCK_MIN = 280;
+const DOCK_MAX = 560;
+const FLOAT_MIN_W = 300;
+const FLOAT_MIN_H = 320;
+
+function clamp(v: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, v));
+}
+
+function clampRect(r: Rect): Rect {
+  const w = clamp(r.w, FLOAT_MIN_W, Math.max(FLOAT_MIN_W, window.innerWidth - 32));
+  const h = clamp(r.h, FLOAT_MIN_H, Math.max(FLOAT_MIN_H, window.innerHeight - 32));
+  return {
+    w,
+    h,
+    x: clamp(r.x, 0, Math.max(0, window.innerWidth - w)),
+    y: clamp(r.y, 0, Math.max(0, window.innerHeight - h)),
+  };
+}
+
+interface ChatMsgUi {
+  role: 'user' | 'assistant';
+  text: string;
+}
+
+type DragKind = 'move' | 'float-resize' | 'dock-resize' | 'dock-resize-left';
+interface DragState {
+  kind: DragKind;
+  ox: number;
+  oy: number;
+  rect: Rect;
+  width: number;
+}
+
+export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore | null }) {
+  const session = useMemo(() => createChatSession(), []);
+  const [open, setOpen] = useState(false);
+  const [dock, setDock] = useState<DockMode>(
+    () => (sidecar?.getSetting('chat.dock') as DockMode | null) ?? 'dock-right',
+  );
+  const [rect, setRect] = useState<Rect>(() => {
+    try {
+      return { ...DEFAULT_RECT, ...(JSON.parse(sidecar?.getSetting('chat.rect') ?? '{}') as Partial<Rect>) };
+    } catch {
+      return DEFAULT_RECT;
+    }
+  });
+  const [dockWidth, setDockWidth] = useState(() =>
+    clamp(Number(sidecar?.getSetting('chat.dockWidth')) || 360, DOCK_MIN, DOCK_MAX),
+  );
+  const [messages, setMessages] = useState<ChatMsgUi[]>([]);
+  const [input, setInput] = useState('');
+  const [streaming, setStreaming] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const dragRef = useRef<DragState | null>(null);
+
+  // Small screens open the panel as a bottom sheet by default.
+  useEffect(() => {
+    if (open && typeof matchMedia === 'function' && matchMedia('(max-width: 720px)').matches) {
+      setDock((d) => (d === 'fullscreen' ? d : 'sheet'));
+    }
+  }, [open]);
+
+  const persist = useCallback(
+    (key: string, value: string) => {
+      sidecar?.setSetting(key, value);
+      void sidecar?.persist();
+    },
+    [sidecar],
+  );
+
+  const changeDock = (mode: DockMode) => {
+    setDock(mode);
+    persist('chat.dock', mode);
+  };
+
+  useEffect(() => {
+    listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
+  }, [messages]);
+
+  const send = async () => {
+    const text = input.trim();
+    if (!text || streaming) return;
+    setInput('');
+    setMessages((m) => [...m, { role: 'user', text }]);
+    setMessages((m) => [...m, { role: 'assistant', text: '' }]);
+    setStreaming(true);
+    const abort = new AbortController();
+    abortRef.current = abort;
+    try {
+      await session.ensureEngine();
+      for await (const ev of session.controller.generate(text, abort.signal)) {
+        setMessages((m) => {
+          const copy = m.slice();
+          const last = copy[copy.length - 1];
+          copy[copy.length - 1] = { role: 'assistant', text: last.text + ev.text };
+          return copy;
+        });
+      }
+    } catch (error) {
+      setMessages((m) => {
+        const copy = m.slice();
+        const last = copy[copy.length - 1];
+        if (!last.text) {
+          copy[copy.length - 1] = {
+            role: 'assistant',
+            text: `⚠ ${error instanceof Error ? error.message : String(error)}`,
+          };
+        }
+        return copy;
+      });
+    } finally {
+      setStreaming(false);
+      abortRef.current = null;
+    }
+  };
+
+  const stop = () => abortRef.current?.abort();
+
+  const onPointerDown = (kind: DragKind) => (e: ReactPointerEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    dragRef.current = { kind, ox: e.clientX, oy: e.clientY, rect, width: dockWidth };
+  };
+
+  const onPointerMove = (e: ReactPointerEvent<HTMLElement>) => {
+    const st = dragRef.current;
+    if (!st) return;
+    const dx = e.clientX - st.ox;
+    const dy = e.clientY - st.oy;
+    if (st.kind === 'move') {
+      setRect(clampRect({ ...st.rect, x: st.rect.x + dx, y: st.rect.y + dy }));
+    } else if (st.kind === 'float-resize') {
+      setRect(clampRect({ ...st.rect, w: st.rect.w + dx, h: st.rect.h + dy }));
+    } else {
+      const delta = st.kind === 'dock-resize' ? -dx : dx;
+      setDockWidth(clamp(st.width + delta, DOCK_MIN, DOCK_MAX));
+    }
+  };
+
+  const onPointerUp = () => {
+    if (!dragRef.current) return;
+    dragRef.current = null;
+    persist('chat.rect', JSON.stringify(rect));
+    persist('chat.dockWidth', String(dockWidth));
+  };
+
+  const panelStyle =
+    dock === 'floating'
+      ? { left: rect.x, top: rect.y, width: rect.w, height: rect.h }
+      : dock === 'dock-left' || dock === 'dock-right'
+        ? { width: dockWidth }
+        : undefined;
+
+  return (
+    <>
+      {!(open && dock === 'fullscreen') && <ChatBadge open={open} onToggle={() => setOpen((o) => !o)} />}
+      {open && (
+        <section
+          className={`chat-panel dock-${dock}`}
+          role="complementary"
+          aria-label="Companion chat"
+          style={panelStyle}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+        >
+          <header
+            className="chat-header"
+            onPointerDown={dock === 'floating' ? onPointerDown('move') : undefined}
+          >
+            <h3>Companion</h3>
+            <div className="chat-modes" role="group" aria-label="Panel placement">
+              {DOCK_MODES.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  title={m.label}
+                  aria-label={m.label}
+                  aria-pressed={dock === m.id}
+                  className={dock === m.id ? 'active' : undefined}
+                  onClick={() => changeDock(m.id)}
+                >
+                  {m.glyph}
+                </button>
+              ))}
+              <button type="button" className="chat-close" aria-label="Close chat" onClick={() => setOpen(false)}>
+                ×
+              </button>
+            </div>
+          </header>
+          {(dock === 'dock-left' || dock === 'dock-right') && (
+            <div
+              className={`chat-resize-edge ${dock}`}
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Resize panel"
+              onPointerDown={onPointerDown(dock === 'dock-left' ? 'dock-resize-left' : 'dock-resize')}
+            />
+          )}
+          {dock === 'floating' && (
+            <div
+              className="chat-resize-corner"
+              role="separator"
+              aria-orientation="horizontal"
+              aria-label="Resize panel"
+              onPointerDown={onPointerDown('float-resize')}
+            />
+          )}
+          <div className="chat-log" ref={listRef}>
+            {messages.length === 0 && (
+              <p className="chat-hello">
+                ℣. Pax et gaudium. Ask about the propers, a feast, or a passage. Replies stream from the on-device
+                engine — this preview build runs a deterministic stand-in; the TurboQuant engine arrives with its
+                stanza.
+              </p>
+            )}
+            {messages.map((m, i) => (
+              <div key={i} className={`chat-msg ${m.role}`}>
+                {m.text}
+              </div>
+            ))}
+          </div>
+          <footer className="chat-input">
+            <textarea
+              rows={2}
+              value={input}
+              placeholder="Ask the companion…"
+              aria-label="Message the companion"
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  void send();
+                }
+              }}
+            />
+            {streaming ? (
+              <button type="button" className="chat-stop" onClick={stop}>
+                Stop
+              </button>
+            ) : (
+              <button type="button" onClick={() => void send()} disabled={!input.trim()}>
+                Send
+              </button>
+            )}
+          </footer>
+        </section>
+      )}
+    </>
+  );
+}
