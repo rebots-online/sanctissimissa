@@ -118,7 +118,12 @@ test('CP.5: mock stand-in rotates deterministic formulas across turns', async ()
   assert.equal(fifth, first, 'four-formula cycle repeats deterministically');
 });
 
-test('CP.5: preview-engine chip is gated on the mock model id', () => {
-  assert.ok(chatView.includes("session.modelId.startsWith('mock://')"), 'chip auto-hides when a real engine lands');
-  assert.ok(chatView.includes('chat-engine-chip'));
+test('CP.7/9: ChatView presents real engine states — no mock surface', () => {
+  assert.ok(chatView.includes('EngineChip'), 'engine state chip present');
+  assert.ok(chatView.includes('resolveNativeEngine') && chatView.includes('resolveWebEngine'));
+  assert.ok(!/createChatSession|mock:\/\//.test(chatView), 'mock never reaches the UI');
+});
+
+test('CP.7/9: needs-model failure is an honest setup pointer, not a canned reply', () => {
+  assert.ok(chatView.includes('No model is downloaded yet'), 'honest setup message');
 });

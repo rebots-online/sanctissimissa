@@ -8,11 +8,13 @@
  * mock engine (CP.3 WebGPU TurboQuant / CP.4 registry plug in unchanged).
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import ChatBadge from './ChatBadge.tsx';
 import ModelPicker, { useCompanionModels } from './ModelPicker.tsx';
-import { createChatSession } from '../core/chat/session.ts';
+import { ChatController } from '../../reusable-chatbot/core/chat-controller.ts';
+import { isTauri } from '../core/chat/models.ts';
+import { resolveNativeEngine, resolveWebEngine, type Resolution } from '../core/chat/resolve.ts';
 
 type DockMode = 'dock-left' | 'dock-right' | 'floating' | 'inline' | 'fullscreen' | 'sheet';
 
@@ -73,7 +75,6 @@ interface DragState {
 }
 
 export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore | null }) {
-  const session = useMemo(() => createChatSession(), []);
   const models = useCompanionModels();
   const [open, setOpen] = useState(false);
   const [dock, setDock] = useState<DockMode>(
@@ -95,6 +96,37 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
   const abortRef = useRef<AbortController | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
   const dragRef = useRef<DragState | null>(null);
+  const [resolution, setResolution] = useState<Resolution | null>(null);
+  const controllerRef = useRef<ChatController | null>(null);
+
+  // Re-resolve whenever the picker's readiness landscape changes: a finished
+  // download, a new selection, or the first capability probe.
+  const readyKey = Object.entries(models.state.states)
+    .map(([id, st]) => (st === 'ready' ? id : ''))
+    .join('|');
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const report = models.state.catalog?.report;
+      if (!report) return; // still probing — chip shows the probing state
+      let resolved: Resolution;
+      const invoke = isTauri()
+        ? (window as unknown as { invoke: (c: string, a?: Record<string, unknown>) => Promise<unknown> }).invoke
+        : undefined;
+      if (invoke) {
+        const candidates = (models.state.catalog?.ranked ?? [])
+          .filter((m) => models.state.states[m.id] === 'ready')
+          .map((m) => ({ id: m.id, displayName: m.displayName }));
+        resolved = await resolveNativeEngine(invoke, report, models.locate, candidates);
+      } else {
+        resolved = await resolveWebEngine(report);
+      }
+      if (!cancelled) setResolution(resolved);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [readyKey, models.state.catalog, models]);
 
   // Small screens open the panel as a bottom sheet by default.
   useEffect(() => {
@@ -130,8 +162,20 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
     const abort = new AbortController();
     abortRef.current = abort;
     try {
-      await session.ensureEngine();
-      for await (const ev of session.controller.generate(text, abort.signal)) {
+      const resolved = resolution;
+      if (!resolved || resolved.kind !== 'ready') {
+        throw new Error(
+          resolved && resolved.kind === 'needs-model'
+            ? 'No model is downloaded yet — pick one in the picker above; the download is verified and stored once.'
+            : (resolved?.reason ?? 'The engine is still probing — try again in a moment.'),
+        );
+      }
+      const controller = controllerRef.current ?? new ChatController();
+      if (controllerRef.current === null) {
+        await controller.useEngine(resolved.engine, resolved.config);
+        controllerRef.current = controller;
+      }
+      for await (const ev of controller.generate(text, abort.signal)) {
         setMessages((m) => {
           const copy = m.slice();
           const last = copy[copy.length - 1];
@@ -214,14 +258,7 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
           >
             <div className="chat-header-left">
               <h3>Companion</h3>
-              {session.modelId.startsWith('mock://') && (
-                <span
-                  className="chat-engine-chip"
-                  title="Deterministic stand-in — the on-device TurboQuant engine arrives with its stanza."
-                >
-                  Preview engine
-                </span>
-              )}
+              <EngineChip resolution={resolution} />
               <ModelPicker hook={models} compact />
             </div>
             <div className="chat-modes" role="group" aria-label="Panel placement">
@@ -302,5 +339,34 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
         </section>
       )}
     </>
+  );
+}
+
+function EngineChip({ resolution }: { resolution: Resolution | null }) {
+  if (!resolution) {
+    return (
+      <span className="chat-engine-chip warn" title="Probing device capabilities">
+        ...
+      </span>
+    );
+  }
+  if (resolution.kind === 'ready') {
+    return (
+      <span className="chat-engine-chip" title={'Running locally (' + resolution.label + ')'}>
+        On-device
+      </span>
+    );
+  }
+  if (resolution.kind === 'needs-model') {
+    return (
+      <span className="chat-engine-chip warn" title={resolution.reason}>
+        Needs model
+      </span>
+    );
+  }
+  return (
+    <span className="chat-engine-chip warn" title={resolution.reason}>
+      Unavailable
+    </span>
   );
 }

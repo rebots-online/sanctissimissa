@@ -98,7 +98,7 @@ pub fn model_lookup(
 #[tauri::command]
 pub fn model_begin(
     app: tauri::AppHandle,
-    sha256: String,
+    key: String,
     file_name: String,
     scope_dir: Option<String>,
 ) -> Result<(), String> {
@@ -106,7 +106,7 @@ pub fn model_begin(
         return Err(format!("Invalid file name: {file_name}"));
     }
     let root = scope_root(&app, scope_dir.as_deref())?;
-    let dir = digest_dir(&root, &sha256)?;
+    let dir = staging_dir(&root, &key)?;
     fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
     fs::File::create(dir.join(&file_name)).map_err(|e| e.to_string())?;
     Ok(())
@@ -115,55 +115,46 @@ pub fn model_begin(
 #[tauri::command]
 pub fn model_chunk(
     app: tauri::AppHandle,
-    sha256: String,
+    key: String,
     offset: u64,
     bytes: Vec<u8>,
     scope_dir: Option<String>,
 ) -> Result<(), String> {
     let root = scope_root(&app, scope_dir.as_deref())?;
-    let dir = digest_dir(&root, &sha256)?;
-    let mut paths = fs::read_dir(&dir)
-        .map_err(|e| e.to_string())?
-        .filter_map(|e| e.ok())
-        .filter(|e| e.path().is_file() && e.file_name().to_string_lossy() != ".complete")
-        .collect::<Vec<_>>();
-    if paths.len() != 1 {
-        return Err("No open write session for digest".into());
-    }
+    let dir = staging_dir(&root, &key)?;
     let mut file = fs::OpenOptions::new()
         .write(true)
-        .open(paths.swap_remove(0).path())
+        .open(dir.join(open_file_name(&dir)?))
         .map_err(|e| e.to_string())?;
     file.seek(SeekFrom::Start(offset)).map_err(|e| e.to_string())?;
     file.write_all(&bytes).map_err(|e| e.to_string())?;
     Ok(())
 }
 
+/// Verify the staged bytes, then publish them immutably under their REAL
+/// digest (content identity is proven at ingest, guide §13) and drop the
+/// staging area. Returns the verified digest + size.
 #[tauri::command]
 pub fn model_finish(
     app: tauri::AppHandle,
-    sha256: String,
+    key: String,
     expected_bytes: u64,
+    expected_sha256: Option<String>,
     scope_dir: Option<String>,
 ) -> Result<serde_json::Value, String> {
     let root = scope_root(&app, scope_dir.as_deref())?;
-    let dir = digest_dir(&root, &sha256)?;
-    let mut paths = fs::read_dir(&dir)
-        .map_err(|e| e.to_string())?
-        .filter_map(|e| e.ok())
-        .filter(|e| e.path().is_file() && e.file_name().to_string_lossy() != ".complete")
-        .collect::<Vec<_>>();
-    if paths.len() != 1 {
-        return Err("No open write session for digest".into());
-    }
-    let path = paths.swap_remove(0).path();
+    let dir = staging_dir(&root, &key)?;
+    let file_name = open_file_name(&dir)?;
+    let path = dir.join(&file_name);
     let (actual, length) = file_sha256(&path)?;
-    if actual != sha256 {
-        fs::remove_dir_all(&dir).ok();
-        return Ok(serde_json::json!({
-            "verified": false,
-            "reason": format!("digest mismatch: got {actual}"),
-        }));
+    if let Some(expected) = expected_sha256.as_deref() {
+        if actual != expected {
+            fs::remove_dir_all(&dir).ok();
+            return Ok(serde_json::json!({
+                "verified": false,
+                "reason": format!("digest mismatch: got {actual}"),
+            }));
+        }
     }
     if length != expected_bytes {
         fs::remove_dir_all(&dir).ok();
@@ -172,11 +163,35 @@ pub fn model_finish(
             "reason": format!("byte count mismatch: got {length}"),
         }));
     }
-    let file_name = path.file_name().unwrap_or_default().to_string_lossy().to_string();
+    let published = digest_dir(&root, &actual)?;
+    fs::create_dir_all(&published).map_err(|e| e.to_string())?;
+    fs::rename(&path, published.join(&file_name)).map_err(|e| e.to_string())?;
     let meta = serde_json::json!({ "bytes": length, "fileName": file_name, "completeAt": SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap_or_default().as_millis() as u64 });
-    fs::write(dir.join("meta.json"), meta.to_string()).map_err(|e| e.to_string())?;
-    fs::write(dir.join(".complete"), "1").map_err(|e| e.to_string())?;
-    Ok(serde_json::json!({ "verified": true }))
+    fs::write(published.join("meta.json"), meta.to_string()).map_err(|e| e.to_string())?;
+    fs::write(published.join(".complete"), "1").map_err(|e| e.to_string())?;
+    fs::remove_dir_all(&dir).ok();
+    Ok(serde_json::json!({ "verified": true, "sha256": actual, "bytes": length }))
+}
+
+fn staging_dir(root: &Path, key: &str) -> Result<PathBuf, String> {
+    if key.is_empty() || !key.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_') {
+        return Err(format!("Invalid staging key: {key}"));
+    }
+    Ok(root.join("models").join("staging").join(key))
+}
+
+/// Exactly one open object per staging area.
+fn open_file_name(dir: &Path) -> Result<String, String> {
+    let mut names = fs::read_dir(dir)
+        .map_err(|e| e.to_string())?
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().is_file())
+        .map(|e| e.file_name().to_string_lossy().to_string())
+        .collect::<Vec<_>>();
+    if names.len() != 1 {
+        return Err("No open write session for staging key".into());
+    }
+    Ok(names.swap_remove(0))
 }
 
 #[tauri::command]
@@ -184,6 +199,13 @@ pub fn model_remove(app: tauri::AppHandle, sha256: String, scope_dir: Option<Str
     let root = scope_root(&app, scope_dir.as_deref())?;
     let dir = digest_dir(&root, &sha256)?;
     fs::remove_dir_all(dir).ok();
+    Ok(())
+}
+
+#[tauri::command]
+pub fn model_remove_staging(app: tauri::AppHandle, key: String, scope_dir: Option<String>) -> Result<(), String> {
+    let root = scope_root(&app, scope_dir.as_deref())?;
+    fs::remove_dir_all(staging_dir(&root, &key)?).ok();
     Ok(())
 }
 

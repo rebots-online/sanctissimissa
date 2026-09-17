@@ -66,6 +66,7 @@ fn save_sidecar(
     std::fs::write(dir.join("sidecar.db"), bytes).map_err(|e| e.to_string())
 }
 
+mod inference;
 mod model_store;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -81,7 +82,13 @@ pub fn run() {
             model_store::model_finish,
             model_store::model_remove,
             model_store::model_lock,
-            model_store::model_unlock
+            model_store::model_unlock,
+            inference::inference_probe,
+            inference::inference_load,
+            inference::inference_generate,
+            inference::inference_cancel,
+            inference::inference_unload,
+            inference::inference_tokenize
         ])
         .run(tauri::generate_context!())
         .expect("error while running SanctissiMissa");
