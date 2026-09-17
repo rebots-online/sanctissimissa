@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "SanctissiMissa",
-  "version": "1.53.28081",
+  "version": "1.54.28154",
   "identifier": "mba.robin.sanctissimissa",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -63,7 +63,7 @@
       }
     },
     "android": {
-      "versionCode": 100053,
+      "versionCode": 100054,
       "autoIncrementVersionCode": false
     }
   }
