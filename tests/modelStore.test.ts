@@ -5,7 +5,7 @@ import { mkdtemp, readFile, rm, writeFile, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { StreamingSha256, digestDir, validateAsset, WebModelLibrary } from '../src/core/model-store/store.ts';
+import { StreamingSha256, digestDirPath, validateAsset, WebModelLibrary } from '../src/core/model-store/store.ts';
 import { DownloadManager, type DownloadProgress } from '../src/core/model-store/download-manager.ts';
 import type { LookupResult, ModelAsset, ModelLibrary, WriteSession } from '../src/core/model-store/types.ts';
 
@@ -32,7 +32,7 @@ class TempFileLibrary implements ModelLibrary {
     }
   }
   async lookup(asset: ModelAsset): Promise<LookupResult> {
-    const dir = join(this.#root, digestDir(asset.sha256));
+    const dir = join(this.#root, digestDirPath(asset.sha256));
     try {
       await readFile(join(dir, '.complete'));
       const meta = JSON.parse(await readFile(join(dir, 'meta.json'), 'utf8')) as { bytes: number; fileName: string };
@@ -52,7 +52,7 @@ class TempFileLibrary implements ModelLibrary {
     }
   }
   async beginWrite(asset: ModelAsset): Promise<WriteSession> {
-    const dir = join(this.#root, digestDir(asset.sha256));
+    const dir = join(this.#root, digestDirPath(asset.sha256));
     await mkdir(dir, { recursive: true });
     const file = join(dir, asset.fileName);
     const digest = createHash('sha256');
@@ -68,12 +68,13 @@ class TempFileLibrary implements ModelLibrary {
         if (digest.digest('hex') !== asset.sha256) throw new Error('digest mismatch');
         await writeFile(join(dir, 'meta.json'), JSON.stringify({ bytes: received, fileName: asset.fileName }));
         await writeFile(join(dir, '.complete'), String(Date.now()));
+        return { sha256: asset.sha256, bytes: received };
       },
       abort: async () => rm(dir, { recursive: true, force: true }),
     };
   }
   async remove(sha256: string): Promise<void> {
-    await rm(join(this.#root, digestDir(sha256)), { recursive: true, force: true });
+    await rm(join(this.#root, digestDirPath(sha256)), { recursive: true, force: true });
   }
   onProgress(): void {}
 }
@@ -99,9 +100,9 @@ test('CP.3: ingest→lookup→ready; tamper→corrupt; truncate→missing; remov
   assert.equal(ready.kind, 'ready');
 
   // Tampered content with a complete marker is corrupt on lookup.
-  await writeFile(join(root, digestDir(GOOD.sha256), 'model.gguf'), Buffer.from('tampered'));
+  await writeFile(join(root, digestDirPath(GOOD.sha256), 'model.gguf'), Buffer.from('tampered'));
   assert.equal((await lib.lookup(GOOD)).kind, 'corrupt');
-  await rm(join(root, digestDir(GOOD.sha256)), { recursive: true, force: true });
+  await rm(join(root, digestDirPath(GOOD.sha256)), { recursive: true, force: true });
 
   // Truncated write never commits — no `.complete`, lookup stays missing.
   const partial = await lib.beginWrite(GOOD);

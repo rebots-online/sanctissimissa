@@ -5,7 +5,7 @@
  * a silent second download; the caller sees the `needs-grant` state.
  */
 
-import type { LookupResult, ModelAsset, ModelLibrary } from './types.ts';
+import type { LookupResult, ModelAsset, ModelLibrary, WriteAsset } from './types.ts';
 
 export interface DownloadProgress {
   sha256: string;
@@ -25,9 +25,12 @@ export class DownloadManager {
   #library: ModelLibrary;
   #listeners = new Set<(p: DownloadProgress) => void>();
   #controllers = new Map<string, AbortController>();
+  /** Catalogue alias: source URL → published digest, when one is recorded. */
+  #alias?: (sourceUrl: string) => Promise<string | null>;
 
-  constructor(library: ModelLibrary) {
+  constructor(library: ModelLibrary, alias?: (sourceUrl: string) => Promise<string | null>) {
     this.#library = library;
+    this.#alias = alias;
   }
 
   onProgress(cb: (p: DownloadProgress) => void): () => void {
@@ -39,10 +42,15 @@ export class DownloadManager {
     for (const cb of this.#listeners) cb(p);
   }
 
-  /** Lookup first (shared library, then caches), then network under the digest lock. */
-  acquire(asset: ModelAsset, sourceUrl: string): DownloadHandle {
+  /**
+   * Lookup first (shared library, then caches), then network under the digest
+   * lock. With a catalog-only asset (digest unknown), `knownDigest` short-
+   * circuits when the content is already published; otherwise the download
+   * proves the digest at commit and the returned lookup is keyed by it.
+   */
+  acquire(asset: ModelAsset, sourceUrl: string, knownDigest?: string, progressKey?: string): DownloadHandle {
     const controller = new AbortController();
-    const promise = this.#run(asset, sourceUrl, controller.signal);
+    const promise = this.#run(asset, sourceUrl, controller.signal, knownDigest, progressKey);
     this.#controllers.set(asset.sha256, controller);
     promise.finally(() => this.#controllers.delete(asset.sha256));
     return { asset, promise, abort: () => controller.abort() };
@@ -52,30 +60,44 @@ export class DownloadManager {
     this.#controllers.get(sha256)?.abort();
   }
 
-  async #run(asset: ModelAsset, sourceUrl: string, signal: AbortSignal): Promise<LookupResult> {
+  async #run(
+    asset: ModelAsset,
+    sourceUrl: string,
+    signal: AbortSignal,
+    knownDigest?: string,
+    progressKeyOverride?: string,
+  ): Promise<LookupResult> {
+    const progressKey = progressKeyOverride ?? asset.sha256 ?? knownDigest ?? sourceUrl;
     try {
-      this.#emit({ ...{}, sha256: asset.sha256, received: 0, total: asset.bytes, phase: 'looking-up' });
-      const existing = await this.#library.lookup(asset);
+      this.#emit({ sha256: progressKey, received: 0, total: asset.bytes, phase: 'looking-up' });
+      // Resolve-existing-first: shared library, then authorized caches — by
+      // the asset digest when known, else through the catalogue alias (§7.8.4).
+      const alias = knownDigest ?? (await this.#alias?.(sourceUrl)) ?? null;
+      const existing = asset.sha256 || alias
+        ? await this.#library.lookup({ ...asset, sha256: asset.sha256 || alias! })
+        : ({ kind: 'missing' } as LookupResult);
       if (existing.kind !== 'missing') {
-        this.#emit({ sha256: asset.sha256, received: asset.bytes, total: asset.bytes, phase: 'ready' });
+        this.#emit({ sha256: asset.sha256 || alias!, received: asset.bytes, total: asset.bytes, phase: 'ready' });
         return existing;
       }
-      return await this.#library.lock(asset.sha256, async () => {
-        const again = await this.#library.lookup(asset);
-        if (again.kind !== 'missing') {
-          this.#emit({ sha256: asset.sha256, received: asset.bytes, total: asset.bytes, phase: 'ready' });
-          return again;
+      const lockKey = knownDigest ?? asset.sha256 ?? sourceUrl;
+      return await this.#library.lock(lockKey, async () => {
+        if (knownDigest) {
+          const again = await this.#library.lookup({ ...asset, sha256: knownDigest });
+          if (again.kind !== 'missing') return again;
         }
-        return this.#download(asset, sourceUrl, signal);
+        const result = await this.#download(asset, sourceUrl, signal, progressKey);
+        if (result.kind === 'ready' && knownDigest && result.locator) return result;
+        return result;
       });
     } catch (error) {
       const reason = error instanceof Error ? error.message : String(error);
-      this.#emit({ sha256: asset.sha256, received: 0, total: asset.bytes, phase: 'failed', reason });
+      this.#emit({ sha256: progressKey, received: 0, total: asset.bytes, phase: 'failed', reason });
       return { kind: 'unavailable', reason };
     }
   }
 
-  async #download(asset: ModelAsset, sourceUrl: string, signal: AbortSignal): Promise<LookupResult> {
+  async #download(asset: ModelAsset, sourceUrl: string, signal: AbortSignal, progressKey: string): Promise<LookupResult> {
     const download = await fetch(sourceUrl, {
       signal,
       headers: { Range: 'bytes=0-' },
@@ -96,8 +118,14 @@ export class DownloadManager {
     // unrelated bytes (guide §15) — the store's meta carries it via commit.
     void download.headers.get('etag');
 
-    const session = await this.#library.beginWrite(asset);
-    this.#emit({ sha256: asset.sha256, received: 0, total: asset.bytes, phase: 'downloading' });
+    const writeAsset: WriteAsset = {
+      bytes: asset.bytes,
+      fileName: asset.fileName,
+      sha256: asset.sha256 || undefined,
+      stagingKey: asset.sha256 ? undefined : `dl-${hashKey(sourceUrl)}`,
+    };
+    const session = await this.#library.beginWrite(writeAsset);
+    this.#emit({ sha256: progressKey, received: 0, total: asset.bytes, phase: 'downloading' });
     const reader = download.body!.getReader();
     const CHUNK = 4 * 1024 * 1024;
     let buffer = new Uint8Array(0);
@@ -129,6 +157,12 @@ export class DownloadManager {
       throw error;
     }
   }
+}
+
+function hashKey(url: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < url.length; i++) h = ((h ^ url.charCodeAt(i)) * 0x01000193) >>> 0;
+  return h.toString(16).padStart(8, '0') + url.length.toString(16);
 }
 
 function concat(a: Uint8Array, b: Uint8Array): Uint8Array<ArrayBuffer> {

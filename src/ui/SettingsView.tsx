@@ -6,6 +6,7 @@
 
 import { useMemo, useState } from 'react';
 import ThemePicker from './ThemePicker.tsx';
+import ModelPicker, { useCompanionModels } from './ModelPicker.tsx';
 import { SidecarDb } from '../core/accompaniment/store.ts';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 
@@ -236,6 +237,12 @@ export default function SettingsView({
             Additional public-domain modules (Catena Aurea, Guéranger, Roman Catechism, Summa, …) arrive with the
             Library &amp; Bookstore update — this list shows only what is actually attached.
           </p>
+          <h3>Companion models</h3>
+          <p className="settings-desc">
+            On-device chat models from the Atomic Chat catalog, ranked for this device. Downloads are verified
+            (SHA-256) and stored once in the shared mba.robin library.
+          </p>
+          <ModelPicker hook={useCompanionModels()} />
         </section>
       )}
 

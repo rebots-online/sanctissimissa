@@ -12,12 +12,26 @@ export interface ModelAsset {
   fileName: string;
 }
 
-/** Result of persisting one chunk: incremental digest state (web) or ack. */
+/**
+ * Staging-first write session (guide §13): content identity is PROVEN at
+ * ingest. `asset.sha256` may be empty when the catalog has no digest — the
+ * implementation hashes the stream and `finish()` publishes the object under
+ * the real digest, returning it. A supplied digest that mismatches the bytes
+ * fails the commit; a tampered artifact can never resolve ready.
+ */
 export interface WriteSession {
-  /** Feed raw chunk bytes; returns the running digest length so far. */
   write(offset: number, chunk: Uint8Array): Promise<void>;
-  finish(): Promise<void>;
+  finish(): Promise<{ sha256: string; bytes: number }>;
   abort(): Promise<void>;
+}
+
+export interface WriteAsset {
+  bytes: number;
+  fileName: string;
+  /** Known digest to enforce, or '' when the download proves it. */
+  sha256?: string;
+  /** Stable staging key when the digest is not yet known. */
+  stagingKey?: string;
 }
 
 export type LookupResult =
@@ -31,8 +45,8 @@ export interface ModelLibrary {
   /** Digest-keyed cross-writer lock; re-check lookup INSIDE the run. */
   lock<T>(key: string, run: () => Promise<T>): Promise<T>;
   lookup(asset: ModelAsset): Promise<LookupResult>;
-  /** Streamed write; the implementation digests and verifies before commit. */
-  beginWrite(asset: ModelAsset): Promise<WriteSession>;
+  /** Streamed staging write; finish() verifies + publishes under the real digest. */
+  beginWrite(asset: WriteAsset): Promise<WriteSession>;
   remove(sha256: string): Promise<void>;
   /** Download bytes the manager reports (progress/resume events). */
   onProgress(cb: (sha256: string, received: number, total: number) => void): void;

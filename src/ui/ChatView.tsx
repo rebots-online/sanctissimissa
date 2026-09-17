@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import ChatBadge from './ChatBadge.tsx';
+import ModelPicker, { useCompanionModels } from './ModelPicker.tsx';
 import { createChatSession } from '../core/chat/session.ts';
 
 type DockMode = 'dock-left' | 'dock-right' | 'floating' | 'inline' | 'fullscreen' | 'sheet';
@@ -73,6 +74,7 @@ interface DragState {
 
 export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore | null }) {
   const session = useMemo(() => createChatSession(), []);
+  const models = useCompanionModels();
   const [open, setOpen] = useState(false);
   const [dock, setDock] = useState<DockMode>(
     () => (sidecar?.getSetting('chat.dock') as DockMode | null) ?? 'dock-right',
@@ -220,6 +222,7 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
                   Preview engine
                 </span>
               )}
+              <ModelPicker hook={models} compact />
             </div>
             <div className="chat-modes" role="group" aria-label="Panel placement">
               {DOCK_MODES.map((m) => (
