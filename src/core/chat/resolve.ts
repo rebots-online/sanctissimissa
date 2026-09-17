@@ -40,6 +40,16 @@ export async function resolveNativeEngine(
   candidates: { id: string; displayName: string }[],
 ): Promise<Resolution> {
   const persisted = selectedModelId();
+  if (report.accelerations.length === 0) {
+    // Windows cross-builds ship without the native engine (feature-gated;
+    // cargo-xwin's clang cannot compile llama.cpp) — honest deferral to the
+    // Windows-native host, exactly like the MSI/MSIX stages.
+    return {
+      kind: 'unsupported',
+      reason:
+        'This build ships without the on-device engine (Windows cross-build) — the Windows-native host build will enable it.',
+    };
+  }
   const order = [
     ...(persisted ? [persisted] : []),
     ...candidates.map((c) => c.id),

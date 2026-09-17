@@ -10,11 +10,17 @@
 //! session map lock for its duration, so cancel must never need that lock —
 //! the flags live in their own registry.
 
+#[cfg(feature = "native-inference")]
 use llama_cpp_2::context::params::LlamaContextParams;
+#[cfg(feature = "native-inference")]
 use llama_cpp_2::llama_backend::LlamaBackend;
+#[cfg(feature = "native-inference")]
 use llama_cpp_2::llama_batch::LlamaBatch;
+#[cfg(feature = "native-inference")]
 use llama_cpp_2::model::params::LlamaModelParams;
+#[cfg(feature = "native-inference")]
 use llama_cpp_2::model::{AddBos, LlamaModel, Special};
+#[cfg(feature = "native-inference")]
 use llama_cpp_2::token::LlamaToken;
 use std::collections::HashMap;
 use std::num::NonZeroU32;
@@ -22,10 +28,14 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
 /// One process-wide backend; llama.cpp is global-state anyway.
+#[cfg(feature = "native-inference")]
 static BACKEND: Mutex<Option<Arc<Mutex<LlamaBackend>>>> = Mutex::new(None);
+#[cfg(feature = "native-inference")]
 static SESSIONS: Mutex<Option<HashMap<String, NativeSession>>> = Mutex::new(None);
+#[cfg(feature = "native-inference")]
 static CANCELS: Mutex<Option<HashMap<String, Arc<AtomicBool>>>> = Mutex::new(None);
 
+#[cfg(feature = "native-inference")]
 fn backend() -> Result<Arc<Mutex<LlamaBackend>>, String> {
     let mut guard = BACKEND.lock().map_err(|_| "backend poisoned")?;
     if guard.is_none() {
@@ -35,10 +45,12 @@ fn backend() -> Result<Arc<Mutex<LlamaBackend>>, String> {
     Ok(guard.clone().expect("just initialized"))
 }
 
+#[cfg(feature = "native-inference")]
 fn sessions() -> &'static Mutex<Option<HashMap<String, NativeSession>>> {
     &SESSIONS
 }
 
+#[cfg(feature = "native-inference")]
 struct NativeSession {
     model: LlamaModel,
     n_ctx: u32,
@@ -49,9 +61,66 @@ struct NativeSession {
 // that lock is held, one thread at a time. Contexts are created per generation
 // call (the controller always re-prefills canonical history), so no context
 // ever outlives the lock scope that created it.
+#[cfg(feature = "native-inference")]
 unsafe impl Send for NativeSession {}
 
 /// Capability truth from the executable engine (the broker frames it).
+#[cfg(not(feature = "native-inference"))]
+#[tauri::command]
+pub fn inference_probe() -> serde_json::Value {
+    serde_json::json!({
+        "runtime": if cfg!(mobile) { "android" } else { "tauri" },
+        "nativeInference": false,
+        "memoryBudgetBytes": 0,
+        "accelerations": [],
+        "contextCeiling": 0,
+        "weightFormats": [],
+        "kvFormats": [],
+        "threads": 1,
+        "notes": ["native engine not compiled into this build (Windows cross) — deferred to the Windows-native host"],
+    })
+}
+
+#[cfg(not(feature = "native-inference"))]
+#[tauri::command]
+pub fn inference_load(_path: String, _context_tokens: Option<u32>) -> Result<String, String> {
+    Err(NOT_COMPILED.into())
+}
+
+#[cfg(not(feature = "native-inference"))]
+#[tauri::command]
+pub fn inference_generate(
+    _session_id: String,
+    _messages: Vec<(String, String)>,
+    _max_tokens: Option<u32>,
+    _on_token: tauri::ipc::Channel<String>,
+) -> Result<(), String> {
+    Err(NOT_COMPILED.into())
+}
+
+#[cfg(not(feature = "native-inference"))]
+#[tauri::command]
+pub fn inference_cancel(_session_id: String) -> Result<(), String> {
+    Ok(())
+}
+
+#[cfg(not(feature = "native-inference"))]
+#[tauri::command]
+pub fn inference_unload(_session_id: String) -> Result<(), String> {
+    Ok(())
+}
+
+#[cfg(not(feature = "native-inference"))]
+#[tauri::command]
+pub fn inference_tokenize(_session_id: String, _text: String) -> Result<Vec<i32>, String> {
+    Err(NOT_COMPILED.into())
+}
+
+#[cfg(not(feature = "native-inference"))]
+const NOT_COMPILED: &str =
+    "native inference is not compiled into this build — deferred to the Windows-native host";
+
+#[cfg(feature = "native-inference")]
 #[tauri::command]
 pub fn inference_probe() -> serde_json::Value {
     let threads = std::thread::available_parallelism().map(|n| n.get()).unwrap_or(4);
@@ -70,12 +139,14 @@ pub fn inference_probe() -> serde_json::Value {
         "weightFormats": ["Q4_K_M", "Q6_K", "Q8_0"],
         "kvFormats": ["f16"],
         "threads": threads,
+        "nativeInference": true,
         "notes": ["llama.cpp native provider — greedy sampling v1"],
     })
 }
 
 /// Load a model object from the CP.3 shared library. `path` arrives from
 /// `model_lookup`'s locator — desktop-absolute, inside the org library.
+#[cfg(feature = "native-inference")]
 #[tauri::command]
 pub fn inference_load(path: String, context_tokens: Option<u32>) -> Result<String, String> {
     if !std::path::Path::new(&path).exists() {
@@ -110,6 +181,7 @@ pub fn inference_load(path: String, context_tokens: Option<u32>) -> Result<Strin
 
 /// ChatML for ChatML-family models (Qwen/LFM2.5 catalog default); the
 /// template stays config, never model-name detection.
+#[cfg(feature = "native-inference")]
 fn chatml(messages: &[(String, String)]) -> String {
     let mut out = String::new();
     for (role, content) in messages {
@@ -119,6 +191,7 @@ fn chatml(messages: &[(String, String)]) -> String {
     out
 }
 
+#[cfg(feature = "native-inference")]
 #[tauri::command]
 pub fn inference_generate(
     session_id: String,
@@ -212,6 +285,7 @@ pub fn inference_generate(
     on_token.send(String::new()).map_err(|e| e.to_string())
 }
 
+#[cfg(feature = "native-inference")]
 #[tauri::command]
 pub fn inference_cancel(session_id: String) -> Result<(), String> {
     let guard = CANCELS.lock().map_err(|_| "cancels poisoned")?;
@@ -221,6 +295,7 @@ pub fn inference_cancel(session_id: String) -> Result<(), String> {
     Ok(())
 }
 
+#[cfg(feature = "native-inference")]
 #[tauri::command]
 pub fn inference_unload(session_id: String) -> Result<(), String> {
     sessions()
@@ -237,6 +312,7 @@ pub fn inference_unload(session_id: String) -> Result<(), String> {
 }
 
 /// Prompt-only tokenization for context budgeting (ABI `tokenize`).
+#[cfg(feature = "native-inference")]
 #[tauri::command]
 pub fn inference_tokenize(session_id: String, text: String) -> Result<Vec<i32>, String> {
     let guard = sessions().lock().map_err(|_| "sessions poisoned")?;
