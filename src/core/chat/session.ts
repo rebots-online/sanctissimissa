@@ -14,8 +14,46 @@ import type {
   SessionId,
 } from '../../../reusable-chatbot/core/engine-types.ts';
 
+/**
+ * Deterministic stand-in formulas — rotated per turn so the preview reads
+ * alive instead of one canned string. No RNG: the sequence is identical
+ * every run, and every formula echoes the user's topic. CP.3 replaces the
+ * whole engine.
+ */
+const REPLY_FORMULAS: ((topic: string) => string)[] = [
+  (topic) =>
+    [
+      '℣. Dóminus vobíscum.',
+      `You bring «${topic}» before the altar.`,
+      'Hold it in silence a moment; grace works where words end.',
+      '✠ Ad iuvándum me, Deus meus, inténde.',
+    ].join(' '),
+  (topic) =>
+    [
+      '℣. Benedícat vos omnípotens Deus.',
+      `Let «${topic}» rest beside the missal a while.`,
+      'The Church prays first, and understanding follows at her pace.',
+      '✠ In nómine Patris, et Fílii, et Spíritus Sancti.',
+    ].join(' '),
+  (topic) =>
+    [
+      '℣. Lex orandi, lex credendi.',
+      `«${topic}» is carried in the liturgy tonight.`,
+      'What the rites hold, the heart learns by heart — the stand-in engine merely bows.',
+      '✠ Confírma hoc, Deus, quod operátus es in nobis.',
+    ].join(' '),
+  (topic) =>
+    [
+      '℣. Introíbo ad altáre Dei.',
+      `You carry «${topic}» up the sanctuary steps.`,
+      'Grace goes before the answer, as the Gloria goes before the Credo.',
+      '✠ Ad iuvándum me, Deus meus, inténde.',
+    ].join(' '),
+];
+
 export class MockEngine implements IInferenceEngine {
   readonly chunkDelayMs: number;
+  private turn = 0;
 
   constructor({ chunkDelayMs = 0 }: { chunkDelayMs?: number } = {}) {
     this.chunkDelayMs = chunkDelayMs;
@@ -38,12 +76,7 @@ export class MockEngine implements IInferenceEngine {
   private reply(messages: GenerateRequest['messages']): string {
     const last = messages.filter((m) => m.role === 'user').at(-1)?.content.trim() ?? '';
     const topic = last.length > 0 ? last.replace(/\s+/g, ' ').slice(0, 120) : 'the sacred liturgy';
-    return [
-      '℣. Dóminus vobíscum.',
-      `You bring «${topic}» before the altar.`,
-      'Hold it in silence a moment; grace works where words end.',
-      '✠ Ad iuvándum me, Deus meus, inténde.',
-    ].join(' ');
+    return REPLY_FORMULAS[this.turn++ % REPLY_FORMULAS.length](topic);
   }
 
   async *generate(

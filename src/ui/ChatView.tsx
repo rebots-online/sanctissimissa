@@ -194,7 +194,9 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
 
   return (
     <>
-      {!(open && dock === 'fullscreen') && <ChatBadge open={open} onToggle={() => setOpen((o) => !o)} />}
+      {/* Badge gets out of the way whenever the panel is open — the header ×
+          closes and brings it back; fullscreen no longer needs a special case. */}
+      {!open && <ChatBadge open={open} onToggle={() => setOpen((o) => !o)} />}
       {open && (
         <section
           className={`chat-panel ${dock}`}
@@ -208,7 +210,17 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
             className="chat-header"
             onPointerDown={dock === 'floating' ? onPointerDown('move') : undefined}
           >
-            <h3>Companion</h3>
+            <div className="chat-header-left">
+              <h3>Companion</h3>
+              {session.modelId.startsWith('mock://') && (
+                <span
+                  className="chat-engine-chip"
+                  title="Deterministic stand-in — the on-device TurboQuant engine arrives with its stanza."
+                >
+                  Preview engine
+                </span>
+              )}
+            </div>
             <div className="chat-modes" role="group" aria-label="Panel placement">
               {DOCK_MODES.map((m) => (
                 <button

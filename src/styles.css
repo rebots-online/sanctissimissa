@@ -2593,6 +2593,7 @@ button.mstation, button.mstation.active, button.mstation.open {
 }
 .chat-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
@@ -2601,7 +2602,18 @@ button.mstation, button.mstation.active, button.mstation.open {
   touch-action: none;
   user-select: none;
 }
+.chat-header-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .chat-header h3 { margin: 0; font-size: 1rem; }
+.chat-engine-chip {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gold, #b08d3e);
+  border: 1px solid rgba(176, 141, 62, 0.45);
+  border-radius: 999px;
+  padding: 1px 8px;
+  white-space: nowrap;
+}
 .chat-modes { display: flex; gap: 4px; }
 .chat-modes button,
 .chat-input button {

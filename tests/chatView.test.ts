@@ -89,3 +89,36 @@ test('CP.5: badge is the default surface and honors prefers-reduced-motion', () 
 test('CP.5: badge mounts globally — every workspace carries the companion', () => {
   assert.ok(app.includes('<ChatView sidecar={sidecar} />'));
 });
+
+test('CP.5: badge gets out of the way — unmounts whenever the panel is open (hotfix 2026-09-17)', () => {
+  assert.ok(
+    chatView.includes('{!open && <ChatBadge'),
+    'badge renders only while the panel is closed; the header × closes and restores it',
+  );
+});
+
+test('CP.5: mock stand-in rotates deterministic formulas across turns', async () => {
+  const session = createChatSession();
+  await session.ensureEngine();
+  const turn = async (text: string) => {
+    let out = '';
+    for await (const ev of session.controller.generate(text)) out += ev.text;
+    return out;
+  };
+  const first = await turn('the Introibo');
+  assert.ok(first.includes('Dóminus vobíscum'), 'first turn keeps the classic formula');
+  const second = await turn('the Introibo');
+  const third = await turn('the Introibo');
+  assert.notEqual(second, first, 'second turn varies');
+  assert.notEqual(third, second, 'third turn varies');
+  assert.ok(second.includes('Introibo') && third.includes('Introibo'), 'every formula echoes the topic');
+  const fourth = await turn('the Introibo');
+  const fifth = await turn('the Introibo');
+  assert.notEqual(fourth, first, 'mid-cycle turns differ from the first');
+  assert.equal(fifth, first, 'four-formula cycle repeats deterministically');
+});
+
+test('CP.5: preview-engine chip is gated on the mock model id', () => {
+  assert.ok(chatView.includes("session.modelId.startsWith('mock://')"), 'chip auto-hides when a real engine lands');
+  assert.ok(chatView.includes('chat-engine-chip'));
+});
