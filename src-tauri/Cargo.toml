@@ -21,11 +21,11 @@ sha2 = "0.10"
 default = ["native-inference"]
 native-inference = ["dep:llama-cpp-2"]
 
-# CP.7 native inference — target-gated because the Windows cross-build
-# (cargo-xwin, clang < 19) cannot compile llama.cpp; Windows ships honestly
-# without the native engine until the Windows-native host build runs
-# (guide §19 host rule).
-[target.'cfg(not(target_os = "windows"))'.dependencies]
+# CP.7 native inference — target-gated: Windows cross-build (cargo-xwin,
+# clang < 19) cannot compile llama.cpp, and 32-bit (armv7) Android is outside
+# llama.cpp's reliable 32-bit support. Those targets ship honestly without
+# the native engine; 64-bit desktop + arm64 Android get the real engine.
+[target.'cfg(all(not(target_os = "windows"), target_pointer_width = "64"))'.dependencies]
 llama-cpp-2 = { version = "0.1.156", optional = true }
 
 [profile.release]
