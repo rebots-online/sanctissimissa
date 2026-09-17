@@ -1495,12 +1495,14 @@ which are recorded back into it after creation. Conventions:
   workflow (§9.4). 60 of 61 works are paid candidates at USD 2.99; collections
   1.99; bundles 9.99; all-library subscription 2.99/mo or 14.99/yr; Companion
   one-time unlock 9.99 (non-consumable, grants `companion_ondevice`).
-- **$ROCHE credits (new):** sold only as RevenueCat consumable credit packs
-  (500 credits = 4.99 USD; 1,100 credits = 9.99 USD), granting no entitlement.
-  Redemption parity 100 ROCHE ≈ 1 USD: works 300, collections 200, bundles
-  1000 ROCHE. Companion and library subscriptions are cash-only. The credit
-  balance ledger and redemption grants are future app-side work following the
-  `DOCS/ENTITLEMENT-SYNC.md` bridge pattern; RevenueCat never holds balances.
+- **$ROCHE credits (new):** a RevenueCat **virtual currency** (`ROCHE`, created
+  2026-09-17) — balances are held and reported natively by RevenueCat. Sold
+  only through consumable credit-pack products that grant the currency
+  (500 credits = 4.99 USD; 1,100 credits = 9.99 USD). Redemption parity
+  100 ROCHE ≈ 1 USD: works 300, collections 200, bundles 1000 ROCHE.
+  Companion and library subscriptions are cash-only. Spending credits on
+  editions (and the resulting entitlement grants) is future app-side work via
+  the SDK spend + `DOCS/ENTITLEMENT-SYNC.md` bridge pattern.
 - **Offerings:** `companion_unlock` (lifetime package) and `bookstore` (all
   product packages). The existing `default` offering is untouched. Each new
   offering carries one dashboard graphical paywall ("Companion Unlock",

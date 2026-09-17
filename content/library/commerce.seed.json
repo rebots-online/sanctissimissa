@@ -25,411 +25,481 @@
       "lookupKey": "reference_douay-rheims-bible-en",
       "title": "Douay–Rheims Bible, complete — paid edition entitlement",
       "source": "work-c001",
-      "catalogueId": "C001"
+      "catalogueId": "C001",
+      "rcEntitlementId": "entl60706787bc"
     },
     {
       "lookupKey": "reference_catena-aurea-en",
       "title": "Catena Aurea, commentary on the four Gospels — paid edition entitlement",
       "source": "work-c003",
-      "catalogueId": "C003"
+      "catalogueId": "C003",
+      "rcEntitlementId": "entl92420f03ef"
     },
     {
       "lookupKey": "reference_confessions-en",
       "title": "Confessions — paid edition entitlement",
       "source": "work-c004",
-      "catalogueId": "C004"
+      "catalogueId": "C004",
+      "rcEntitlementId": "entl7c67b4421f"
     },
     {
       "lookupKey": "reference_city-of-god-en",
       "title": "City of God, volumes I–II — paid edition entitlement",
       "source": "work-c005",
-      "catalogueId": "C005"
+      "catalogueId": "C005",
+      "rcEntitlementId": "entl9b11e99c11"
     },
     {
       "lookupKey": "reference_first-epistle-to-the-corinthians-en",
       "title": "First Epistle to the Corinthians — paid edition entitlement",
       "source": "work-c006",
-      "catalogueId": "C006"
+      "catalogueId": "C006",
+      "rcEntitlementId": "entl6ee3e3a22d"
     },
     {
       "lookupKey": "reference_epistles-of-ignatius-en",
       "title": "Epistles of Ignatius — paid edition entitlement",
       "source": "work-c007",
-      "catalogueId": "C007"
+      "catalogueId": "C007",
+      "rcEntitlementId": "entl80cc9abdc5"
     },
     {
       "lookupKey": "reference_epistle-to-the-philippians-en",
       "title": "Epistle to the Philippians — paid edition entitlement",
       "source": "work-c008",
-      "catalogueId": "C008"
+      "catalogueId": "C008",
+      "rcEntitlementId": "entl90e7b0f1df"
     },
     {
       "lookupKey": "reference_martyrdom-of-polycarp-en",
       "title": "Martyrdom of Polycarp — paid edition entitlement",
       "source": "work-c009",
-      "catalogueId": "C009"
+      "catalogueId": "C009",
+      "rcEntitlementId": "entlc04468bc99"
     },
     {
       "lookupKey": "reference_epistle-to-diognetus-en",
       "title": "Epistle to Diognetus — paid edition entitlement",
       "source": "work-c010",
-      "catalogueId": "C010"
+      "catalogueId": "C010",
+      "rcEntitlementId": "entl476e7892e3"
     },
     {
       "lookupKey": "reference_first-apology-en",
       "title": "First Apology — paid edition entitlement",
       "source": "work-c011",
-      "catalogueId": "C011"
+      "catalogueId": "C011",
+      "rcEntitlementId": "entlc81edf5839"
     },
     {
       "lookupKey": "reference_second-apology-en",
       "title": "Second Apology — paid edition entitlement",
       "source": "work-c012",
-      "catalogueId": "C012"
+      "catalogueId": "C012",
+      "rcEntitlementId": "entl139e47ac20"
     },
     {
       "lookupKey": "reference_against-heresies-en",
       "title": "Against Heresies, books I–V — paid edition entitlement",
       "source": "work-c013",
-      "catalogueId": "C013"
+      "catalogueId": "C013",
+      "rcEntitlementId": "entl9ed9510044"
     },
     {
       "lookupKey": "reference_select-works-and-letters-en",
       "title": "Select Works and Letters — paid edition entitlement",
       "source": "work-c014",
-      "catalogueId": "C014"
+      "catalogueId": "C014",
+      "rcEntitlementId": "entl50f84691de"
     },
     {
       "lookupKey": "reference_selected-works-and-letters-en",
       "title": "Selected Works and Letters — paid edition entitlement",
       "source": "work-c015",
-      "catalogueId": "C015"
+      "catalogueId": "C015",
+      "rcEntitlementId": "entle7ea4d5725"
     },
     {
       "lookupKey": "reference_sulpitius-severus-en",
       "title": "Sulpitius Severus, Vincent of Lérins, John Cassian — paid edition entitlement",
       "source": "work-c016",
-      "catalogueId": "C016"
+      "catalogueId": "C016",
+      "rcEntitlementId": "entl37206b0a3a"
     },
     {
       "lookupKey": "reference_baltimore-catechism-no-1-en",
       "title": "Baltimore Catechism No. 1 — paid edition entitlement",
       "source": "work-c017",
-      "catalogueId": "C017"
+      "catalogueId": "C017",
+      "rcEntitlementId": "entl72386f9b8c"
     },
     {
       "lookupKey": "reference_baltimore-catechism-no-2-en",
       "title": "Baltimore Catechism No. 2 — paid edition entitlement",
       "source": "work-c018",
-      "catalogueId": "C018"
+      "catalogueId": "C018",
+      "rcEntitlementId": "entl49a0fc4467"
     },
     {
       "lookupKey": "reference_baltimore-catechism-no-3-en",
       "title": "Baltimore Catechism No. 3 — paid edition entitlement",
       "source": "work-c019",
-      "catalogueId": "C019"
+      "catalogueId": "C019",
+      "rcEntitlementId": "entl6af88dc26d"
     },
     {
       "lookupKey": "reference_explanation-of-the-baltimore-catechism-en",
       "title": "Explanation of the Baltimore Catechism — paid edition entitlement",
       "source": "work-c020",
-      "catalogueId": "C020"
+      "catalogueId": "C020",
+      "rcEntitlementId": "entlb942009ae4"
     },
     {
       "lookupKey": "reference_catechism-of-the-council-of-trent-en",
       "title": "Catechism of the Council of Trent — paid edition entitlement",
       "source": "work-c021",
-      "catalogueId": "C021"
+      "catalogueId": "C021",
+      "rcEntitlementId": "entlc31baca86f"
     },
     {
       "lookupKey": "reference_a-full-catechism-of-the-catholic-religion-en",
       "title": "A Full Catechism of the Catholic Religion — paid edition entitlement",
       "source": "work-c022",
-      "catalogueId": "C022"
+      "catalogueId": "C022",
+      "rcEntitlementId": "entl1cbb062f5c"
     },
     {
       "lookupKey": "reference_the-faith-of-our-fathers-en",
       "title": "The Faith of Our Fathers — paid edition entitlement",
       "source": "work-c023",
-      "catalogueId": "C023"
+      "catalogueId": "C023",
+      "rcEntitlementId": "entl462ff91d90"
     },
     {
       "lookupKey": "reference_summa-theologica-prima-pars-en",
       "title": "Summa Theologica: Prima Pars — paid edition entitlement",
       "source": "work-c024",
-      "catalogueId": "C024"
+      "catalogueId": "C024",
+      "rcEntitlementId": "entl683b5074d2"
     },
     {
       "lookupKey": "reference_summa-theologica-prima-secundae-en",
       "title": "Summa Theologica: Prima Secundae — paid edition entitlement",
       "source": "work-c025",
-      "catalogueId": "C025"
+      "catalogueId": "C025",
+      "rcEntitlementId": "entl1ef570e7dc"
     },
     {
       "lookupKey": "reference_summa-theologica-secunda-secundae-en",
       "title": "Summa Theologica: Secunda Secundae — paid edition entitlement",
       "source": "work-c026",
-      "catalogueId": "C026"
+      "catalogueId": "C026",
+      "rcEntitlementId": "entle4f7ba8925"
     },
     {
       "lookupKey": "reference_summa-theologica-tertia-pars-en",
       "title": "Summa Theologica: Tertia Pars — paid edition entitlement",
       "source": "work-c027",
-      "catalogueId": "C027"
+      "catalogueId": "C027",
+      "rcEntitlementId": "entl8ec093d2f3"
     },
     {
       "lookupKey": "reference_on-prayer-and-the-contemplative-life-en",
       "title": "On Prayer and the Contemplative Life — paid edition entitlement",
       "source": "work-c028",
-      "catalogueId": "C028"
+      "catalogueId": "C028",
+      "rcEntitlementId": "entl283491b529"
     },
     {
       "lookupKey": "reference_essay-on-the-development-of-christian-doctrine-en",
       "title": "Essay on the Development of Christian Doctrine — paid edition entitlement",
       "source": "work-c029",
-      "catalogueId": "C029"
+      "catalogueId": "C029",
+      "rcEntitlementId": "entl93e7602ded"
     },
     {
       "lookupKey": "reference_essay-in-aid-of-a-grammar-of-assent-en",
       "title": "Essay in Aid of a Grammar of Assent — paid edition entitlement",
       "source": "work-c030",
-      "catalogueId": "C030"
+      "catalogueId": "C030",
+      "rcEntitlementId": "entlc1a17d370f"
     },
     {
       "lookupKey": "reference_imitation-of-christ-en",
       "title": "Imitation of Christ — paid edition entitlement",
       "source": "work-c031",
-      "catalogueId": "C031"
+      "catalogueId": "C031",
+      "rcEntitlementId": "entld9ab5520c5"
     },
     {
       "lookupKey": "reference_introduction-to-the-devout-life-en",
       "title": "Introduction to the Devout Life — paid edition entitlement",
       "source": "work-c032",
-      "catalogueId": "C032"
+      "catalogueId": "C032",
+      "rcEntitlementId": "entlc03b43f351"
     },
     {
       "lookupKey": "reference_treatise-on-the-love-of-god-en",
       "title": "Treatise on the Love of God — paid edition entitlement",
       "source": "work-c033",
-      "catalogueId": "C033"
+      "catalogueId": "C033",
+      "rcEntitlementId": "entlc18fd3cf84"
     },
     {
       "lookupKey": "reference_interior-castle-the-mansions-en",
       "title": "Interior Castle / The Mansions — paid edition entitlement",
       "source": "work-c034",
-      "catalogueId": "C034"
+      "catalogueId": "C034",
+      "rcEntitlementId": "entl46a47d2105"
     },
     {
       "lookupKey": "reference_way-of-perfection-en",
       "title": "Way of Perfection — paid edition entitlement",
       "source": "work-c035",
-      "catalogueId": "C035"
+      "catalogueId": "C035",
+      "rcEntitlementId": "entl3c5bd1bf01"
     },
     {
       "lookupKey": "reference_life-of-st-teresa-of-jesus-en",
       "title": "Life of St. Teresa of Jesus — paid edition entitlement",
       "source": "work-c036",
-      "catalogueId": "C036"
+      "catalogueId": "C036",
+      "rcEntitlementId": "entl0759513104"
     },
     {
       "lookupKey": "reference_ascent-of-mount-carmel-en",
       "title": "Ascent of Mount Carmel — paid edition entitlement",
       "source": "work-c037",
-      "catalogueId": "C037"
+      "catalogueId": "C037",
+      "rcEntitlementId": "entl67ad6a533d"
     },
     {
       "lookupKey": "reference_dark-night-of-the-soul-en",
       "title": "Dark Night of the Soul — paid edition entitlement",
       "source": "work-c038",
-      "catalogueId": "C038"
+      "catalogueId": "C038",
+      "rcEntitlementId": "entl8a4d2162be"
     },
     {
       "lookupKey": "reference_spiritual-canticle-en",
       "title": "Spiritual Canticle — paid edition entitlement",
       "source": "work-c039",
-      "catalogueId": "C039"
+      "catalogueId": "C039",
+      "rcEntitlementId": "entl6fc0b4eb58"
     },
     {
       "lookupKey": "reference_dialogue-en",
       "title": "Dialogue — paid edition entitlement",
       "source": "work-c040",
-      "catalogueId": "C040"
+      "catalogueId": "C040",
+      "rcEntitlementId": "entld12c5eb501"
     },
     {
       "lookupKey": "reference_spiritual-exercises-en",
       "title": "Spiritual Exercises — paid edition entitlement",
       "source": "work-c041",
-      "catalogueId": "C041"
+      "catalogueId": "C041",
+      "rcEntitlementId": "entla2b8c50342"
     },
     {
       "lookupKey": "reference_spiritual-combat-en",
       "title": "Spiritual Combat, with supplement and Path of Paradise — paid edition entitlement",
       "source": "work-c042",
-      "catalogueId": "C042"
+      "catalogueId": "C042",
+      "rcEntitlementId": "entle1788ee18c"
     },
     {
       "lookupKey": "reference_practice-of-the-presence-of-god-en",
       "title": "Practice of the Presence of God — paid edition entitlement",
       "source": "work-c043",
-      "catalogueId": "C043"
+      "catalogueId": "C043",
+      "rcEntitlementId": "entlda9300e6af"
     },
     {
       "lookupKey": "reference_on-loving-god-en",
       "title": "On Loving God — paid edition entitlement",
       "source": "work-c044",
-      "catalogueId": "C044"
+      "catalogueId": "C044",
+      "rcEntitlementId": "entl86e4189c01"
     },
     {
       "lookupKey": "reference_friendship-of-christ-en",
       "title": "Friendship of Christ — paid edition entitlement",
       "source": "work-c045",
-      "catalogueId": "C045"
+      "catalogueId": "C045",
+      "rcEntitlementId": "entl39923109b3"
     },
     {
       "lookupKey": "reference_story-of-a-soul-en",
       "title": "Story of a Soul, with additional writings — paid edition entitlement",
       "source": "work-c046",
-      "catalogueId": "C046"
+      "catalogueId": "C046",
+      "rcEntitlementId": "entl888d23e111"
     },
     {
       "lookupKey": "reference_autobiography-of-st-ignatius-en",
       "title": "Autobiography of St. Ignatius — paid edition entitlement",
       "source": "work-c047",
-      "catalogueId": "C047"
+      "catalogueId": "C047",
+      "rcEntitlementId": "entl0b94379eb4"
     },
     {
       "lookupKey": "reference_apologia-pro-vita-sua-en",
       "title": "Apologia pro Vita Sua — paid edition entitlement",
       "source": "work-c048",
-      "catalogueId": "C048"
+      "catalogueId": "C048",
+      "rcEntitlementId": "entl5ee3129887"
     },
     {
       "lookupKey": "reference_lives-of-the-saints-en",
       "title": "Lives of the Saints, with reflections for every day — paid edition entitlement",
       "source": "work-c049",
-      "catalogueId": "C049"
+      "catalogueId": "C049",
+      "rcEntitlementId": "entl8fc4fa1e53"
     },
     {
       "lookupKey": "reference_little-flowers-of-st-francis-en",
       "title": "Little Flowers of St. Francis — paid edition entitlement",
       "source": "work-c050",
-      "catalogueId": "C050"
+      "catalogueId": "C050",
+      "rcEntitlementId": "entl52c33f38af"
     },
     {
       "lookupKey": "reference_glories-of-mary-en",
       "title": "Glories of Mary — paid edition entitlement",
       "source": "work-c051",
-      "catalogueId": "C051"
+      "catalogueId": "C051",
+      "rcEntitlementId": "entlc7ad20fb98"
     },
     {
       "lookupKey": "reference_true-devotion-to-the-blessed-virgin-en",
       "title": "True Devotion to the Blessed Virgin — paid edition entitlement",
       "source": "work-c052",
-      "catalogueId": "C052"
+      "catalogueId": "C052",
+      "rcEntitlementId": "entl0f867aa2e8"
     },
     {
       "lookupKey": "reference_mary-en",
       "title": "Mary, the Help of Christians: novenas — paid edition entitlement",
       "source": "work-c053",
-      "catalogueId": "C053"
+      "catalogueId": "C053",
+      "rcEntitlementId": "entlb33367115b"
     },
     {
       "lookupKey": "reference_general-catholic-devotions-en",
       "title": "General Catholic Devotions — paid edition entitlement",
       "source": "work-c054",
-      "catalogueId": "C054"
+      "catalogueId": "C054",
+      "rcEntitlementId": "entlcdafd5f84a"
     },
     {
       "lookupKey": "reference_our-monthly-devotions-en",
       "title": "Our Monthly Devotions — paid edition entitlement",
       "source": "work-c055",
-      "catalogueId": "C055"
+      "catalogueId": "C055",
+      "rcEntitlementId": "entla786501975"
     },
     {
       "lookupKey": "reference_golden-manual-guide-to-catholic-devotion-en",
       "title": "Golden Manual: guide to Catholic devotion, public and private — paid edition entitlement",
       "source": "work-c056",
-      "catalogueId": "C056"
+      "catalogueId": "C056",
+      "rcEntitlementId": "entl4e917fc03a"
     },
     {
       "lookupKey": "reference_raccolta-indulgenced-prayers-and-good-works-en",
       "title": "Raccolta: indulgenced prayers and good works — paid edition entitlement",
       "source": "work-c057",
-      "catalogueId": "C057"
+      "catalogueId": "C057",
+      "rcEntitlementId": "entl0c9cb4c0d3"
     },
     {
       "lookupKey": "reference_my-prayer-book-happiness-in-goodness-en",
       "title": "My Prayer Book: Happiness in Goodness — paid edition entitlement",
       "source": "work-c058",
-      "catalogueId": "C058"
+      "catalogueId": "C058",
+      "rcEntitlementId": "entld17f5c695f"
     },
     {
       "lookupKey": "reference_holy-sacrifice-of-the-mass-dogmatically-en",
       "title": "Holy Sacrifice of the Mass: dogmatically, liturgically and ascetically explained — paid edition entitlement",
       "source": "work-c059",
-      "catalogueId": "C059"
+      "catalogueId": "C059",
+      "rcEntitlementId": "entl9dbe391f9a"
     },
     {
       "lookupKey": "reference_explanation-of-the-prayers-and-ceremonies-of-holy-mass-en",
       "title": "Explanation of the Prayers and Ceremonies of Holy Mass — paid edition entitlement",
       "source": "work-c060",
-      "catalogueId": "C060"
+      "catalogueId": "C060",
+      "rcEntitlementId": "entl51627b1ffc"
     },
     {
       "lookupKey": "reference_the-liturgical-year-en",
       "title": "The Liturgical Year, multi-volume set — paid edition entitlement",
       "source": "work-c061",
-      "catalogueId": "C061"
+      "catalogueId": "C061",
+      "rcEntitlementId": "entl20f1e2dd44"
     },
     {
       "lookupKey": "reference_collection-daily-and-family-prayer",
       "title": "Daily and Family Prayer — collection entitlement",
-      "source": "collection-daily-and-family-prayer"
+      "source": "collection-daily-and-family-prayer",
+      "rcEntitlementId": "entlab27cbf346"
     },
     {
       "lookupKey": "reference_collection-rosary-and-marian-prayer",
       "title": "Rosary and Marian Prayer — collection entitlement",
-      "source": "collection-rosary-and-marian-prayer"
+      "source": "collection-rosary-and-marian-prayer",
+      "rcEntitlementId": "entl41128a65d0"
     },
     {
       "lookupKey": "reference_collection-confession-and-communion",
       "title": "Confession and Communion — collection entitlement",
-      "source": "collection-confession-and-communion"
+      "source": "collection-confession-and-communion",
+      "rcEntitlementId": "entl6ad61a176b"
     },
     {
       "lookupKey": "reference_collection-stations-and-passion",
       "title": "Stations and Passion — collection entitlement",
-      "source": "collection-stations-and-passion"
+      "source": "collection-stations-and-passion",
+      "rcEntitlementId": "entlc51828cd95"
     },
     {
       "lookupKey": "reference_collection-eucharistic-adoration",
       "title": "Eucharistic Adoration — collection entitlement",
-      "source": "collection-eucharistic-adoration"
+      "source": "collection-eucharistic-adoration",
+      "rcEntitlementId": "entl3c75965664"
     },
     {
       "lookupKey": "reference_collection-litanies-and-saints",
       "title": "Litanies and Saints — collection entitlement",
-      "source": "collection-litanies-and-saints"
+      "source": "collection-litanies-and-saints",
+      "rcEntitlementId": "entla6c8ab1ec1"
     },
     {
       "lookupKey": "reference_collection-sick-dying-and-departed",
       "title": "Sick, Dying and Departed — collection entitlement",
-      "source": "collection-sick-dying-and-departed"
+      "source": "collection-sick-dying-and-departed",
+      "rcEntitlementId": "entl2eee0e19d6"
     },
     {
       "lookupKey": "reference_collection-the-devotional-year",
       "title": "The Devotional Year — collection entitlement",
-      "source": "collection-the-devotional-year"
+      "source": "collection-the-devotional-year",
+      "rcEntitlementId": "entla7a8061380"
     },
     {
       "lookupKey": "study_library_all",
       "title": "All-library subscription entitlement (global)",
-      "source": "global"
+      "source": "global",
+      "rcEntitlementId": "entl49003aa9c5"
     },
     {
       "lookupKey": "companion_ondevice",
       "title": "Companion on-device unlimited (one-time unlock)",
-      "source": "ARCHITECTURE.md §7.6"
+      "source": "ARCHITECTURE.md §7.6",
+      "rcEntitlementId": "entl6431a53473"
     }
   ],
   "products": [
@@ -444,7 +514,8 @@
       "subtitle": "Traditional Catholic translation; Challoner revision lineage",
       "catalogueId": "C001",
       "source": "work-c001",
-      "editionId": "douay-rheims-bible-en"
+      "editionId": "douay-rheims-bible-en",
+      "rcProductId": "prod4378778779"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.catena-aurea-en",
@@ -457,7 +528,8 @@
       "subtitle": "Thomas Aquinas; English edition associated with John Henry Newman and contributors",
       "catalogueId": "C003",
       "source": "work-c003",
-      "editionId": "catena-aurea-en"
+      "editionId": "catena-aurea-en",
+      "rcProductId": "prodf3a4051f42"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.confessions-en",
@@ -470,7 +542,8 @@
       "subtitle": "Augustine; E. B. Pusey translation",
       "catalogueId": "C004",
       "source": "work-c004",
-      "editionId": "confessions-en"
+      "editionId": "confessions-en",
+      "rcProductId": "prod8d7bc25527"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.city-of-god-en",
@@ -483,7 +556,8 @@
       "subtitle": "Augustine",
       "catalogueId": "C005",
       "source": "work-c005",
-      "editionId": "city-of-god-en"
+      "editionId": "city-of-god-en",
+      "rcProductId": "prodcca54ba476"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.first-epistle-to-the-corinthians-en",
@@ -496,7 +570,8 @@
       "subtitle": "Clement of Rome",
       "catalogueId": "C006",
       "source": "work-c006",
-      "editionId": "first-epistle-to-the-corinthians-en"
+      "editionId": "first-epistle-to-the-corinthians-en",
+      "rcProductId": "prodfa19b76ec3"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.epistles-of-ignatius-en",
@@ -509,7 +584,8 @@
       "subtitle": "Ignatius of Antioch",
       "catalogueId": "C007",
       "source": "work-c007",
-      "editionId": "epistles-of-ignatius-en"
+      "editionId": "epistles-of-ignatius-en",
+      "rcProductId": "prodf1a94da8de"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.epistle-to-the-philippians-en",
@@ -522,7 +598,8 @@
       "subtitle": "Polycarp of Smyrna",
       "catalogueId": "C008",
       "source": "work-c008",
-      "editionId": "epistle-to-the-philippians-en"
+      "editionId": "epistle-to-the-philippians-en",
+      "rcProductId": "prodf2c4bbd55f"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.martyrdom-of-polycarp-en",
@@ -535,7 +612,8 @@
       "subtitle": "Church of Smyrna; traditional attribution",
       "catalogueId": "C009",
       "source": "work-c009",
-      "editionId": "martyrdom-of-polycarp-en"
+      "editionId": "martyrdom-of-polycarp-en",
+      "rcProductId": "prod8147e8a614"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.epistle-to-diognetus-en",
@@ -548,7 +626,8 @@
       "subtitle": "Anonymous; traditionally labelled Mathetes",
       "catalogueId": "C010",
       "source": "work-c010",
-      "editionId": "epistle-to-diognetus-en"
+      "editionId": "epistle-to-diognetus-en",
+      "rcProductId": "prod8328d1557e"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.first-apology-en",
@@ -561,7 +640,8 @@
       "subtitle": "Justin Martyr",
       "catalogueId": "C011",
       "source": "work-c011",
-      "editionId": "first-apology-en"
+      "editionId": "first-apology-en",
+      "rcProductId": "prod85fdaf23f7"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.second-apology-en",
@@ -574,7 +654,8 @@
       "subtitle": "Justin Martyr",
       "catalogueId": "C012",
       "source": "work-c012",
-      "editionId": "second-apology-en"
+      "editionId": "second-apology-en",
+      "rcProductId": "prod24f488a849"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.against-heresies-en",
@@ -587,7 +668,8 @@
       "subtitle": "Irenaeus of Lyons",
       "catalogueId": "C013",
       "source": "work-c013",
-      "editionId": "against-heresies-en"
+      "editionId": "against-heresies-en",
+      "rcProductId": "prod588c9b1244"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.select-works-and-letters-en",
@@ -600,7 +682,8 @@
       "subtitle": "Athanasius of Alexandria; NPNF editors/translators",
       "catalogueId": "C014",
       "source": "work-c014",
-      "editionId": "select-works-and-letters-en"
+      "editionId": "select-works-and-letters-en",
+      "rcProductId": "prod5eb10d4cec"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.selected-works-and-letters-en",
@@ -613,7 +696,8 @@
       "subtitle": "Ambrose of Milan; H. and E. de Romestin, H. T. F. Duckworth",
       "catalogueId": "C015",
       "source": "work-c015",
-      "editionId": "selected-works-and-letters-en"
+      "editionId": "selected-works-and-letters-en",
+      "rcProductId": "prod80f2942e89"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.sulpitius-severus-en",
@@ -626,7 +710,8 @@
       "subtitle": "Named Fathers; NPNF editors/translators",
       "catalogueId": "C016",
       "source": "work-c016",
-      "editionId": "sulpitius-severus-en"
+      "editionId": "sulpitius-severus-en",
+      "rcProductId": "prodfa47b29aeb"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.baltimore-catechism-no-1-en",
@@ -639,7 +724,8 @@
       "subtitle": "Third Plenary Council of Baltimore; edition contributors",
       "catalogueId": "C017",
       "source": "work-c017",
-      "editionId": "baltimore-catechism-no-1-en"
+      "editionId": "baltimore-catechism-no-1-en",
+      "rcProductId": "prod0787f220c5"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.baltimore-catechism-no-2-en",
@@ -652,7 +738,8 @@
       "subtitle": "Third Plenary Council of Baltimore; edition contributors",
       "catalogueId": "C018",
       "source": "work-c018",
-      "editionId": "baltimore-catechism-no-2-en"
+      "editionId": "baltimore-catechism-no-2-en",
+      "rcProductId": "prod7460ace1df"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.baltimore-catechism-no-3-en",
@@ -665,7 +752,8 @@
       "subtitle": "Third Plenary Council of Baltimore; Thomas L. Kinkead supplement",
       "catalogueId": "C019",
       "source": "work-c019",
-      "editionId": "baltimore-catechism-no-3-en"
+      "editionId": "baltimore-catechism-no-3-en",
+      "rcProductId": "prodcfea53671e"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.explanation-of-the-baltimore-catechism-en",
@@ -678,7 +766,8 @@
       "subtitle": "Thomas L. Kinkead; edition contributors",
       "catalogueId": "C020",
       "source": "work-c020",
-      "editionId": "explanation-of-the-baltimore-catechism-en"
+      "editionId": "explanation-of-the-baltimore-catechism-en",
+      "rcProductId": "prod9e53633265"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.catechism-of-the-council-of-trent-en",
@@ -691,7 +780,8 @@
       "subtitle": "Catholic Church; Jeremiah Donovan, translator",
       "catalogueId": "C021",
       "source": "work-c021",
-      "editionId": "catechism-of-the-council-of-trent-en"
+      "editionId": "catechism-of-the-council-of-trent-en",
+      "rcProductId": "prod29836e16a5"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.a-full-catechism-of-the-catholic-religion-en",
@@ -704,7 +794,8 @@
       "subtitle": "Joseph Deharbe",
       "catalogueId": "C022",
       "source": "work-c022",
-      "editionId": "a-full-catechism-of-the-catholic-religion-en"
+      "editionId": "a-full-catechism-of-the-catholic-religion-en",
+      "rcProductId": "proda7cbbd4630"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.the-faith-of-our-fathers-en",
@@ -717,7 +808,8 @@
       "subtitle": "James Gibbons",
       "catalogueId": "C023",
       "source": "work-c023",
-      "editionId": "the-faith-of-our-fathers-en"
+      "editionId": "the-faith-of-our-fathers-en",
+      "rcProductId": "prodf43a058bdf"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.summa-theologica-prima-pars-en",
@@ -730,7 +822,8 @@
       "subtitle": "Thomas Aquinas; English Dominican translation lineage",
       "catalogueId": "C024",
       "source": "work-c024",
-      "editionId": "summa-theologica-prima-pars-en"
+      "editionId": "summa-theologica-prima-pars-en",
+      "rcProductId": "prod425557785f"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.summa-theologica-prima-secundae-en",
@@ -743,7 +836,8 @@
       "subtitle": "Thomas Aquinas; English Dominican translation lineage",
       "catalogueId": "C025",
       "source": "work-c025",
-      "editionId": "summa-theologica-prima-secundae-en"
+      "editionId": "summa-theologica-prima-secundae-en",
+      "rcProductId": "prodf2a32a9821"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.summa-theologica-secunda-secundae-en",
@@ -756,7 +850,8 @@
       "subtitle": "Thomas Aquinas; Fathers of the English Dominican Province",
       "catalogueId": "C026",
       "source": "work-c026",
-      "editionId": "summa-theologica-secunda-secundae-en"
+      "editionId": "summa-theologica-secunda-secundae-en",
+      "rcProductId": "prodab9ed80cd9"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.summa-theologica-tertia-pars-en",
@@ -769,7 +864,8 @@
       "subtitle": "Thomas Aquinas; English Dominican translation lineage",
       "catalogueId": "C027",
       "source": "work-c027",
-      "editionId": "summa-theologica-tertia-pars-en"
+      "editionId": "summa-theologica-tertia-pars-en",
+      "rcProductId": "prodf82314e5f5"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.on-prayer-and-the-contemplative-life-en",
@@ -782,7 +878,8 @@
       "subtitle": "Thomas Aquinas; Hugh Pope, translator",
       "catalogueId": "C028",
       "source": "work-c028",
-      "editionId": "on-prayer-and-the-contemplative-life-en"
+      "editionId": "on-prayer-and-the-contemplative-life-en",
+      "rcProductId": "prodc171a168ba"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.essay-on-the-development-of-christian-doctrine-en",
@@ -795,7 +892,8 @@
       "subtitle": "John Henry Newman",
       "catalogueId": "C029",
       "source": "work-c029",
-      "editionId": "essay-on-the-development-of-christian-doctrine-en"
+      "editionId": "essay-on-the-development-of-christian-doctrine-en",
+      "rcProductId": "prod8aff13f1bb"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.essay-in-aid-of-a-grammar-of-assent-en",
@@ -808,7 +906,8 @@
       "subtitle": "John Henry Newman",
       "catalogueId": "C030",
       "source": "work-c030",
-      "editionId": "essay-in-aid-of-a-grammar-of-assent-en"
+      "editionId": "essay-in-aid-of-a-grammar-of-assent-en",
+      "rcProductId": "proda02e9c054e"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.imitation-of-christ-en",
@@ -821,7 +920,8 @@
       "subtitle": "Thomas à Kempis; William Benham, translator",
       "catalogueId": "C031",
       "source": "work-c031",
-      "editionId": "imitation-of-christ-en"
+      "editionId": "imitation-of-christ-en",
+      "rcProductId": "prod0a9bafd729"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.introduction-to-the-devout-life-en",
@@ -834,7 +934,8 @@
       "subtitle": "Francis de Sales",
       "catalogueId": "C032",
       "source": "work-c032",
-      "editionId": "introduction-to-the-devout-life-en"
+      "editionId": "introduction-to-the-devout-life-en",
+      "rcProductId": "prodae3be4e8ca"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.treatise-on-the-love-of-god-en",
@@ -847,7 +948,8 @@
       "subtitle": "Francis de Sales",
       "catalogueId": "C033",
       "source": "work-c033",
-      "editionId": "treatise-on-the-love-of-god-en"
+      "editionId": "treatise-on-the-love-of-god-en",
+      "rcProductId": "prod23b75c6f6c"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.interior-castle-the-mansions-en",
@@ -860,7 +962,8 @@
       "subtitle": "Teresa of Ávila; Benedictines of Stanbrook; Benedict Zimmerman revision",
       "catalogueId": "C034",
       "source": "work-c034",
-      "editionId": "interior-castle-the-mansions-en"
+      "editionId": "interior-castle-the-mansions-en",
+      "rcProductId": "prodb89b9ba0e1"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.way-of-perfection-en",
@@ -873,7 +976,8 @@
       "subtitle": "Teresa of Ávila",
       "catalogueId": "C035",
       "source": "work-c035",
-      "editionId": "way-of-perfection-en"
+      "editionId": "way-of-perfection-en",
+      "rcProductId": "prod4940ddeab1"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.life-of-st-teresa-of-jesus-en",
@@ -886,7 +990,8 @@
       "subtitle": "Teresa of Ávila",
       "catalogueId": "C036",
       "source": "work-c036",
-      "editionId": "life-of-st-teresa-of-jesus-en"
+      "editionId": "life-of-st-teresa-of-jesus-en",
+      "rcProductId": "prod26e6fef639"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.ascent-of-mount-carmel-en",
@@ -899,7 +1004,8 @@
       "subtitle": "John of the Cross",
       "catalogueId": "C037",
       "source": "work-c037",
-      "editionId": "ascent-of-mount-carmel-en"
+      "editionId": "ascent-of-mount-carmel-en",
+      "rcProductId": "prod319772d441"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.dark-night-of-the-soul-en",
@@ -912,7 +1018,8 @@
       "subtitle": "John of the Cross",
       "catalogueId": "C038",
       "source": "work-c038",
-      "editionId": "dark-night-of-the-soul-en"
+      "editionId": "dark-night-of-the-soul-en",
+      "rcProductId": "prod230ef91bcd"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.spiritual-canticle-en",
@@ -925,7 +1032,8 @@
       "subtitle": "John of the Cross",
       "catalogueId": "C039",
       "source": "work-c039",
-      "editionId": "spiritual-canticle-en"
+      "editionId": "spiritual-canticle-en",
+      "rcProductId": "prodd0f1d64bf3"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.dialogue-en",
@@ -938,7 +1046,8 @@
       "subtitle": "Catherine of Siena",
       "catalogueId": "C040",
       "source": "work-c040",
-      "editionId": "dialogue-en"
+      "editionId": "dialogue-en",
+      "rcProductId": "prod23a2cdafd2"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.spiritual-exercises-en",
@@ -951,7 +1060,8 @@
       "subtitle": "Ignatius of Loyola",
       "catalogueId": "C041",
       "source": "work-c041",
-      "editionId": "spiritual-exercises-en"
+      "editionId": "spiritual-exercises-en",
+      "rcProductId": "prodbf073017d0"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.spiritual-combat-en",
@@ -964,7 +1074,8 @@
       "subtitle": "Lorenzo Scupoli",
       "catalogueId": "C042",
       "source": "work-c042",
-      "editionId": "spiritual-combat-en"
+      "editionId": "spiritual-combat-en",
+      "rcProductId": "prod0de9f78020"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.practice-of-the-presence-of-god-en",
@@ -977,7 +1088,8 @@
       "subtitle": "Brother Lawrence",
       "catalogueId": "C043",
       "source": "work-c043",
-      "editionId": "practice-of-the-presence-of-god-en"
+      "editionId": "practice-of-the-presence-of-god-en",
+      "rcProductId": "prod99a814e003"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.on-loving-god-en",
@@ -990,7 +1102,8 @@
       "subtitle": "Bernard of Clairvaux",
       "catalogueId": "C044",
       "source": "work-c044",
-      "editionId": "on-loving-god-en"
+      "editionId": "on-loving-god-en",
+      "rcProductId": "prod459763e67a"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.friendship-of-christ-en",
@@ -1003,7 +1116,8 @@
       "subtitle": "Robert Hugh Benson",
       "catalogueId": "C045",
       "source": "work-c045",
-      "editionId": "friendship-of-christ-en"
+      "editionId": "friendship-of-christ-en",
+      "rcProductId": "proda56ccda67f"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.story-of-a-soul-en",
@@ -1016,7 +1130,8 @@
       "subtitle": "Thérèse of Lisieux; Thomas N. Taylor, translator",
       "catalogueId": "C046",
       "source": "work-c046",
-      "editionId": "story-of-a-soul-en"
+      "editionId": "story-of-a-soul-en",
+      "rcProductId": "prod6c897a37c8"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.autobiography-of-st-ignatius-en",
@@ -1029,7 +1144,8 @@
       "subtitle": "Ignatius of Loyola; J. F. X. O'Conor, editor",
       "catalogueId": "C047",
       "source": "work-c047",
-      "editionId": "autobiography-of-st-ignatius-en"
+      "editionId": "autobiography-of-st-ignatius-en",
+      "rcProductId": "prodb702aa490e"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.apologia-pro-vita-sua-en",
@@ -1042,7 +1158,8 @@
       "subtitle": "John Henry Newman",
       "catalogueId": "C048",
       "source": "work-c048",
-      "editionId": "apologia-pro-vita-sua-en"
+      "editionId": "apologia-pro-vita-sua-en",
+      "rcProductId": "prodec0e43cf33"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.lives-of-the-saints-en",
@@ -1055,7 +1172,8 @@
       "subtitle": "Alban Butler; historical abridgment/editors",
       "catalogueId": "C049",
       "source": "work-c049",
-      "editionId": "lives-of-the-saints-en"
+      "editionId": "lives-of-the-saints-en",
+      "rcProductId": "prodf1e2cb41c2"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.little-flowers-of-st-francis-en",
@@ -1068,7 +1186,8 @@
       "subtitle": "Traditional Franciscan collection, associated with Ugolino",
       "catalogueId": "C050",
       "source": "work-c050",
-      "editionId": "little-flowers-of-st-francis-en"
+      "editionId": "little-flowers-of-st-francis-en",
+      "rcProductId": "prod6ea7d158c7"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.glories-of-mary-en",
@@ -1081,7 +1200,8 @@
       "subtitle": "Alphonsus Liguori",
       "catalogueId": "C051",
       "source": "work-c051",
-      "editionId": "glories-of-mary-en"
+      "editionId": "glories-of-mary-en",
+      "rcProductId": "prod9787c2d4c5"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.true-devotion-to-the-blessed-virgin-en",
@@ -1094,7 +1214,8 @@
       "subtitle": "Louis-Marie Grignion de Montfort; Frederick William Faber, translator",
       "catalogueId": "C052",
       "source": "work-c052",
-      "editionId": "true-devotion-to-the-blessed-virgin-en"
+      "editionId": "true-devotion-to-the-blessed-virgin-en",
+      "rcProductId": "prodb44c9758d0"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.mary-en",
@@ -1107,7 +1228,8 @@
       "subtitle": "Bonaventure Hammer",
       "catalogueId": "C053",
       "source": "work-c053",
-      "editionId": "mary-en"
+      "editionId": "mary-en",
+      "rcProductId": "prod4f55a35171"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.general-catholic-devotions-en",
@@ -1120,7 +1242,8 @@
       "subtitle": "Bonaventure Hammer, compiler",
       "catalogueId": "C054",
       "source": "work-c054",
-      "editionId": "general-catholic-devotions-en"
+      "editionId": "general-catholic-devotions-en",
+      "rcProductId": "prod64773cdfd2"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.our-monthly-devotions-en",
@@ -1133,7 +1256,8 @@
       "subtitle": "Albert A. Lings",
       "catalogueId": "C055",
       "source": "work-c055",
-      "editionId": "our-monthly-devotions-en"
+      "editionId": "our-monthly-devotions-en",
+      "rcProductId": "prod44e9367d50"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.golden-manual-guide-to-catholic-devotion-en",
@@ -1146,7 +1270,8 @@
       "subtitle": "Compiled from approved Catholic sources; individual compiler unresolved",
       "catalogueId": "C056",
       "source": "work-c056",
-      "editionId": "golden-manual-guide-to-catholic-devotion-en"
+      "editionId": "golden-manual-guide-to-catholic-devotion-en",
+      "rcProductId": "prod4d85c11d2d"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.raccolta-indulgenced-prayers-and-good-works-en",
@@ -1159,7 +1284,8 @@
       "subtitle": "Catholic Church; Ambrose St John translation lineage",
       "catalogueId": "C057",
       "source": "work-c057",
-      "editionId": "raccolta-indulgenced-prayers-and-good-works-en"
+      "editionId": "raccolta-indulgenced-prayers-and-good-works-en",
+      "rcProductId": "prodf5f44c2d08"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.my-prayer-book-happiness-in-goodness-en",
@@ -1172,7 +1298,8 @@
       "subtitle": "Francis Xavier Lasance",
       "catalogueId": "C058",
       "source": "work-c058",
-      "editionId": "my-prayer-book-happiness-in-goodness-en"
+      "editionId": "my-prayer-book-happiness-in-goodness-en",
+      "rcProductId": "prod9957fdba06"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.holy-sacrifice-of-the-mass-dogmatically-en",
@@ -1185,7 +1312,8 @@
       "subtitle": "Nikolaus Gihr",
       "catalogueId": "C059",
       "source": "work-c059",
-      "editionId": "holy-sacrifice-of-the-mass-dogmatically-en"
+      "editionId": "holy-sacrifice-of-the-mass-dogmatically-en",
+      "rcProductId": "prod507be506f2"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.explanation-of-the-prayers-and-ceremonies-of-holy-mass-en",
@@ -1198,7 +1326,8 @@
       "subtitle": "Prosper Guéranger; Laurence Shepherd, translator",
       "catalogueId": "C060",
       "source": "work-c060",
-      "editionId": "explanation-of-the-prayers-and-ceremonies-of-holy-mass-en"
+      "editionId": "explanation-of-the-prayers-and-ceremonies-of-holy-mass-en",
+      "rcProductId": "prod4db643d506"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.the-liturgical-year-en",
@@ -1211,7 +1340,8 @@
       "subtitle": "Prosper Guéranger; Lucien Fromage; James Laurence Shepherd and other translators",
       "catalogueId": "C061",
       "source": "work-c061",
-      "editionId": "the-liturgical-year-en"
+      "editionId": "the-liturgical-year-en",
+      "rcProductId": "prod814018dbd8"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.collection-daily-and-family-prayer",
@@ -1223,7 +1353,8 @@
       "title": "Daily and Family Prayer",
       "subtitle": "Morning/evening prayer, grace, family prayer, short acts of faith/hope/charity. Source plan: C054, C056; review selected",
       "source": "collection-daily-and-family-prayer",
-      "editionId": "collection-daily-and-family-prayer"
+      "editionId": "collection-daily-and-family-prayer",
+      "rcProductId": "prod45fc608cd8"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.collection-rosary-and-marian-prayer",
@@ -1235,7 +1366,8 @@
       "title": "Rosary and Marian Prayer",
       "subtitle": "Traditional mysteries, Angelus, Marian prayers, feast novenas. Source plan: C053, C056; keep historical and newly writte",
       "source": "collection-rosary-and-marian-prayer",
-      "editionId": "collection-rosary-and-marian-prayer"
+      "editionId": "collection-rosary-and-marian-prayer",
+      "rcProductId": "prodc11eb1cca8"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.collection-confession-and-communion",
@@ -1247,7 +1379,8 @@
       "title": "Confession and Communion",
       "subtitle": "Preparation, examination guidance, thanksgiving. Source plan: C054, C056; historical discipline annotated.",
       "source": "collection-confession-and-communion",
-      "editionId": "collection-confession-and-communion"
+      "editionId": "collection-confession-and-communion",
+      "rcProductId": "prod96255eb103"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.collection-stations-and-passion",
@@ -1259,7 +1392,8 @@
       "title": "Stations and Passion",
       "subtitle": "Stations, Passion meditations, prayers before a crucifix. Source plan: C054, C056; select and name the exact version.",
       "source": "collection-stations-and-passion",
-      "editionId": "collection-stations-and-passion"
+      "editionId": "collection-stations-and-passion",
+      "rcProductId": "proda212f7de03"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.collection-eucharistic-adoration",
@@ -1271,7 +1405,8 @@
       "title": "Eucharistic Adoration",
       "subtitle": "Visits to the Blessed Sacrament, adoration prayers. Source plan: C054, C056; personal devotion distinct from liturgical ",
       "source": "collection-eucharistic-adoration",
-      "editionId": "collection-eucharistic-adoration"
+      "editionId": "collection-eucharistic-adoration",
+      "rcProductId": "prodb850db9ccf"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.collection-litanies-and-saints",
@@ -1283,7 +1418,8 @@
       "title": "Litanies and Saints",
       "subtitle": "Jesus, Mary, saints, St Joseph and angels. Source plan: C053, C056; distinguish private-use texts from approved public l",
       "source": "collection-litanies-and-saints",
-      "editionId": "collection-litanies-and-saints"
+      "editionId": "collection-litanies-and-saints",
+      "rcProductId": "prodda68188588"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.collection-sick-dying-and-departed",
@@ -1295,7 +1431,8 @@
       "title": "Sick, Dying and Departed",
       "subtitle": "Intercession for the sick, dying and departed. Source plan: C056; do not present lay prayers as administration of sacram",
       "source": "collection-sick-dying-and-departed",
-      "editionId": "collection-sick-dying-and-departed"
+      "editionId": "collection-sick-dying-and-departed",
+      "rcProductId": "proda1e8aac860"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.book.collection-the-devotional-year",
@@ -1307,7 +1444,8 @@
       "title": "The Devotional Year",
       "subtitle": "Monthly prayers and season/feast-linked selections. Source plan: C055, C057, C061; date and calendar metadata required.",
       "source": "collection-the-devotional-year",
-      "editionId": "collection-the-devotional-year"
+      "editionId": "collection-the-devotional-year",
+      "rcProductId": "prod3e4d1e0651"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.bundle.included-essentials",
@@ -1321,7 +1459,8 @@
       "title": "Included essentials",
       "subtitle": "Candidate contents: C001, C018, C054, selected daily prayers. Recommended acquisition model: Free permanent Library addi",
       "source": "bundle-included-essentials",
-      "containsFreeSkipped": []
+      "containsFreeSkipped": [],
+      "rcProductId": "prod47c21aa912"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.bundle.scripture-study",
@@ -1335,7 +1474,8 @@
       "source": "bundle-scripture-study",
       "containsFreeSkipped": [
         "work-c002"
-      ]
+      ],
+      "rcProductId": "proda6f6153bbe"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.bundle.catholic-foundations",
@@ -1355,7 +1495,8 @@
       "title": "Catholic Foundations",
       "subtitle": "Candidate contents: C017–C023, C029–C030. Recommended acquisition model: One-time bundle with deduplication/credit for a",
       "source": "bundle-catholic-foundations",
-      "containsFreeSkipped": []
+      "containsFreeSkipped": [],
+      "rcProductId": "prodfd27e8b70b"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.bundle.doctors-and-spiritual-classics",
@@ -1390,7 +1531,8 @@
       "title": "Doctors and Spiritual Classics",
       "subtitle": "Candidate contents: C004–C005, C024–C045. Recommended acquisition model: Smaller author bundles and individual purchases",
       "source": "bundle-doctors-and-spiritual-classics",
-      "containsFreeSkipped": []
+      "containsFreeSkipped": [],
+      "rcProductId": "prod785d291aca"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.bundle.saints-and-marian-life",
@@ -1409,7 +1551,8 @@
       "title": "Saints and Marian Life",
       "subtitle": "Candidate contents: C046–C053. Recommended acquisition model: Individual editions plus optional bundle.",
       "source": "bundle-saints-and-marian-life",
-      "containsFreeSkipped": []
+      "containsFreeSkipped": [],
+      "rcProductId": "prodf30a198a2a"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.bundle.prayer-companion",
@@ -1424,7 +1567,8 @@
       "title": "Prayer Companion",
       "subtitle": "Candidate contents: C055–C058 and the proposed prayer selections. Recommended acquisition model: Optional prepared colle",
       "source": "bundle-prayer-companion",
-      "containsFreeSkipped": []
+      "containsFreeSkipped": [],
+      "rcProductId": "prod9c1686c1d9"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.bundle.understanding-the-mass",
@@ -1438,7 +1582,8 @@
       "title": "Understanding the Mass",
       "subtitle": "Candidate contents: C059–C061, with links to C011 and C021. Recommended acquisition model: Reference bundle integrated w",
       "source": "bundle-understanding-the-mass",
-      "containsFreeSkipped": []
+      "containsFreeSkipped": [],
+      "rcProductId": "prod2ea560669c"
     },
     {
       "productId": "mba.robin.sanctissimissa.sub.study_library_all_monthly",
@@ -1448,7 +1593,8 @@
       "entitlements": [
         "study_library_all"
       ],
-      "title": "All-Library Access — Monthly"
+      "title": "All-Library Access — Monthly",
+      "rcProductId": "prod4508cf8d27"
     },
     {
       "productId": "mba.robin.sanctissimissa.sub.study_library_all_annual",
@@ -1458,7 +1604,8 @@
       "entitlements": [
         "study_library_all"
       ],
-      "title": "All-Library Access — Annual"
+      "title": "All-Library Access — Annual",
+      "rcProductId": "prod25cabf4437"
     },
     {
       "productId": "mba.robin.sanctissimissa.iap.companion_ondevice",
@@ -1467,7 +1614,8 @@
       "entitlements": [
         "companion_ondevice"
       ],
-      "title": "Companion — Unlimited On-Device (one-time)"
+      "title": "Companion — Unlimited On-Device (one-time)",
+      "rcProductId": "prod6eb9e7451f"
     },
     {
       "productId": "mba.robin.sanctissimissa.consumable.roche_credits_500",
@@ -1475,7 +1623,8 @@
       "priceUSD": 4.99,
       "entitlements": [],
       "credits": 500,
-      "title": "500 $ROCHE credits"
+      "title": "500 $ROCHE credits",
+      "rcProductId": "prodb705021228"
     },
     {
       "productId": "mba.robin.sanctissimissa.consumable.roche_credits_1100",
@@ -1483,7 +1632,20 @@
       "priceUSD": 9.99,
       "entitlements": [],
       "credits": 1100,
-      "title": "1,100 $ROCHE credits"
+      "title": "1,100 $ROCHE credits",
+      "rcProductId": "proda2c9f74a94"
     }
-  ]
+  ],
+  "revenuecat": {
+    "projectId": "proja6953637",
+    "appId": "app93892430fa",
+    "appType": "test_store",
+    "virtualCurrencyCode": "ROCHE",
+    "offerings": {
+      "companion_unlock": "ofrng2f2b4466ee",
+      "bookstore": "ofrngbbf1e4e25b"
+    },
+    "createdAt": "2026-09-17",
+    "storeStateNote": "Products registered on the Test Store app only; Google Play products (BI.4a) and RC Billing/Stripe app linkage pending."
+  }
 }
