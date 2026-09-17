@@ -243,12 +243,15 @@ function getOutboxDir(deps) {
 }
 
 /**
- * Canonical stage order
+ * Canonical stage order.
+ * android-debug is REMOVED (operator rule 2026-09-16: no android-debug stage
+ * ever — debug APKs are never shipped; android-release is the only Android
+ * build stage).
  */
 export const STAGE_ORDER = [
   'test', 'web', 'linux',
   'windows', 'windows-msi', 'windows-msix',
-  'android-debug', 'android-release', 'symbols', 'collect',
+  'android-release', 'symbols', 'collect',
 ];
 
 export const PENDING_RELEASE_EXIT_CODE = 2;
