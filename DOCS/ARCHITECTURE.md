@@ -1600,6 +1600,41 @@ APK/AAB/symbol ZIP, and web/PWA share one complete release stamp. Missing
 hosts remain pending; BP.1 Play delivery and native installation/Store
 verification remain explicit release obligations.
 
+### Automatic Surge web publication (operator request 2026-09-18; pending amendment signoff)
+
+Every successful web build in the release train publishes the generated PWA to
+`https://sanctissimissa.surge.sh`. Add `web-deploy` immediately after `web` in
+`scripts/release-state.mjs` and its declaration/acceptance contracts. Both native
+Linux and Windows may execute this stage; a shared release state records success
+once. It runs before platform packaging, so a pending Windows installer does not
+prevent web publication. `collect` requires this stage along with the other
+required stages. Existing release states from an earlier source continue to use
+the existing source-mismatch protection, not an implicit migration.
+
+`scripts/deploy-web.mjs`, exposed as `npm run deploy:web`, publishes only the
+completed `dist` web output to the fixed domain using a pinned Surge CLI dependency.
+It requires `dist/index.html`, prepares the SPA fallback `dist/200.html`, and
+invokes the CLI with explicit project/domain arguments and inherited terminal
+output. Credentials come from the host's Surge login or environment, never
+committed files, browser configuration or diagnostic output. Missing credentials,
+missing build output and publication failures return nonzero; the release stage
+remains incomplete and can be retried without stamping again. `build:web` builds
+then deploys; `build:vite` remains build-only because native packaging uses it.
+Deployment does not perform a second build or version stamp.
+
+For this requested release, the operator authorizes exactly one minor increment
+from the current source version, performed by the existing fresh-release stamp.
+Do not pre-stamp this source edit and then stamp again when starting the release.
+Resume and deployment retries retain the same complete version across web and
+native artifacts. If the host has an older release state, explicitly starting the
+new release preserves that state using the existing restart/archive behavior.
+
+Acceptance: hermetic release tests prove web build precedes publication, failed
+publication remains retryable, resumed publication causes no second stamp, and
+successful publication is skipped on later resumes. A real release additionally
+verifies the deployed web version at the target domain. Documentation or a mocked
+CLI result alone is not evidence of a live deployment.
+
 
 ## RevenueCat commerce product wave amendment (2026-09-17)
 

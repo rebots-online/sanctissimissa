@@ -75,7 +75,34 @@ The committed workflow also explicitly includes:
 8. The current architecture reconciliation documents gaps; it does not cancel the target product or authorize reducing its scope.
 9. The previous focused check passed TypeScript and 61 tests. Rust/device loading, visual acceptance and live commerce remain unverified; corpus-dependent testing lacks the provisioned corpus in this checkout.
 
-## Resume prompt — use after Natally is live
+## Subsequent operator requirements — September 18 handoff update
+
+These additions record later instructions; the comparison matrix above remains the historical audited snapshot, not a fresh CodeGraph or device qualification.
+
+### Automatic web publication and exactly one version increment
+
+Requested destination: `https://sanctissimissa.surge.sh`. Add automatic publication to the build sequence. A concrete amendment has been drafted in DOCS/ARCHITECTURE.md under “Automatic Surge web publication”; the script change, deployment and version increment have **not** been performed. Do not describe this handoff as a completed deployment or as architecture signoff.
+
+The intended implementation is a resumable `web-deploy` stage immediately after `web`, before native packaging, plus a standalone `deploy:web` command that publishes completed web output without stamping. `build:web` builds and publishes; `build:vite` stays build-only for native packaging. Use a pinned Surge CLI, an explicit destination and project directory, a valid SPA fallback, and host-managed credentials. Keep deployment failure visible and its stage incomplete.
+
+| Event | Required version and release-state behavior |
+|---|---|
+| First fresh release for these changes | Increment minor exactly once through the existing release stamp; all artifacts share its complete version. Do not separately pre-stamp the source edit. |
+| Failed web publication, unchanged commit/version/inputs | Resume the incomplete stage using the saved version; do not stamp again. |
+| Successful publication followed by another resume | Skip the completed publication stage. |
+| Changed commit or frozen inputs | Reject reuse of the saved release state with a precise explanation; do not silently increment or reuse stale output. |
+| Explicit new release via `--restart` | Preserve/archive previous state and stamp the new release once. Never recommend this command as an ordinary deployment retry. |
+| Standalone `deploy:web` | Publish already-built output only; no stamp, no implicit rebuild. |
+
+Verify the resume/failure paths with hermetic release tests, then verify the actual published version at the destination. An upload exit code alone does not establish that the intended version is being served. Existing release state and host-local builds must be inspected before deciding whether a new stamp is still needed: another agent may already have performed it.
+
+### Hosted LLM provider decision
+
+Robin selected **Venice AI as the preferred hosted LLM provider for EnZIME and future hosted integrations**, citing model availability and end-user API-key provisioning/management. This records an operator preference, not independently verified API capabilities. Before implementing an integration, verify Venice's current official API contracts, supported models, key creation/revocation/scoping and applicable account requirements. Keep provisioning credentials in the appropriate trusted service and never ship administrative secrets in the web bundle or logs.
+
+This preference does not itself replace SanctissiMissa's on-device Qwen default, authorize sending private user content to a hosted service, or authorize an EnZIME implementation in this repository. Reconcile any hosted option with the product's approved privacy, consent and architecture requirements. Keep Natally-first priority intact.
+
+## Ultimate GLM execution prompt — use after Natally is live
 
 > Work on SANCTISSIMISSA to complete the already specified product and release it on its intended marketplaces.
 >
@@ -90,6 +117,10 @@ The committed workflow also explicitly includes:
 > Finish Companion semantics and qualification: retrieval from the real corpus, supported citations/deep links, appropriate lore recall and saved insights, real entitlement wiring; qualify the selected native Qwen 3.5 2B default on the Z Fold and all supported distribution targets. Preserve the guidance/diagnostics/Mass-navigation repairs, complete the intended chatbot-led DOM orientation, and disclose actual unsupported targets. Implement outstanding runner/storage requirements from the signed contract; do not silently replace them with claims of qualification.
 >
 > Test the real workflows as well as meaningful automated cases: sign-in and return links; browse/buy/restore; pending/cancel/error; successful entitlement reconciliation; download/resume/integrity; permanent offline reading; expiry/refund; preservation of notes; navigation and accessibility; model cold-load/generation/cancel/recovery. Keep raw debugging in the dedicated diagnostics surface and clear next-step guidance in ordinary UI.
+>
+> Complete the requested automatic Surge publication at https://sanctissimissa.surge.sh using the concrete architecture amendment and the release-state rules in this report. Check actual approval status before changing the implementation; this handoff is not an approval ledger. Add the deployment stage, command, dependency lock and meaningful retry tests. Inspect current version and release state before stamping: the requested increment is exactly once for this release, not once per invocation or deployment attempt. A failed deployment must resume without a new version; changed source must not silently reuse an old release. Verify the served version after publication and distinguish live web deployment from marketplace publication.
+>
+> Respect Robin's Venice AI preference for hosted LLM integrations, especially EnZIME. Verify current official API/key-management capabilities before designing against them. Do not replace the on-device default or expand this repository into EnZIME work by implication. If a hosted option belongs to the approved SanctissiMissa scope, implement its real authentication, consent and key lifecycle without embedding provisioning secrets in the client.
 >
 > Integrate completed work into master and publish promptly using the authorized GitHub connection if shell credentials are unavailable. Preserve concurrent upstream changes; avoid leaving the only copy on a branch/workstation. Robin's instruction to merge to master includes publication, as explicitly clarified in this conversation.
 >
