@@ -1,0 +1,187 @@
+{
+  "schema": "mba.robin.release-manifest.v1",
+  "project": "SanctissiMissa",
+  "slug": "sanctissimissa",
+  "version": "1.54.28154",
+  "versionCode": 100054,
+  "built_at": "2026-09-17T23:54:35.411Z",
+  "release_status": "partial",
+  "host": {
+    "platform": "linux",
+    "complete": false
+  },
+  "missing": [
+    {
+      "id": "windows-native-standalone",
+      "platform": "windows",
+      "kind": "exe-native",
+      "reason": "Required build stage is still pending: windows-msi"
+    },
+    {
+      "id": "windows-msi",
+      "platform": "windows",
+      "kind": "msi",
+      "reason": "Required build stage is still pending: windows-msi"
+    },
+    {
+      "id": "windows-msix",
+      "platform": "windows",
+      "kind": "msix",
+      "reason": "Required build stage is still pending: windows-msix"
+    },
+    {
+      "id": "android-native-debug-symbols",
+      "platform": "android",
+      "kind": "native-debug-symbols",
+      "reason": "Required build stage is still pending: symbols"
+    }
+  ],
+  "working_status": "unknown",
+  "source": {
+    "commit": "ae5139a8f97e282448edf6e4830f90428f2372ec",
+    "branch": "master"
+  },
+  "change_notes": {
+    "source": "DOCS/CHANGELOG.md",
+    "present": false,
+    "heading": null,
+    "highlights": [],
+    "markdown": "No changelog section for v1.54.28154. Add a \"## v1.54.28154\" section to DOCS/CHANGELOG.md."
+  },
+  "artifacts": [
+    {
+      "id": "web-pwa",
+      "platform": "web",
+      "kind": "pwa-zip",
+      "filename": "sanctissimissa-v1.54.28154-web-pwa.zip",
+      "size_bytes": 69439381,
+      "sha256": "98324f3d753b598c57e7b50835623a61f352389e0a5f56b6be5003e9fb416f7f",
+      "locations": [
+        {
+          "role": "canonical-checkout-dist",
+          "transport": "local-fs",
+          "host": "developer-workstation",
+          "path": "/home/robin/Desktop/devProjects/sanctissimissa/dist/sanctissimissa-v1.54.28154-web-pwa.zip",
+          "public": false
+        }
+      ]
+    },
+    {
+      "id": "linux-deb",
+      "platform": "linux",
+      "kind": "deb",
+      "filename": "sanctissimissa-v1.54.28154-linux-amd64.deb",
+      "size_bytes": 122796826,
+      "sha256": "539f5726ebfa359f55423c9f3fda8538fe026d73129ee21886dc7a3d796ecd8d",
+      "locations": [
+        {
+          "role": "canonical-checkout-dist",
+          "transport": "local-fs",
+          "host": "developer-workstation",
+          "path": "/home/robin/Desktop/devProjects/sanctissimissa/dist/sanctissimissa-v1.54.28154-linux-amd64.deb",
+          "public": false
+        }
+      ]
+    },
+    {
+      "id": "linux-appimage",
+      "platform": "linux",
+      "kind": "appimage",
+      "filename": "sanctissimissa-v1.54.28154-linux-amd64.AppImage",
+      "size_bytes": 193497592,
+      "sha256": "70831fb75e0df8c3d8b2b7808980791bdfb157bd675622cfa5ef123ec302833e",
+      "locations": [
+        {
+          "role": "canonical-checkout-dist",
+          "transport": "local-fs",
+          "host": "developer-workstation",
+          "path": "/home/robin/Desktop/devProjects/sanctissimissa/dist/sanctissimissa-v1.54.28154-linux-amd64.AppImage",
+          "public": false
+        }
+      ]
+    },
+    {
+      "id": "windows-standalone",
+      "platform": "windows",
+      "kind": "exe",
+      "filename": "sanctissimissa-v1.54.28154-windows-x64-standalone.exe",
+      "canonical_version": "1.54.28154",
+      "size_bytes": 255912448,
+      "sha256": "5e0e63b7d0cb44c4bce9d8e4a6ba1d8ef4a11e0b62b58b2160173121da08e518",
+      "locations": [
+        {
+          "role": "canonical-checkout-dist",
+          "transport": "local-fs",
+          "host": "developer-workstation",
+          "path": "/home/robin/Desktop/devProjects/sanctissimissa/dist/sanctissimissa-v1.54.28154-windows-x64-standalone.exe",
+          "public": false
+        }
+      ]
+    },
+    {
+      "id": "windows-nsis",
+      "platform": "windows",
+      "kind": "nsis",
+      "filename": "sanctissimissa-v1.54.28154-windows-x64-setup.exe",
+      "canonical_version": "1.54.28154",
+      "size_bytes": 99000573,
+      "sha256": "9855717ae9533dbb8c9d5f049faf9f64b1199b2f81bdadd7220aff53aeca7398",
+      "locations": [
+        {
+          "role": "canonical-checkout-dist",
+          "transport": "local-fs",
+          "host": "developer-workstation",
+          "path": "/home/robin/Desktop/devProjects/sanctissimissa/dist/sanctissimissa-v1.54.28154-windows-x64-setup.exe",
+          "public": false
+        }
+      ]
+    },
+    {
+      "id": "android-apk-release",
+      "platform": "android",
+      "kind": "apk-release",
+      "filename": "sanctissimissa-v1.54.28154-android-universal-release.apk",
+      "size_bytes": 1509907354,
+      "sha256": "d77bfb9ea74b72c5940be81afcf706952b4780d6171adfafca2318d887dd5c57",
+      "locations": [
+        {
+          "role": "canonical-checkout-dist",
+          "transport": "local-fs",
+          "host": "developer-workstation",
+          "path": "/home/robin/Desktop/devProjects/sanctissimissa/dist/sanctissimissa-v1.54.28154-android-universal-release.apk",
+          "public": false
+        }
+      ]
+    },
+    {
+      "id": "android-aab-release",
+      "platform": "android",
+      "kind": "aab-release",
+      "filename": "sanctissimissa-v1.54.28154-android-universal-release.aab",
+      "size_bytes": 592870707,
+      "sha256": "66dae2967e849f0df647168fc936a01ea23bd439e6054e0ef6268939d6fb10c6",
+      "locations": [
+        {
+          "role": "canonical-checkout-dist",
+          "transport": "local-fs",
+          "host": "developer-workstation",
+          "path": "/home/robin/Desktop/devProjects/sanctissimissa/dist/sanctissimissa-v1.54.28154-android-universal-release.aab",
+          "public": false
+        }
+      ]
+    }
+  ],
+  "windows_versions": {
+    "canonical": "1.54.28154",
+    "msi": "1.54.0",
+    "msix": "1.54.0.0"
+  },
+  "verification": {
+    "sha256_command": "sha256sum <filename>",
+    "android_signatures_verified": true,
+    "windows_package_signatures_verified": false,
+    "windows_store_runtime": "unverified",
+    "windows_store_acceptance": "unverified",
+    "android_play_delivery": "unverified (BP.1)"
+  }
+}

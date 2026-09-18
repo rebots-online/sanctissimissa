@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<release schema="mba.robin.release-manifest.v1" version="1.53.28081" versionCode="100053" status="partial">
+  <change_notes source="DOCS/CHANGELOG.md" present="false">
+  </change_notes>
+  <windows_versions canonical="1.53.28081" msi="1.53.0" msix="1.53.0.0"/>
+  <verification windows_store_runtime="unverified" windows_store_acceptance="unverified" android_play_delivery="unverified (BP.1)"/>
+  <artifact id="web-pwa" platform="web" kind="pwa-zip"><filename>sanctissimissa-v1.53.28081-web-pwa.zip</filename><size_bytes>69350014</size_bytes><sha256>d2155f694cdc849e33b5be271132e085a0efaee7a8f3bf1eb6be8608c1cca097</sha256></artifact>
+  <artifact id="linux-deb" platform="linux" kind="deb"><filename>sanctissimissa-v1.53.28081-linux-amd64.deb</filename><size_bytes>123220766</size_bytes><sha256>98c744c76ade5664949e6943da2d9d35c0c5efb4bbfcd5b1f68c16caa86eab1e</sha256></artifact>
+  <artifact id="linux-appimage" platform="linux" kind="appimage"><filename>sanctissimissa-v1.53.28081-linux-amd64.AppImage</filename><size_bytes>193899000</size_bytes><sha256>272b5b63c1a96585a24a9ba23c774926c4b587c9f51a206c154738967df4feb7</sha256></artifact>
+  <artifact id="windows-standalone" platform="windows" kind="exe"><filename>sanctissimissa-v1.53.28081-windows-x64-standalone.exe</filename><size_bytes>256338944</size_bytes><sha256>74f42d9ba8ba3424a2b7b0aab35a99a86f3a55d8f0cc9d3009b6fae4dcd518d9</sha256></artifact>
+  <artifact id="windows-nsis" platform="windows" kind="nsis"><filename>sanctissimissa-v1.53.28081-windows-x64-setup.exe</filename><size_bytes>99445263</size_bytes><sha256>e295abd7a5cd5f53a8231eba1b682c3a4276c5bbd1542fd32bf298a38e17ed0e</sha256></artifact>
+  <artifact id="android-apk-release" platform="android" kind="apk-release"><filename>sanctissimissa-v1.53.28081-android-universal-release.apk</filename><size_bytes>1511611406</size_bytes><sha256>b0f7ec9c9f0b57e0599c47625978e8d0a6976c3e163fecbbcd8c694f69167150</sha256></artifact>
+  <artifact id="android-aab-release" platform="android" kind="aab-release"><filename>sanctissimissa-v1.53.28081-android-universal-release.aab</filename><size_bytes>594555159</size_bytes><sha256>982c9417ed733baa8d56ed6a393c5f6b9706b097f5f41ccab9d3a7679d6393b8</sha256></artifact>
+  <artifact id="android-native-debug-symbols" platform="android" kind="native-debug-symbols"><filename>sanctissimissa-v1.53.28081-android-native-debug-symbols.zip</filename><size_bytes>588994384</size_bytes><sha256>4cd000c91975d6df8d13e18b032b7fee9110b5f875b5e3c3d9a55179ef6429c0</sha256></artifact>
+  <missing>
+    <artifact id="windows-native-standalone" platform="windows" kind="exe-native">Required build stage is still pending: windows-msi</artifact>
+    <artifact id="windows-msi" platform="windows" kind="msi">Required build stage is still pending: windows-msi</artifact>
+    <artifact id="windows-msix" platform="windows" kind="msix">Required build stage is still pending: windows-msix</artifact>
+  </missing>
+</release>

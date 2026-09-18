@@ -1,0 +1,198 @@
+{
+  "schema": "mba.robin.release-manifest.v1",
+  "project": "SanctissiMissa",
+  "slug": "sanctissimissa",
+  "version": "1.53.28081",
+  "versionCode": 100053,
+  "built_at": "2026-09-17T22:41:57.457Z",
+  "release_status": "partial",
+  "host": {
+    "platform": "linux",
+    "complete": false
+  },
+  "missing": [
+    {
+      "id": "windows-native-standalone",
+      "platform": "windows",
+      "kind": "exe-native",
+      "reason": "Required build stage is still pending: windows-msi"
+    },
+    {
+      "id": "windows-msi",
+      "platform": "windows",
+      "kind": "msi",
+      "reason": "Required build stage is still pending: windows-msi"
+    },
+    {
+      "id": "windows-msix",
+      "platform": "windows",
+      "kind": "msix",
+      "reason": "Required build stage is still pending: windows-msix"
+    }
+  ],
+  "working_status": "unknown",
+  "source": {
+    "commit": "0865e052613c97de583655036695cbb26b5e9f47",
+    "branch": "master"
+  },
+  "change_notes": {
+    "source": "DOCS/CHANGELOG.md",
+    "present": false,
+    "heading": null,
+    "highlights": [],
+    "markdown": "No changelog section for v1.53.28081. Add a \"## v1.53.28081\" section to DOCS/CHANGELOG.md."
+  },
+  "artifacts": [
+    {
+      "id": "web-pwa",
+      "platform": "web",
+      "kind": "pwa-zip",
+      "filename": "sanctissimissa-v1.53.28081-web-pwa.zip",
+      "size_bytes": 69350014,
+      "sha256": "d2155f694cdc849e33b5be271132e085a0efaee7a8f3bf1eb6be8608c1cca097",
+      "locations": [
+        {
+          "role": "canonical-checkout-dist",
+          "transport": "local-fs",
+          "host": "developer-workstation",
+          "path": "/home/robin/Desktop/devProjects/sanctissimissa/dist/sanctissimissa-v1.53.28081-web-pwa.zip",
+          "public": false
+        }
+      ]
+    },
+    {
+      "id": "linux-deb",
+      "platform": "linux",
+      "kind": "deb",
+      "filename": "sanctissimissa-v1.53.28081-linux-amd64.deb",
+      "size_bytes": 123220766,
+      "sha256": "98c744c76ade5664949e6943da2d9d35c0c5efb4bbfcd5b1f68c16caa86eab1e",
+      "locations": [
+        {
+          "role": "canonical-checkout-dist",
+          "transport": "local-fs",
+          "host": "developer-workstation",
+          "path": "/home/robin/Desktop/devProjects/sanctissimissa/dist/sanctissimissa-v1.53.28081-linux-amd64.deb",
+          "public": false
+        }
+      ]
+    },
+    {
+      "id": "linux-appimage",
+      "platform": "linux",
+      "kind": "appimage",
+      "filename": "sanctissimissa-v1.53.28081-linux-amd64.AppImage",
+      "size_bytes": 193899000,
+      "sha256": "272b5b63c1a96585a24a9ba23c774926c4b587c9f51a206c154738967df4feb7",
+      "locations": [
+        {
+          "role": "canonical-checkout-dist",
+          "transport": "local-fs",
+          "host": "developer-workstation",
+          "path": "/home/robin/Desktop/devProjects/sanctissimissa/dist/sanctissimissa-v1.53.28081-linux-amd64.AppImage",
+          "public": false
+        }
+      ]
+    },
+    {
+      "id": "windows-standalone",
+      "platform": "windows",
+      "kind": "exe",
+      "filename": "sanctissimissa-v1.53.28081-windows-x64-standalone.exe",
+      "canonical_version": "1.53.28081",
+      "size_bytes": 256338944,
+      "sha256": "74f42d9ba8ba3424a2b7b0aab35a99a86f3a55d8f0cc9d3009b6fae4dcd518d9",
+      "locations": [
+        {
+          "role": "canonical-checkout-dist",
+          "transport": "local-fs",
+          "host": "developer-workstation",
+          "path": "/home/robin/Desktop/devProjects/sanctissimissa/dist/sanctissimissa-v1.53.28081-windows-x64-standalone.exe",
+          "public": false
+        }
+      ]
+    },
+    {
+      "id": "windows-nsis",
+      "platform": "windows",
+      "kind": "nsis",
+      "filename": "sanctissimissa-v1.53.28081-windows-x64-setup.exe",
+      "canonical_version": "1.53.28081",
+      "size_bytes": 99445263,
+      "sha256": "e295abd7a5cd5f53a8231eba1b682c3a4276c5bbd1542fd32bf298a38e17ed0e",
+      "locations": [
+        {
+          "role": "canonical-checkout-dist",
+          "transport": "local-fs",
+          "host": "developer-workstation",
+          "path": "/home/robin/Desktop/devProjects/sanctissimissa/dist/sanctissimissa-v1.53.28081-windows-x64-setup.exe",
+          "public": false
+        }
+      ]
+    },
+    {
+      "id": "android-apk-release",
+      "platform": "android",
+      "kind": "apk-release",
+      "filename": "sanctissimissa-v1.53.28081-android-universal-release.apk",
+      "size_bytes": 1511611406,
+      "sha256": "b0f7ec9c9f0b57e0599c47625978e8d0a6976c3e163fecbbcd8c694f69167150",
+      "locations": [
+        {
+          "role": "canonical-checkout-dist",
+          "transport": "local-fs",
+          "host": "developer-workstation",
+          "path": "/home/robin/Desktop/devProjects/sanctissimissa/dist/sanctissimissa-v1.53.28081-android-universal-release.apk",
+          "public": false
+        }
+      ]
+    },
+    {
+      "id": "android-aab-release",
+      "platform": "android",
+      "kind": "aab-release",
+      "filename": "sanctissimissa-v1.53.28081-android-universal-release.aab",
+      "size_bytes": 594555159,
+      "sha256": "982c9417ed733baa8d56ed6a393c5f6b9706b097f5f41ccab9d3a7679d6393b8",
+      "locations": [
+        {
+          "role": "canonical-checkout-dist",
+          "transport": "local-fs",
+          "host": "developer-workstation",
+          "path": "/home/robin/Desktop/devProjects/sanctissimissa/dist/sanctissimissa-v1.53.28081-android-universal-release.aab",
+          "public": false
+        }
+      ]
+    },
+    {
+      "id": "android-native-debug-symbols",
+      "platform": "android",
+      "kind": "native-debug-symbols",
+      "filename": "sanctissimissa-v1.53.28081-android-native-debug-symbols.zip",
+      "size_bytes": 588994384,
+      "sha256": "4cd000c91975d6df8d13e18b032b7fee9110b5f875b5e3c3d9a55179ef6429c0",
+      "locations": [
+        {
+          "role": "canonical-checkout-dist",
+          "transport": "local-fs",
+          "host": "developer-workstation",
+          "path": "/home/robin/Desktop/devProjects/sanctissimissa/dist/sanctissimissa-v1.53.28081-android-native-debug-symbols.zip",
+          "public": false
+        }
+      ]
+    }
+  ],
+  "windows_versions": {
+    "canonical": "1.53.28081",
+    "msi": "1.53.0",
+    "msix": "1.53.0.0"
+  },
+  "verification": {
+    "sha256_command": "sha256sum <filename>",
+    "android_signatures_verified": true,
+    "windows_package_signatures_verified": false,
+    "windows_store_runtime": "unverified",
+    "windows_store_acceptance": "unverified",
+    "android_play_delivery": "unverified (BP.1)"
+  }
+}
