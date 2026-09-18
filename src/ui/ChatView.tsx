@@ -97,9 +97,17 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
   const [input, setInput] = useState('');
   const [orientationPrompt, setOrientationPrompt] = useState<string | null>(null);
   const [streaming, setStreaming] = useState(false);
+  const [genSeconds, setGenSeconds] = useState<number | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
   const dragRef = useRef<DragState | null>(null);
+  useEffect(() => {
+    if (!streaming) { setGenSeconds(null); return; }
+    const started = Date.now();
+    setGenSeconds(0);
+    const timer = setInterval(() => setGenSeconds(Math.floor((Date.now() - started) / 1000)), 1000);
+    return () => clearInterval(timer);
+  }, [streaming]);
   const [engineState, setEngineState] = useState<'idle' | 'starting' | 'ready' | 'failed'>('idle');
   const [engineProgress, setEngineProgress] = useState<number | null>(null);
   const [slow, setSlow] = useState(false);
@@ -395,6 +403,11 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
             </div>
             {orientationPrompt && <p role="status">Your orientation question is waiting. Prepare the Companion to hear its explanation; you can keep using the on-screen guide now.</p>}
             {replyNotice && <p className="companion-notice" role="status">{replyNotice}</p>}
+            {streaming && genSeconds !== null && (
+              <p className="chat-generating" role="status" aria-live="polite">
+                <span className="chat-generating-dot" aria-hidden="true" /> Generating … {genSeconds}s
+              </p>
+            )}
             {messages.map((m, i) => (
               <div key={i} className={`chat-msg ${m.role}`}>
                 {m.role === 'assistant' ? stripGuideCommands(m.text) : m.text}

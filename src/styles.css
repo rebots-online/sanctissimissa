@@ -2834,3 +2834,9 @@ button:hover:not(:disabled) { filter: brightness(0.96); }
 button:active:not(:disabled) { transform: translateY(1px) scale(0.98); filter: brightness(0.9); }
 button:disabled { opacity: 0.55; cursor: not-allowed; }
 @media (prefers-reduced-motion: reduce) { button:active:not(:disabled) { transform: none; } }
+
+/* OG.4 generation live feedback (2026-09-18 amendment §B) */
+.chat-generating { display: flex; align-items: center; gap: 8px; font-size: .9rem; opacity: .85; }
+.chat-generating-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--gold, #b08d3e); border-top-color: transparent; animation: chat-gen-spin 1s linear infinite; flex: none; }
+@keyframes chat-gen-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .chat-generating-dot { animation: none; border-right-color: transparent; } }
