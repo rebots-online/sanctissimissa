@@ -396,6 +396,9 @@ details go to Diagnostics. The old mock remains an unconnected test helper.
 | `ChatController` / `ChatView` | Controller in `reusable-chatbot/core/chat-controller.ts`; UI in `src/ui/ChatView.tsx`. Engine init precedes send; technical exceptions are logged, never yielded as assistant tokens. History is in-memory and clears when engine closes. |
 | `DiagnosticStore` / `installDiagnosticCapture` / `DiagnosticsWindow` | `src/core/diagnostics/store.ts`, `capture.ts`, `src/ui/DiagnosticsWindow.tsx`. Capture starts before React; viewer is mounted outside `App` under the shared model provider. |
 | `GUIDE_STEPS` / `OrientationGuide` | `src/core/orientation/guide.ts`, `src/ui/OrientationGuide.tsx`. Six registered targets; saved `{completed, step}` under localStorage `sanctissimissa.orientation.v1`; no arbitrary model-provided selector or JavaScript execution. |
+| `HostedOpenRouterProvider` | `reusable-chatbot/engines/hosted-openrouter/index.ts` — OpenAI-compatible SSE streaming provider over `https://openrouter.ai/api/v1`; **automatic debug default engine on every platform** (amendment §E, pending signoff): tried first by ChatView, local providers retained and picker-selectable; key by pointer (`VITE_OPENROUTER_API_KEY`), `debugEvent('hosted-openrouter', …)` diagnostics, never the key |
+| `resolveHostedEngine` / `hostedProvider` config | `src/core/chat/resolve.ts` + `config/companion-defaults.json` — `(key, onProgress?) => Promise<Resolution>`; config block `{ kind: 'openrouter', baseUrl, model: 'qwen/qwen3.8-27b:free', fallbackModel: 'z-ai/glm-5.2:free', modelLabel: 'Qwen 3.8 27B' }`; feedback `hostedKeyMissing` / `hostedNetwork` in `src/core/chat/feedback.ts` |
+| `occupiedRects` / `resolveGuidePlacement` / `ORIENTATION_GAP` | `src/core/orientation/layout.ts` — workspace-aware placement for both orientation cards (amendment §D, pending signoff): live `.chat-panel`/`.rail`/`.masthead` rects; saved-position validity check; top-right → bottom-right → top-left → bottom-left anchor scan 16 px in / 64 px header zone; `'compact'` fallback presentation |
 | `RunnerPhases` | Phase 0 contract freeze → 1 dependable baseline (CP.2→CP.4, CP.7, CP.9) → 2 TurboQuant KV → 3 Bonsai → 4 LiteRT-LM → 5 llama.cpp-WebGPU consolidation (guide §10; Phases 2–5 expand to self-contained tasks when reached) |
 
 The historical Stanza CP derivation remains recorded in `CHECKLIST.md`. This
@@ -1839,3 +1842,195 @@ Android). Automatic resolution NEVER selects a heavier model: if the preferred
 presents the explicit choice; heavier models enter use only by express user
 selection. The automatic-qualified-default fallback that ranked any
 non-manual-only model is removed.
+
+## Whole-card orientation interaction, workspace-aware placement, and hosted OpenRouter debug default (2026-09-18)
+
+**Status: drafted — pending operator signoff (amendment-sequence gate, CLAUDE.md).**
+No CHECKLIST stanza derives from this section and no code is written under it
+until the operator signs off and `DOCS/ARCHITECTURE-SIGNOFF.md` records the entry.
+
+Operator directives (verbatim, this session):
+
+- "the method of dragging by clicking on the title with no indication to, is so
+  extremely unintuitive it would be a turnoff and frfustration either mke it
+  draggble anywhere you click on it or add window dressing like MS Windows. But
+  better to jsut allow dragging by clicking anywhere on the box"
+- "i closed it. you cannot coninue testing on the webapp until you fix the
+  atomic.bot chatbot on webapp"
+- "easier, replace the webapp/pwa and FOR NOW default for all platforms, to
+  openrouter/free as per api key in admin-manual we are losing too much time to
+  the chatbot problems and making no progress; so fowr now, make the default to
+  use hosted openrouter/free. But leave everything in place to fix--openrouter
+  is for debug only because it is not scalable"
+
+Supporting operator requirements from the same date (placement/interaction
+contract): a useful initial position is provided automatically; position
+derives from actual available workspace and occupied panels, not a fixed
+browser corner; when space is insufficient an explicitly designed compact
+presentation is used instead of covering essential controls; a
+keyboard-accessible placement/reset alternative exists; saved geometry is
+validated on initial display, reopening, viewport resize and panel-layout
+changes; the guide stays compact; all tour flows are preserved.
+
+### D. Orientation card interaction and workspace-aware placement (supersedes the drag/anchor mechanics of §A; §A's size caps and step semantics stand)
+
+The offer card (`.orientation-offer`) and the guide card
+(`.orientation-guide`) are pointer-draggable **by pressing anywhere on the
+card** — not only the heading. Drag engages when the pointer travels more than
+4 px from pointer-down; a press released under the threshold is an ordinary
+click and buttons/links on the card keep working (no `preventDefault` on
+pointer-down unless drag engages). While dragging, the card takes pointer
+capture, gains the `dragging` class, suppresses text selection
+(`user-select: none`) and clamps through the existing `clampGuidePos`; release
+persists through the existing `saveGuidePos`
+(`sanctissimissa.orientation.pos.v1`). The whole card shows `cursor: grab`
+(`grabbing` while dragging) and `touch-action: none`. The card header carries
+a visible grip glyph `⠿` and the hint "Drag to move", so the affordance is
+discoverable even though the whole card is the handle. Recorded tradeoff
+(operator-selected): drags starting on body text move the card rather than
+select text; card prose is short and selection elsewhere is unaffected.
+
+Keyboard placement and reset: both cards are focusable (`tabIndex={0}`); with
+focus, ArrowLeft/Right/Up/Down nudge the card 16 px, Shift+Arrow nudges 96 px,
+Home resets the card to the resolved default placement, and every nudge/reset
+persists via `saveGuidePos`. A visible "Reset position" button in the actions
+row performs the same reset for pointer users.
+
+Workspace-aware placement — new module `src/core/orientation/layout.ts`:
+
+- `export const ORIENTATION_GAP = 8;`
+- `export interface OccupiedRect { left: number; top: number; width: number; height: number }`
+- `export function occupiedRects(root: Document): OccupiedRect[]` — live
+  `getBoundingClientRect()` of `.chat-panel` (the docked/floating Companion,
+  only when present with non-zero area), `.rail` (collapsed or full), and
+  `.masthead` (the app header zone). `.mapstrip` is inside the flow below the
+  masthead and is not treated as occupied.
+- `export function resolveGuidePlacement(viewport: { w: number; h: number }, occupied: OccupiedRect[], card: { w: number; h: number }, saved: { left: number; top: number } | null): { left: number; top: number } | 'compact'`
+  — (1) if `saved` is finite, fully inside the viewport with an 8 px inset, and
+  the card at `saved` intersects no occupied rect (grown by
+  `ORIENTATION_GAP`), return `saved`; (2) otherwise scan anchor candidates in
+  priority order — top-right, bottom-right, top-left, bottom-left — each
+  placed 16 px from its viewport edges with top anchors starting below a
+  64 px header zone, and return the first candidate whose card rectangle fits
+  the viewport and avoids every occupied rect; (3) if no candidate fits,
+  return `'compact'`. Integer coordinates.
+
+Compact presentation: when `resolveGuidePlacement` returns `'compact'`, the
+card renders with class `orientation-compact` — padding 10 px,
+`max-width: min(300px, calc(100vw - 24px))`, `max-height: 32dvh`, the step
+body collapsed behind a `<details><summary>Details</summary></details>`
+disclosure, actions row preserved (wrapping) — docked at the top of the
+largest free horizontal band. The card never expands to solve overlap
+(§A caps stand: 340 px / 40 dvh non-compact).
+
+Validation triggers — placement is recomputed on: card mount, every `step`
+change, the `START_GUIDE` and `OPEN_COMPANION` window events, window
+`resize`, and a `ResizeObserver` attached to `document.documentElement`
+(panel dock/undock/resize changes the root box). A recomputation that yields
+a position different from the saved one both applies it and persists it
+through `saveGuidePos` — stale, off-screen or obstructive positions
+self-heal on initial display, reopening, resize and panel-layout changes.
+The initial mount no longer applies saved coordinates unclamped: mount runs
+`resolveGuidePlacement` first.
+
+Unchanged: step semantics (`Show me`, `Ask Companion to explain`, `Back`,
+`Next`, `Finish orientation`, `Continue later`, Settings restart via
+`START_GUIDE`), completion key `sanctissimissa.orientation.v1`, offer gating
+`offerOrientationUntilCompleted && !saved.completed`, `.orientation-target`
+highlighting, hard size caps, and the never-full-bleed/never-over-the-USP
+rules of §A.
+
+### E. Hosted OpenRouter debug default — all platforms, temporary (supersedes the automatic on-device default; local stack retained)
+
+The Companion's **automatic default engine on every platform (web/PWA,
+desktop, Android) is a hosted OpenRouter free-tier provider**, effective
+immediately for the debug period. The local engine stack — native llama.cpp
+(`NativeRunnerProvider`) and browser WebLLM (`WebLlmRunnerProvider`) — is
+**retained in full** and remains selectable in the picker; nothing is deleted.
+This supersedes the same-day instruction "Do not … introduce a hosted
+fallback" (recorded verbatim above in this session's history) and re-scopes
+§C: §C's heavier-never-automatic rule continues to bind **local** model
+selection; the automatic **engine** default is hosted until the operator
+reverts this. No entitlement is created or gated: this is not the §7.6 metered
+`HostedEngine`/`companion_hosted` product tier and must not be represented as
+scalable.
+
+Entities:
+
+- **`reusable-chatbot/engines/hosted-openrouter/index.ts`** —
+  `export class HostedOpenRouterProvider implements IInferenceEngine`.
+  Constructor `(apiKey: string, model: string, fallbackModel: string | null, onProgress?: (fraction: number, text: string) => void, log?: (operation: string, detail: unknown) => void)`.
+  `probe()` returns a `CapabilityReport`-shaped report with
+  `runtime: 'web'`, `accelerations: ['hosted-openrouter']`,
+  `contextCeiling: 32768`, `memoryBudgetBytes: Number.MAX_SAFE_INTEGER`,
+  `notes: 'debug hosted default — not scalable'`. `init(config)` validates the
+  key and model are non-empty (no network call; failures surface on first
+  generation). `generate(session, req, signal?)` POSTs
+  `<baseUrl>/chat/completions` with headers
+  `{ Authorization: 'Bearer <key>', 'Content-Type': 'application/json', 'HTTP-Referer': 'https://sanctissimissa.surge.sh', 'X-Title': 'SanctissiMissa' }`
+  and body `{ model, messages, stream: true, max_tokens: req.maxTokens ?? 768, temperature: 0.7 }`,
+  parses SSE `data:` lines and yields real provider token deltas; HTTP errors
+  throw with the status; an HTTP 404 for `model` retries exactly once with
+  `fallbackModel` when set and different; `AbortSignal` cancellation stops the
+  stream. `close()` is a no-op; `batchScore` throws unsupported.
+- **`resolveHostedEngine`** in `src/core/chat/resolve.ts` —
+  `(key: string | undefined, onProgress?) => Promise<Resolution>`: key absent
+  → `{ kind: 'unsupported', reason: companionFeedback.hostedKeyMissing }`;
+  otherwise `{ kind: 'ready', engine: new HostedOpenRouterProvider(...), config, label: '<modelLabel> · hosted (free)' }`.
+- **ChatView prepare order** (`src/ui/ChatView.tsx`): with no explicit local
+  selection, `resolveHostedEngine` is tried **first** on every platform and a
+  ready result is adopted (`controller.useEngine`); hosted failure falls
+  through to the existing native/web resolution. An explicit picker selection
+  of a local entry forces that local engine for the session; a picker
+  selection of the hosted entry forces hosted. The engine chip reads `HOSTED`
+  while the hosted engine is active.
+- **`config/companion-defaults.json`** gains exactly:
+  `"hostedProvider": { "kind": "openrouter", "baseUrl": "https://openrouter.ai/api/v1", "model": "qwen/qwen3.8-27b:free", "fallbackModel": "z-ai/glm-5.2:free", "modelLabel": "Qwen 3.8 27B" }`
+  (model ids verified live on the public OpenRouter catalog 2026-09-18;
+  `liquid/lfm-2.5-2.6b:free` is the lightweight alternate).
+- **Picker** (`src/ui/ModelPicker.tsx`): the first choice is the hosted entry
+  — id `hosted:openrouter`, display name `<modelLabel> · hosted (free)`, no
+  download state, instantly preparable. Local entries (including the Qwen 3.5
+  2B native preference and their honest "Not available on this device"
+  markings) are unchanged below it.
+- **Authored feedback** (`src/core/chat/feedback.ts`) gains:
+  `hostedKeyMissing: 'The hosted Companion is not configured on this build. On-device choices remain below; you can keep using the Missal.'`
+  and
+  `hostedNetwork: 'The Companion could not reach the hosted service. Check the connection and try again — the Missal keeps working.'`.
+  Hosted generation reuses the §B elapsed indicator, streamed partial reply
+  and Stop affordance; no engine is reported working until an actual reply is
+  observed.
+- **Secrets by pointer** (`scripts/provision-secrets.mjs`): a new
+  MATERIALIZATIONS entry `OPENROUTER_API_KEY` dereferences the canonical
+  cleartext (Admin-Manual `CREDENTIALS/api-tokens.md` § OpenRouter, var
+  `OPENROUTER_API_KEY`) into the gitignored `.env.local` as
+  `VITE_OPENROUTER_API_KEY=<value>` (preserving unrelated lines; absent
+  pointer warns, dangling pointer fails, per the existing regime). The web
+  build reads `import.meta.env.VITE_OPENROUTER_API_KEY`. Cleartext never
+  enters the repo, transcripts, or command echoes.
+- **Diagnostics**: `debugEvent('hosted-openrouter', operation, detail)`
+  for `init`, `stream.start`, `stream.end`, `fallback`, `error` — never the
+  key or Authorization header.
+- **CSP**: no change — `connect-src` has allowed `https:` since `2c1d163f`.
+- **Exposure record (binding honesty):** the key ships inside the public web
+  bundle on surge.sh and inside desktop/Android builds; any user can extract
+  it. This is accepted **only** for the debug period ("openrouter is for
+  debug only because it is not scalable"); the key must be rotated before any
+  non-debug exposure, and the scalable design remains the §7.6 metered proxy
+  behind the `companion_hosted` entitlement — explicitly NOT implemented here.
+
+### F. Version uniqueness (binding record; no new mechanism)
+
+`v1.58.28951` was stamped at `3bbd4960`; code commits `1ca2ba86`, `5b487d11`,
+`e9a9283c` (OG.1–OG.5) and `c3cc281d` landed afterwards without an increment,
+so changed source carries the same displayed version as the shipped v1.58
+build — the duplicate-version defect (Admin-Manual NO-DUPLICATE-VERSIONS;
+v1.58 fixed-in-place incident, same day). Binding: the next build's
+fresh-release stamp performs exactly one minor increment (→ `1.59.<epoch
+minutes % 100000>`) through `scripts/stamp-version.mjs` + the release driver;
+no pre-stamp of source edits; resume and deploy retries keep the one version;
+no artifact is ever overwritten with different bytes under a version another
+build already used; and release verification must confirm the running app's
+displayed version, the produced artifacts, and the canonical version files
+(`package.json` / `src-tauri/tauri.conf.json` / `src-tauri/Cargo.toml`) all
+agree on that new version.
