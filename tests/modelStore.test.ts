@@ -287,3 +287,65 @@ test('CP.11: desktop IPC passes camelCase arguments and one storage scope throug
     assert.ok(!Object.keys(args ?? {}).some((key) => key.includes('_')), 'Tauri argument names are camelCase');
   }
 });
+
+test('CP.3: a stalled stream resumes by Range instead of failing (WebKitGTK long pauses)', async (t) => {
+  const root = await mkdtemp(join(tmpdir(), 'sam-stall-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const lib = new TempFileLibrary(root);
+  const manager = new DownloadManager(lib, undefined, { stallMs: 120, maxResumes: 4 });
+  const requests: { range: string | undefined }[] = [];
+  const originalFetch = globalThis.fetch;
+  t.after(() => { globalThis.fetch = originalFetch; });
+  const half = Math.floor(PAYLOAD.byteLength / 2);
+  globalThis.fetch = (async (_url: string | URL | Request, init?: RequestInit) => {
+    const headers = init?.headers as Record<string, string> | undefined;
+    requests.push({ range: headers?.Range });
+    if (requests.length === 1) {
+      // Serve the first half, then never resolve another read — the stall
+      // timer must abort only this connection.
+      const stream = new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(PAYLOAD.subarray(0, half));
+          init?.signal?.addEventListener('abort', () =>
+            controller.error(new DOMException('The operation was aborted.', 'AbortError')), { once: true });
+        },
+      });
+      return new Response(stream, { status: 206, headers: { 'content-range': `bytes 0-${PAYLOAD.byteLength - 1}/${PAYLOAD.byteLength}` } });
+    }
+    const asked = /^bytes=(\d+)-$/.exec(requests[1].range ?? '');
+    if (requests.length === 2 && asked && Number(asked[1]) === half) {
+      return new Response(PAYLOAD.subarray(half), { status: 206, headers: { 'content-range': `bytes ${half}-${PAYLOAD.byteLength - 1}/${PAYLOAD.byteLength}` } });
+    }
+    return new Response('unexpected', { status: 500 });
+  }) as typeof fetch;
+
+  const result = await manager.acquire(GOOD, 'https://models.example/stall.gguf').promise;
+  assert.equal(result.kind, 'ready', `resume must complete the object, got ${JSON.stringify(result)}`);
+  assert.equal(requests.length, 2, 'exactly one stall-reconnect');
+  assert.equal(requests[1].range, `bytes=${half}-`, 'reconnect asks for exactly the durable remainder');
+});
+
+test('CP.3: repeated stalls exhaust resumes and fail honestly, not silently', async (t) => {
+  const root = await mkdtemp(join(tmpdir(), 'sam-stall2-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const lib = new TempFileLibrary(root);
+  const manager = new DownloadManager(lib, undefined, { stallMs: 100, maxResumes: 2 });
+  let calls = 0;
+  const originalFetch = globalThis.fetch;
+  t.after(() => { globalThis.fetch = originalFetch; });
+  globalThis.fetch = (async (_u: string | URL | Request, init?: RequestInit) => {
+    calls++;
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        init?.signal?.addEventListener('abort', () =>
+          controller.error(new DOMException('The operation was aborted.', 'AbortError')), { once: true });
+      },
+    });
+    return new Response(stream, { status: 206, headers: { 'content-range': `bytes 0-${PAYLOAD.byteLength - 1}/${PAYLOAD.byteLength}` } });
+  }) as typeof fetch;
+
+  const result = await manager.acquire(GOOD, 'https://models.example/dead.gguf').promise;
+  assert.equal(result.kind, 'unavailable');
+  assert.match((result as { reason?: string }).reason ?? '', /stalled/i);
+  assert.equal(calls, 3, 'initial attempt plus exactly maxResumes reconnects');
+});
