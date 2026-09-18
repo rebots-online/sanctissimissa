@@ -95,3 +95,16 @@ test('CP.4: picker states are honest — no mock/preview anywhere in the surface
   assert.ok(chatViewSource.includes('<ModelPicker hook={models} compact'), 'ChatView header carries the picker');
   assert.ok(settingsSource.includes('Companion models'), 'Settings carries the models surface');
 });
+
+/* OG.5 — universal default model is the preferred 2B repo only; heavier models never auto-selected (2026-09-18 amendment §C). */
+test('preferredDefault resolves the preferred 2B repo or nothing — never a heavier fallback', async () => {
+  const defaults = JSON.parse(readFileSync(new URL('../config/companion-defaults.json', import.meta.url), 'utf8')) as { preferredNativeRepo: string };
+  assert.equal(defaults.preferredNativeRepo, 'unsloth/Qwen3.5-2B-GGUF');
+  const source = readFileSync(new URL('../src/core/chat/models.ts', import.meta.url), 'utf8');
+  const body = /export function preferredDefault[\s\S]*?\n}/.exec(source)?.[0] ?? '';
+  assert.match(body, /entry\.repo === defaults\.preferredNativeRepo/, 'default resolves the preferred repo');
+  assert.doesNotMatch(body, /manualOnlyFamilies/, 'the any-ranked-model fallback is removed');
+  assert.match(body, /\?\? null/, 'absence of the preferred repo yields null (explicit choice)');
+  const picker = readFileSync(new URL('../src/ui/ModelPicker.tsx', import.meta.url), 'utf8');
+  assert.match(picker, /!state\.catalog\.defaultPick && /, 'picker renders an honest no-default state');
+});

@@ -104,8 +104,9 @@ export function makeDownloadManager(library: ReturnType<typeof makeLibrary>): Do
   return new DownloadManager(library);
 }
 
+// Amendment 2026-09-18 §C: the automatic default is the preferred 2B repo only —
+// a heavier model is never auto-selected; absence of the preferred entry leaves
+// the choice explicitly to the user.
 export function preferredDefault(ranked: RankedModel[]): RankedModel | null {
-  return ranked.find((entry) => entry.repo === defaults.preferredNativeRepo && !entry.unsupported)
-    ?? ranked.find((entry) => !entry.unsupported && !defaults.manualOnlyFamilies.some((family) => entry.displayName.toUpperCase().includes(family)))
-    ?? null;
+  return ranked.find((entry) => entry.repo === defaults.preferredNativeRepo && !entry.unsupported) ?? null;
 }
