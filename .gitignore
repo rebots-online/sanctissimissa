@@ -54,3 +54,51 @@ LOGS/
 .remember/
 .playwright-mcp/
 .codegraph/
+
+# Extracted AppImage runtime; retained locally, never source.
+/squashfs-root/
+
+# TEMPORARY operator exception (2026-09-18): Forgejo LFS outage.
+# These existing release binaries exceed GitHub's 100 MiB ordinary-file limit.
+# Keep local bytes and historical LFS objects; do not delete the artifacts.
+# When Forgejo LFS returns: remove this block, git add these paths, then
+# git lfs push --all origin master and push the restoration commit to both remotes.
+# .gitattributes and .lfsconfig retain the Forgejo LFS configuration.
+/dist/sanctissimissa-v1.41.21298-all.zip
+/dist/sanctissimissa-v1.41.21298-android-native-debug-symbols.zip
+/dist/sanctissimissa-v1.41.21298-android-universal-debug.apk
+/dist/sanctissimissa-v1.41.21298-android-universal-release.aab
+/dist/sanctissimissa-v1.41.21298-android-universal-release.apk
+/dist/sanctissimissa-v1.41.21298-linux-amd64.AppImage
+/dist/sanctissimissa-v1.41.21298-linux-amd64.deb
+/dist/sanctissimissa-v1.41.21298-windows-x64-standalone.exe
+/dist/sanctissimissa-v1.42.25336-android-native-debug-symbols.zip
+/dist/sanctissimissa-v1.42.25336-android-universal-debug.apk
+/dist/sanctissimissa-v1.42.25336-android-universal-release.aab
+/dist/sanctissimissa-v1.42.25336-android-universal-release.apk
+/dist/sanctissimissa-v1.42.25336-linux-amd64.AppImage
+/dist/sanctissimissa-v1.42.25336-linux-amd64.deb
+/dist/sanctissimissa-v1.42.25336-windows-x64-standalone.exe
+/dist/sanctissimissa-v1.45.27008-android-native-debug-symbols.zip
+/dist/sanctissimissa-v1.45.27008-android-universal-release.aab
+/dist/sanctissimissa-v1.45.27008-android-universal-release.apk
+/dist/sanctissimissa-v1.45.27008-linux-amd64.AppImage
+/dist/sanctissimissa-v1.45.27008-linux-amd64.deb
+/dist/sanctissimissa-v1.45.27008-windows-x64-standalone.exe
+/dist/sanctissimissa-v1.53.28081-android-native-debug-symbols.zip
+/dist/sanctissimissa-v1.53.28081-android-universal-release.aab
+/dist/sanctissimissa-v1.53.28081-android-universal-release.apk
+/dist/sanctissimissa-v1.53.28081-linux-amd64.AppImage
+/dist/sanctissimissa-v1.53.28081-linux-amd64.deb
+/dist/sanctissimissa-v1.53.28081-windows-x64-standalone.exe
+/dist/sanctissimissa-v1.54.28154-android-universal-release.aab
+/dist/sanctissimissa-v1.54.28154-android-universal-release.apk
+/dist/sanctissimissa-v1.54.28154-linux-amd64.AppImage
+/dist/sanctissimissa-v1.54.28154-linux-amd64.deb
+/dist/sanctissimissa-v1.54.28154-windows-x64-standalone.exe
+/dist/sanctissimissa-v1.58.28951-android-native-debug-symbols.zip
+/dist/sanctissimissa-v1.58.28951-android-universal-release.aab
+/dist/sanctissimissa-v1.58.28951-android-universal-release.apk
+/dist/sanctissimissa-v1.58.28951-linux-amd64.AppImage
+/dist/sanctissimissa-v1.58.28951-linux-amd64.deb
+/dist/sanctissimissa-v1.58.28951-windows-x64-standalone.exe
