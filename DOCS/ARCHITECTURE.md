@@ -1,5 +1,26 @@
 # SanctissiMissa — Authoritative Architecture
 
+> **Current code snapshot — 2026-09-18.** Published on `master` at
+> `047374b47124b57e3db2e0866bbfcc8607bb4170`, with the exact source tree of
+> local merge `f65f848` (implementation `448a6ab`, upstream `3021d44`;
+> package version `1.55.28490`). This snapshot and §7.8
+> distinguish implemented behavior from retained target contracts. Historical
+> “shipped”, “verified” and phase labels below are dated records, not evidence
+> that all planned entities exist or that this revision passed device acceptance.
+> This reconciliation documents existing code; it does not approve new features
+> or record operator signoff under `CLAUDE.md`.
+
+| Area | Present in the reviewed source | Remaining boundary |
+|---|---|---|
+| Shell and reading | React 18 / Vite 6 shell; Holy Mass map, Missal Reader, calendar, Office, Scripture, journal, homily planner, annotations, Settings and About. Mass/Office/Bible share `SectionReader`. | `SubwayMap` now has only Mass content; the former Missa/Scriptura/Horæ selector and alternate map routes were removed. |
+| Corpus | `CorpusDb` runs sql.js against the same corpus bytes on every platform. Web fetches `/missal.db`; native `load_corpus` returns `tauri::ipc::Response` from `include_bytes!`. | Android Play Asset Delivery described in decision 18 is a target, not the active native loader. This checkout has no provisioned `assets/missal.db`. |
+| User data | `src/core/accompaniment/store.ts` implements the separate SQLite sidecar. CKEditor-backed `AccompanimentEditor` uses `body_html`; journal and homily views are present. | Lore tables do not establish that Companion retrieval or memory distillation is integrated. |
+| Companion | Shared `CompanionModelsProvider`, explicit preparation, native llama.cpp and browser WebLLM providers, actual progress, authored recovery messages; details in §7.8. | Real Qwen cold-load/reply on the Z Fold, Rust compilation and browser visual acceptance were not completed in this checkout. |
+| Guidance | Persistent orientation offer, six authored steps, real DOM highlighting and user-triggered activation; ready Companion receives visible-control context and can explain/highlight. | Generated explanations are requested with “Ask Companion to explain”; the tour does not automatically generate narration for every step. |
+| Diagnostics | App-global console/error/fetch/IPC recorder; Settings opens a floating/dockable viewer with filters, pause, copy and JSONL export. | Native library stderr is not captured. Fetch events end at response headers; download byte progress is recorded separately. |
+| Library and commerce | Catalogue/provisioning data and LS/RevenueCat contracts are tracked. | No runtime Bookstore/Chant/Reference rail routes or RevenueCat SDK integration in the current shell; server provisioning is not app delivery. |
+| Release | Existing version stamp retained from upstream; release scripts remain the release path. | This source merge creates no APK/AppImage or deployment. LFS payload retrieval failed during checkout; source verification does not qualify historical release binaries. |
+
 > **Current Library/Bookstore/Chant/Reference contract — 2026-09-13 (LS-1).**
 > The inherited document mixes shipped behavior with pending designs. The audit
 > confirmed Haydock commentary and shared reader foundations; it did **not** find
@@ -276,7 +297,12 @@ CREATE TABLE IF NOT EXISTS reading_progress (plan_id TEXT NOT NULL, ord INTEGER 
 
 **Journal sidecar workspace (UI elaboration of §7.6 B-C/B-D per the prototype + PRD):** reader context menus (ReaderView, BibleView, OfficeView once SectionReader lands) gain **"✎ Add to Journal/Homily notes"** and **"🖍 Highlight both panes"**. Capture opens `JournalSidecar` (`src/ui/JournalSidecar.tsx`, right split pane on the MeaningPanel pattern): source block (bilingual quote via `alignSelection` + anchor nodeKey/verse ref + capture timestamp), embedded `AccompanimentEditor`, `ConnectionsPanel` (corpus vector hits via `nucleatedSimilarToText` over note+quote, the user's own past accompaniments via runtime `embedText` against `sidecar_embeddings`, and direct commentary blocks; every card carries a why-bridge line + evidence chips + add-as-source/dismiss — routes, not bare similarity scores), a destinations row mapping to `exposure` + `OccurrenceSelector` (keep as journal | promote to homily seed | attach to theme/series | schedule for a liturgical occasion), and toast feedback. Dual-pane highlight = lightweight accompaniment (quote + quoteAlt) rendered through the existing `mark.ann` pipeline in **both** panes. Priest/laity vocabulary from settings `mode`. Voice dictation and attachments: schema-ready (`attachments` JSON per PRD), out of scope this wave.
 
-## 7.8 Companion engine plane — org-wide chatbot-guide re-baseline (2026-09-17, decision 23)
+## 7.8 Companion engine plane — target contract and current implementation (2026-09-18)
+
+**Reading rule.** The organization-wide guide remains the design direction.
+The implementation columns and §7.8.7 are the current source snapshot. A target
+ABI method, provider, storage policy or qualification described by the guide
+must not be reported as implemented merely because it is specified here.
 
 **Authority and supersession (operator, 2026-09-17).** This section re-baselines the Companion runner layer 1:1 from `DOCS/CHATBOT_SPECS/Edge_Mobile_Web_LLM_Runners_and_Tauri_2_Strategy_Natally_2026-09-17.md` (the standard organization-wide chatbot guide; its §1–11 research is dated 2026-09-13 and its §12–22 Natally continuation supplies the shared-storage/runner-decision patterns — both govern direction, neither replaces this product contract). It **supersedes the 2026-09-16 engine roster inside the §7.6 Companion paragraph** ("TurboQuant on every viable execution platform", WebGPU-WGSL-first, CP.3-era engine order) and the §9.4 `InferenceBackend` row's provider list; everything else in §7.6 (ChatView presentation, CompanionMemory, entitlements, one-object sidecar) stands unchanged. Operator directive recorded with this re-baseline: **the Companion ships no preview/mock/placeholder engine surface to users** — the mock `MockEngine` remains a test fixture behind the same interface only; every user-facing engine surface is a real provider or an honest "unsupported/needs setup" state.
 
@@ -285,43 +311,49 @@ CREATE TABLE IF NOT EXISTS reading_progress (plan_id TEXT NOT NULL, ord INTEGER 
 | Layer | Shared contract | SanctissiMissa realization |
 |---|---|---|
 | Experience | ChatView badge/panel (§7.6, CP.5 — landed), transcripts, citations, model picker surface | existing `src/ui/ChatView.tsx` + `ModelPicker` (§7.8.5) |
-| Orchestration | messages, retrieval, prompt policy, cancellation — no runner-specific imports | existing `reusable-chatbot/core/chat-controller.ts` |
-| Capability broker | probe memory, acceleration, context ceiling, model formats, tool constraints | `reusable-chatbot/core/capability-broker.ts` (new); Rust/native probe in Tauri, JS/WebGPU probe in browser |
-| Runner ABI | `load, warmup, generate-stream, embed, tokenize, cancel, unload, health, estimateMemory` | extension of the existing `IInferenceEngine` (`probe/init/generate/batchScore/kvStats/reset/close`); handles stay opaque, KV stays engine-owned, no per-token IPC |
-| Model manager | signed manifest, resumable chunks, hashes, variants, storage policy, license acceptance | decision-22 content-addressed store completed per guide §13–15 (§7.8.4) |
-| Knowledge services | corpus retrieval, embeddings, graph memory, citations, context packing | existing corpus graph + `CompanionMemory` (§7.6) |
-| Control plane | entitlements, model catalog, optional hosted fallback | RC gates `companion_ondevice`/`companion_hosted` (§7.6); Atomic Chat catalogs (§7.8.5) |
+| Orchestration | messages, retrieval, prompt policy, cancellation — no runner-specific imports | `ChatController` currently probes/initializes providers, keeps in-memory turn history and streams generation; optional system context carries orientation. Retrieval is not wired into this path. |
+| Capability broker | probe memory, acceleration, context ceiling, model formats, tool constraints | `capability-broker.ts`; native build/CPU report and browser adapter/memory heuristics. No smoke generation or measured memory qualification occurs during the probe. |
+| Runner ABI | target `load, warmup, generate-stream, embed, tokenize, cancel, unload, health, estimateMemory` | Implemented `IInferenceEngine` is `probe/init/generate/batchScore/kvStats/reset/close`; extended methods remain targets. Native cancellation/tokenization also have IPC commands. |
+| Model manager | signed manifest, resumable chunks, hashes, variants, storage policy, license acceptance | `DesktopModelLibrary`, `WebModelLibrary`, `DownloadManager` implement lookup/write/verification/locking. Signed manifests, resume, leases and license acceptance are not implemented. |
+| Knowledge services | corpus retrieval, embeddings, graph memory, citations, context packing | Corpus graph/vector queries and sidecar lore storage exist outside the current chat path. No `CompanionMemory` implementation or retrieval/citation injection in `ChatController`. |
+| Control plane | entitlements, model catalog, optional hosted fallback | Vendored native catalog and executable WebLLM manifest are connected. RevenueCat gates and hosted inference remain target integrations. |
 
 ### 7.8.2 Runner provider roster and phases (guide §4, §10)
 
 The correction this roster embodies: **stop treating a particular fork, model family, or browser package as the module.** TurboQuant is a KV-cache-compression capability negotiated per runner — compressing the growing cache, never the weights — and is developed as Phase 2, not Phase 1.
 
-| Provider | Surface | Role / phase |
+| Provider | Current executable surface | Target role / phase |
 |---|---|---|
-| **Native llama.cpp / `atomic-llama-cpp-turboquant`** | desktop (Windows/Linux/macOS) + Android, via Tauri 2 (pinned 2.11.x line) Rust command/event bridge; persistent session; streaming Channel; **no per-token IPC**; CPU SIMD baseline, CUDA/Metal/Vulkan where present | **Phase 1 dependable baseline for installed builds.** Installed builds never require WebGPU: the Linux AppImage's WebKitGTK webview has none — native inference is what makes the AppImage's Companion real |
-| **WebLLM (worker-hosted)** | browser/PWA | **Phase 1 dependable baseline for web.** Replaces the hand-rolled WebGPU-WGSL plan as the browser default; self-hosted runtime assets (no CDN dependency for shipping) |
-| **CPU/WASM fallback (`turboquant-wasm`)** | any runtime meeting the relaxed-SIMD floor | Phase 1 fallback tier; older runtimes get honest "unsupported", never a degraded pretend-mode |
+| **Native llama.cpp** | `NativeRunnerProvider` → official Tauri invoke/Channel → `src-tauri/src/inference.rs`, using `llama-cpp-2` 0.1.156. Enabled only with `native-inference`, 64-bit, non-Windows. Model object persists; generation creates its context per call and uses greedy sampling. | Phase 1 installed-build baseline. Windows and 32-bit Android are compiled as unsupported stubs, even on a Windows-native host under the current cfg. No atomic-TurboQuant fork or GPU backend selection is wired here. |
+| **WebLLM** | `WebLlmRunnerProvider` calls `CreateMLCEngine` in the page, using the installed package's compiled-model manifest and cache. | Phase 1 browser baseline. Worker hosting and self-hosted model/runtime assets remain targets; the current code does not construct a worker. |
+| **CPU/WASM fallback (`turboquant-wasm`)** | Dependency/vendored material only; no connected fallback provider. | Phase 1 target, currently unimplemented. A browser without WebGPU cannot generate through the current app. |
 | TurboQuant KV compression | wherever fused kernels are validated (native first) | Phase 2 context advantage; capability flag, not a UX mode |
 | Bonsai 27B 1-bit/ternary | qualified flagships/laptops only | Phase 3 optional high-density tier; promotion only where it beats baseline end-to-end (guide §9 matrix) |
 | LiteRT-LM | cross-platform CPU/GPU/NPU challenger | Phase 4 strategic second engine, qualification-gated |
 | llama.cpp WebGPU (LlamaWeb) | browsers | Phase 5 consolidation candidate — the superseded 2026-09-16 "WebGPU TurboQuant WGSL engine extraction" idea lives on here, as a *later* phase, not the near-term deliverable |
 | `HostedEngine` (metered proxy) | entitlement `companion_hosted` | later tier, unchanged from §7.6 |
 
-Every provider's `probe()` reports true adapter limits and runs a smoke generation before claiming capability; provider claims follow observed capability, never marketing (§9.4 honesty rule, retained).
+**Qualification target:** a provider must pass smoke generation and device memory,
+latency and cancellation checks before being called qualified. Current probes do
+not perform this acceptance. The native probe reports a fixed 3 GiB budget and
+8,192-token ceiling; these are configured ceilings, not Z Fold measurements.
 
 ### 7.8.3 Model tiers and acceptance (guide §7, §8)
 
 | Tier | Target | Strategy |
 |---|---|---|
-| Universal baseline (default) | 8 GB RAM desktop; broad browsers | a strong **3B–4B instruct, role-tuned to the Companion persona**, conservative context, **retrieval-first**: answers come from the corpus with citations; the model composes, it does not recite from memory |
+| Native preferred default | Compatible installed runtime | **Qwen 3.5 2B**, from `config/companion-defaults.json`, takes precedence when the catalog/budget filter accepts it. LFM is excluded from automatic fallback selection. This is configured preference, not device qualification. |
+| Browser default | WebGPU browser | First budget-compatible executable entry from WebLLM's size-ordered manifest. It is not represented as Qwen 3.5 2B unless that exact executable entry exists. |
 | Quality | 12–16 GB devices | **4B–9B** specialist — beats a generic 27B for this UX (guide §7 SanctissiMissa row) |
 | High-density experimental | qualified flagships | Bonsai 27B 1-bit — conditional on Phase-3 qualification |
 
 **Acceptance for any model/engine promotion is retrieval quality and citation fidelity on the liturgical corpus** (feast/propers questions answered from the corpus with correct deep links), plus cold-load, first-token latency, sustained decode, peak memory with UI + index active, and cancellation — not parameter count or generic benchmarks (guide §9 harness, adapted).
 
-### 7.8.4 Model manager — decision-22 store completed per guide §13–15
+### 7.8.4 Model manager — retained target contract (partially implemented)
 
-Decision 22's content-addressed layout (`models/sha256/<digest>/…` under the resolved org-common root) is retained and completed with the guide's shared-library contract:
+Decision 22's content-addressed layout (`models/sha256/<digest>/…` under the
+resolved storage root) is implemented. The following completion requirements
+remain the target contract; §7.8.7 records what exists and its limits:
 
 - **Build-config parity:** one generated artifact (`scripts/generate-storage-config.mjs` → `config/asset-storage.generated.json`: `{schema, scope}`) consumed by BOTH Vite and Rust (`src-tauri/src/storage_config.rs`, `include_str!` + `cargo:rerun-if-changed`); generated under the release lock; build fails on generation/parity failure. `src/core/storage/root.ts` remains the frontend resolver, now reading the generated config.
 - **Content identity:** SHA-256 + exact byte count; immutable object paths; a small transactional **catalogue/alias index** maps logical model IDs/revisions → digests (multiple aliases may resolve to the same bytes); runtime qualification (backend, context limit, chat template, hardware evidence) is recorded separately from file presence.
@@ -332,27 +364,127 @@ Decision 22's content-addressed layout (`models/sha256/<digest>/…` under the r
 
 ### 7.8.5 Model registry and the model picker (operator directive 2026-09-17)
 
-The catalog is the **Atomic Chat catalogs** (`rebots-online/atomic-chat-conf` recommended/staff-picks + `models/inference-profiles.json` + `rebots-online/atomic-chat-model-catalog`), vendored with PROVENANCE and **fused with live `probe()` truth** — never hardcoded models — ranked by deployability (capability + quality + task fit + Atomic priority + context − memory pressure − latency − unsupported-runtime penalty) and resolved to `EngineConfig` pointing at §7.8.4 content keys.
+The native catalog comes from the vendored Atomic Chat catalogue/recommendations
+under `reusable-chatbot/model-registry/data/`, with provenance recorded alongside
+them. `buildCompanionCatalog` adds the explicitly configured Qwen 3.5 2B preference,
+ranks/deduplicates entries, and filters by the capability report. Browser choices
+come from WebLLM's actual `prebuiltAppConfig.model_list`, not native GGUF files.
+Selection persists in localStorage, separately from sidecar settings. Ranking and
+budget estimates do not prove architecture support, download size or successful
+inference on a particular phone.
 
-The **model picker** is a first-class user surface: (a) **automatic qualified default** — an ordinary desktop user gets a usable model choice without questions about CUDA, VRAM, or quantization (guide §17); first open of the Companion offers the ranked default with size and a one-tap download; (b) **manual selection** — the ChatView header carries a model chip/⌄ menu (name + size + readiness state: ready / downloading % / needs setup / unsupported here) and Settings gains a Companion→Models surface listing catalog models with download manager (progress, resume, verify, claim-release/delete), storage usage, and the active default; (c) **honest states** — unsupported-on-this-device models are marked, never forced; no preview/mock/placeholder engine appears in the picker or the panel. Customer-facing language stays product-level (model name, size, "works on this device"); `probe()` detail lives in developer diagnostics only.
+The model picker and ChatView show the selected/recommended name, approximate
+size, “Companion choices” and “Prepare Companion”. Preparation starts explicitly;
+an already verified selected native model is initialized automatically. Settings
+and chat share one provider. Downloading/verifying/file-present and engine-ready
+are distinct states. No resume, usage accounting or claim/delete control is exposed
+by the current picker. Browser “About … MB” currently derives from manifest VRAM
+requirements, not an exact transfer size. Errors use authored guidance; raw
+details go to Diagnostics. The old mock remains an unconnected test helper.
 
-### 7.8.6 Binding entity table (CHECKLIST Stanza CP re-derivation source)
+### 7.8.6 Current entity table (source snapshot)
 
 | Entity | Contract |
 |---|---|
 | `CapabilityReport` (`reusable-chatbot/core/capability-broker.ts`) | `{ runtime: 'tauri'\|'web'\|'android', memoryBudgetBytes, accelerations: string[], contextCeiling, weightFormats, kvFormats, threads, notes }` — probed per platform (Rust probe native; JS probe web), cached per session, re-probed on demand |
-| `RunnerProvider` implementations | `NativeRunnerProvider` (`src-tauri/src/inference/`, llama.cpp/atomic-turboquant via C ABI, persistent session, Channel streaming, no per-token IPC) · `WebLLMRunnerProvider` (worker) · `WasmRunnerProvider` (`turboquant-wasm`) — all behind the extended `IInferenceEngine` ABI (§7.8.1) |
+| `NativeRunnerProvider` / `WebLlmRunnerProvider` | `reusable-chatbot/engines/native/index.ts` / `engines/webllm/index.ts`; native commands in `src-tauri/src/inference.rs`. Two connected providers; no `WasmRunnerProvider` implementation. |
 | `AssetStorageConfig` | generated `config/asset-storage.generated.json` `{schema, scope}`; one artifact feeds Vite + Rust; fails closed |
-| `SharedModelLibrary` (`src/core/model-store/library.ts`) | `lookup(asset) → ready\|missing\|needs-grant\|unavailable\|corrupt`; `acquire(asset) → Lease` (verified, atomically published); digest-keyed cross-process lock; resumable Range downloads; `release()` |
-| `ModelCatalogEntry` / `ModelRegistry` (`reusable-chatbot/model-registry/`) | Atomic Chat catalog rows + probe fusion → ranked `EngineConfig` (content key, format, quant, license, minRuntime, context); zero model-specific hardcoding |
-| `ModelPicker` (`src/ui/ModelPicker.tsx`) + `DownloadManager` (`src/core/model-store/download-manager.ts`) | picker surface per §7.8.5; download progress/resume/verify events; persistence `chat.modelId` sidecar setting |
+| `ModelLibrary` / `DesktopModelLibrary` / `WebModelLibrary` | Interface in `src/core/model-store/types.ts`; classes in `store.ts`. `lock`, `lookup`, `beginWrite`, `remove`, `onProgress`; writes expose `write/finish/abort`. No `library.ts`, lease or `release` API exists. |
+| `ModelCatalogEntry` / `RankedModel` / `buildCompanionCatalog` | Types/ranking in `reusable-chatbot/model-registry/`; host integration in `src/core/chat/models.ts`. Native preference is explicit config; browser uses its own executable manifest. |
+| `CompanionModelsProvider` / `ModelPicker` | `src/ui/ModelPicker.tsx`; one app-global selection/download owner; localStorage `chat.modelId` and `sam.model.alias.assets` (URL → verified `{sha256, bytes, fileName}`). |
+| `DownloadManager` | `src/core/model-store/download-manager.ts`; `acquire` returns `{asset, promise, abort}`. Progress phases: `looking-up`, `downloading`, `verifying`, `ready`, `needs-grant`, `failed`; retries restart transfer. |
+| `ChatController` / `ChatView` | Controller in `reusable-chatbot/core/chat-controller.ts`; UI in `src/ui/ChatView.tsx`. Engine init precedes send; technical exceptions are logged, never yielded as assistant tokens. History is in-memory and clears when engine closes. |
+| `DiagnosticStore` / `installDiagnosticCapture` / `DiagnosticsWindow` | `src/core/diagnostics/store.ts`, `capture.ts`, `src/ui/DiagnosticsWindow.tsx`. Capture starts before React; viewer is mounted outside `App` under the shared model provider. |
+| `GUIDE_STEPS` / `OrientationGuide` | `src/core/orientation/guide.ts`, `src/ui/OrientationGuide.tsx`. Six registered targets; saved `{completed, step}` under localStorage `sanctissimissa.orientation.v1`; no arbitrary model-provided selector or JavaScript execution. |
 | `RunnerPhases` | Phase 0 contract freeze → 1 dependable baseline (CP.2→CP.4, CP.7, CP.9) → 2 TurboQuant KV → 3 Bonsai → 4 LiteRT-LM → 5 llama.cpp-WebGPU consolidation (guide §10; Phases 2–5 expand to self-contained tasks when reached) |
 
-Stanza CP in `CHECKLIST.md` is re-derived 1:1 from this section (superseding the 2026-09-16 CP.2/CP.3/CP.4/CP.7/CP.8 texts; CP.0/CP.1/CP.5 landed, CP.6 semantics stands).
+The historical Stanza CP derivation remains recorded in `CHECKLIST.md`. This
+source reconciliation does not mark its acceptance items complete or re-derive
+tasks without the amendment signoff required by `CLAUDE.md`.
+
+### 7.8.7 Implemented lifecycle and evidence boundaries
+
+`main.tsx` installs diagnostic capture, then renders `CompanionModelsProvider`
+around `App` and `DiagnosticsWindow`. `App` owns the workspaces, ChatView and
+orientation. The official Tauri API is chosen using `__TAURI_INTERNALS__`;
+there is no dependency on a non-existent `window.invoke` function.
+
+Model preparation follows this sequence:
+
+1. Probe the runtime; load its actual catalogue. Restore a supported explicit
+   `chat.modelId` or select the configured native preference/browser candidate.
+2. Native installed identities are looked up in the content-addressed store.
+   File states are `idle/downloading/verifying/downloaded/failed/unsupported`.
+   Catalogue checking/error are separate picker state. Browser `downloaded`
+   currently means preparation was requested: WebLLM performs acquisition at init.
+3. “Prepare” starts acquisition for the selected entry. Native byte streaming
+   records a stable operation identity, accepts exact source length for estimated
+   catalogue sizes, writes 4 MiB chunks, verifies/publishes the returned digest
+   and byte count, and remembers that identity. There is a 60-second transfer
+   stall deadline. The downloader requests `Range: bytes=0-`; it does **not**
+   resume partial data or validate ETag/revision continuity. Cancellation removes
+   staging through the now-registered `model_remove_staging` command.
+4. File readiness triggers provider resolution and `ChatController.useEngine`.
+   Native loading runs via `spawn_blocking`; its Channel reports `file.check`,
+   `backend.init`, `model.load`, `session.create`, `session.ready`, plus actual
+   llama.cpp progress fractions. WebLLM forwards its original init reports and
+   checks membership in `prebuiltAppConfig.model_list`; the nonexistent
+   `hasModelInModelList` API is no longer called.
+5. ChatView owns `idle/starting/ready/failed`. Only successful init enables
+   sending. Slow startup is acknowledged at 30 seconds; two minutes without
+   numeric progress triggers recovery. Stale completion cannot set a newer
+   selection ready. Cancel currently cancels UI adoption of pending init and
+   closes it after it settles; it does not interrupt llama.cpp model loading.
+6. Generation uses real provider tokens, separate authored recovery notices,
+   and editable retained drafts. Orientation supplies actual registered visible
+   controls as system context. No corpus retrieval, deep-link citation checking,
+   persistent transcript or lore distillation is connected to this generation path.
+
+**Storage limits:** native scope is an app-data sibling on desktop and app-private
+on mobile. The Rust store uses exclusive-create lock files with a TTL, not a
+kernel-held lock/lease protocol. Unknown-digest downloads use a URL-derived lock
+key. Native lookup reads/hashes the file, but only compares the hash for files
+at most 64 MiB; large-file integrity is currently trusted from commit metadata.
+That is not continuous large-file corruption detection. Native and OPFS libraries
+exist, but WebLLM's compiled assets use WebLLM's own cache. Android SAF/provider/
+BlobStore grants and Windows shared Profile-root storage are not implemented.
+
+**Diagnostics limits:** 4,000 in-memory events retain receipt sequence, ISO time,
+elapsed time, source, level, operation and correlation ID. Errors include stack
+and cause. Typed binary views are summarized by byte length; plain arrays over
+256 entries by length. Fetch capture observes request and response headers, not
+full body completion; native load callbacks and the model downloader add their
+own events. No stdout/stderr adapter, file-backed log, automatic upload or
+diagnostic interpretation is present. Pop-out depends on `window.open` support;
+the floating viewer remains the fallback.
+
+**Orientation limits:** completion is written only by Finish after the last step;
+Later is session-local. Generated explanations are optional and wait for real
+engine readiness. The Companion can append `[[guide:<id>]]` to highlight a
+registered visible target; “Show me” calls that element's click handler. The
+Companion target is currently the panel element, not a separate actionable
+control; highlighting it works but clicking it does not perform setup. Automatic
+chatbot narration and final phone layout/interaction qualification remain pending.
+
+**Verification at this source revision:** `npx tsc -b --pretty false` passed;
+61 focused Node tests passed across browser/native provider interfaces, model
+store transfer integrity, picker/ChatView wiring, navigation, diagnostics and
+orientation state. Corpus-dependent suite execution is blocked by the absent
+`assets/missal.db`. No Rust toolchain/device/browser acceptance run establishes
+that this revision loads Qwen or generates a reply on the Z Fold. CodeGraph
+0.9.4 indexed 187 files / 2,710 nodes / 6,070 edges. `codegraph sync` then
+reported “Already up to date”, and `codegraph status` confirmed that state.
+This verifies source structure, not runtime behavior. Its local database is
+ignored by Git and does not update `asrock`.
 
 ## 8. Entity Table
 
-Status: **S** = shipped (on disk now) · **P-<phase>** = planned, target location. Independent agents must produce these identifiers byte-identically.
+Historical status: **S** = recorded as implemented at the row's original checkpoint;
+**P-<phase>** = planned target location. These inherited phase labels do not mean
+the present checkout was release-tested. The current snapshot at the top and
+§7.8 take precedence where implementations or names have changed. Corpus assets
+must be provisioned separately; an `S` corpus row does not mean this checkout
+contains its bytes.
 
 ### Corpus pipeline (build time)
 
@@ -436,7 +568,7 @@ Status: **S** = shipped (on disk now) · **P-<phase>** = planned, target locatio
 
 | Entity | Type | File:line | St | Role | Key signatures / fields |
 |---|---|---|---|---|---|
-| `App` / `View` / `NAV` | comp/type/const | `src/App.tsx:22` | S | shell, rail nav, day chip, `MapStrip` under the masthead, `.split`/`.single` layout, focus routing, source-day search-hit navigation; also owns the **splash** (the `!db` loading branch doubles as it per the app-chrome SOP): rose, title, and a `.splash-meta` line reading `v{versionInfo.version} · © 2026 Robin L. M. Cheung, MBA` | `View = 'map'\|'reader'\|'calendar'\|'office'` → P-D adds `'planner'`; state `focus { section, nonce }`, `activeStation: string \| null`, `officeHour: string` |
+| `App` / `View` / `NAV` | comp/type/const | `src/App.tsx:22` | S | shell, rail nav, day chip, `MapStrip` under the masthead, `.split`/`.single` layout, focus routing, source-day search-hit navigation; also owns the **splash** (the `!db` loading branch doubles as it per the app-chrome SOP): rose, title, and a `.splash-meta` line reading `v{versionInfo.version} · © 2026 Robin L. M. Cheung, MBA` | `View = 'map'\|'reader'\|'annotations'\|'calendar'\|'office'\|'bible'\|'journal'\|'homily'\|'settings'\|'about'`; state `focus { section, nonce }`, `activeStation: string \| null`, `officeHour: string` |
 | `MapStrip` | comp | `src/ui/MapStrip.tsx:1` | S | ever-present compact subway strip (decision 17): Mass line / Office cursus, index-based journey states, container-only auto-centering, hover flyouts | props `{ db, day, view, activeStation, officeHour, onStation, onHour }` |
 | `MapFlyout` / `FlyoutData` | comp/type | `src/ui/MapFlyout.tsx:1` | S | hover/focus flyout shared by strip + full map: dual-language incipit, about, flagged planned-media slot | props `FlyoutData { title, subtitle, incipit, about, media, x, y }` |
 | `SubwayMap` / `StationDot` | comps | `src/ui/SubwayMap.tsx:28` | S | SVG Mass map; hover flyouts via `data-sid` event delegation (M); P-C adds lore callout triggers | props `{ db, day, onStation }` |
@@ -455,7 +587,7 @@ Status: **S** = shipped (on disk now) · **P-<phase>** = planned, target locatio
 
 | Entity | Type | File:line | St | Role | Key signatures / fields |
 |---|---|---|---|---|---|
-| `load_corpus` | Tauri cmd | `src-tauri/src/lib.rs` | S | embedded corpus bytes | `#[tauri::command] fn load_corpus() -> Vec<u8>` |
+| `load_corpus` | Tauri cmd | `src-tauri/src/lib.rs` | S | embedded corpus bytes on desktop and Android | `#[tauri::command] fn load_corpus() -> tauri::ipc::Response` |
 | `load_sidecar` / `save_sidecar` | Tauri cmds | `src-tauri/src/lib.rs` | S | sidecar file under the resolved storage root (decision 22 `scopeDir` param; desktop joins org-common `mba.robin` as app-dir sibling, mobile stays sandboxed); load falls back to the legacy pre-namespace path | `load_sidecar(scope_dir?) -> Option<Vec<u8>>`, `save_sidecar(bytes: Vec<u8>, scope_dir?) -> Result<(), String>` |
 | tests | node:test | `tests/{computus,embed,massOrdo,ingest,normalize,conceptSearch,office,mapStrip}.test.ts` | S | 44 passing (2026-07-11); P-phases add `tests/officeTexts.test.ts`, `tests/sidecarDb.test.ts`, `tests/shareLink.test.ts` | `npm test` |
 | CI | workflow | `.github/workflows/build-all-platforms.yml` | S | web/NSIS/deb+AppImage/APK | — |
@@ -962,7 +1094,12 @@ exact gates semantically confirms production is the sole behaviour source.
 
 **Attestation (2026-07-14, fourth re-attestation).** Amended per operator direction (this session): §7.7 presentation & meaning plane added (v0.5, labelled P-T in the entity table) — `sanctissimissa` theme family (7th family; decision 13 + open question 6 amended; text-role tokens `--rubric`/`--dialogue-p`/`--dialogue-s` with render-level `dialogueClass`), interleaved bilingual mode (`BilingualText` extraction, selection-range echo), similarity UX (clause focus `bestClause`, `SimilarityGlyph`, `IMAGERY_CONCEPTS`), Scripture Atlas (imagery/scenario + Gospel-parallels navigation, `PERICOPES` spine), generalized interpretive layer (`ingest-commentary.mjs`, `COMMENTS_ON` edges; Haydock + Catena Aurea this wave, 13-source PD roadmap), and the journal sidecar workspace (`JournalSidecar`/`ConnectionsPanel`, capture + highlight-both-panes context actions, destinations → exposure/selectors). Open question 8 amended with v0.5 shared-file ownership; open question 9 added (parallels data source).
 
-**Attestation.** This document is complete, stub-free, and depicts the end-state production release: every named entity carries an exact identifier, target `file:line`, role, and signature; no TBD markers remain; open questions are resolved above. Shipped rows were verified against the working tree via codegraph on the date below; planned rows are normative targets and are cited verbatim by `CHECKLIST.md` stanzas (v0.2 wave, O-stanzas, B-stanzas, and the v0.5 BJ–BO stanzas). Re-attested after adding §7.7 + the P-T entity rows.
+**Historical attestation, superseded as a current-status claim on 2026-09-18.**
+Earlier revisions described this document as a complete, stub-free production
+snapshot. The current audit finds pending providers, storage contracts and
+knowledge/commerce integrations. Historical CodeGraph verification and planned
+entity rows remain provenance; they do not attest the present release. Current
+source and verification boundaries are recorded at the top and in §7.8.7.
 
 ## 10. Bible-reader workspace and navigation correction wave (2026-07-14)
 
@@ -1530,7 +1667,7 @@ API; installed apps do not silently select a browser engine. Browser choices com
 from the actual WebLLM manifest. `src/core/chat/feedback.ts` owns the closed set of
 setup/recovery messages. `ModelPicker` owns checking, idle, downloading, verifying,
 downloaded, failed and unsupported states. Downloaded describes stored bytes only.
-`ChatView` owns starting, ready and failed engine states. Ready requires successful
+`ChatView` owns idle, starting, ready and failed engine states. Ready requires successful
 engine initialization for the selected model. Selection changes unload the previous
 engine and prepare the selected one; stale completion cannot replace a newer choice.
 
@@ -1552,7 +1689,7 @@ Native generation uses the official Channel.onmessage API and throws failures to
 controller rather than yielding exception strings as tokens. Browser initialization
 checks prebuiltAppConfig.model_list, and relays actual initialization progress.
 
-Acceptance: tests exercise real SDK surface shapes, unknown-digest multi-chunk
+Acceptance requirements (not all completed): tests exercise real SDK surface shapes, unknown-digest multi-chunk
 acquisition, rounded catalogue sizes, HTTP failures, denied grants, cancellation,
 selected-model replacement and sanitized feedback. Browser visual checks cover
 first use, progress, failure, retry, large text and mobile controls. Native-device
@@ -1573,7 +1710,7 @@ only on an explicit click, falling back to the floating window if unsupported.
 ISO timestamp, elapsed monotonic milliseconds, source, level, operation, correlation
 ID and JSON-serialized raw details/errors (including stack/cause). Retain the most
 recent 4,000 events; report how many were dropped. `capture.ts` records console,
-uncaught errors, unhandled rejections, resource failures, fetch request/headers/end/
+uncaught errors, unhandled rejections, resource failures, fetch request/headers/
 failure and native invoke request/result/failure. Native calls include precise
 command names and elapsed times. Binary arrays are represented by exact byte counts;
 no automatic upload occurs. Model pipeline events record selected IDs, provider
@@ -1608,7 +1745,7 @@ as Qwen 3.5 2B. Selected/recommended names and the change control are visible be
 preparation. `CompanionModelsProvider` shares the same selection/download state across
 Settings and Companion. No large first-run download starts without Prepare.
 
-`orientation.completed` and `orientation.step` persist locally. While the configuration
+`{completed, step}` persists at localStorage key `sanctissimissa.orientation.v1`. While the configuration
 `offerOrientationUntilCompleted` is true, each new app launch offers or resumes the
 orientation until Finish is selected after the final step. “Later” suppresses only this
 session. Settings can restart it. Steps use actual `data-guide` elements: Holy Mass,
