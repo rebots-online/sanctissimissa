@@ -99,25 +99,32 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
   const [resolution, setResolution] = useState<Resolution | null>(null);
   const controllerRef = useRef<ChatController | null>(null);
 
-  // Re-resolve whenever the picker's readiness landscape changes: a finished
-  // download, a new selection, or the first capability probe.
+  // Re-resolve when the picker's readiness landscape changes. Deps are
+  // PRIMITIVES/STABLE REFERENCES only: the `models` hook object has a fresh
+  // identity every render, and depending on it re-runs this effect on every
+  // render — an IPC flood that freezes the webview (found in the AppImage
+  // acceptance run). Live values ride refs instead.
   const readyKey = Object.entries(models.state.states)
     .map(([id, st]) => (st === 'ready' ? id : ''))
     .join('|');
+  const modelsRef = useRef(models);
+  modelsRef.current = models;
+  const catalog = models.state.catalog;
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const report = models.state.catalog?.report;
+      const current = modelsRef.current;
+      const report = current.state.catalog?.report;
       if (!report) return; // still probing — chip shows the probing state
       let resolved: Resolution;
       const invoke = isTauri()
         ? (window as unknown as { invoke: (c: string, a?: Record<string, unknown>) => Promise<unknown> }).invoke
         : undefined;
       if (invoke) {
-        const candidates = (models.state.catalog?.ranked ?? [])
-          .filter((m) => models.state.states[m.id] === 'ready')
+        const candidates = (current.state.catalog?.ranked ?? [])
+          .filter((m) => current.state.states[m.id] === 'ready')
           .map((m) => ({ id: m.id, displayName: m.displayName }));
-        resolved = await resolveNativeEngine(invoke, report, models.locate, candidates);
+        resolved = await resolveNativeEngine(invoke, report, current.locate, candidates);
       } else {
         resolved = await resolveWebEngine(report);
       }
@@ -126,7 +133,7 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
     return () => {
       cancelled = true;
     };
-  }, [readyKey, models.state.catalog, models]);
+  }, [readyKey, catalog]);
 
   // Small screens open the panel as a bottom sheet by default.
   useEffect(() => {
