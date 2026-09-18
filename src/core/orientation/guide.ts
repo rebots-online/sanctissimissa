@@ -23,6 +23,23 @@ export function saveGuideState(value: GuideState, storage: Pick<Storage, 'setIte
   try { storage.setItem(GUIDE_KEY, JSON.stringify(value)); }
   catch (error) { debugEvent('orientation', 'persist.error', error, 'error'); }
 }
+export const GUIDE_POS_KEY = 'sanctissimissa.orientation.pos.v1';
+export interface GuidePos { left: number; top: number }
+export function clampGuidePos(pos: GuidePos, width: number, height: number, viewport: { innerWidth: number; innerHeight: number } = window): GuidePos {
+  const maxX = Math.max(8, viewport.innerWidth - width - 8);
+  const maxY = Math.max(8, viewport.innerHeight - height - 8);
+  return { left: Math.round(Math.min(Math.max(8, pos.left), maxX)), top: Math.round(Math.min(Math.max(8, pos.top), maxY)) };
+}
+export function readGuidePos(storage: Pick<Storage, 'getItem'> = localStorage): GuidePos | null {
+  try {
+    const value = JSON.parse(storage.getItem(GUIDE_POS_KEY) ?? 'null') as Partial<GuidePos> | null;
+    return value && Number.isFinite(value.left) && Number.isFinite(value.top) ? { left: value.left!, top: value.top! } : null;
+  } catch { return null; }
+}
+export function saveGuidePos(pos: GuidePos, storage: Pick<Storage, 'setItem'> = localStorage): void {
+  try { storage.setItem(GUIDE_POS_KEY, JSON.stringify(pos)); }
+  catch (error) { debugEvent('orientation', 'persist.error', error, 'error'); }
+}
 let activeId: GuideId | null = null;
 export function guideTarget(id: string, root: Document = document): HTMLElement | null {
   if (!GUIDE_STEPS.some((step) => step.id === id)) return null;

@@ -2820,10 +2820,17 @@ button.mstation, button.mstation.active, button.mstation.open {
 .diagnostics-copy { display: flex; flex-direction: column; padding: 8px; }
 .diagnostics-copy textarea { height: 100px; }
 @media (max-width: 720px) { .diagnostics-window { width: calc(100vw - 16px); } .diagnostics-tools input[placeholder] { width: 100%; } }
-.orientation-offer, .orientation-guide { position: fixed; right: 16px; bottom: max(24px, env(safe-area-inset-bottom)); z-index: 85; max-width: min(400px, calc(100vw - 32px)); max-height: 45dvh; overflow: auto; padding: 18px; color: var(--text); background: var(--card, #faf7f0); border: 2px solid var(--gold, #b08d3e); border-radius: 12px; box-shadow: 0 8px 28px #0006; line-height: 1.5; }
-.orientation-guide { right: auto; left: max(16px, env(safe-area-inset-left)); }
+.orientation-offer, .orientation-guide { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: auto; top: 64px; z-index: 85; max-width: min(340px, calc(100vw - 32px)); max-height: 40dvh; overflow: auto; padding: 18px; color: var(--text); background: var(--card, #faf7f0); border: 2px solid var(--gold, #b08d3e); border-radius: 12px; box-shadow: 0 8px 28px #0006; line-height: 1.5; }
+.orientation-guide strong { cursor: grab; user-select: none; touch-action: none; display: block; }
+.orientation-guide.dragging strong { cursor: grabbing; }
 .orientation-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .orientation-offer button, .orientation-guide button { padding: 10px; min-height: 44px; font: inherit; border: 1px solid var(--gold, #b08d3e); border-radius: 8px; color: inherit; background: var(--card, #faf7f0); cursor: pointer; }
 .orientation-offer button { margin-right: 8px; }
 .orientation-target { outline: 3px solid #edc657 !important; outline-offset: 4px; box-shadow: 0 0 0 7px #edc65733 !important; }
 .companion-choice { font-size: .92rem; }
+
+/* OG.3 global press/disabled feedback (2026-09-18 amendment §B) */
+button:hover:not(:disabled) { filter: brightness(0.96); }
+button:active:not(:disabled) { transform: translateY(1px) scale(0.98); filter: brightness(0.9); }
+button:disabled { opacity: 0.55; cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) { button:active:not(:disabled) { transform: none; } }
