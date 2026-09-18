@@ -11,6 +11,17 @@ ONLY AND ALWAYS comply with `~/Admin-Manual/` — save for project-scoped, previ
 - Failing to plan is planning to fail. If you don't know how you will finish the story, do not begin writing it. Every question asked during coding wastes all the time already spent planning.
 - Only an operator decision changes the architecture. A "major change" discovered during implementation means the architecture was done wrong.
 
+## THE AMENDMENT-SEQUENCE GATE (operator directive 2026-09-17 — binding, no exceptions)
+
+Any architecture change executes in this order, and **the order is a hard gate, not a preference**:
+
+1. **Amend `DOCS/ARCHITECTURE.md` FIRST** — and nothing else. No CHECKLIST edit, no code, no vendoring, no build, in the same change.
+2. **STOP. Present the amendment to the operator and WAIT for explicit signoff.** An instruction to "rearchitect X → CHECKLIST" authorizes the work; it NEVER authorizes skipping this gate. Signoff is recorded in `DOCS/ARCHITECTURE-SIGNOFF.md` (architecture SHA-256 + date + operator line) before anything else moves.
+3. **Only then derive/re-derive `CHECKLIST.md`** 1:1 from the signed architecture.
+4. **Only then code** — and only checklist tasks that cite the signed architecture version.
+
+Violations of this sequence — however productive the outcome, however urgent the request, however combined the directive — are defects in themselves. "The operator asked for both in one breath" is NOT an exemption: pause at step 2 regardless, and say so. Enforcement is machine-checked (pre-commit hook + release-driver gate validating the signoff ledger); those checks fail closed and exist because prose alone already failed once (2026-09-17: CHECKLIST re-derived and code shipped before signoff).
+
 Authority order: `~/Admin-Manual/` is the organization-wide single source of truth (its index
 is `MANUAL.md`); this file is the project layer — where it is silent, the manual governs.
 Rules are cited by code with their operative clause inlined; full text lives in the manual:
