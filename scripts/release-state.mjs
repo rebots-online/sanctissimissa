@@ -258,7 +258,7 @@ function getOutboxDir(deps) {
  * build stage).
  */
 export const STAGE_ORDER = [
-  'test', 'web', 'linux',
+  'test', 'web', 'web-deploy', 'linux',
   'windows', 'windows-msi', 'windows-msix',
   'android-release', 'symbols', 'collect',
 ];
@@ -268,7 +268,7 @@ export const PENDING_RELEASE_EXIT_CODE = 2;
 export function stageRunsOnHost(stage, platform) {
   if (!STAGE_ORDER.includes(stage)) return false;
   if (stage === 'collect') return platform === 'linux';
-  if (['test', 'web'].includes(stage)) return ['linux', 'win32'].includes(platform);
+  if (['test', 'web', 'web-deploy'].includes(stage)) return ['linux', 'win32'].includes(platform);
   if (['windows-msi', 'windows-msix'].includes(stage)) return platform === 'win32';
   return platform === 'linux';
 }
@@ -498,6 +498,14 @@ async function runCommand(name, deps, root) {
       console.log('🔧 Stage: web');
       execSync('npm run build:vite', inherited);
     },
+    // Publishes the completed web output (REL.1 / operator 2026-09-18). Runs
+    // before native packaging so a pending Windows installer never blocks web
+    // publication; deploy-web.mjs never rebuilds or stamps, and its failure
+    // leaves this stage incomplete and retryable under the same version.
+    'web-deploy': () => {
+      console.log('🔧 Stage: web-deploy');
+      execFileSync(process.execPath, ['scripts/deploy-web.mjs'], inherited);
+    },
     linux: () => {
       console.log('🔧 Stage: linux');
       execSync('npm exec -- tauri build --bundles deb,appimage --ci', inherited);
@@ -594,6 +602,7 @@ Options:
 Release stages (run automatically):
   test               Run the test suite
   web                Build web/PWA
+  web-deploy         Publish the completed web output to sanctissimissa.surge.sh
   linux              Build Linux deb and AppImage
   windows            Build Windows x64 standalone PE and NSIS installer
   windows-msi        Build the MSI installer (Windows host only)

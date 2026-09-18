@@ -42,7 +42,9 @@ interface SpawnResult {
 // Canonical stage order for verification
 // The Windows installer stages sit immediately after the standalone PE: the
 // MSI and MSIX are part of the release, not produced out of band (BUGS #7).
-const CANONICAL_STAGE_ORDER = ['test', 'web', 'linux', 'windows', 'windows-msi', 'windows-msix', 'android-release', 'symbols', 'collect'];
+// web-deploy publishes the completed web output immediately after the web
+// build, before native packaging (REL.1, operator 2026-09-18).
+const CANONICAL_STAGE_ORDER = ['test', 'web', 'web-deploy', 'linux', 'windows', 'windows-msi', 'windows-msix', 'android-release', 'symbols', 'collect'];
 
 // Helper: create a temporary directory and return cleanup function
 function createTempDir() {
@@ -160,8 +162,13 @@ describe('Unit tests: STAGE_ORDER', () => {
     assert.deepStrictEqual(STAGE_ORDER, CANONICAL_STAGE_ORDER);
   });
 
-  it('should have 9 stages total (android-debug removed, operator rule 2026-09-16)', () => {
-    assert.strictEqual(STAGE_ORDER.length, 9);
+  it('should have 10 stages total (android-debug removed 2026-09-16; web-deploy added 2026-09-18)', () => {
+    assert.strictEqual(STAGE_ORDER.length, 10);
+  });
+
+  it('places web-deploy immediately after web and before native packaging (REL.1)', () => {
+    assert.strictEqual(STAGE_ORDER.indexOf('web-deploy'), STAGE_ORDER.indexOf('web') + 1);
+    assert.ok(STAGE_ORDER.indexOf('web-deploy') < STAGE_ORDER.indexOf('linux'));
   });
 });
 
@@ -289,7 +296,7 @@ describe('Unit tests: main with injected deps', () => {
     assert.ok(!commandsRun.includes('stamp'));
 
     // Should run only remaining stages
-    const expectedStages = ['linux', 'windows', 'windows-msi', 'windows-msix', 'android-release', 'symbols', 'collect'];
+    const expectedStages = ['web-deploy', 'linux', 'windows', 'windows-msi', 'windows-msix', 'android-release', 'symbols', 'collect'];
     assert.deepStrictEqual(commandsRun, expectedStages);
 
     // Lock should be archived
@@ -505,6 +512,63 @@ describe('Unit tests: main with injected deps', () => {
     assert.ok(commandsRun.includes('linux'));
     assert.ok(!commandsRun.includes('windows'));
   });
+
+  it('keeps web-deploy incomplete on publication failure and retries it without a second stamp (REL.1)', async () => {
+    const failDeploy: ReleaseDeps = {
+      runCommand: async (name: string) => {
+        commandsRun.push(name);
+        if (name === 'web-deploy') return 1; // publication failed
+        return 0;
+      },
+      fixtureDir: tempDir,
+    };
+
+    await assert.rejects(
+      async () => await main(['node', 'test'], failDeploy),
+      /Stage web-deploy failed with exit code 1/
+    );
+
+    // web and everything before it completed; web-deploy did NOT
+    const lockAfterFailure = readLock(tempDir);
+    assert.deepStrictEqual(lockAfterFailure.completedStages, ['test', 'web']);
+
+    // Resume under the same version: deploy retried first, no new stamp
+    const retried: string[] = [];
+    const passDeps: ReleaseDeps = {
+      runCommand: async (name: string) => {
+        retried.push(name);
+        return 0;
+      },
+      fixtureDir: tempDir,
+    };
+    assert.strictEqual(await main(['node', 'test'], passDeps), 0);
+    assert.strictEqual(retried[0], 'web-deploy');
+    assert.ok(!retried.includes('stamp'));
+    assert.strictEqual(retried.filter(c => c === 'web-deploy').length, 1);
+    assert.deepStrictEqual(readLock(tempDir).completedStages, CANONICAL_STAGE_ORDER);
+  });
+
+  it('skips a completed web-deploy on later resumes (REL.1)', async () => {
+    writeLock(tempDir, {
+      version: '2.17.34595',
+      sourceHead: 'abc123def456',
+      startedAt: '2026-07-15T00:00:00.000Z',
+      completedStages: ['test', 'web', 'web-deploy'],
+    });
+
+    const stubDeps: ReleaseDeps = {
+      runCommand: async (name: string) => {
+        commandsRun.push(name);
+        return 0;
+      },
+      fixtureDir: tempDir,
+    };
+
+    assert.strictEqual(await main(['node', 'test'], stubDeps), 0);
+    assert.ok(!commandsRun.includes('web-deploy'));
+    assert.strictEqual(commandsRun[0], 'linux');
+    assert.ok(!commandsRun.includes('stamp'));
+  });
 });
 
 describe('Integration tests: Real CLI spawning', () => {
@@ -603,7 +667,7 @@ describe('Integration tests: Real CLI spawning', () => {
       assert.ok(!loggedCommands.includes('stamp'));
 
       // Should have only remaining stages
-      const expectedStages = ['linux', 'windows', 'windows-msi', 'windows-msix', 'android-release', 'symbols', 'collect'];
+      const expectedStages = ['web-deploy', 'linux', 'windows', 'windows-msi', 'windows-msix', 'android-release', 'symbols', 'collect'];
       assert.deepStrictEqual(loggedCommands, expectedStages);
     });
 
@@ -692,9 +756,9 @@ describe('Integration tests: Real CLI spawning', () => {
       // Should exit nonzero (interrupted)
       assert.notStrictEqual(r1.code, 0);
 
-      // Lock should show partial completion (test, web only)
+      // Lock should show partial completion (test, web, web-deploy; linux interrupted)
       const lock1 = readLock(tempDir);
-      assert.deepStrictEqual(lock1.completedStages, ['test', 'web']);
+      assert.deepStrictEqual(lock1.completedStages, ['test', 'web', 'web-deploy']);
 
       // Receipt should exist with target='linux'
       assert.ok(fs.existsSync(path.join(tempDir, 'sanctissimissa-release-interrupt-receipt.json')));
@@ -715,19 +779,19 @@ describe('Integration tests: Real CLI spawning', () => {
 
       // After both spawns: log should show stamp once, each stage once, in order
       const loggedCommands = readRunCommandLog(tempDir).trim().split('\n').filter(l => l);
-      assert.deepStrictEqual(loggedCommands, ['stamp', 'test', 'web', 'linux', 'windows', 'windows-msi', 'windows-msix', 'android-release', 'symbols', 'collect']);
+      assert.deepStrictEqual(loggedCommands, ['stamp', 'test', 'web', 'web-deploy', 'linux', 'windows', 'windows-msi', 'windows-msix', 'android-release', 'symbols', 'collect']);
 
       // Stamp appears exactly once
       assert.strictEqual(loggedCommands.filter(c => c === 'stamp').length, 1);
     });
 
     it('corrupt interrupt receipt fails closed without mutating the lock', async () => {
-      // Seed lock with test,web completed (linux is first pending)
+      // Seed lock with test,web,web-deploy completed (linux is first pending)
       writeLock(tempDir, {
         version: '2.17.34595',
         sourceHead: 'abc123def456',
         startedAt: '2026-07-15T00:00:00.000Z',
-        completedStages: ['test', 'web'],
+        completedStages: ['test', 'web', 'web-deploy'],
       });
 
       // Write corrupt receipt
@@ -754,12 +818,12 @@ describe('Integration tests: Real CLI spawning', () => {
     });
 
     it('mismatched interrupt receipt fails closed without mutating the lock', async () => {
-      // Seed lock with test,web completed (linux is first pending)
+      // Seed lock with test,web,web-deploy completed (linux is first pending)
       writeLock(tempDir, {
         version: '2.17.34595',
         sourceHead: 'abc123def456',
         startedAt: '2026-07-15T00:00:00.000Z',
-        completedStages: ['test', 'web'],
+        completedStages: ['test', 'web', 'web-deploy'],
       });
 
       // Write structurally valid but mismatched receipt (target='windows' not 'linux')
@@ -991,17 +1055,17 @@ describe('RP.1 shared release across build hosts', () => {
   it('uses one stamp through Linux, Windows, then Linux collection', async () => {
     const deps = { fixtureDir: tempDir, runCommand: runner };
     assert.strictEqual(await main(['node', 'test'], { ...deps, platform: 'linux' }), PENDING_RELEASE_EXIT_CODE);
-    assert.deepStrictEqual(commands, ['stamp', 'test', 'web', 'linux', 'windows', 'android-release', 'symbols']);
+    assert.deepStrictEqual(commands, ['stamp', 'test', 'web', 'web-deploy', 'linux', 'windows', 'android-release', 'symbols']);
     const linuxState = readLock(tempDir);
     assert.deepStrictEqual(linuxState.completedStages, commands.slice(1));
     assert.strictEqual(fs.existsSync(path.join(tempDir, 'dist', 'rubric-runs')), false);
 
     assert.strictEqual(await main(['node', 'test', '--resume-only'], { ...deps, platform: 'win32' }), 2);
-    assert.deepStrictEqual(commands.slice(7), ['windows-msi', 'windows-msix']);
+    assert.deepStrictEqual(commands.slice(8), ['windows-msi', 'windows-msix']);
     assert.strictEqual(readLock(tempDir).completedStages.includes('collect'), false);
     assert.strictEqual(fs.existsSync(path.join(tempDir, 'dist', 'rubric-runs')), false);
     assert.strictEqual(await main(['node', 'test', '--resume-only'], { ...deps, platform: 'linux' }), 0);
-    assert.deepStrictEqual(commands.slice(9), ['collect']);
+    assert.deepStrictEqual(commands.slice(10), ['collect']);
     assert.strictEqual(commands.filter(name => name === 'stamp').length, 1);
     assert.strictEqual(readLock(tempDir).version, linuxState.version);
     assert.strictEqual(readLock(tempDir).sourceHead, linuxState.sourceHead);
@@ -1015,9 +1079,9 @@ describe('RP.1 shared release across build hosts', () => {
   it('can start on Windows and defer Linux targets until a same-version Linux continuation', async () => {
     const deps = { fixtureDir: tempDir, runCommand: runner };
     assert.strictEqual(await main(['node', 'test'], { ...deps, platform: 'win32' }), 2);
-    assert.deepStrictEqual(commands, ['stamp', 'test', 'web', 'windows-msi', 'windows-msix']);
+    assert.deepStrictEqual(commands, ['stamp', 'test', 'web', 'web-deploy', 'windows-msi', 'windows-msix']);
     assert.strictEqual(await main(['node', 'test', '--resume-only'], { ...deps, platform: 'linux' }), 0);
-    assert.deepStrictEqual(commands.slice(5), ['linux', 'windows', 'android-release', 'symbols', 'collect']);
+    assert.deepStrictEqual(commands.slice(6), ['linux', 'windows', 'android-release', 'symbols', 'collect']);
   });
 
   it('never stamps or writes state when resume-only has no existing state', async () => {
@@ -1131,6 +1195,10 @@ describe('RP.1 shared release across build hosts', () => {
     assert.strictEqual(stageRunsOnHost('collect', 'win32'), false);
     assert.strictEqual(stageRunsOnHost('collect', 'linux'), true);
     assert.strictEqual(stageRunsOnHost('test', 'darwin'), false);
+    // web-deploy publishes on both native hosts (REL.1 / operator 2026-09-18)
+    assert.strictEqual(stageRunsOnHost('web-deploy', 'linux'), true);
+    assert.strictEqual(stageRunsOnHost('web-deploy', 'win32'), true);
+    assert.strictEqual(stageRunsOnHost('web-deploy', 'darwin'), false);
     assert.strictEqual(stageRunsOnHost('made-up-stage', 'linux'), false);
   });
 });
