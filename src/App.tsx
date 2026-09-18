@@ -7,7 +7,7 @@ import versionInfo from '../version.json';
 import { UPDATE_READY_EVENT, applyPendingUpdate } from './pwa/pwaUpdate.ts';
 import type { DayInfo } from './core/data/types.ts';
 import { stationForAnchor, type Station } from './core/model/massOrdo.ts';
-import SubwayMap, { type MapMode } from './ui/SubwayMap.tsx';
+import SubwayMap from './ui/SubwayMap.tsx';
 import MapStrip from './ui/MapStrip.tsx';
 import ReaderView, { type SelectionAction } from './ui/ReaderView.tsx';
 import MeaningPanel from './ui/MeaningPanel.tsx';
@@ -23,6 +23,7 @@ import JournalView from './ui/JournalView.tsx';
 import HomilyPlanner from './ui/HomilyPlanner.tsx';
 import SettingsView from './ui/SettingsView.tsx';
 import ChatView from './ui/ChatView.tsx';
+import OrientationGuide from './ui/OrientationGuide.tsx';
 import AboutView from './ui/AboutView.tsx';
 import ResizableInspectorLayout from './ui/ResizableInspectorLayout.tsx';
 import TrayPanel from './ui/TrayPanel.tsx';
@@ -84,7 +85,6 @@ export default function App() {
   // Bible deep-link focus ("Gen/1/5"); nonce bumps so re-navigating re-scrolls.
   const [bibleFocus, setBibleFocus] = useState<{ ref: string | null; nonce: number }>({ ref: null, nonce: 0 });
   // Map view content type (App-owned so it survives view switches).
-  const [mapMode, setMapMode] = useState<MapMode>('missa');
   const [sidecar, setSidecar] = useState<SidecarDb | null>(null);
   const [pendingAccId, setPendingAccId] = useState<string | null>(null);
   const [capture, setCapture] = useState<{ quote: string; quoteAlt?: string; anchor: string | null } | null>(null);
@@ -113,7 +113,7 @@ export default function App() {
     loadCorpusBytes()
       .then((bytes) => CorpusDb.open(bytes))
       .then(setDb)
-      .catch((e) => setError(String(e)));
+      .catch((e) => { console.error('[Missal:open]', e); setError('unavailable'); });
   }, []);
 
   useEffect(() => {
@@ -285,8 +285,8 @@ export default function App() {
     return (
       <div className="loading">
         <div>
-          <p>Could not open the liturgical corpus: {error}</p>
-          <p>Run <code>npm run ingest</code> to build <code>missal.db</code>.</p>
+          <p>The Missal could not open just now. Please try opening it again.</p>
+          <button type="button" onClick={() => window.location.reload()}>Try again</button>
         </div>
       </div>
     );
@@ -333,6 +333,8 @@ export default function App() {
         {NAV.map((n) => (
           <button
             key={n.id}
+            data-guide={`nav-${n.id}`}
+            aria-label={n.label}
             className={`nav${view === n.id ? ' active' : ''}`}
             onClick={() => setView(n.id)}
           >
@@ -344,6 +346,8 @@ export default function App() {
         {UTIL_NAV.map((n) => (
           <button
             key={n.id}
+            data-guide={`nav-${n.id}`}
+            aria-label={n.label}
             className={`nav${view === n.id ? ' active' : ''}`}
             onClick={() => setView(n.id)}
           >
@@ -439,11 +443,7 @@ export default function App() {
                     db={db}
                     day={day}
                     onStation={onStation}
-                    onOpenBibleRef={(ref) => { setBibleFocus({ ref, nonce: Date.now() }); setView('bible'); }}
-                    onOpenHour={(h) => { setOfficeHour(h); setView('office'); }}
-                    activeHour={officeHour}
-                    mode={mapMode}
-                    onMode={setMapMode}
+
                   />
                 </div>
               )}
@@ -530,6 +530,7 @@ export default function App() {
 
       {/* CP.5: Companion intercom badge — present on every workspace. */}
       <ChatView sidecar={sidecar} />
+      <OrientationGuide />
 
       {/* Mandatory app chrome: version bottom-right on every surface. */}
       <div className="version-tag" title={`Build ${versionInfo.buildNumber} · ${versionInfo.buildDate}`}>

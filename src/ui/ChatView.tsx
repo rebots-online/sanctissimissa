@@ -10,10 +10,13 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
+import { OPEN_COMPANION, guideContext, stripGuideCommands, applyGuideCommand } from '../core/orientation/guide.ts';
 import ChatBadge from './ChatBadge.tsx';
-import ModelPicker, { useCompanionModels } from './ModelPicker.tsx';
+import ModelPicker, { formatBytes, useCompanionModels } from './ModelPicker.tsx';
 import { ChatController } from '../../reusable-chatbot/core/chat-controller.ts';
-import { isTauri } from '../core/chat/models.ts';
+import { companionInvoke } from '../core/chat/runtime.ts';
+import { debugEvent, debugTrace } from '../core/diagnostics/store.ts';
+import { companionFeedback, logCompanionFailure } from '../core/chat/feedback.ts';
 import { resolveNativeEngine, resolveWebEngine, type Resolution } from '../core/chat/resolve.ts';
 
 type DockMode = 'dock-left' | 'dock-right' | 'floating' | 'inline' | 'fullscreen' | 'sheet';
@@ -92,48 +95,110 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
   );
   const [messages, setMessages] = useState<ChatMsgUi[]>([]);
   const [input, setInput] = useState('');
+  const [orientationPrompt, setOrientationPrompt] = useState<string | null>(null);
   const [streaming, setStreaming] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
   const dragRef = useRef<DragState | null>(null);
-  const [resolution, setResolution] = useState<Resolution | null>(null);
+  const [engineState, setEngineState] = useState<'idle' | 'starting' | 'ready' | 'failed'>('idle');
+  const [engineProgress, setEngineProgress] = useState<number | null>(null);
+  const [slow, setSlow] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  const [replyNotice, setReplyNotice] = useState<string | null>(null);
   const controllerRef = useRef<ChatController | null>(null);
 
-  // Re-resolve when the picker's readiness landscape changes. Deps are
-  // PRIMITIVES/STABLE REFERENCES only: the `models` hook object has a fresh
-  // identity every render, and depending on it re-runs this effect on every
-  // render — an IPC flood that freezes the webview (found in the AppImage
-  // acceptance run). Live values ride refs instead.
-  const readyKey = Object.entries(models.state.states)
-    .map(([id, st]) => (st === 'ready' ? id : ''))
-    .join('|');
   const modelsRef = useRef(models);
   modelsRef.current = models;
   const catalog = models.state.catalog;
+  const selectedId = models.state.selectedId;
+  const selected = catalog?.ranked.find((model) => model.id === selectedId);
+  const selectedState = selectedId ? models.state.states[selectedId] : undefined;
+
+  // Progress updates never restart initialization. Only a changed selection,
+  // verified download or explicit retry creates a new engine attempt.
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      const current = modelsRef.current;
-      const report = current.state.catalog?.report;
-      if (!report) return; // still probing — chip shows the probing state
-      let resolved: Resolution;
-      const invoke = isTauri()
-        ? (window as unknown as { invoke: (c: string, a?: Record<string, unknown>) => Promise<unknown> }).invoke
-        : undefined;
-      if (invoke) {
-        const candidates = (current.state.catalog?.ranked ?? [])
-          .filter((m) => current.state.states[m.id] === 'ready')
-          .map((m) => ({ id: m.id, displayName: m.displayName }));
-        resolved = await resolveNativeEngine(invoke, report, current.locate, candidates);
-      } else {
-        resolved = await resolveWebEngine(report);
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    let slowTimer: ReturnType<typeof setTimeout> | undefined;
+    const controller = new ChatController();
+    let initialized = false;
+    controllerRef.current = null;
+    setEngineState('idle');
+    setEngineProgress(null);
+    setSlow(false);
+    if (!catalog || !selectedId || selectedState !== 'downloaded') return;
+    setEngineState('starting');
+    const heartbeat = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        cancelled = true;
+        controllerRef.current = null;
+        setEngineState('failed');
+        logCompanionFailure('startup-timeout', new Error('No startup progress for two minutes'));
+        if (initialized) void controller.close();
+      }, 120_000);
+    };
+    heartbeat();
+    slowTimer = setTimeout(() => { if (!cancelled) setSlow(true); }, 30_000);
+    void (async () => {
+      try {
+        const current = modelsRef.current;
+        const invoke = companionInvoke();
+        const candidates = catalog.ranked.filter((model) => current.state.states[model.id] === 'downloaded');
+        const traceId = debugTrace('companion-start');
+        debugEvent('companion', 'resolve.start', { selectedId, native: Boolean(invoke) }, 'info', traceId);
+        const progress = (fraction: number) => {
+          if (cancelled) return;
+          heartbeat();
+          setEngineProgress(Math.max(0, Math.min(100, Math.round(fraction * 100))));
+        };
+        const resolved: Resolution = invoke
+          ? await resolveNativeEngine(invoke, catalog.report, current.locate, candidates, selectedId, progress)
+          : await resolveWebEngine(catalog.report, selectedId, progress);
+        debugEvent('companion', 'resolve.result', resolved.kind === 'ready' ? { kind: resolved.kind, config: resolved.config } : resolved, 'info', traceId);
+        if (cancelled) return;
+        if (resolved.kind !== 'ready') throw new Error(resolved.reason);
+        await controller.useEngine(resolved.engine, resolved.config);
+        initialized = true;
+        debugEvent('companion', 'engine.ready', { selectedId }, 'info', traceId);
+        if (cancelled) { await controller.close(); return; }
+        controllerRef.current = controller;
+        setEngineState('ready');
+      } catch (error) {
+        logCompanionFailure('startup', error);
+        if (!cancelled) setEngineState('failed');
+      } finally {
+        clearTimeout(timeout);
+        clearTimeout(slowTimer);
       }
-      if (!cancelled) setResolution(resolved);
     })();
     return () => {
       cancelled = true;
+      clearTimeout(timeout);
+      clearTimeout(slowTimer);
+      abortRef.current?.abort();
+      if (controllerRef.current === controller) controllerRef.current = null;
+      if (initialized) void controller.close().catch((error) => logCompanionFailure('close', error));
+      // A pending init disposes its own engine when it settles.
     };
-  }, [readyKey, catalog]);
+  }, [catalog, selectedId, selectedState, attempt]);
+
+  const sendRef = useRef<(text?: string) => Promise<void>>(async () => {});
+  useEffect(() => {
+    const show = (event: Event) => {
+      setOpen(true);
+      const prompt = (event as CustomEvent<{ prompt?: string }>).detail?.prompt;
+      if (prompt) setOrientationPrompt(prompt);
+    };
+    window.addEventListener(OPEN_COMPANION, show);
+    return () => window.removeEventListener(OPEN_COMPANION, show);
+  }, []);
+  useEffect(() => {
+    if (orientationPrompt && engineState === 'ready' && !streaming) {
+      setOrientationPrompt(null);
+      void sendRef.current(orientationPrompt);
+    }
+  }, [orientationPrompt, engineState, streaming]);
 
   // Small screens open the panel as a bottom sheet by default.
   useEffect(() => {
@@ -159,30 +224,23 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
   }, [messages]);
 
-  const send = async () => {
-    const text = input.trim();
-    if (!text || streaming) return;
-    setInput('');
-    setMessages((m) => [...m, { role: 'user', text }]);
-    setMessages((m) => [...m, { role: 'assistant', text: '' }]);
+  const send = async (requestedText?: string) => {
+    const text = requestedText ?? input.trim();
+    const controller = controllerRef.current;
+    if (!text || streaming || engineState !== 'ready' || !controller) return;
+    setReplyNotice(null);
+    if (!requestedText) setInput('');
+    setMessages((m) => [...m, { role: 'user', text }, { role: 'assistant', text: '' }]);
     setStreaming(true);
     const abort = new AbortController();
     abortRef.current = abort;
+    let received = false;
+    let response = '';
     try {
-      const resolved = resolution;
-      if (!resolved || resolved.kind !== 'ready') {
-        throw new Error(
-          resolved && resolved.kind === 'needs-model'
-            ? 'No model is downloaded yet — pick one in the picker above; the download is verified and stored once.'
-            : (resolved?.reason ?? 'The engine is still probing — try again in a moment.'),
-        );
-      }
-      const controller = controllerRef.current ?? new ChatController();
-      if (controllerRef.current === null) {
-        await controller.useEngine(resolved.engine, resolved.config);
-        controllerRef.current = controller;
-      }
-      for await (const ev of controller.generate(text, abort.signal)) {
+      for await (const ev of controller.generate(text, abort.signal, guideContext())) {
+        if (abort.signal.aborted) break;
+        received ||= Boolean(ev.text);
+        response += ev.text;
         setMessages((m) => {
           const copy = m.slice();
           const last = copy[copy.length - 1];
@@ -190,27 +248,29 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
           return copy;
         });
       }
+      if (abort.signal.aborted) {
+        setInput((draft) => draft || text);
+        setReplyNotice(companionFeedback.stopped);
+      } else if (!received) throw new Error('Engine returned an empty reply');
+      else applyGuideCommand(response);
     } catch (error) {
-      setMessages((m) => {
-        const copy = m.slice();
-        const last = copy[copy.length - 1];
-        if (!last.text) {
-          copy[copy.length - 1] = {
-            role: 'assistant',
-            text: `⚠ ${error instanceof Error ? error.message : String(error)}`,
-          };
-        }
-        return copy;
-      });
+      logCompanionFailure('reply', error);
+      setInput((draft) => draft || text);
+      setReplyNotice(companionFeedback.reply);
+      setEngineState('failed');
     } finally {
+      setMessages((m) => m.filter((message) => message.text.length > 0));
       setStreaming(false);
       abortRef.current = null;
     }
   };
 
+  sendRef.current = send;
+
   const stop = () => abortRef.current?.abort();
 
   const onPointerDown = (kind: DragKind) => (e: ReactPointerEvent<HTMLElement>) => {
+    if (kind === 'move' && (e.target as HTMLElement).closest('button, input, textarea, a')) return;
     e.preventDefault();
     e.currentTarget.setPointerCapture?.(e.pointerId);
     dragRef.current = { kind, ox: e.clientX, oy: e.clientY, rect, width: dockWidth };
@@ -255,6 +315,7 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
           className={`chat-panel ${dock}`}
           role="complementary"
           aria-label="Companion chat"
+          data-guide="companion"
           style={panelStyle}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
@@ -265,8 +326,8 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
           >
             <div className="chat-header-left">
               <h3>Companion</h3>
-              <EngineChip resolution={resolution} />
-              <ModelPicker hook={models} compact />
+              <EngineChip state={engineState} />
+              <ModelPicker hook={models} compact disabled={streaming || engineState === 'starting'} />
             </div>
             <div className="chat-modes" role="group" aria-label="Panel placement">
               {DOCK_MODES.map((m) => (
@@ -306,15 +367,37 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
             />
           )}
           <div className="chat-log" ref={listRef}>
-            {messages.length === 0 && (
-              <p className="chat-hello">
-                ℣. Pax et gaudium. Ask about the propers, a feast, or a passage — answers stream from the model
-                running on this device; pick one with the Models menu above if none is downloaded yet.
+            <div className="companion-guidance">
+              <p className="companion-choice">{selected ? `Selected: ${selected.displayName}${selected.id === catalog?.defaultPick?.id ? " · recommended" : ""}. Change it with Companion choices above.` : ""}</p>
+              <p role="status" aria-live="polite" aria-atomic="true">
+                {models.state.error ? companionFeedback.catalogue
+                  : !catalog ? companionFeedback.checking
+                  : !selected || selected.unsupported ? companionFeedback.unavailable
+                  : selectedState === 'failed' || engineState === 'failed' ? companionFeedback.failed
+                  : selectedState === 'downloading' ? `${companionFeedback.downloading} ${models.state.progress[selectedId ?? ''] ?? 0}%`
+                  : selectedState === 'verifying' ? companionFeedback.verifying
+                  : engineState === 'starting' ? `${slow ? companionFeedback.slow : companionFeedback.starting}${engineProgress === null ? '' : ` ${engineProgress}%`}`
+                  : engineState === 'ready' ? companionFeedback.ready
+                  : companionFeedback.setup}
               </p>
-            )}
+              {selectedState === 'downloading' && <progress aria-label="Companion download" max={100} value={models.state.progress[selectedId ?? ''] ?? 0} />}
+              {engineState === 'starting' && <progress aria-label="Preparing Companion" max={100} value={engineProgress ?? undefined} />}
+              <div className="companion-actions">
+                {models.state.error && <button type="button" onClick={models.retryCatalog}>Try again</button>}
+                {selected && !selected.unsupported && !streaming && (selectedState === 'idle' || selectedState === 'failed') &&
+                  <button type="button" onClick={() => models.download(selected.id)}>
+                    {selectedState === 'failed' ? 'Try again' : `Prepare Companion · about ${formatBytes(selected.bytes)}`}
+                  </button>}
+                {engineState === 'failed' && selectedState === 'downloaded' && <button type="button" onClick={() => setAttempt((value) => value + 1)}>Try again</button>}
+                {(selectedState === 'downloading' || engineState === 'starting') && selected && <button type="button" onClick={() => models.cancel(selected.id)}>Cancel preparation</button>}
+                {engineState !== 'ready' && <button type="button" onClick={() => setOpen(false)}>Return to Missal</button>}
+              </div>
+            </div>
+            {orientationPrompt && <p role="status">Your orientation question is waiting. Prepare the Companion to hear its explanation; you can keep using the on-screen guide now.</p>}
+            {replyNotice && <p className="companion-notice" role="status">{replyNotice}</p>}
             {messages.map((m, i) => (
               <div key={i} className={`chat-msg ${m.role}`}>
-                {m.text}
+                {m.role === 'assistant' ? stripGuideCommands(m.text) : m.text}
               </div>
             ))}
           </div>
@@ -337,7 +420,7 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
                 Stop
               </button>
             ) : (
-              <button type="button" onClick={() => void send()} disabled={!input.trim()}>
+              <button type="button" onClick={() => void send()} disabled={!input.trim() || engineState !== 'ready'}>
                 Send
               </button>
             )}
@@ -348,31 +431,8 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
   );
 }
 
-function EngineChip({ resolution }: { resolution: Resolution | null }) {
-  if (!resolution) {
-    return (
-      <span className="chat-engine-chip warn" title="Probing device capabilities">
-        ...
-      </span>
-    );
-  }
-  if (resolution.kind === 'ready') {
-    return (
-      <span className="chat-engine-chip" title={'Running locally (' + resolution.label + ')'}>
-        On-device
-      </span>
-    );
-  }
-  if (resolution.kind === 'needs-model') {
-    return (
-      <span className="chat-engine-chip warn" title={resolution.reason}>
-        Needs model
-      </span>
-    );
-  }
-  return (
-    <span className="chat-engine-chip warn" title={resolution.reason}>
-      Unavailable
-    </span>
-  );
+function EngineChip({ state }: { state: 'idle' | 'starting' | 'ready' | 'failed' }) {
+  return <span className="chat-engine-chip">
+    {state === 'ready' ? 'Ready' : state === 'starting' ? 'Preparing…' : state === 'failed' ? 'Needs attention' : 'Setup'}
+  </span>;
 }

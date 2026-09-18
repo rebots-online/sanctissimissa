@@ -10,6 +10,7 @@
 import type { EngineConfig, IInferenceEngine } from '../../../reusable-chatbot/core/engine-types.ts';
 import { NativeRunnerProvider, type TauriInvoke } from '../../../reusable-chatbot/engines/native/index.ts';
 import { loadWebLLM, webllmEntries } from '../../../reusable-chatbot/engines/webllm/index.ts';
+import { debugEvent, debugTrace } from '../diagnostics/store.ts';
 import type { CapabilityReport } from '../../../reusable-chatbot/core/capability-broker.ts';
 
 export type Resolution =
@@ -38,8 +39,10 @@ export async function resolveNativeEngine(
   report: CapabilityReport,
   locate: (id: string) => Promise<string | null>,
   candidates: { id: string; displayName: string }[],
+  selected: string | null = selectedModelId(),
+  onProgress?: (fraction: number, text: string) => void,
 ): Promise<Resolution> {
-  const persisted = selectedModelId();
+  const persisted = selected;
   if (report.accelerations.length === 0) {
     // Windows cross-builds ship without the native engine (feature-gated;
     // cargo-xwin's clang cannot compile llama.cpp) — honest deferral to the
@@ -51,14 +54,14 @@ export async function resolveNativeEngine(
     };
   }
   const order = [
-    ...(persisted ? [persisted] : []),
-    ...candidates.map((c) => c.id),
+    ...(persisted ? [persisted] : candidates.map((c) => c.id)),
   ];
   for (const id of order) {
     const located = await locate(id);
     if (located) {
-      const [sha, locator] = splitLocator(located);
-      const engine = new NativeRunnerProvider(invoke);
+      const [, locator] = splitLocator(located);
+      const traceId = debugTrace('native-load');
+      const engine = new NativeRunnerProvider(invoke, undefined, (operation, detail) => debugEvent('native-loader', operation, detail, 'info', traceId), onProgress);
       return {
         kind: 'ready',
         engine,
@@ -67,7 +70,7 @@ export async function resolveNativeEngine(
           artifactUrl: locator,
           contextTokens: Math.min(report.contextCeiling, 4096),
         },
-        label: sha.slice(0, 8),
+        label: candidates.find((candidate) => candidate.id === id)?.displayName ?? 'Companion',
       };
     }
   }
@@ -83,7 +86,11 @@ export function splitLocator(located: string): [string, string] {
 }
 
 /** Web resolution: WebLLM roster gated by the probed budget. */
-export async function resolveWebEngine(report: CapabilityReport): Promise<Resolution> {
+export async function resolveWebEngine(
+  report: CapabilityReport,
+  selected: string | null = selectedModelId(),
+  onProgress?: (fraction: number, text: string) => void,
+): Promise<Resolution> {
   if (!report.accelerations.includes('webgpu')) {
     return {
       kind: 'unsupported',
@@ -97,12 +104,12 @@ export async function resolveWebEngine(report: CapabilityReport): Promise<Resolu
   if (entries.length === 0) {
     return { kind: 'needs-model', reason: 'No compiled model fits this device budget yet.' };
   }
-  const persisted = selectedModelId();
-  const pick = entries.find((e) => e.id === persisted) ?? entries[0];
+  const pick = selected ? entries.find((e) => e.id === selected) : entries[0];
+  if (!pick) return { kind: 'needs-model', reason: 'Selected model is not available in this browser.' };
   const { WebLlmRunnerProvider } = await import('../../../reusable-chatbot/engines/webllm/index.ts');
   return {
     kind: 'ready',
-    engine: new WebLlmRunnerProvider(),
+    engine: new WebLlmRunnerProvider(onProgress, module, (operation, detail) => debugEvent('webllm', operation, detail, 'info', pick.id)),
     config: { modelId: pick.id, artifactUrl: 'webllm-manifest:' },
     label: pick.displayName,
   };

@@ -1,269 +1,196 @@
-/**
- * ModelPicker (CP.4, §7.8.5): the Companion's model surface. No
- * preview/mock/placeholder state ever appears here — every entry is a real
- * catalog model with an honest readiness state: ready / download % /
- * needs setup / unsupported on this device. The automatic qualified default
- * is offered on first open; manual selection persists `chat.modelId`.
- */
-
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+/** Companion choices and verified download lifecycle; ready belongs to the engine. */
+import { createContext, useContext, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { RankedModel } from '../../reusable-chatbot/model-registry/rank.ts';
-import {
-  buildCompanionCatalog,
-  entryAsset,
-  isTauri,
-  makeDownloadManager,
-  makeLibrary,
-  readAliases,
-  writeAlias,
-  type CompanionCatalog,
-} from '../core/chat/models.ts';
-import type { DownloadProgress } from '../core/model-store/download-manager.ts';
+import { buildCompanionCatalog, entryAsset, makeDownloadManager, makeLibrary, readInstalledAssets,
+  writeInstalledAsset, type CompanionCatalog } from '../core/chat/models.ts';
+import { companionInvoke } from '../core/chat/runtime.ts';
+import { selectedModelId, SELECTED_MODEL_KEY } from '../core/chat/resolve.ts';
+import { companionFeedback, logCompanionFailure } from '../core/chat/feedback.ts';
+import { debugEvent } from '../core/diagnostics/store.ts';
+import { storageRootName } from '../core/storage/root.ts';
+import type { DownloadHandle } from '../core/model-store/download-manager.ts';
+import type { ModelAsset } from '../core/model-store/types.ts';
 import type { TauriInvoke } from '../../reusable-chatbot/core/capability-broker.ts';
 
-export type ModelState = 'loading' | 'ready' | 'idle' | 'downloading' | 'failed' | 'unsupported';
-
+export type ModelState = 'idle' | 'downloaded' | 'downloading' | 'verifying' | 'failed' | 'unsupported';
 export interface PickerState {
   catalog: CompanionCatalog | null;
   states: Record<string, ModelState>;
   progress: Record<string, number>;
   selectedId: string | null;
-  error: string | null;
+  error: boolean;
 }
-
-interface Hook {
+export interface CompanionModels {
   state: PickerState;
   select(id: string): void;
   download(id: string): void;
+  cancel(id: string): void;
+  retryCatalog(): void;
   locate(id: string): Promise<string | null>;
 }
 
-export function useCompanionModels(invoke?: TauriInvoke, scopeDir?: string | null): Hook {
-  const [state, setState] = useState<PickerState>({
-    catalog: null,
-    states: {},
-    progress: {},
-    selectedId: null,
-    error: null,
-  });
+function useModelState(invoke?: TauriInvoke, scopeDir = storageRootName()): CompanionModels {
+  const [state, setState] = useState<PickerState>({ catalog: null, states: {}, progress: {}, selectedId: null, error: false });
+  const [revision, setRevision] = useState(0);
+  const backend = invoke ?? companionInvoke();
+  const libraryRef = useRef<ReturnType<typeof makeLibrary> | null>(null);
   const managerRef = useRef<ReturnType<typeof makeDownloadManager> | null>(null);
-  const assetsRef = useRef<Map<string, ReturnType<typeof entryAsset>>>(new Map());
-  const keyMapRef = useRef<Map<string, string> | null>(null);
+  const installedRef = useRef<Record<string, ModelAsset>>({});
+  const activeRef = useRef(new Map<string, DownloadHandle>());
+  const mountedRef = useRef(false);
 
   useEffect(() => {
+    mountedRef.current = true;
     let cancelled = false;
-    (async () => {
+    let off = () => {};
+    setState((s) => ({ ...s, catalog: null, error: false }));
+    void (async () => {
       try {
-        const tauriInvoke = invoke ?? (isTauri() ? (window as unknown as { invoke: TauriInvoke }).invoke : undefined);
-        const catalog = await buildCompanionCatalog(tauriInvoke);
+        debugEvent('model-catalog', 'probe.start', { runtime: backend ? 'native' : 'browser' });
+        const catalog = await buildCompanionCatalog(backend);
+        debugEvent('model-catalog', 'probe.result', catalog);
+        const library = makeLibrary(backend, scopeDir);
+        const installed = readInstalledAssets();
+        const states: Record<string, ModelState> = {};
+        for (const model of catalog.ranked) {
+          if (model.unsupported) states[model.id] = 'unsupported';
+          else if (backend && installed[model.url]) {
+            const found = await library.lookup(installed[model.url]);
+            states[model.id] = found.kind === 'ready' ? 'downloaded' : 'idle';
+          } else states[model.id] = 'idle';
+        }
         if (cancelled) return;
-        const library = makeLibrary(tauriInvoke, scopeDir);
+        libraryRef.current = library;
+        installedRef.current = installed;
         const manager = makeDownloadManager(library);
         managerRef.current = manager;
-        const aliases = typeof localStorage === 'undefined' ? {} : readAliases();
-        const states: Record<string, ModelState> = {};
-        const progress: Record<string, number> = {};
-        for (const model of catalog.ranked) {
-          assetsRef.current.set(model.id, entryAsset(model));
-          if (model.unsupported) {
-            states[model.id] = 'unsupported';
-            continue;
-          }
-          const alias = aliases[model.url];
-          if (alias) {
-            const lookup = await library.lookup({ ...entryAsset(model), sha256: alias });
-            states[model.id] = lookup.kind === 'ready' ? 'ready' : 'idle';
-          } else {
-            states[model.id] = 'idle';
-          }
-        }
-        const keyToModel = new Map<string, string>();
-        keyMapRef.current = keyToModel;
-        manager.onProgress((p: DownloadProgress) => {
-          const modelId = keyToModel.get(p.sha256) ?? (p.phase === 'ready' ? undefined : undefined);
-          if (!modelId) return;
-          setState((s) => ({
-            ...s,
-            states: {
-              ...s.states,
-              ...(p.phase === 'ready' ? { [modelId]: 'ready' as ModelState } : {}),
-              ...(p.phase === 'failed' ? { [modelId]: 'failed' as ModelState } : {}),
-            },
-            progress: {
-              ...s.progress,
-              [modelId]: p.total > 0 ? Math.min(100, Math.round((p.received / p.total) * 100)) : 0,
-            },
+        off = manager.onProgress((p) => {
+          if (cancelled || !activeRef.current.has(p.sha256)) return;
+          setState((s) => ({ ...s,
+            states: { ...s.states, [p.sha256]: p.phase === 'verifying' ? 'verifying' : 'downloading' },
+            progress: { ...s.progress, [p.sha256]: p.total > 0 ? Math.min(100, Math.round(p.received / p.total * 100)) : 0 },
           }));
         });
-        setState({ catalog, states, progress, selectedId: null, error: null });
+        const previous = selectedModelId();
+        const selectedId = catalog.ranked.find((m) => m.id === previous && !m.unsupported)?.id ?? catalog.defaultPick?.id ?? null;
+        setState({ catalog, states, progress: {}, selectedId, error: false });
       } catch (error) {
-        if (!cancelled) {
-          setState((s) => ({ ...s, error: error instanceof Error ? error.message : String(error) }));
-        }
+        logCompanionFailure('choices', error);
+        if (!cancelled) setState((s) => ({ ...s, error: true }));
       }
     })();
+    const active = activeRef.current;
     return () => {
+      mountedRef.current = false;
       cancelled = true;
+      off();
+      for (const handle of active.values()) handle.abort();
+      active.clear();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [backend, scopeDir, revision]);
 
   const select = useCallback((id: string) => {
+    debugEvent('model-selection', 'selected', { id });
     setState((s) => ({ ...s, selectedId: id }));
-    if (typeof localStorage !== 'undefined') localStorage.setItem('chat.modelId', id);
+    try { localStorage.setItem(SELECTED_MODEL_KEY, id); }
+    catch (error) { logCompanionFailure('remember-choice', error); }
   }, []);
 
   const download = useCallback((id: string) => {
-    const manager = managerRef.current;
     const model = state.catalog?.ranked.find((m) => m.id === id);
-    if (!manager || !model) return;
-    const asset = entryAsset(model);
-    assetsRef.current.set(id, asset);
-    keyMapRef.current?.set(`${model.repo}-${model.quant}`, id);
+    if (!model || model.unsupported || activeRef.current.has(id)) return;
+    select(id);
+    if (!backend) {
+      // Browser initialization owns its compiled assets and cache. Do not download a GGUF.
+      setState((s) => ({ ...s, states: { ...s.states, [id]: 'downloaded' } }));
+      return;
+    }
+    const manager = managerRef.current;
+    if (!manager) return;
     setState((s) => ({ ...s, states: { ...s.states, [id]: 'downloading' }, progress: { ...s.progress, [id]: 0 } }));
-    manager.acquire(asset, model.url, undefined, `${model.repo}-${model.quant}`);
-    // Record the catalogue alias when the verified commit lands.
-    const off = manager.onProgress((p) => {
-      if (p.phase === 'ready' && /^[a-f0-9]{64}$/.test(p.sha256)) {
-        writeAlias(model.url, p.sha256);
-        off();
+    const asset = installedRef.current[model.url] ?? entryAsset(model);
+    const handle = manager.acquire(asset, model.url, asset.sha256 || undefined, id);
+    activeRef.current.set(id, handle);
+    void (async () => {
+      try {
+        const result = await handle.promise;
+        if (activeRef.current.get(id) !== handle) return;
+        if (result.kind !== 'ready' || !result.asset) throw new Error('reason' in result ? result.reason : 'No verified model identity');
+        installedRef.current[model.url] = result.asset;
+        writeInstalledAsset(model.url, result.asset);
+        if (mountedRef.current) setState((s) => ({ ...s, states: { ...s.states, [id]: 'downloaded' } }));
+      } catch (error) {
+        logCompanionFailure('download', error);
+        if (mountedRef.current && activeRef.current.get(id) === handle) setState((s) => ({ ...s, states: { ...s.states, [id]: 'failed' } }));
+      } finally {
+        if (activeRef.current.get(id) === handle) activeRef.current.delete(id);
       }
-    });
+    })();
+  }, [state.catalog, backend, select]);
+
+  const cancel = useCallback((id: string) => {
+    activeRef.current.get(id)?.abort();
+    activeRef.current.delete(id);
+    setState((s) => ({ ...s, states: { ...s.states, [id]: 'idle' } }));
+  }, []);
+  const locate = useCallback(async (id: string) => {
+    const model = state.catalog?.ranked.find((m) => m.id === id);
+    const asset = model && installedRef.current[model.url];
+    if (!asset || !libraryRef.current) return null;
+    const found = await libraryRef.current.lookup(asset);
+    return found.kind === 'ready' ? `${asset.sha256}::${found.locator}` : null;
   }, [state.catalog]);
 
-  const locate = useCallback(
-    async (id: string): Promise<string | null> => {
-      const model = state.catalog?.ranked.find((m) => m.id === id);
-      const library = makeLibrary(isTauri() ? (window as unknown as { invoke: TauriInvoke }).invoke : undefined);
-      if (!model) return null;
-      const alias = readAliases()[model.url];
-      if (!alias) return null;
-      const result = await library.lookup({ ...entryAsset(model), sha256: alias });
-      return result.kind === 'ready' ? `${alias}::${result.locator}` : null;
-    },
-    [state.catalog],
-  );
+  return { state, select, download, cancel, locate, retryCatalog: () => setRevision((r) => r + 1) };
+}
 
-  return { state, select, download, locate };
+const ModelsContext = createContext<CompanionModels | null>(null);
+export function CompanionModelsProvider({ children }: { children: ReactNode }) {
+  const models = useModelState();
+  return <ModelsContext.Provider value={models}>{children}</ModelsContext.Provider>;
+}
+export function useCompanionModels(): CompanionModels {
+  const models = useContext(ModelsContext);
+  if (!models) throw new Error('CompanionModelsProvider is missing');
+  return models;
 }
 
 export function formatBytes(bytes: number): string {
-  if (!bytes) return 'size unknown';
-  const gb = bytes / 1024 ** 3;
-  if (gb >= 1) return `${gb.toFixed(1)} GB`;
-  return `${Math.round(bytes / 1024 ** 2)} MB`;
+  if (!bytes) return 'size to be checked';
+  return bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.round(bytes / 1024 ** 2)} MB`;
 }
 
-export interface ModelPickerProps {
-  hook: Hook;
-  compact?: boolean;
-}
-
-/** Header chip/menu — used by ChatView; also embedded in Settings' Library tab. */
-export default function ModelPicker({ hook, compact = false }: ModelPickerProps) {
+export interface ModelPickerProps { hook: CompanionModels; compact?: boolean; disabled?: boolean }
+export default function ModelPicker({ hook, compact = false, disabled = false }: ModelPickerProps) {
   const { state, select, download } = hook;
   const [open, setOpen] = useState(false);
-  const ranked: RankedModel[] = state.catalog?.ranked ?? [];
-  const selected = useMemo(
-    () => ranked.find((m) => m.id === state.selectedId) ?? state.catalog?.defaultPick ?? null,
-    [ranked, state.selectedId, state.catalog],
-  );
-  if (compact) {
-    const st = selected ? state.states[selected.id] : 'loading';
-    const label =
-      state.error
-        ? 'Models \u2717'
-        : st === 'ready'
-        ? (selected?.displayName ?? 'Model')
-        : st === 'downloading'
-          ? `${state.progress[selected?.id ?? ''] ?? 0}%`
-          : st === 'unsupported'
-            ? 'Unsupported here'
-            : st === 'failed'
-              ? 'Download failed'
-              : st === 'loading'
-                ? 'Models…'
-                : 'Set up model';
-    return (
-      <div className="model-picker compact">
-        <button
-          type="button"
-          className={`model-picker-chip${open ? ' open' : ''}`}
-          aria-expanded={open}
-          aria-haspopup="listbox"
-          title={selected ? `${selected.displayName} · ${selected.quant} · ${formatBytes(selected.bytes)}` : 'Choose a model'}
-          onClick={() => setOpen((o) => !o)}
-        >
-          {label} ⌄
-        </button>
-        {open && (
-          <ul className="model-picker-menu" role="listbox" aria-label="Companion models">
-            {ranked.map((m) => (
-              <li key={m.id}>
-                <ModelRow model={m} st={state.states[m.id] ?? 'idle'} pct={state.progress[m.id]} onSelect={select} onDownload={download} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    );
-  }
-  return (
-    <div className="model-picker full">
-      {state.error && <p className="model-error">Catalog unavailable: {state.error}</p>}
-      <ul className="model-picker-menu" role="listbox" aria-label="Companion models">
-        {ranked.map((m) => (
-          <li key={m.id}>
-            <ModelRow model={m} st={state.states[m.id] ?? 'idle'} pct={state.progress[m.id]} onSelect={select} onDownload={download} />
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function ModelRow({
-  model,
-  st,
-  pct,
-  onSelect,
-  onDownload,
-}: {
-  model: RankedModel;
-  st: ModelState;
-  pct?: number;
-  onSelect(id: string): void;
-  onDownload(id: string): void;
-}) {
-  return (
-    <div className={`model-row ${st}`}>
-      <button
-        type="button"
-        role="option"
-        aria-selected={false}
-        disabled={st === 'unsupported'}
-        className="model-row-main"
-        onClick={() => onSelect(model.id)}
-      >
-        <span className="model-name">{model.displayName}</span>
-        <span className="model-meta">
-          {model.quant} · {formatBytes(model.bytes)}
-          {model.license ? ` · ${model.license}` : ''}
-        </span>
-        {st === 'unsupported' && <span className="model-why">{model.unsupportedReason}</span>}
-      </button>
-      {st === 'idle' && (
-        <button type="button" className="model-download" onClick={() => onDownload(model.id)}>
-          Download
-        </button>
-      )}
-      {st === 'downloading' && <span className="model-progress">{pct ?? 0}%</span>}
-      {st === 'ready' && <span className="model-ready">ready ✓</span>}
-      {st === 'failed' && (
-        <button type="button" className="model-download retry" onClick={() => onDownload(model.id)}>
-          Retry
-        </button>
-      )}
-    </div>
-  );
+  const ranked = state.catalog?.ranked ?? [];
+  const selected = ranked.find((m) => m.id === state.selectedId);
+  const content = <>
+    {state.error && <p role="status">{companionFeedback.catalogue} <button onClick={hook.retryCatalog}>Try again</button></p>}
+    {!state.catalog && !state.error && <p role="status">{companionFeedback.checking}</p>}
+    {state.catalog && !state.catalog.defaultPick && <p>{companionFeedback.unavailable}</p>}
+    <ul className="model-picker-menu" aria-label="Companion choices">
+      {ranked.map((model: RankedModel) => {
+        const status = state.states[model.id] ?? 'idle';
+        const busy = status === 'downloading' || status === 'verifying';
+        return <li className={`model-row ${status}`} key={model.id}>
+          <button type="button" className="model-row-main" disabled={disabled || model.unsupported || busy}
+            aria-pressed={model.id === state.selectedId} onClick={() => { select(model.id); setOpen(false); }}>
+            <span className="model-name">{model.displayName}</span>
+            <span className="model-meta">{model.id === state.catalog?.defaultPick?.id ? 'Recommended · ' : ''}About {formatBytes(model.bytes)}{model.unsupported ? ' · Not available on this device' : ''}</span>
+          </button>
+          {!model.unsupported && <button type="button" className="model-download" disabled={disabled || busy}
+            onClick={() => { download(model.id); setOpen(false); }}>
+            {status === 'failed' ? 'Try again' : status === 'downloaded' ? 'Use this' : status === 'verifying' ? 'Checking…' : status === 'downloading' ? `${state.progress[model.id] ?? 0}%` : 'Prepare'}
+          </button>}
+        </li>;
+      })}
+    </ul>
+  </>;
+  return <div className={`model-picker ${compact ? 'compact' : 'full'}`}>
+    {compact && <button type="button" className="model-picker-chip" aria-expanded={open} disabled={disabled}
+      onClick={() => setOpen((value) => !value)} title={selected?.displayName}>Companion choices ⌄</button>}
+    {(!compact || open) && <div className="model-picker-content">{content}</div>}
+  </div>;
 }

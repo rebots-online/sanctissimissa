@@ -6,6 +6,8 @@
  * session stays usable afterwards.
  */
 
+import { Channel } from '@tauri-apps/api/core';
+
 import type {
   EngineCapabilities,
   EngineConfig,
@@ -17,8 +19,8 @@ import type {
 } from '../../core/engine-types.ts';
 
 export type TauriInvoke = (command: string, args?: Record<string, unknown>) => Promise<unknown>;
-interface TauriChannelLike<T> {
-  on(callback: (message: T) => void): void;
+export interface TauriChannelLike<T> {
+  onmessage: (message: T) => void;
 }
 
 /** Simple single-consumer queue bridging Channel callbacks to async iteration. */
@@ -52,8 +54,16 @@ export class NativeRunnerProvider implements IInferenceEngine {
   #invoke: TauriInvoke;
   #session: SessionId | null = null;
 
-  constructor(invoke: TauriInvoke) {
+  #diagnostic: (operation: string, detail: unknown) => void;
+  #progress: (fraction: number, text: string) => void;
+  #makeChannel: () => TauriChannelLike<string>;
+
+  constructor(invoke: TauriInvoke, makeChannel: () => TauriChannelLike<string> = () => new Channel<string>(),
+    diagnostic: (operation: string, detail: unknown) => void = () => {}, progress: (fraction: number, text: string) => void = () => {}) {
     this.#invoke = invoke;
+    this.#makeChannel = makeChannel;
+    this.#diagnostic = diagnostic;
+    this.#progress = progress;
   }
 
   async probe(): Promise<EngineCapabilities> {
@@ -81,8 +91,17 @@ export class NativeRunnerProvider implements IInferenceEngine {
     if (!locator || locator.startsWith('builtin:')) {
       throw new Error('native engine needs a shared-library locator — download a model first');
     }
+    const onProgress = this.#makeChannel();
+    onProgress.onmessage = (raw) => {
+      this.#diagnostic('load.event', raw);
+      try {
+        const event = JSON.parse(raw) as { progress?: number; stage?: string };
+        if (typeof event.progress === 'number') this.#progress(event.progress, event.stage ?? '');
+      } catch { /* Raw payload is already recorded. */ }
+    };
     const id = (await this.#invoke('inference_load', {
       path: locator,
+      onProgress,
       contextTokens: config.contextTokens ?? 4096,
     })) as string;
     this.#session = id;
@@ -95,38 +114,33 @@ export class NativeRunnerProvider implements IInferenceEngine {
     signal?: AbortSignal,
   ): AsyncIterable<TokenEvent, void, undefined> {
     if (session !== this.#session) throw new Error('native session mismatch');
-    const channel = (this.#invoke as unknown as {
-      Channel: new <T>() => TauriChannelLike<T>;
-    }).Channel;
-    if (typeof channel !== 'function') {
-      throw new Error('Tauri Channel unavailable outside the desktop shell');
-    }
-    const chan = new (channel as new () => TauriChannelLike<string>)();
+    if (signal?.aborted) return;
+    const chan = this.#makeChannel();
     const queue = new TokenQueue();
-    chan.on((piece: string) => {
-      queue.push(piece);
-      if (piece === '') queue.close();
-    });
-    if (signal) signal.addEventListener('abort', () => void this.cancel(session), { once: true });
-
+    let failure: unknown;
+    chan.onmessage = (piece: string) => {
+      if (piece) queue.push(piece);
+      else queue.close();
+    };
+    const cancel = () => { queue.close(); void this.cancel(session); };
+    signal?.addEventListener('abort', cancel, { once: true });
     const generation = this.#invoke('inference_generate', {
       sessionId: session,
       messages: request.messages.map((m) => [m.role, m.content]),
       maxTokens: request.maxTokens ?? null,
       onToken: chan,
-    }) as Promise<void>;
-    // The command itself streams into the channel; surface hard failures.
-    generation.catch((error) => {
-      queue.push(`⚠ ${error instanceof Error ? error.message : String(error)}`);
-      queue.close();
-    });
-    void generation.finally(() => queue.close());
-
-    for (;;) {
-      const piece = await queue.next();
-      if (piece === null) return;
-      if (piece === '') return; // completion sentinel
-      yield { text: piece };
+    }).catch((error: unknown) => { failure = error; }).finally(() => queue.close());
+    try {
+      for (;;) {
+        const piece = await queue.next();
+        if (signal?.aborted) return;
+        if (piece === null) break;
+        yield { text: piece };
+      }
+      await generation;
+      if (failure !== undefined) throw failure;
+    } finally {
+      signal?.removeEventListener('abort', cancel);
     }
   }
 

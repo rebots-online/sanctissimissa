@@ -38,7 +38,6 @@ interface WebLLMEngineLike {
 }
 
 export interface WebLLMModule {
-  hasModelInModelList(modelId: string): boolean;
   CreateMLCEngine(
     modelId: string,
     options?: { initProgressCallback?: (report: { progress?: number; text?: string }) => void },
@@ -72,7 +71,7 @@ export interface WebLlmCatalogEntry {
 /** Map WebLLM's prebuilt list into picker entries (chat/instruct text models). */
 export function webllmEntries(module: WebLLMModule): WebLlmCatalogEntry[] {
   return module.prebuiltAppConfig.model_list
-    .filter((m) => /-q4f16_1|-q4f32_1|-q4f16$/i.test(m.model_id) || m.low_resource_required === true)
+    .filter((m) => /-q4f16_1(?:-MLC)?$|-q4f32_1(?:-MLC)?$|-q4f16(?:-MLC)?$/i.test(m.model_id) || m.low_resource_required === true)
     .map((m) => ({
       id: m.model_id,
       displayName: m.model_id
@@ -88,9 +87,12 @@ export function webllmEntries(module: WebLLMModule): WebLlmCatalogEntry[] {
 export class WebLlmRunnerProvider implements IInferenceEngine {
   #engine: WebLLMEngineLike | null = null;
   #module: WebLLMModule | null = null;
+  #diagnostic: (operation: string, detail: unknown) => void;
   #initProgress: ((fraction: number, text: string) => void) | null = null;
 
-  constructor(onInitProgress?: (fraction: number, text: string) => void) {
+  constructor(onInitProgress?: (fraction: number, text: string) => void, module?: WebLLMModule, diagnostic: (operation: string, detail: unknown) => void = () => {}) {
+    this.#module = module ?? null;
+    this.#diagnostic = diagnostic;
     this.#initProgress = onInitProgress ?? null;
   }
 
@@ -120,12 +122,15 @@ export class WebLlmRunnerProvider implements IInferenceEngine {
   async init(config: EngineConfig): Promise<SessionId> {
     const module = this.#module ?? (await loadWebLLM());
     if (!module) throw new Error('WebLLM unavailable in this runtime');
-    if (!module.hasModelInModelList(config.modelId)) {
+    if (!module.prebuiltAppConfig.model_list.some((model) => model.model_id === config.modelId)) {
       throw new Error(`Unknown WebLLM model: ${config.modelId}`);
     }
     this.#module = module;
     this.#engine = await module.CreateMLCEngine(config.modelId, {
-      initProgressCallback: (report) => this.#initProgress?.(report.progress ?? 0, report.text ?? ''),
+      initProgressCallback: (report) => {
+        this.#diagnostic('init.progress', report);
+        this.#initProgress?.(report.progress ?? 0, report.text ?? '');
+      },
     });
     return 'webllm-session';
   }

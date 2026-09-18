@@ -88,10 +88,10 @@ test('CP.4: ranking changes correctly when probe truth changes', () => {
 });
 
 test('CP.4: picker states are honest — no mock/preview anywhere in the surface', () => {
-  for (const state of ['ready', 'downloading', 'failed', 'unsupported', 'idle']) {
+  for (const state of ['downloaded', 'downloading', 'failed', 'unsupported', 'idle']) {
     assert.ok(pickerSource.includes(`'${state}'`), `state ${state} exists`);
   }
   assert.ok(!/mock:\/\//.test(pickerSource) && !/MockEngine/.test(pickerSource), 'picker never presents a mock engine');
-  assert.ok(chatViewSource.includes('<ModelPicker hook={models} compact />'), 'ChatView header carries the picker');
+  assert.ok(chatViewSource.includes('<ModelPicker hook={models} compact'), 'ChatView header carries the picker');
   assert.ok(settingsSource.includes('Companion models'), 'Settings carries the models surface');
 });

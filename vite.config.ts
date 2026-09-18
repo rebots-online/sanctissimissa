@@ -83,6 +83,7 @@ export default defineConfig(({ mode }) => {
   ],
   clearScreen: false,
   server: {
+    hmr: { overlay: false }, // Product screens use authored recovery in development too.
     port: 5173,
     strictPort: true,
     watch: {

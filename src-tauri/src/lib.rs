@@ -81,6 +81,7 @@ pub fn run() {
             model_store::model_chunk,
             model_store::model_finish,
             model_store::model_remove,
+            model_store::model_remove_staging,
             model_store::model_lock,
             model_store::model_unlock,
             inference::inference_probe,

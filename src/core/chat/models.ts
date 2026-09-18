@@ -11,15 +11,11 @@ import { probeNativeCapabilities, probeWebCapabilities, type CapabilityReport, t
 import { DesktopModelLibrary, WebModelLibrary } from '../model-store/store.ts';
 import { DownloadManager } from '../model-store/download-manager.ts';
 import type { ModelAsset } from '../model-store/types.ts';
+import { loadWebLLM, webllmEntries } from '../../../reusable-chatbot/engines/webllm/index.ts';
+export { isTauri } from './runtime.ts';
 
+import defaults from '../../../config/companion-defaults.json' with { type: 'json' };
 import catalogUrl from '../../../reusable-chatbot/model-registry/data/atomic-chat-catalog.json?url';
-
-export type TauriGlobals = { invoke: TauriInvoke };
-
-/** The Tauri shell injects __TAURI_INTERNALS__; web builds do not have it. */
-export function isTauri(): boolean {
-  return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
-}
 
 export async function probeCapabilities(invoke?: TauriInvoke): Promise<CapabilityReport> {
   return invoke ? probeNativeCapabilities(invoke) : probeWebCapabilities();
@@ -42,20 +38,35 @@ export interface CompanionCatalog {
 }
 
 export async function buildCompanionCatalog(invoke?: TauriInvoke): Promise<CompanionCatalog> {
-  const [report, rows] = await Promise.all([probeCapabilities(invoke), loadCatalogRows()]);
+  const report = await probeCapabilities(invoke);
+  if (!invoke) {
+    const module = await loadWebLLM();
+    if (!module) throw new Error('Browser inference module unavailable');
+    const ranked: RankedModel[] = webllmEntries(module).map((entry) => ({
+      id: entry.id, displayName: entry.displayName, bytes: entry.bytes, repo: entry.id,
+      url: '', quant: '', license: null, priority: 'catalog', score: -entry.bytes,
+      unsupported: !report.accelerations.includes('webgpu') || entry.bytes > report.memoryBudgetBytes,
+    }));
+    return { report, ranked, defaultPick: pickDefault(ranked) };
+  }
+  const rows = await loadCatalogRows();
   const { recommended, lowSpec } = loadRecommendedRepos();
   const entries: ModelCatalogEntry[] = [
+    ...resolveCatalogEntries([defaults.preferredNativeRepo], rows).map((e) => ({ ...e, displayName: defaults.preferredDisplayName, priority: 'recommended' as const })),
     ...resolveCatalogEntries(recommended, rows).map((e) => ({ ...e, priority: 'recommended' as const })),
     ...resolveCatalogEntries(lowSpec, rows).map((e) => ({ ...e, priority: 'low-spec' as const })),
   ];
-  const ranked = rankModels(entries, report);
-  return { report, ranked, defaultPick: pickDefault(ranked) };
+  const unique = entries.filter((entry, index) => entries.findIndex((other) => other.id === entry.id) === index);
+  const ranked = rankModels(unique, report).map((entry) => ({ ...entry, unsupported: entry.unsupported || report.accelerations.length === 0 }));
+  const defaultPick = preferredDefault(ranked);
+  return { report, ranked, defaultPick };
 }
 
 /** Catalog-side download identity: digest unknown until the download proves it. */
 export function entryAsset(entry: ModelCatalogEntry): ModelAsset {
   return {
     sha256: '',
+    estimatedBytes: true,
     bytes: entry.bytes,
     fileName: `${entry.repo.split('/').pop()}-${entry.quant}.gguf`,
   };
@@ -72,10 +83,15 @@ export function readAliases(): Record<string, string> {
   }
 }
 
-export function writeAlias(url: string, sha256: string): void {
-  const aliases = readAliases();
-  aliases[url] = sha256;
-  localStorage.setItem(ALIAS_KEY, JSON.stringify(aliases));
+export function readInstalledAssets(): Record<string, ModelAsset> {
+  try { return JSON.parse(localStorage.getItem(`${ALIAS_KEY}.assets`) ?? '{}') as Record<string, ModelAsset>; }
+  catch { return {}; }
+}
+
+export function writeInstalledAsset(url: string, asset: ModelAsset): void {
+  const assets = readInstalledAssets();
+  assets[url] = asset;
+  localStorage.setItem(`${ALIAS_KEY}.assets`, JSON.stringify(assets));
 }
 
 export function makeLibrary(invoke?: TauriInvoke, scopeDir?: string | null) {
@@ -86,4 +102,10 @@ export function makeLibrary(invoke?: TauriInvoke, scopeDir?: string | null) {
 
 export function makeDownloadManager(library: ReturnType<typeof makeLibrary>): DownloadManager {
   return new DownloadManager(library);
+}
+
+export function preferredDefault(ranked: RankedModel[]): RankedModel | null {
+  return ranked.find((entry) => entry.repo === defaults.preferredNativeRepo && !entry.unsupported)
+    ?? ranked.find((entry) => !entry.unsupported && !defaults.manualOnlyFamilies.some((family) => entry.displayName.toUpperCase().includes(family)))
+    ?? null;
 }

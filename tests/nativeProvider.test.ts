@@ -41,7 +41,7 @@ test('CP.7: adapter refuses builtin placeholders — needs a real locator', asyn
   const invoke = (async () => {
     throw new Error('must not be called');
   }) as never;
-  const provider = new NativeRunnerProvider(invoke);
+  const provider = new NativeRunnerProvider(invoke, () => ({ onmessage() {} }));
   await assert.rejects(
     () => provider.init({ modelId: 'x', artifactUrl: 'builtin:' }),
     /needs a shared-library locator/,
@@ -66,7 +66,7 @@ test('CP.7: init invokes inference_load with the library locator and keeps the s
     }
     throw new Error(`unexpected ${cmd}`);
   }) as never;
-  const provider = new NativeRunnerProvider(invoke);
+  const provider = new NativeRunnerProvider(invoke, () => ({ onmessage() {} }));
   const caps = await provider.probe();
   assert.equal(caps.backend, 'turboquant-native');
   const session = await provider.init({ modelId: 'm', artifactUrl: '/lib/models/sha256/ab/m.gguf' });
@@ -97,4 +97,36 @@ test('CP.7: locator split + selection persistence key', () => {
   assert.deepEqual(splitLocator('abc123::/lib/m.gguf'), ['abc123', '/lib/m.gguf']);
   assert.deepEqual(splitLocator('/no/digest/here'), ['/no/digest/here', '/no/digest/here']);
   assert.equal(SELECTED_MODEL_KEY, 'chat.modelId');
+});
+
+test('CP.11: official Channel onmessage streams text and propagates failures without tokens', async () => {
+  const channel = { onmessage: (_message: string) => {} };
+  let fail = false;
+  const provider = new NativeRunnerProvider(async (command, args) => {
+    if (command === 'inference_load') return 'session';
+    if (command === 'inference_generate') {
+      assert.equal(args?.onToken, channel);
+      channel.onmessage('The Mass ');
+      if (fail) throw new Error('secret_function is not a function');
+      channel.onmessage('begins.');
+      channel.onmessage('');
+    }
+  }, () => channel);
+  await provider.init({ modelId: 'm', artifactUrl: '/models/m.gguf' });
+  const output: string[] = [];
+  for await (const event of provider.generate('session', { messages: [] })) output.push(event.text);
+  assert.equal(output.join(''), 'The Mass begins.');
+  fail = true;
+  const partial: string[] = [];
+  await assert.rejects(async () => {
+    for await (const event of provider.generate('session', { messages: [] })) partial.push(event.text);
+  }, /secret_function/);
+  assert.equal(partial.join(''), 'The Mass ');
+});
+
+test('CP.11: explicit model selection cannot silently use a different installed model', async () => {
+  const invoke = async () => ({});
+  const models = [{ id: 'first', displayName: 'First' }, { id: 'second', displayName: 'Second' }];
+  const result = await resolveNativeEngine(invoke, report(), async (id) => id === 'first' ? 'sha::/first.gguf' : null, models, 'second');
+  assert.equal(result.kind, 'needs-model');
 });

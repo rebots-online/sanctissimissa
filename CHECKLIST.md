@@ -2492,3 +2492,40 @@ immediately. CP shares no files with Stanza LS except `src/core/storage/root.ts`
   **Accept:** provider choice changes correctly with probe truth; no engine-specific imports in orchestration; PWA remains fully functional offline after model setup.
 
 - [ ] **CP.10 — Later runner phases (staged; expand when reached).** Phase 2 TurboQuant KV context advantage (native first; capability flag, not a UX mode) → Phase 3 Bonsai 27B high-density tier qualification (guide §9 matrix: artifact/memory/latency quality/context/thermals/portability/operations) → Phase 4 LiteRT-LM challenger → Phase 5 llama.cpp-WebGPU consolidation (the superseded 2026-09-16 WGSL plan lives here). Each expands to self-contained tasks with exact entities before dispatch; promotion of any tier requires beating the baseline on §7.8.3 acceptance.
+
+- [ ] **CP.11 — Guided Companion startup and recovery (operator 2026-09-18).**
+  Source contract: DOCS/ARCHITECTURE.md “Companion startup and recovery correction”.
+  Files: `src/core/chat/{runtime,feedback,models,resolve}.ts`,
+  `src/ui/{ModelPicker,ChatView}.tsx`, `src/styles.css`,
+  `src/core/model-store/{types,store,download-manager}.ts`,
+  `reusable-chatbot/{engines/{native,webllm}/index,core/chat-controller}.ts`,
+  `src/App.tsx`, `src/ui/SettingsView.tsx`, `vite.config.ts`, and
+  focused provider/store/feedback/UI tests. Implement the official Tauri invoke and
+  Channel surfaces; repair catalogue download identity, exact lengths and progress;
+  select runtime-compatible browser entries; initialize on setup/selection with
+  visible authored status and retry; reserve ready for initialized engines; prevent
+  exception rendering in both development and release. Preserve drafts and provide
+  a return to the Missal. Verify focused runtime tests, TypeScript, existing suite
+  and browser first-use/recovery checks. Record native-device limitations explicitly.
+
+- [ ] **CP.12 — Raw live diagnostics (operator 2026-09-18).** Implement the preceding
+  architecture contract in `src/core/diagnostics/{store,capture}.ts`,
+  `src/ui/DiagnosticsWindow.tsx`, `src/main.tsx`, `src/ui/SettingsView.tsx`,
+  `src/styles.css`, model/provider boundary instrumentation and native load Channel
+  progress in `src-tauri/src/inference.rs`; add `tests/diagnostics.test.ts` and UI
+  verification. Verify ordered raw errors, correlation, bounded capture, continued
+  capture while closed/paused, escaping, copy/export, docking and navigation.
+- [ ] **NAV.18 — Mass means Mass (operator 2026-09-18).** `src/App.tsx` permanently
+  renders the Mass-only `src/ui/SubwayMap.tsx`; remove its alternate mode props,
+  state, buttons and unused routing helpers. Add regression
+  checks in `tests/workspaceNavigation.test.ts` and browser navigation verification.
+
+- [ ] **CP.13 — Explicit default and persistent DOM orientation (operator 2026-09-18).**
+  Implement the preceding architecture contract in `config/companion-defaults.json`,
+  model selection/provider, `src/core/orientation/guide.ts`, `src/ui/OrientationGuide.tsx`,
+  actual App/sidebar/Companion anchors, `ChatController` contextual system messages,
+  Settings restart and style/test files. Verify Qwen default when supported, LFM not
+  auto-selected, explicit choices honored, guide completion/deferral persistence,
+  registered DOM targeting only, actual Show me clicks, unavailable target feedback,
+  and real-engine explanations without fabricated chat. Native full-device validation
+  is separately reported from UI/fixture checks.

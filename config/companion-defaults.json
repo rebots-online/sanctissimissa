@@ -1,0 +1,6 @@
+{
+  "preferredNativeRepo": "unsloth/Qwen3.5-2B-GGUF",
+  "preferredDisplayName": "Qwen 3.5 2B",
+  "manualOnlyFamilies": ["LFM"],
+  "offerOrientationUntilCompleted": true
+}

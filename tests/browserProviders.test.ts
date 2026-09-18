@@ -12,7 +12,6 @@ const providerSource = readFileSync(
 );
 
 const MODULE: WebLLMModule = {
-  hasModelInModelList: (id: string) => ['Llama-3.2-1B-Instruct-q4f16_1-MLC', 'Llama-3.2-3B-Instruct-q4f16_1-MLC'].includes(id),
   CreateMLCEngine: async () => {
     throw new Error('not used in unit tests');
   },
@@ -63,4 +62,33 @@ test('CP.9: budget gating — a device with 2 GB budget takes the 1B model', () 
   assert.equal(deployable[0].id, 'Llama-3.2-1B-Instruct-q4f16_1-MLC');
   assert.ok(!deployable.some((e) => e.id.includes('3B')), '3B does not fit a 2 GB budget');
   void ({} as CapabilityReport | null);
+});
+
+test('CP.11: production SDK manifest is used without a fictitious helper', async () => {
+  const actual = await import('@mlc-ai/web-llm');
+  const { WebLlmRunnerProvider } = await import('../reusable-chatbot/engines/webllm/index.ts');
+  const pick = actual.prebuiltAppConfig.model_list[0];
+  const progress: number[] = [];
+  let initialized = '';
+  let unloaded = false;
+  const provider = new WebLlmRunnerProvider((fraction) => progress.push(fraction), {
+    prebuiltAppConfig: actual.prebuiltAppConfig as WebLLMModule['prebuiltAppConfig'],
+    CreateMLCEngine: async (id, options) => {
+      initialized = id;
+      options?.initProgressCallback?.({ progress: 0.25, text: 'private runtime detail' });
+      return {
+        chat: { completions: { create: async function* () { yield { choices: [{ delta: { content: 'A reply' } }] }; } } },
+        interruptGenerate() {}, resetChat: async () => {}, unload: async () => { unloaded = true; },
+      };
+    },
+  });
+  await provider.init({ modelId: pick.model_id, artifactUrl: 'webllm-manifest:' });
+  assert.equal(initialized, pick.model_id);
+  assert.deepEqual(progress, [0.25]);
+  let text = '';
+  for await (const token of provider.generate('webllm-session', { messages: [] })) text += token.text;
+  assert.equal(text, 'A reply');
+  await provider.close();
+  assert.equal(unloaded, true);
+  await assert.rejects(provider.init({ modelId: 'not-in-the-manifest', artifactUrl: '' }), /Unknown WebLLM model/);
 });

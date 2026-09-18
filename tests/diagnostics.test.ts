@@ -1,0 +1,42 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { DiagnosticStore, diagnostics, serializeDebug, traceOperation } from '../src/core/diagnostics/store.ts';
+
+test('diagnostics retain receipt order, frozen payloads and an honest dropped count', () => {
+  const store = new DiagnosticStore(2);
+  const input = { stage: 'loading' };
+  store.record('native', 'progress', input);
+  input.stage = 'changed';
+  assert.equal(JSON.parse(store.snapshot()[0].detail).stage, 'loading');
+  store.record('native', 'ready', { progress: 1 });
+  store.record('console', 'error', new Error('raw failure'));
+  assert.deepEqual(store.snapshot().map(event => event.seq), [2, 3]);
+  assert.equal(store.dropped, 1);
+  const exported = store.export().split('\n').map(line => JSON.parse(line));
+  assert.equal(JSON.parse(exported[1].detail).message, 'raw failure');
+  assert.match(JSON.parse(exported[1].detail).stack, /Error: raw failure/);
+});
+
+test('cyclic data and a broken subscriber cannot stop recording', () => {
+  const store = new DiagnosticStore();
+  let notified = 0;
+  store.subscribe(() => { throw new Error('viewer failed'); });
+  store.subscribe(() => { notified++; });
+  const circular: { self?: unknown } = {};
+  circular.self = circular;
+  store.record('test', 'cycle', circular);
+  assert.equal(notified, 1);
+  assert.equal(JSON.parse(store.snapshot()[0].detail).self, '[Circular]');
+  assert.deepEqual(JSON.parse(serializeDebug(new Uint8Array(2048))), { type: 'Uint8Array', byteLength: 2048 });
+});
+
+test('failed operations keep the original error and correlate start and failure', async () => {
+  diagnostics.clear();
+  const original = new Error('engine missing', { cause: new Error('native detail') });
+  await assert.rejects(traceOperation('test-ipc', 'load', { path: '/model.gguf' }, async () => { throw original; }), error => error === original);
+  const events = diagnostics.snapshot().filter(event => event.source === 'test-ipc');
+  assert.deepEqual(events.map(event => event.operation), ['load.start', 'load.error']);
+  assert.ok(events[0].traceId);
+  assert.equal(events[0].traceId, events[1].traceId);
+  assert.equal(JSON.parse(events[1].detail).error.cause.message, 'native detail');
+});

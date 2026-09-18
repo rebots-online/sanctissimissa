@@ -124,6 +124,8 @@ test('CP.7/9: ChatView presents real engine states — no mock surface', () => {
   assert.ok(!/createChatSession|mock:\/\//.test(chatView), 'mock never reaches the UI');
 });
 
-test('CP.7/9: needs-model failure is an honest setup pointer, not a canned reply', () => {
-  assert.ok(chatView.includes('No model is downloaded yet'), 'honest setup message');
+test('CP.11: setup and failures use authored guidance outside assistant messages', () => {
+  assert.ok(chatView.includes('companionFeedback.setup'));
+  assert.ok(chatView.includes('Prepare Companion'));
+  assert.ok(!chatView.includes('error.message'));
 });

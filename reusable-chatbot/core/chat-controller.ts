@@ -37,12 +37,12 @@ export class ChatController {
   }
 
   /** Stream one assistant turn; canonical history grows even on abort. */
-  async *generate(userText: string, signal?: AbortSignal): AsyncGenerator<TokenEvent, void, undefined> {
+  async *generate(userText: string, signal?: AbortSignal, systemContext?: string): AsyncGenerator<TokenEvent, void, undefined> {
     if (!this.#engine || this.#session === null) {
       throw new Error('ChatController: no engine session — call useEngine() first');
     }
     const request: GenerateRequest = {
-      messages: [...this.#history, { role: 'user', content: userText }],
+      messages: [...(systemContext ? [{ role: 'system' as const, content: systemContext }] : []), ...this.#history, { role: 'user', content: userText }],
     };
     this.#history.push({ role: 'user', content: userText });
     let assistant = '';

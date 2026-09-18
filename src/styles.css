@@ -2780,3 +2780,50 @@ button.mstation, button.mstation.active, button.mstation.open {
   touch-action: none;
   background: linear-gradient(135deg, transparent 50%, var(--border, #ccc) 50%);
 }
+
+/* Guided setup remains legible and reachable with large text and mobile insets. */
+.companion-guidance { padding: 12px; border: 1px solid var(--gold, #b08d3e); border-radius: 10px; line-height: 1.55; }
+.companion-guidance p { margin: 0 0 12px; }
+.companion-guidance progress { width: 100%; height: 16px; accent-color: var(--gold, #b08d3e); }
+.companion-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.companion-actions button, .model-picker button { min-height: 44px; font-size: 1rem; white-space: normal; }
+.companion-actions button { padding: 10px 14px; border: 1px solid var(--gold, #b08d3e); border-radius: 8px; color: inherit; background: var(--card, #faf7f0); }
+.companion-notice { line-height: 1.55; }
+.chat-header-left { flex-wrap: wrap; }
+.chat-input { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+.chat-input textarea { min-width: 0; }
+.chat-input button { min-height: 44px; }
+.model-picker-content { position: absolute; right: 0; top: 100%; width: min(340px, calc(100vw - 32px)); max-height: 50dvh; overflow: auto; padding: 10px; z-index: 80; background: var(--card, #faf7f0); border: 1px solid var(--border, #ccc); border-radius: 10px; }
+.model-picker-content .model-picker-menu { position: static; min-width: 0; max-width: none; max-height: none; box-shadow: none; border: 0; }
+.model-picker.full .model-picker-content { position: static; width: 100%; max-height: none; }
+.model-row { flex-wrap: wrap; }
+.model-name { overflow-wrap: anywhere; }
+.model-meta { opacity: 1; font-size: 0.9rem; }
+.model-row-main[aria-pressed="true"] { border-color: var(--gold, #b08d3e); }
+.chat-panel.sheet { height: 72dvh; max-height: 85dvh; }
+.chat-panel.sheet .model-picker-content { position: fixed; left: 16px; right: 16px; top: auto; bottom: max(16px, env(safe-area-inset-bottom)); width: auto; max-height: 55dvh; }
+
+.settings-diagnostics { display: block; margin: 24px 0 4px auto; padding: 8px; color: var(--muted, #999); border: 0; background: transparent; font: inherit; font-size: .78rem; text-decoration: underline; cursor: pointer; }
+.diagnostics-window { position: fixed; z-index: 200; display: flex; flex-direction: column; width: min(850px, calc(100vw - 32px)); height: min(520px, 75dvh); min-width: 280px; min-height: 220px; max-width: 100vw; max-height: 100dvh; resize: both; overflow: hidden; color: #e5eaf1; background: #121923; border: 1px solid #7a899a; border-radius: 8px; box-shadow: 0 10px 30px #0008; font: 12px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.diagnostics-window.docked { inset: auto 0 0; width: 100%; height: 38dvh; resize: vertical; border-radius: 0; }
+.diagnostics-window.popped-out { inset: 0; width: 100%; height: 100%; resize: none; }
+.diagnostics-title { padding: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; background: #202d3e; cursor: move; touch-action: none; }
+.diagnostics-title strong { margin-right: auto; }
+.diagnostics-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; padding: 8px; }
+.diagnostics-window button, .diagnostics-window input, .diagnostics-window select, .diagnostics-window textarea { font: inherit; color: #e5eaf1; background: #202d3e; border: 1px solid #708398; border-radius: 4px; padding: 6px; min-width: 0; }
+.diagnostics-window button { cursor: pointer; }
+.diagnostics-events { flex: 1; min-height: 40px; overflow: auto; padding: 6px 10px; background: #0c1119; }
+.diagnostics-event { margin: 0; padding: 5px 0; border-bottom: 1px solid #293445; white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
+.diagnostics-event.error { color: #ffb4b4; }
+.diagnostics-event.warn { color: #f9d488; }
+.diagnostics-window footer { padding: 6px; color: #bac6d4; }
+.diagnostics-copy { display: flex; flex-direction: column; padding: 8px; }
+.diagnostics-copy textarea { height: 100px; }
+@media (max-width: 720px) { .diagnostics-window { width: calc(100vw - 16px); } .diagnostics-tools input[placeholder] { width: 100%; } }
+.orientation-offer, .orientation-guide { position: fixed; right: 16px; bottom: max(24px, env(safe-area-inset-bottom)); z-index: 85; max-width: min(400px, calc(100vw - 32px)); max-height: 45dvh; overflow: auto; padding: 18px; color: var(--text); background: var(--card, #faf7f0); border: 2px solid var(--gold, #b08d3e); border-radius: 12px; box-shadow: 0 8px 28px #0006; line-height: 1.5; }
+.orientation-guide { right: auto; left: max(16px, env(safe-area-inset-left)); }
+.orientation-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.orientation-offer button, .orientation-guide button { padding: 10px; min-height: 44px; font: inherit; border: 1px solid var(--gold, #b08d3e); border-radius: 8px; color: inherit; background: var(--card, #faf7f0); cursor: pointer; }
+.orientation-offer button { margin-right: 8px; }
+.orientation-target { outline: 3px solid #edc657 !important; outline-offset: 4px; box-shadow: 0 0 0 7px #edc65733 !important; }
+.companion-choice { font-size: .92rem; }

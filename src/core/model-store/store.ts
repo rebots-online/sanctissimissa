@@ -65,8 +65,8 @@ export class DesktopModelLibrary implements ModelLibrary {
   async lock<T>(key: string, run: () => Promise<T>): Promise<T> {
     const token = (await this.#invoke('model_lock', {
       key,
-      scope_dir: this.#scopeDir,
-      ttl_ms: 30 * 60_000,
+      scopeDir: this.#scopeDir,
+      ttlMs: 30 * 60_000,
     })) as string;
     try {
       return await run();
@@ -80,8 +80,8 @@ export class DesktopModelLibrary implements ModelLibrary {
     const result = (await this.#invoke('model_lookup', {
       sha256: asset.sha256,
       bytes: asset.bytes,
-      file_name: asset.fileName,
-      scope_dir: this.#scopeDir,
+      fileName: asset.fileName,
+      scopeDir: this.#scopeDir,
     })) as { kind: string; reason?: string; path?: string };
     switch (result.kind) {
       case 'ready':
@@ -102,27 +102,28 @@ export class DesktopModelLibrary implements ModelLibrary {
     const progressKey = key;
     await this.#invoke('model_begin', {
       key: safeKey(key),
-      file_name: asset.fileName,
-      scope_dir: this.#scopeDir,
+      fileName: asset.fileName,
+      scopeDir: this.#scopeDir,
     });
     let offset = 0;
     return {
       write: async (_offset, chunk) => {
-        await this.#invoke('model_chunk', { key: safeKey(key), offset, bytes: Array.from(chunk) });
+        await this.#invoke('model_chunk', { key: safeKey(key), offset, bytes: Array.from(chunk), scopeDir: this.#scopeDir });
         offset += chunk.byteLength;
         this.#emit(progressKey, offset, asset.bytes);
       },
       finish: async () => {
         const ok = (await this.#invoke('model_finish', {
           key: safeKey(key),
-          expected_bytes: asset.bytes,
-          expected_sha256: asset.sha256 || null,
+          expectedBytes: asset.bytes,
+          expectedSha256: asset.sha256 || null,
+          scopeDir: this.#scopeDir,
         })) as { verified: boolean; reason?: string; sha256?: string; bytes?: number };
         if (!ok.verified) throw new Error(ok.reason ?? 'Commit verification failed');
         return { sha256: ok.sha256 ?? asset.sha256 ?? '', bytes: ok.bytes ?? asset.bytes };
       },
       abort: async () => {
-        await this.#invoke('model_remove_staging', { key: safeKey(key), scope_dir: this.#scopeDir }).catch(
+        await this.#invoke('model_remove_staging', { key: safeKey(key), scopeDir: this.#scopeDir }).catch(
           () => undefined,
         );
       },
@@ -130,7 +131,7 @@ export class DesktopModelLibrary implements ModelLibrary {
   }
 
   async remove(sha256: string): Promise<void> {
-    await this.#invoke('model_remove', { sha256, scope_dir: this.#scopeDir });
+    await this.#invoke('model_remove', { sha256, scopeDir: this.#scopeDir });
   }
 }
 

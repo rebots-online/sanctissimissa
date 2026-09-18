@@ -1516,3 +1516,112 @@ nothing is delivered until the bookstore service publishes signed packages for
 `ready` editions (BS-S flow). Google Play product creation in Play Console,
 Play app linkage, and sandbox purchase verification are explicit pending
 operator obligations (BI.4a); web checkout wiring remains LS.08/LS.09.
+
+### Companion startup and recovery correction — operator directive 2026-09-18
+
+The Companion guides a nontechnical, often elderly reader through preparation.
+All builds, including development builds, render only authored product messages;
+exceptions, identifiers, provider diagnostics and stack traces stay in developer
+logs. Model names and approximate download sizes belong in optional choices;
+quantization, licences and runtime details do not belong in the setup flow.
+
+`src/core/chat/runtime.ts` resolves the installed Tauri bridge through the official
+API; installed apps do not silently select a browser engine. Browser choices come
+from the actual WebLLM manifest. `src/core/chat/feedback.ts` owns the closed set of
+setup/recovery messages. `ModelPicker` owns checking, idle, downloading, verifying,
+downloaded, failed and unsupported states. Downloaded describes stored bytes only.
+`ChatView` owns starting, ready and failed engine states. Ready requires successful
+engine initialization for the selected model. Selection changes unload the previous
+engine and prepare the selected one; stale completion cannot replace a newer choice.
+
+First open offers “Prepare Companion”, explains the one-time download and its
+approximate size, and offers “Return to Missal”. Preparation reports connecting,
+received-byte progress, checking downloaded files and starting. Progress is tied to
+the operation's stable identity, not a digest that changes during ingestion. A slow
+operation remains visible and cancellable; a stalled transfer ends in recovery.
+Failures explain that preparation could not finish, preserve typed questions and
+provide “Try again”, model choices and “Return to Missal”. Sending requires ready;
+starting or unavailable states leave the draft editable. Technical errors are not
+assistant messages. A failed/empty/partial reply has a separate recovery notice.
+
+Native downloads use exact server lengths for catalogue-only size estimates, retain
+known-digest integrity checks, publish the returned digest/size, and persist that
+identity per URL before reporting downloaded. Native model-store commands use Tauri
+camelCase arguments and the same configured scope on begin/write/finish/lookup.
+Native generation uses the official Channel.onmessage API and throws failures to the
+controller rather than yielding exception strings as tokens. Browser initialization
+checks prebuiltAppConfig.model_list, and relays actual initialization progress.
+
+Acceptance: tests exercise real SDK surface shapes, unknown-digest multi-chunk
+acquisition, rounded catalogue sizes, HTTP failures, denied grants, cancellation,
+selected-model replacement and sanitized feedback. Browser visual checks cover
+first use, progress, failure, retry, large text and mobile controls. Native-device
+model load and reply remain a separately reported qualification; fixture execution
+alone does not prove that an APK works on the operator's phone.
+
+### Live diagnostics window — operator directive 2026-09-18
+
+A quiet “Diagnostics” button at the bottom of Settings opens an app-global,
+nonmodal, draggable/resizable windowlet, retained across workspace navigation.
+Dock/undock, pause display (capture continues), follow latest, text/source/severity
+filters, clear, copy and JSONL download are real actions. Closing affects visibility
+only. The same local in-memory recorder runs from startup in development and release;
+normal screens continue to show authored guidance. A standalone pop-out is attempted
+only on an explicit click, falling back to the floating window if unsupported.
+
+`src/core/diagnostics/store.ts` owns ordered immutable event snapshots: sequence,
+ISO timestamp, elapsed monotonic milliseconds, source, level, operation, correlation
+ID and JSON-serialized raw details/errors (including stack/cause). Retain the most
+recent 4,000 events; report how many were dropped. `capture.ts` records console,
+uncaught errors, unhandled rejections, resource failures, fetch request/headers/end/
+failure and native invoke request/result/failure. Native calls include precise
+command names and elapsed times. Binary arrays are represented by exact byte counts;
+no automatic upload occurs. Model pipeline events record selected IDs, provider
+resolution, download byte counts, verification identity, native load stages/progress
+and WebLLM's original progress report. No diagnostic interpretation replaces the
+recorded payload. Sequence is receipt order across layers; native-origin time is
+retained separately. Diagnostic recording must not throw into application work.
+
+`DiagnosticsWindow.tsx` renders text with React escaping, debounces redraws to 100ms,
+and stays independently usable while models prepare. A paused/filtered view is
+labelled; export offers the complete retained buffer, not only displayed rows.
+The native progress channel reports the loader's actual callback fraction. Missing
+instrumentation is not inferred as success; a start without a matching end remains
+visible as pending evidence. Native library stderr needs its own capture adapter;
+command/progress events are explicitly labelled as such.
+
+### Holy Mass navigation correction — operator directive 2026-09-18
+
+The Holy Mass home screen is exclusively the Mass map. Remove its Missa / Scriptura /
+Horæ mode switcher. The left rail owns workspace navigation: Holy Mass always selects
+the Mass map; Sacred Scripture and Divine Office keep their independent workspaces.
+Remove the unused alternative routes and their local state from SubwayMap entirely. Preserve the expand
+full-detail control. Test Scripture → Holy Mass and Divine Office → Holy Mass.
+
+### Preferred model and persistent orientation — operator directive 2026-09-18
+
+`config/companion-defaults.json` chooses `unsloth/Qwen3.5-2B-GGUF`, displayed as
+“Qwen 3.5 2B”, as the native default when supported. LFM is manual-only for automatic
+selection. An explicit user selection persists and takes precedence. Browser choices
+must remain executable browser artifacts; do not relabel an unrelated browser model
+as Qwen 3.5 2B. Selected/recommended names and the change control are visible before
+preparation. `CompanionModelsProvider` shares the same selection/download state across
+Settings and Companion. No large first-run download starts without Prepare.
+
+`orientation.completed` and `orientation.step` persist locally. While the configuration
+`offerOrientationUntilCompleted` is true, each new app launch offers or resumes the
+orientation until Finish is selected after the final step. “Later” suppresses only this
+session. Settings can restart it. Steps use actual `data-guide` elements: Holy Mass,
+Missal Reader, Sacred Scripture, Divine Office, Settings and Companion. The nonmodal
+guide highlights the real element, follows layout/scroll changes, and “Show me” clicks
+that exact visible element. The guide remains functional before the language model is
+ready; explanations generated by the Companion require the real initialized engine.
+
+The chatbot receives a DOM snapshot of the allowlisted visible controls and current
+orientation step as context. It can propose `[[guide:<id>]]` to highlight a registered
+control; invalid or missing targets are recorded, not executed. User-selected “Show me”
+activates the highlighted control through its normal click handler. No arbitrary JS,
+CSS selectors, destructive actions, purchase or export/import operations are exposed.
+Tour instruction text is authored UI; it is not displayed as a generated chatbot reply.
+The user can ask questions in Companion, request explanations, and continue the tour;
+model failures leave the working on-screen guide and pending completion state intact.

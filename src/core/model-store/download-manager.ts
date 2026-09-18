@@ -5,6 +5,8 @@
  * a silent second download; the caller sees the `needs-grant` state.
  */
 
+import { debugEvent } from '../diagnostics/store.ts';
+
 import type { LookupResult, ModelAsset, ModelLibrary, WriteAsset } from './types.ts';
 
 export interface DownloadProgress {
@@ -39,6 +41,7 @@ export class DownloadManager {
   }
 
   #emit(p: DownloadProgress): void {
+    debugEvent('model-download', p.phase, p, p.phase === 'failed' ? 'error' : 'info', p.sha256);
     for (const cb of this.#listeners) cb(p);
   }
 
@@ -49,114 +52,130 @@ export class DownloadManager {
    * proves the digest at commit and the returned lookup is keyed by it.
    */
   acquire(asset: ModelAsset, sourceUrl: string, knownDigest?: string, progressKey?: string): DownloadHandle {
+    const key = progressKey || asset.sha256 || knownDigest || sourceUrl;
     const controller = new AbortController();
-    const promise = this.#run(asset, sourceUrl, controller.signal, knownDigest, progressKey);
-    this.#controllers.set(asset.sha256, controller);
-    promise.finally(() => this.#controllers.delete(asset.sha256));
+    this.#controllers.set(key, controller);
+    const promise = this.#run(asset, sourceUrl, controller, knownDigest, key).finally(() => {
+      if (this.#controllers.get(key) === controller) this.#controllers.delete(key);
+    });
     return { asset, promise, abort: () => controller.abort() };
   }
 
-  cancel(sha256: string): void {
-    this.#controllers.get(sha256)?.abort();
+  cancel(key: string): void {
+    this.#controllers.get(key)?.abort();
   }
 
   async #run(
     asset: ModelAsset,
     sourceUrl: string,
-    signal: AbortSignal,
-    knownDigest?: string,
-    progressKeyOverride?: string,
+    controller: AbortController,
+    knownDigest: string | undefined,
+    progressKey: string,
   ): Promise<LookupResult> {
-    const progressKey = progressKeyOverride ?? asset.sha256 ?? knownDigest ?? sourceUrl;
+    const emitResult = (result: LookupResult): LookupResult => {
+      const ready = result.kind === 'ready';
+      const total = ready ? (result.asset?.bytes ?? asset.bytes) : asset.bytes;
+      this.#emit({ sha256: progressKey, received: ready ? total : 0, total,
+        phase: ready ? 'ready' : result.kind === 'needs-grant' ? 'needs-grant' : 'failed',
+        reason: 'reason' in result ? result.reason : undefined });
+      return result;
+    };
     try {
       this.#emit({ sha256: progressKey, received: 0, total: asset.bytes, phase: 'looking-up' });
-      // Resolve-existing-first: shared library, then authorized caches — by
-      // the asset digest when known, else through the catalogue alias (§7.8.4).
-      const alias = knownDigest ?? (await this.#alias?.(sourceUrl)) ?? null;
-      const existing = asset.sha256 || alias
-        ? await this.#library.lookup({ ...asset, sha256: asset.sha256 || alias! })
-        : ({ kind: 'missing' } as LookupResult);
+      const digest = asset.sha256 || knownDigest || (await this.#alias?.(sourceUrl)) || '';
+      const identity = { ...asset, sha256: digest };
+      const existing = digest ? await this.#library.lookup(identity) : { kind: 'missing' } as LookupResult;
       if (existing.kind !== 'missing') {
-        this.#emit({ sha256: asset.sha256 || alias!, received: asset.bytes, total: asset.bytes, phase: 'ready' });
-        return existing;
+        return emitResult(existing.kind === 'ready' ? { ...existing, asset: identity } : existing);
       }
-      const lockKey = knownDigest ?? asset.sha256 ?? sourceUrl;
-      return await this.#library.lock(lockKey, async () => {
-        if (knownDigest) {
-          const again = await this.#library.lookup({ ...asset, sha256: knownDigest });
-          if (again.kind !== 'missing') return again;
+      const result = await this.#library.lock(digest || `dl-${hashKey(sourceUrl)}`, async () => {
+        controller.signal.throwIfAborted();
+        if (digest) {
+          const again = await this.#library.lookup(identity);
+          if (again.kind !== 'missing') return again.kind === 'ready' ? { ...again, asset: identity } : again;
         }
-        const result = await this.#download(asset, sourceUrl, signal, progressKey);
-        if (result.kind === 'ready' && knownDigest && result.locator) return result;
-        return result;
+        return this.#download(identity, sourceUrl, controller, progressKey);
       });
+      return emitResult(result);
     } catch (error) {
-      const reason = error instanceof Error ? error.message : String(error);
-      this.#emit({ sha256: progressKey, received: 0, total: asset.bytes, phase: 'failed', reason });
-      return { kind: 'unavailable', reason };
+      return emitResult({ kind: 'unavailable', reason: error instanceof Error ? error.message : String(error) });
     }
   }
 
-  async #download(asset: ModelAsset, sourceUrl: string, signal: AbortSignal, progressKey: string): Promise<LookupResult> {
-    const download = await fetch(sourceUrl, {
-      signal,
-      headers: { Range: 'bytes=0-' },
-    });
-    if (!download.ok && download.status !== 206 && download.status !== 200) {
-      return { kind: 'unavailable', reason: `${sourceUrl} answered HTTP ${download.status}` };
-    }
-    const contentRange = download.headers.get('content-range'); // "bytes 0-<n>/<total>"
-    const declaredTotal = contentRange ? Number(contentRange.split('/')[1]) : Number(download.headers.get('content-length') ?? 0);
-    if (declaredTotal && declaredTotal !== asset.bytes) {
-      await download.body?.cancel();
-      return { kind: 'corrupt', reason: `Source serves ${declaredTotal} bytes for an asset of ${asset.bytes}` };
-    }
-    if (!download.body) {
-      return { kind: 'unavailable', reason: `${sourceUrl} returned no body` };
-    }
-    // ETag/revision validation: a changed ETag mid-resume must not splice
-    // unrelated bytes (guide §15) — the store's meta carries it via commit.
-    void download.headers.get('etag');
-
-    const writeAsset: WriteAsset = {
-      bytes: asset.bytes,
-      fileName: asset.fileName,
-      sha256: asset.sha256 || undefined,
-      stagingKey: asset.sha256 ? undefined : `dl-${hashKey(sourceUrl)}`,
-    };
-    const session = await this.#library.beginWrite(writeAsset);
-    this.#emit({ sha256: progressKey, received: 0, total: asset.bytes, phase: 'downloading' });
-    const reader = download.body!.getReader();
-    const CHUNK = 4 * 1024 * 1024;
-    let buffer = new Uint8Array(0);
-    let received = 0;
+  async #download(asset: ModelAsset, sourceUrl: string, controller: AbortController, progressKey: string): Promise<LookupResult> {
+    // Stall deadline resets on received bytes; large, progressing downloads are not timed out.
+    let deadline: ReturnType<typeof setTimeout>;
+    const touch = () => { clearTimeout(deadline); deadline = setTimeout(() => controller.abort(), 60_000); };
+    touch();
+    let session: Awaited<ReturnType<ModelLibrary['beginWrite']>> | undefined;
+    let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
     try {
+      const download = await fetch(sourceUrl, { signal: controller.signal, headers: { Range: 'bytes=0-' } });
+      if (!download.ok) throw new Error(`Model source answered HTTP ${download.status}`);
+      const range = download.headers.get('content-range');
+      const match = range?.match(/^bytes 0-([0-9]+)\/([0-9]+)$/);
+      if (download.status === 206 && (!match || Number(match[1]) + 1 !== Number(match[2]))) {
+        await download.body?.cancel();
+        return { kind: 'corrupt', reason: 'Incomplete or invalid model byte range' };
+      }
+      const declaredTotal = Number(match?.[2] ?? download.headers.get('content-length') ?? 0);
+      if (!Number.isSafeInteger(declaredTotal) || declaredTotal < 0) throw new Error('Invalid source length');
+      if (asset.estimatedBytes && !declaredTotal) throw new Error('Model source did not provide its exact size');
+      if (!asset.estimatedBytes && declaredTotal && declaredTotal !== asset.bytes) {
+        await download.body?.cancel();
+        return { kind: 'corrupt', reason: `Source serves ${declaredTotal} bytes for an asset of ${asset.bytes}` };
+      }
+      const total = asset.estimatedBytes ? declaredTotal : asset.bytes;
+      if (!download.body) throw new Error('Model source returned no body');
+      const writeAsset: WriteAsset = {
+        bytes: total, fileName: asset.fileName, sha256: asset.sha256 || undefined,
+        stagingKey: asset.sha256 ? undefined : `dl-${hashKey(sourceUrl)}`,
+      };
+      session = await this.#library.beginWrite(writeAsset);
+      reader = download.body.getReader();
+      const CHUNK = 4 * 1024 * 1024;
+      let buffer = new Uint8Array(0);
+      let received = 0;
+      let written = 0;
+      this.#emit({ sha256: progressKey, received, total, phase: 'downloading' });
       for (;;) {
+        controller.signal.throwIfAborted();
         const { done, value } = await reader.read();
         if (done) break;
         if (!value) continue;
-        const merged = buffer.byteLength === 0 ? value : concat(buffer, value);
-        for (let offset = 0; offset + CHUNK <= merged.byteLength; offset += CHUNK) {
-          await session.write(received, merged.subarray(offset, offset + CHUNK));
-          received += CHUNK;
+        touch();
+        received += value.byteLength;
+        if (received > total) throw new Error('Model source exceeded its declared size');
+        const merged = concat(buffer, value);
+        let consumed = 0;
+        while (consumed + CHUNK <= merged.byteLength) {
+          controller.signal.throwIfAborted();
+          await session.write(written, merged.subarray(consumed, consumed + CHUNK));
+          written += CHUNK;
+          consumed += CHUNK;
         }
-        buffer = merged.subarray(received);
+        buffer = merged.slice(consumed);
+        this.#emit({ sha256: progressKey, received, total, phase: 'downloading' });
       }
-      if (buffer.byteLength > 0) {
-        await session.write(received, buffer);
-        received += buffer.byteLength;
-      }
-      if (received !== asset.bytes) throw new Error(`Stream ended at ${received}/${asset.bytes} bytes`);
-      this.#emit({ sha256: asset.sha256, received, total: asset.bytes, phase: 'verifying' });
-      await session.finish();
-      const ready = await this.#library.lookup(asset);
-      this.#emit({ sha256: asset.sha256, received, total: asset.bytes, phase: 'ready' });
-      return ready;
+      controller.signal.throwIfAborted();
+      if (received !== total) throw new Error(`Stream ended at ${received}/${total} bytes`);
+      if (buffer.byteLength) await session.write(written, buffer);
+      clearTimeout(deadline!);
+      this.#emit({ sha256: progressKey, received, total, phase: 'verifying' });
+      const committed = await session.finish();
+      const identity: ModelAsset = { sha256: committed.sha256, bytes: committed.bytes, fileName: asset.fileName };
+      const ready = await this.#library.lookup(identity);
+      return ready.kind === 'ready' ? { ...ready, asset: identity } : ready;
     } catch (error) {
-      await session.abort().catch(() => undefined);
+      await session?.abort().catch(() => undefined);
       throw error;
+    } finally {
+      clearTimeout(deadline!);
+      await reader?.cancel().catch(() => undefined);
+      reader?.releaseLock();
     }
   }
+
 }
 
 function hashKey(url: string): string {

@@ -6,6 +6,8 @@
 
 import { useMemo, useState } from 'react';
 import ThemePicker from './ThemePicker.tsx';
+import { START_GUIDE } from '../core/orientation/guide.ts';
+import { openDiagnostics } from './DiagnosticsWindow.tsx';
 import ModelPicker, { useCompanionModels } from './ModelPicker.tsx';
 import { SidecarDb } from '../core/accompaniment/store.ts';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
@@ -61,6 +63,7 @@ export default function SettingsView({
   corpus?: CorpusDb | null;
   onOpenJournal?: () => void;
 }) {
+  const companionModels = useCompanionModels();
   const [tab, setTab] = useState<Tab>('appearance');
   const [, bump] = useState(0);
   const [syncBusy, setSyncBusy] = useState(false);
@@ -97,7 +100,8 @@ export default function SettingsView({
       URL.revokeObjectURL(a.href);
       setSyncMsg('Snapshot exported.');
     } catch (error) {
-      setSyncMsg(`Export failed: ${error instanceof Error ? error.message : String(error)}`);
+      console.error('[Settings:export]', error);
+      setSyncMsg('Your backup could not be saved. Please try exporting it again.');
     }
   };
 
@@ -110,7 +114,8 @@ export default function SettingsView({
       setSyncMsg('Snapshot restored — reloading…');
       setTimeout(() => window.location.reload(), 600);
     } catch (error) {
-      setSyncMsg(`Import failed: ${error instanceof Error ? error.message : String(error)}`);
+      console.error('[Settings:import]', error);
+      setSyncMsg('This backup could not be opened. Please choose a SanctissiMissa backup and try again.');
       setSyncBusy(false);
     }
   };
@@ -242,7 +247,7 @@ export default function SettingsView({
             On-device chat models from the Atomic Chat catalog, ranked for this device. Downloads are verified
             (SHA-256) and stored once in the shared mba.robin library.
           </p>
-          <ModelPicker hook={useCompanionModels()} />
+          <ModelPicker hook={companionModels} />
         </section>
       )}
 
@@ -309,6 +314,8 @@ export default function SettingsView({
           {!sidecar && <p className="settings-desc">Sidecar unavailable — snapshots cannot be exported or restored.</p>}
         </section>
       )}
+      <button type="button" className="settings-button" onClick={() => window.dispatchEvent(new Event(START_GUIDE))}>Restart orientation</button>
+      <button type="button" className="settings-diagnostics" onClick={openDiagnostics}>Diagnostics</button>
     </div>
   );
 }

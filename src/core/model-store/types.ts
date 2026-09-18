@@ -8,6 +8,8 @@
 export interface ModelAsset {
   sha256: string;
   bytes: number;
+  /** Catalogue display sizes are estimates until response metadata proves the length. */
+  estimatedBytes?: boolean;
   /** File name inside the digest directory (e.g. "model.gguf"). */
   fileName: string;
 }
@@ -35,7 +37,7 @@ export interface WriteAsset {
 }
 
 export type LookupResult =
-  | { kind: 'ready'; locator: string }
+  | { kind: 'ready'; locator: string; asset?: ModelAsset }
   | { kind: 'missing' }
   | { kind: 'needs-grant'; reason: string }
   | { kind: 'unavailable'; reason: string }

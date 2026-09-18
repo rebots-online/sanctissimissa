@@ -201,3 +201,89 @@ test('CP.3: web OPFS backend absent in node — lookup degrades honestly', async
   // unavailable message (no OPFS) is honest — a throw is not.
   assert.ok(result === 'missing' || /OPFS unavailable/.test(result), `honest outcome: ${result}`);
 });
+
+test('CP.11: unknown digest, approximate catalogue size and many chunks publish exact identity', async (t) => {
+  const payload = new Uint8Array(9 * 1024 * 1024 + 173).map((_, i) => i % 251);
+  const expected = digestOf(payload);
+  const events: DownloadProgress[] = [];
+  const writes: Uint8Array[] = [];
+  let committed: ModelAsset | undefined;
+  const library: ModelLibrary = {
+    lock: async (_key, run) => run(),
+    lookup: async (asset) => committed && asset.sha256 === committed.sha256 && asset.bytes === payload.length
+      ? { kind: 'ready', locator: '/verified/model.gguf' } : { kind: 'missing' },
+    beginWrite: async (asset) => {
+      assert.equal(asset.bytes, payload.length, 'exact source size replaces display estimate');
+      let offset = 0;
+      return {
+        write: async (at, chunk) => { assert.equal(at, offset); writes.push(chunk.slice()); offset += chunk.length; },
+        finish: async () => {
+          const bytes = Buffer.concat(writes);
+          assert.equal(digestOf(bytes), expected, 'multiple network chunks retain every byte');
+          committed = { sha256: expected, bytes: bytes.length, fileName: asset.fileName };
+          return committed;
+        },
+        abort: async () => {},
+      };
+    },
+    remove: async () => {}, onProgress() {},
+  };
+  const original = globalThis.fetch;
+  t.after(() => { globalThis.fetch = original; });
+  globalThis.fetch = async () => new Response(new ReadableStream({ start(controller) {
+    for (let i = 0; i < payload.length; i += 100_003) controller.enqueue(payload.subarray(i, i + 100_003));
+    controller.close();
+  } }), { headers: { 'content-length': String(payload.length) } });
+  const manager = new DownloadManager(library);
+  manager.onProgress((event) => events.push(event));
+  const result = await manager.acquire({ sha256: '', bytes: 10 * 1024 ** 2, estimatedBytes: true, fileName: 'model.gguf' }, 'https://example.test/model', undefined, 'selected-model').promise;
+  assert.equal(result.kind, 'ready');
+  assert.deepEqual(result.kind === 'ready' && result.asset, committed);
+  assert.ok(events.every((event) => event.sha256 === 'selected-model'), 'operation identity is stable through verification');
+  assert.ok(events.filter((event) => event.phase === 'downloading').length > 5, 'intermediate progress is emitted');
+  assert.equal(events.at(-1)?.phase, 'ready');
+});
+
+test('CP.11: HTTP failures and denied grants produce terminal feedback without downloads', async (t) => {
+  const original = globalThis.fetch;
+  t.after(() => { globalThis.fetch = original; });
+  let fetched = 0;
+  globalThis.fetch = async () => { fetched++; return new Response('gone', { status: 404 }); };
+  const events: DownloadProgress[] = [];
+  let grant = false;
+  const library: ModelLibrary = {
+    lookup: async () => grant ? { kind: 'needs-grant', reason: 'grant required' } : { kind: 'missing' },
+    lock: async (_key, run) => run(), beginWrite: async () => { throw new Error('unreachable'); },
+    remove: async () => {}, onProgress() {},
+  };
+  const manager = new DownloadManager(library);
+  manager.onProgress((event) => events.push(event));
+  assert.equal((await manager.acquire(GOOD, 'https://example.test/model').promise).kind, 'unavailable');
+  assert.equal(events.at(-1)?.phase, 'failed');
+  grant = true;
+  assert.equal((await manager.acquire(GOOD, 'https://example.test/model').promise).kind, 'needs-grant');
+  assert.equal(events.at(-1)?.phase, 'needs-grant');
+  assert.equal(fetched, 1);
+});
+
+test('CP.11: desktop IPC passes camelCase arguments and one storage scope throughout', async () => {
+  const { DesktopModelLibrary } = await import('../src/core/model-store/store.ts');
+  const calls: { command: string; args?: Record<string, unknown> }[] = [];
+  const lib = new DesktopModelLibrary(async (command, args) => {
+    calls.push({ command, args });
+    if (command === 'model_finish') return { verified: true, sha256: GOOD.sha256, bytes: GOOD.bytes };
+    if (command === 'model_lookup') return { kind: 'ready', path: '/model.gguf' };
+    return 'lock';
+  }, 'mba.robin');
+  await lib.lock(GOOD.sha256, async () => {
+    const session = await lib.beginWrite(GOOD);
+    await session.write(0, PAYLOAD);
+    await session.finish();
+    await lib.lookup(GOOD);
+  });
+  for (const { command, args } of calls) {
+    if (command === 'model_unlock') continue;
+    assert.equal(args?.scopeDir, 'mba.robin', command);
+    assert.ok(!Object.keys(args ?? {}).some((key) => key.includes('_')), 'Tauri argument names are camelCase');
+  }
+});

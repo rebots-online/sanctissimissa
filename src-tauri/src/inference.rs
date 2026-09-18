@@ -148,16 +148,44 @@ pub fn inference_probe() -> serde_json::Value {
 /// `model_lookup`'s locator — desktop-absolute, inside the org library.
 #[cfg(all(feature = "native-inference", not(target_os = "windows"), target_pointer_width = "64"))]
 #[tauri::command]
-pub fn inference_load(path: String, context_tokens: Option<u32>) -> Result<String, String> {
+pub async fn inference_load(path: String, context_tokens: Option<u32>, on_progress: Option<tauri::ipc::Channel<String>>) -> Result<String, String> {
+    tauri::async_runtime::spawn_blocking(move || load_model(path, context_tokens, on_progress))
+        .await.map_err(|error| error.to_string())?
+}
+
+#[cfg(all(feature = "native-inference", not(target_os = "windows"), target_pointer_width = "64"))]
+fn load_model(path: String, context_tokens: Option<u32>, on_progress: Option<tauri::ipc::Channel<String>>) -> Result<String, String> {
+    let report = |stage: &str, progress: Option<f32>| {
+        if let Some(channel) = &on_progress {
+            let _ = channel.send(serde_json::json!({ "stage": stage, "progress": progress,
+                "nativeTimeMs": std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis() }).to_string());
+        }
+    };
+    report("file.check", None);
     if !std::path::Path::new(&path).exists() {
         return Err(format!("model object not found: {path}"));
     }
+    report("backend.init", None);
     let be = backend()?;
+    report("model.load", Some(0.0));
+    let progress_channel = on_progress.clone();
+    let mut last_percent = -1i32;
+    let params = LlamaModelParams::default().with_progress_callback(move |progress| {
+        let percent = (progress * 100.0) as i32;
+        if percent != last_percent {
+            last_percent = percent;
+            if let Some(channel) = &progress_channel {
+                let _ = channel.send(serde_json::json!({ "stage": "model.load", "progress": progress }).to_string());
+            }
+        }
+        true
+    });
     let model = {
         let guard = be.lock().map_err(|_| "backend poisoned")?;
-        LlamaModel::load_from_file(&guard, &path, &LlamaModelParams::default())
+        LlamaModel::load_from_file(&guard, &path, &params)
             .map_err(|e| format!("model load failed: {e}"))?
     };
+    report("session.create", Some(1.0));
     let n_ctx = context_tokens.unwrap_or(4096).min(8192).max(512);
     let id = format!(
         "native-{}",
@@ -176,6 +204,7 @@ pub fn inference_load(path: String, context_tokens: Option<u32>) -> Result<Strin
         .map_err(|_| "cancels poisoned")?
         .get_or_insert_with(HashMap::new)
         .insert(id.clone(), Arc::new(AtomicBool::new(false)));
+    report("session.ready", Some(1.0));
     Ok(id)
 }
 
