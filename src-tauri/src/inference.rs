@@ -148,18 +148,16 @@ pub fn inference_probe() -> serde_json::Value {
 /// `model_lookup`'s locator — desktop-absolute, inside the org library.
 #[cfg(all(feature = "native-inference", not(target_os = "windows"), target_pointer_width = "64"))]
 #[tauri::command]
-pub async fn inference_load(path: String, context_tokens: Option<u32>, on_progress: Option<tauri::ipc::Channel<String>>) -> Result<String, String> {
+pub async fn inference_load(path: String, context_tokens: Option<u32>, on_progress: tauri::ipc::Channel<String>) -> Result<String, String> {
     tauri::async_runtime::spawn_blocking(move || load_model(path, context_tokens, on_progress))
         .await.map_err(|error| error.to_string())?
 }
 
 #[cfg(all(feature = "native-inference", not(target_os = "windows"), target_pointer_width = "64"))]
-fn load_model(path: String, context_tokens: Option<u32>, on_progress: Option<tauri::ipc::Channel<String>>) -> Result<String, String> {
+fn load_model(path: String, context_tokens: Option<u32>, on_progress: tauri::ipc::Channel<String>) -> Result<String, String> {
     let report = |stage: &str, progress: Option<f32>| {
-        if let Some(channel) = &on_progress {
-            let _ = channel.send(serde_json::json!({ "stage": stage, "progress": progress,
-                "nativeTimeMs": std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis() }).to_string());
-        }
+        let _ = on_progress.send(serde_json::json!({ "stage": stage, "progress": progress,
+            "nativeTimeMs": std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis() }).to_string());
     };
     report("file.check", None);
     if !std::path::Path::new(&path).exists() {
@@ -174,9 +172,7 @@ fn load_model(path: String, context_tokens: Option<u32>, on_progress: Option<tau
         let percent = (progress * 100.0) as i32;
         if percent != last_percent {
             last_percent = percent;
-            if let Some(channel) = &progress_channel {
-                let _ = channel.send(serde_json::json!({ "stage": "model.load", "progress": progress }).to_string());
-            }
+            let _ = progress_channel.send(serde_json::json!({ "stage": "model.load", "progress": progress }).to_string());
         }
         true
     });
