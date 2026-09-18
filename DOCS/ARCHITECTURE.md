@@ -1797,3 +1797,45 @@ CSS selectors, destructive actions, purchase or export/import operations are exp
 Tour instruction text is authored UI; it is not displayed as a generated chatbot reply.
 The user can ask questions in Companion, request explanations, and continue the tour;
 model failures leave the working on-screen guide and pending completion state intact.
+
+## Orientation geometry, feedback plane, and universal default model amendment (2026-09-18)
+
+Operator directives (verbatim, this date): "move the 'Orientation walk-through'
+notification at the bottom left somewhere else--and make sure it is moveable by
+dragging: it is obscuring the text box to type in"; "In the linux, it defauted
+to full-screen, also, obscuring all of the Mass; ... the main USP of the main
+feature cannot be completely obscurfed by a supporting function"; "progress
+animation/spinners with percentages are critically important ... even feedback
+of a button 3D 'pressing,' clicking, changing colour on press"; "The universal
+default model should be the qwen3.5:2b and no heavier without their expressly
+choosing it."
+
+**A. Orientation walk-through card geometry.** The guide card (`.orientation-guide`)
+and the offer card (`.orientation-offer`) are small floating assistant surfaces
+and are never full-bleed on any platform: hard caps `max-width: min(340px,
+calc(100vw - 32px))` and `max-height: 40dvh`. Default anchor for both is the
+TOP-RIGHT of the viewport, below the app header — never over the chat composer
+and never obscuring the Mass view by default. The guide card is draggable by
+pointer: the card's heading is the grab handle (`cursor: grab`); the dragged
+position persists under localStorage `sanctissimissa.orientation.pos.v1` as
+`{left, top}` and is clamped inside the viewport on drag and on window resize.
+Step semantics (`Show me`, `Ask Companion to explain`, `Back`, `Next`,
+`Finish orientation`, `Continue later`) are unchanged.
+
+**B. Feedback plane (global).** Every button shows hover, pressed
+(`:active` — a visible translate/brightness change), and disabled states
+globally; any asynchronous wait longer than ~300 ms presents a busy indicator.
+Model download and model preparation keep their percentage `<progress>` rows;
+generation shows a live "Generating … Ns" elapsed indicator with the streamed
+partial reply visible as tokens arrive and a cancel affordance while a
+generation is in flight; failures surface as inline recovery messages, never
+silently. A supporting surface may delay, but never destroy, the user's view
+of the Mass (the product's USP).
+
+**C. Universal default model.** `unsloth/Qwen3.5-2B-GGUF` ("Qwen 3.5 2B") is
+the universal first-run default on every platform (desktop native, WebLLM,
+Android). Automatic resolution NEVER selects a heavier model: if the preferred
+2B entry is unavailable, resolution returns no automatic default and the picker
+presents the explicit choice; heavier models enter use only by express user
+selection. The automatic-qualified-default fallback that ranked any
+non-manual-only model is removed.

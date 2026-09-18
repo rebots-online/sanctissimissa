@@ -2538,3 +2538,38 @@ immediately. CP shares no files with Stanza LS except `src/core/storage/root.ts`
   **Do:** `deploy-web.mjs` refuses to run without `dist-web/index.html` (nonzero, stage stays incomplete, retryable without stamping); copies `dist-web/index.html` to `dist-web/200.html` as the Surge SPA fallback; invokes the pinned project-local `node_modules/.bin/surge` with explicit `--project <absolute dist-web>` and `--domain sanctissimissa.surge.sh`, inherited terminal output, credentials only from the host Surge login or environment (never committed files, browser configuration or logs); nonzero exit on missing credentials, missing output, or CLI failure; no second build and no version stamp inside the deploy path. The release train runs the stage immediately after `web`, before native packaging, on Linux or Windows; a shared release state records success once.
   **Verify:** hermetic release tests prove `web-deploy` sits immediately after `web`, failed publication keeps the stage incomplete and retryable, resumed publication runs no second stamp, and a completed publication stage is skipped on later resumes; deploy-script tests prove the index.html precondition, SPA-fallback creation, explicit project/domain arguments and failure exits. A real release then verifies the deployed version served at `https://sanctissimissa.surge.sh` (an upload exit code alone is not evidence).
   **Accept:** exactly one minor increment for this release via the existing fresh-release stamp; changed source rejects stale release state per the existing source-mismatch protection; live web version at the domain matches the stamped version; documentation or a mocked CLI result alone is not accepted as deployment evidence.
+
+## OG.1 — Orientation card geometry: top-right default, pointer-drag, persisted position (2026-09-18; from ARCHITECTURE amendment §A)
+
+Self-contained. Files: `src/ui/OrientationGuide.tsx`, `src/core/orientation/guide.ts`, `src/styles.css`.
+- **Do:** in `guide.ts` add `GUIDE_POS_KEY = 'sanctissimissa.orientation.pos.v1'` with `readGuidePos()/saveGuidePos()` returning/clamping `{left, top}` (clamped to `window.innerWidth/innerHeight` minus a 48px margin, integers). In `OrientationGuide.tsx` apply the saved position as inline `{left, top, right: 'auto', bottom: 'auto'}` on the `.orientation-guide` aside; make the card's `<strong>` heading the drag handle: `onPointerDown` captures the pointer, `pointermove` updates position through state (uncontrolled writes to `document.body` styles are forbidden), `pointerup` persists via `saveGuidePos`; clicking (movement < 4px) still selects nothing but must not swallow button clicks — only the heading drags. Add a `resize` listener that re-clamps the live position and persists the clamped value. Both the guide and the offer card default to top-right via CSS (below): `top: 64px; right: 16px; left: auto; bottom: auto`.
+- **Verify:** `grep -n "sanctissimissa.orientation.pos.v1" src/core/orientation/guide.ts` finds the key; `npx tsc -b --pretty false` passes; the focused orientation tests still pass.
+- **Accept:** in a rendered run the guide card opens at the top-right, clear of the composer and the Mass view; dragging the heading moves it anywhere on screen; the position survives reload; the card is never wider than 340px nor taller than 40dvh on any platform.
+
+## OG.2 — Orientation card CSS caps and anchor (2026-09-18; §A)
+
+Self-contained. Files: `src/styles.css`.
+- **Do:** replace line-2824 rule `.orientation-guide { right: auto; left: max(16px, env(safe-area-inset-left)); }` with `.orientation-guide { left: auto; right: max(16px, env(safe-area-inset-right)); bottom: auto; top: 64px; max-width: min(340px, calc(100vw - 32px)); max-height: 40dvh; }`; change the shared 2823 rule's `max-width: min(400px, ...)` to `min(340px, ...)` and `max-height: 45dvh` to `40dvh`; give `.orientation-guide strong` `cursor: grab; user-select: none;` (and `cursor: grabbing` while dragging via a `.dragging` class on the card).
+- **Verify:** `grep -c "min(400px" src/styles.css` reports 0 for the orientation rules; tsc passes.
+- **Accept:** rendered: card top-right, small; Mass view fully readable behind it.
+
+## OG.3 — Global button press/disabled feedback (2026-09-18; §B)
+
+Self-contained. Files: `src/styles.css`.
+- **Do:** add near the global button rule: `button:hover:not(:disabled) { filter: brightness(0.96); }`, `button:active:not(:disabled) { transform: translateY(1px) scale(0.98); filter: brightness(0.9); }`, `button:disabled { opacity: 0.55; cursor: not-allowed; }`, plus `@media (prefers-reduced-motion: reduce) { button:active:not(:disabled) { transform: none; } }`. No per-component overrides removed.
+- **Verify:** tsc passes; `grep -n "button:active:not(:disabled)" src/styles.css` finds the rule.
+- **Accept:** rendered: pressing Show me / Next / Send visibly depresses and dims; disabled Send is greyed with not-allowed cursor.
+
+## OG.4 — Generation live feedback: "Generating … Ns" elapsed indicator and streamed partial reply (2026-09-18; §B)
+
+Self-contained. Files: `src/ui/ChatView.tsx` (+ a tick hook if none exists).
+- **Do:** while `streaming` is true, render above/beside the reply a live indicator `Generating … {elapsed}s` (elapsed seconds from a `setInterval(…, 1000)` started when streaming begins, cleared when it ends; `<span role="status" aria-live="polite">` with a CSS spinner dot animation) so even a slow first token shows motion. The streamed partial reply already renders — keep it. If the controller exposes cancellation, render a `Stop` button beside the indicator wired to it; if it does not, omit the button (do not fake it) and record that honestly in the ARCHITECTURE limits note.
+- **Verify:** tsc passes; focused ChatView tests pass.
+- **Accept:** rendered: sending a message shows the counting indicator immediately and partial text as tokens arrive; no multi-second silence without motion.
+
+## OG.5 — Universal default model: 2B only, heavier by express choice (2026-09-18; §C)
+
+Self-contained. Files: `src/core/chat/models.ts` (+ its test).
+- **Do:** in `preferredDefault`, drop the second fallback (any non-manual-only ranked model): return the preferred-repo entry (`defaults.preferredNativeRepo`, not `unsupported`) or `null`. A `null` default flows to the existing picker as an explicit "choose a model" state — verify ChatView renders an honest prompt rather than throwing when `defaultPick` is null. Update the models test to cover: preferred present ⇒ 2B; preferred absent ⇒ null (never a heavier pick).
+- **Verify:** focused node tests pass (`npx vitest run` scope for models/picker or the node test runner the file already uses); tsc passes.
+- **Accept:** fresh profile resolves Qwen 3.5 2B; removing that catalog entry yields no automatic model and an explicit choice UI — never a heavier silent pick.

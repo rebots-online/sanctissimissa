@@ -33,3 +33,29 @@ CLAUDE.md at `3021d442`) requires before CHECKLIST derivation and code.
   hosted-provider preference recorded in the 2026-09-18 handoff is noted,
   not executed: no hosted provider is authorized for SanctissiMissa by this
   entry, and the on-device default is unchanged.)
+
+## 2026-09-18 — Orientation geometry, feedback plane, universal default model (executed)
+
+- **Amendment:** DOCS/ARCHITECTURE.md § "Orientation geometry, feedback plane,
+  and universal default model amendment (2026-09-18)".
+- **Operator directives (verbatim, 2026-09-18, this session):** "move the
+  'Orientation walk-through' notification at the bottom left somewhere
+  else--and make sure it is moveable by dragging: it is obscuring the text box
+  to type in"; "In the linux, it defauted to full-screen, also, obscuring all
+  of the Mass; this is totally unacceptable--the main USP of the main feature
+  cannot be completely obscurfed by a supporting function--especially when it
+  doesn3 work"; "the latency with no spinner or 'please wait... %' animation
+  ... progress animation/spinners with percentages are critically important in
+  these situations, and even feedback of a button 3D 'pressing,' clicking,
+  changing colour on press, etc."; "The universal default model should be the
+  qwen3.5:2b and no heavier without their expressly choosing it."
+- **Authorized by this entry:** §A top-right default + pointer-drag +
+  persisted/clamped position + hard size caps for the orientation cards;
+  §B global button press/disabled states, busy indicators, generation
+  elapsed/spinner/streaming/cancel, inline failure surfaces; §C 2B-only
+  automatic default, heavier models by express choice only. CHECKLIST stanza
+  OG.1–OG.5 derives 1:1 from §A–§C; code lands only through those tasks.
+- **Qualitative gate (operator, same session):** "You must check your work
+  with the rubrics and make qualitative observations before declaring success
+  conditions" — acceptance for this stanza is judged from rendered screens,
+  not tests alone.
