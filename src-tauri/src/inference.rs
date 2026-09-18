@@ -262,12 +262,27 @@ pub fn inference_generate(
     let mut pos: i32 = 0;
 
     // Prefill: all prompt tokens in one batch, logits only on the last.
-    for (i, token) in tokens.iter().enumerate() {
-        let last = i + 1 == tokens.len();
-        batch.add(*token, pos, &[0], last).map_err(|e| e.to_string())?;
-        pos += 1;
+    // Recurrent hybrids (Qwen3.5's qwen35 SSM blocks, Mamba lineage) build
+    // their state token-by-token — a batched prefill leaves logits
+    // initialized only at [0], and the -1 read below panics the process
+    // (non-unwinding inside spawn_blocking; observed on the v1.57 desktop
+    // drive). Attention models keep the fast batched path.
+    if model.is_recurrent() {
+        for (i, token) in tokens.iter().enumerate() {
+            let last = i + 1 == tokens.len();
+            batch.clear();
+            batch.add(*token, pos, &[0], last).map_err(|e| e.to_string())?;
+            pos += 1;
+            ctx.decode(&mut batch).map_err(|e| e.to_string())?;
+        }
+    } else {
+        for (i, token) in tokens.iter().enumerate() {
+            let last = i + 1 == tokens.len();
+            batch.add(*token, pos, &[0], last).map_err(|e| e.to_string())?;
+            pos += 1;
+        }
+        ctx.decode(&mut batch).map_err(|e| e.to_string())?;
     }
-    ctx.decode(&mut batch).map_err(|e| e.to_string())?;
 
     let mut generated = 0u32;
     let mut next = tokens.last().copied();
