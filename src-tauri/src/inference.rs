@@ -261,31 +261,41 @@ pub fn inference_generate(
 
     let mut pos: i32 = 0;
 
-    // Prefill: all prompt tokens in one batch, logits only on the last.
-    for (i, token) in tokens.iter().enumerate() {
-        let last = i + 1 == tokens.len();
-        batch.add(*token, pos, &[0], last).map_err(|e| e.to_string())?;
-        pos += 1;
-    }
-    ctx.decode(&mut batch).map_err(|e| e.to_string())?;
+    // Prefill. llama-cpp-2 tracks initialized logits by BATCH-LOCAL index
+    // (get_logits_ith asserts raw membership — the C API's negative-index
+    // convention is not implemented in 0.1.156, and reading -1 aborts the
+    // process inside spawn_blocking), so the prefill's logits live at the
+    // last token's batch index and each decode's at 0. Recurrent models
+    // (Mamba lineage) build state token-by-token and keep the per-token
+    // path; everything else — including Qwen3.5's hybrid SSM blocks — uses
+    // the fast batched prefill, whose logits the engine accepted fine.
+    let prefill_logits_idx = if model.is_recurrent() {
+        for (i, token) in tokens.iter().enumerate() {
+            let last = i + 1 == tokens.len();
+            batch.clear();
+            batch.add(*token, pos, &[0], last).map_err(|e| e.to_string())?;
+            pos += 1;
+            ctx.decode(&mut batch).map_err(|e| e.to_string())?;
+        }
+        0
+    } else {
+        for (i, token) in tokens.iter().enumerate() {
+            let last = i + 1 == tokens.len();
+            batch.add(*token, pos, &[0], last).map_err(|e| e.to_string())?;
+            pos += 1;
+        }
+        ctx.decode(&mut batch).map_err(|e| e.to_string())?;
+        i32::try_from(tokens.len().saturating_sub(1)).unwrap_or(0)
+    };
 
+    // Greedy decode from the prefill's own last-position logits — the loop
+    // re-feeds no prompt token; each sampled token is decoded once.
+    let mut logits: Vec<f32> = ctx.get_logits_ith(prefill_logits_idx).to_vec();
     let mut generated = 0u32;
-    let mut next = tokens.last().copied();
     loop {
         if cancel.load(Ordering::SeqCst) {
             break;
         }
-        if let Some(token) = next {
-            if token == eos {
-                break;
-            }
-            batch.clear();
-            batch.add(token, pos, &[0], true).map_err(|e| e.to_string())?;
-            pos += 1;
-            ctx.decode(&mut batch).map_err(|e| e.to_string())?;
-        }
-        // Greedy argmax over the vocab logits at the last position.
-        let logits = ctx.get_logits_ith(-1);
         let mut best = 0usize;
         for (i, v) in logits.iter().enumerate() {
             if *v > logits[best] {
@@ -304,7 +314,11 @@ pub fn inference_generate(
         if generated >= max {
             break;
         }
-        next = Some(token);
+        batch.clear();
+        batch.add(token, pos, &[0], true).map_err(|e| e.to_string())?;
+        pos += 1;
+        ctx.decode(&mut batch).map_err(|e| e.to_string())?;
+        logits = ctx.get_logits_ith(0).to_vec();
     }
     // Empty delta signals completion to the frontend reader.
     on_token.send(String::new()).map_err(|e| e.to_string())
