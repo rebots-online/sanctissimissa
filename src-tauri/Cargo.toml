@@ -1,6 +1,6 @@
 [package]
 name = "sanctissimissa"
-version = "1.62.29674"
+version = "1.63.29675"
 description = "SanctissiMissa — the Traditional Latin Mass and Divine Office as a navigable subway map"
 authors = ["Robin L. M. Cheung, MBA"]
 edition = "2021"
