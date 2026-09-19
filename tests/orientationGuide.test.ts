@@ -97,7 +97,7 @@ test('OG.7: keyboard placement — arrows nudge 16 px, Shift+arrows 96 px, Home 
   assert.ok(keyBody.includes("'Home'"), 'Home key handled');
   assert.ok(keyBody.includes('resetPlacement()'), 'Home performs the shared reset');
   assert.ok(resetBody.includes('resolveGuidePlacement('), 'reset resolves placement');
-  assert.ok(/,\s*null,?\s*\)/.test(resetBody), 'reset asks for the default placement (saved = null)');
+  assert.ok(resetBody.includes('posRef.current'), 'reset self-heals: the current position is honored — a valid position is never warped (operator 2026-09-19), an invalid one is re-resolved');
   assert.ok(resetBody.includes('saveGuidePos('), 'reset persists');
   assert.ok(resetBody.includes("'compact'"), 'reset honors the compact fallback');
 });

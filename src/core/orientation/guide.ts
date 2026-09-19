@@ -56,7 +56,7 @@ export function highlightGuide(id: string): boolean {
   for (const previous of document.querySelectorAll('.orientation-target')) previous.classList.remove('orientation-target');
   activeId = id as GuideId;
   element.classList.add('orientation-target');
-  element.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+  element.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' });
   debugEvent('orientation', 'target.highlight', { id, tag: element.tagName, label: element.getAttribute('aria-label') ?? element.textContent });
   window.dispatchEvent(new CustomEvent(GUIDE_CHANGED, { detail: { id } }));
   return true;
@@ -64,6 +64,15 @@ export function highlightGuide(id: string): boolean {
 export function activateGuide(): boolean {
   const element = activeId && guideTarget(activeId);
   if (!element) return false;
+  // "Show me" must SHOW something: bring the target prominently into view
+  // and pulse it, then activate — a click alone can be a no-op from the
+  // current state (e.g. the already-active view's rail button).
+  element.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' });
+  element.classList.remove('orientation-showing');
+  // void reflow so the animation restarts on repeated clicks
+  void (element as HTMLElement).offsetWidth;
+  element.classList.add('orientation-showing');
+  setTimeout(() => element.classList.remove('orientation-showing'), 1400);
   debugEvent('orientation', 'target.click', { id: activeId });
   element.click();
   return true;

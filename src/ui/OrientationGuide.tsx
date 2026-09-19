@@ -123,15 +123,20 @@ export default function OrientationGuide() {
     if (posRef.current) saveGuidePos(posRef.current);
   };
   const resetPlacement = () => {
+    // Reset is a self-heal, not a teleport: a currently-valid position is
+    // kept (the resolver honors it as the saved value); only an invalid,
+    // off-screen or obstructed position is re-resolved (operator 2026-09-19:
+    // "clicking 'reset position' unnecessarily warps the card").
     const size = cardSize();
     const resolved = resolveGuidePlacement(
       { w: window.innerWidth, h: window.innerHeight },
       occupiedRects(document),
       size,
-      null,
+      posRef.current,
     );
     if (resolved === 'compact') { setCompact(true); return; }
     setCompact(false);
+    if (posRef.current && posRef.current.left === resolved.left && posRef.current.top === resolved.top) return;
     saveGuidePos(resolved);
     applyPos(resolved);
   };

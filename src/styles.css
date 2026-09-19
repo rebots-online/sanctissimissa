@@ -2828,6 +2828,14 @@ button.mstation, button.mstation.active, button.mstation.open {
 .orientation-drag-hint { display: block; font-size: 11px; font-style: italic; color: var(--ink-soft, #6b6353); margin-bottom: 6px; }
 .orientation-compact { padding: 10px; max-width: min(300px, calc(100vw - 24px)); max-height: 32dvh; }
 .orientation-compact details summary { cursor: pointer; font-size: 12px; }
+.orientation-compact details[open] { max-height: 24dvh; overflow-y: auto; overscroll-behavior: contain; }
+.orientation-showing { animation: orientation-showing 1.4s ease-out 1; }
+@keyframes orientation-showing {
+  0% { outline-offset: 4px; box-shadow: 0 0 0 0 #edc657cc; }
+  35% { outline-offset: 8px; box-shadow: 0 0 0 12px #edc65755; }
+  100% { outline-offset: 4px; box-shadow: 0 0 0 7px #edc65733; }
+}
+@media (prefers-reduced-motion: reduce) { .orientation-showing { animation: none; outline-offset: 8px; } }
 .orientation-offer:focus-visible, .orientation-guide:focus-visible { outline: 2px solid var(--gold, #b08d3e); outline-offset: 2px; }
 .orientation-guide.dragging strong { cursor: grabbing; }
 .orientation-actions { display: flex; flex-wrap: wrap; gap: 8px; }
