@@ -2235,3 +2235,20 @@ dimmed surroundings. The same treatment (shared classes
 `.orientation-target`, `.orientation-showing`) drives tour steps, Show me
 pulses, and §H.4 show-path steps: one attention grammar everywhere the
 Companion points. OG.9's contract extends to these rules.
+
+### H.7 Preloaded prompt guides (operator, 2026-09-19)
+
+"preloaded prompt guides, like 'How to Pray the Breviary' etc" — a fresh
+Companion conversation offers curated starter questions as tappable chips,
+so a newcomer sees immediately what the DOM-aware Companion can teach.
+Authored-static content (INC-19: authored UI strings, never generated):
+`src/content/companionPrompts.ts` exports `COMPANION_PROMPTS: { label:
+string; prompt: string }[]` — the initial closed set, exact strings:
+"How do I pray the Breviary?" / "How do I follow along at my first
+Traditional Latin Mass?" / "Walk me through the parts of the Mass" / "What
+is the difference between the Missal and the Liber Usualis?" / "How does
+the Church's liturgical year work?" / "Explain today's feast and its
+propers" (label authored; the sent prompt may append the app's current
+date). ChatView renders the chip rail only while the conversation has no
+turns; tapping fills the composer and sends. CHECKLIST task CL.7 derives
+1:1.
