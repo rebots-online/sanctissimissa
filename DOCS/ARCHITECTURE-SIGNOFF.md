@@ -223,3 +223,26 @@ CLAUDE.md at `3021d442`) requires before CHECKLIST derivation and code.
   whole-delta safety-classification preamble lines
   (/^(user|response)\s+safety:/i), which are classifier artifacts, never
   liturgical content.
+
+## 2026-09-19 — §H wave EXECUTED (operator signoff: "signedoff")
+
+- **Amendment:** DOCS/ARCHITECTURE.md § "Companion DOM read/write and
+  functional lore on the 32k budget" (H.1–H.7 incl. the H.3 target-side
+  attention amendment), drafted pending across commits `82688d38`–`cdb1bec5`.
+- **Operator directives (verbatim, this session):** "and r/w DOM access and
+  funcional lore"; "ARCHITECTURE.md -> CHECLIST. then hold for sinoff";
+  "especially to insert into/edit homily drafts and help annotate and find
+  cnocordances with journlling"; "the guided tour at the beginning mustbe
+  able to dim background and 'halo' the oint eto be emphasized"; "and it
+  must be aware of what is visible and to show how to navigate paths the
+  user askd about, ike the coloured ribbon bookmarks,s but more actively
+  didactic"; "Have the intercom-stye mascot do the same animated but subtle
+  'i'm here' once in  while to emphwsize the USP DOM-aware chatbot";
+  "responses need to at least format better" / "bold, centre, tables";
+  "highlight on DOM, mke button wave/tilt and colour contrast it, etc.";
+  "preloaded prompt guides, like 'How to Pray the Breviary' etc"; signoff:
+  "signedoff".
+- **Authorized by this entry:** CHECKLIST tasks CL.1–CL.7 and OG.9–OG.11
+  execute 1:1 from the signed §H text; delivery runs the sanctioned release
+  train (next stamp ≥ v1.66), publishes surge, and renders-verified
+  acceptance per task.
