@@ -2090,6 +2090,10 @@ the END of a reply, parsed by `stripGuideCommands`/`applyGuideCommand`:
   for `<term>` and open the results in `MeaningPanel`.
 - `[[journal:<term>]]` — same search, routed into `JournalSidecar` as a
   capture-ready source list (the existing capture machinery).
+- `[[show-path:<a>> <b>> <c>]]` — the didactic path walkthrough (§H.4): a
+  `>`-separated ordered step list, each step a registered guide target id,
+  `view:<View>`, or `section:<anchor>`; the tour engine walks the user
+  through the path one haloed step at a time.
 
 Every write-command resolves against the live DOM/allowlist at execution
 time; unknown ids, invalid dates, absent anchors and non-visible targets are
@@ -2100,7 +2104,14 @@ sensibly: current view, current date, active reading focus section, the
 registered visible controls (existing list), and — when relevant — the open
 homily draft's liturgical key/title and the current text selection/section
 (so homily inserts and annotations target what the user is actually
-looking at).
+looking at). **Visibility awareness (operator, 2026-09-19): "it must be
+aware of what is visible"** — the context additionally carries a compact
+`visible` snapshot assembled from the same allowlisted sources: rail
+collapsed/full, companion panel state + dock mode, orientation card
+state, tour/spotlight state, the scrolled-into-view reading section, and
+which of the registered controls are currently on-screen (bounding-rect
+intersection). Still an allowlisted structured report — never an arbitrary
+DOM dump, and never page text.
 
 New entities: `COMPANION_ACT = 'sanctissimissa:companion-act'` window event
 (custom detail `{ kind: 'open'|'focus'|'date'; value: string }`); exported
@@ -2153,3 +2164,29 @@ tour's control surface. Entities: the spotlight element + rect tracking in
 `src/ui/OrientationGuide.tsx`; `.tour-spotlight` / `.tour-spotlight-cutout`
 / `.tour-spotlight-halo` rules in `src/styles.css`. CHECKLIST task OG.9
 derives 1:1.
+
+### H.4 Didactic path walkthroughs — the active ribbon (operator, 2026-09-19)
+
+"to show how to navigate paths the user askd about, ike the coloured ribbon
+bookmarks, sbut more actively didactic." When the user asks HOW to get
+somewhere or HOW a flow works, the Companion answers with a `[[show-path:…]]`
+command (§H.1 grammar) whose step list is walked by the tour engine:
+
+- The reply's narration is split per step (the `COMPANION_ACT` detail carries
+  `{ steps: [{ target, narration }] }`); `OrientationGuide` enters path mode:
+  for each step in order it highlights the step's target with the §H.3
+  spotlight (dim veil + halo), renders the step's narration in the guide
+  card, and offers `Next` / `Back` / `Show me` (executes the step's own
+  click/navigate action) / `End walkthrough`. A thin progress ribbon on the
+  card (step markers like bookmarks, `--gold` for visited, `--accent` for the
+  current step) makes the trail persistent through the walk.
+- Step targets resolve through the same allowlist as every other command:
+  registered guide ids, `view:<View>`, `section:<anchor>`; a step whose
+  target is not live-rendered is skipped with a diagnostics record, never
+  faked. The walk is user-paced and dismissible at every step; the veil and
+  card obey the §D caps (never full-screen, Mass visible through the veil).
+- Entities: path-mode state + ribbon in `src/ui/OrientationGuide.tsx`
+  (`pathSteps`, `pathIndex`, `.tour-ribbon` markers), the `show-path` branch
+  of `parseCompanionCommand`/`applyGuideCommand` (§H.1 file), and the
+  narration-passing detail shape of `COMPANION_ACT`. CHECKLIST task OG.10
+  derives 1:1.
