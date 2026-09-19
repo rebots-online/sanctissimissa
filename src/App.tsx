@@ -29,6 +29,15 @@ import ResizableInspectorLayout from './ui/ResizableInspectorLayout.tsx';
 import TrayPanel from './ui/TrayPanel.tsx';
 import { useNarrow } from './ui/BilingualText.tsx';
 import { applyTheme, readThemePreference, systemMode } from './core/theme/themes.ts';
+import {
+  COMPANION_ACT,
+  COMPANION_LAYOUT,
+  GUIDE_STEPS,
+  readGuideState,
+  setGuideLiveContext,
+  type CompanionAct,
+} from './core/orientation/guide.ts';
+import { debugEvent } from './core/diagnostics/store.ts';
 
 type View = 'map' | 'reader' | 'annotations' | 'calendar' | 'office' | 'bible' | 'journal' | 'homily' | 'settings' | 'about';
 
@@ -47,6 +56,69 @@ const UTIL_NAV: { id: View; ico: string; label: string }[] = [
   { id: 'settings', ico: '⚙', label: 'Settings' },
   { id: 'about', ico: 'ℹ', label: 'Help · About' },
 ];
+
+// ── CL.2 (§H.1): COMPANION_ACT routing + live/visibility context ──────
+/** Document-plane events App forwards acts onto for CL.5's surfaces (and the
+ *  tour engine for OG.10). Values follow the guide.ts event convention
+ *  (COMPANION_ACT = 'sanctissimissa:companion-act'); App only forwards — it
+ *  never performs the document-plane write itself. */
+const COMPANION_DRAFT = 'sanctissimissa:companion-draft';
+const COMPANION_ANNOTATE = 'sanctissimissa:companion-annotate';
+const COMPANION_SEARCH = 'sanctissimissa:companion-search';
+const COMPANION_SHOWPATH = 'sanctissimissa:companion-showpath';
+
+/** The rail's own view set — an `open` act routes through exactly these. */
+const RAIL_VIEWS = new Set<string>([...NAV, ...UTIL_NAV].map((n) => n.id));
+
+/** CL.2 act payloads may carry the origin reply (and pre-split path steps)
+ *  attached by the sender (CL.4); App reads them defensively only. */
+type CompanionActDetail = Partial<CompanionAct> & { reply?: string; steps?: { target: string; narration: string }[] };
+
+/** Real calendar date: pattern + Date round-trip (the grammar already
+ *  validated this at parse time; App re-validates before committing state). */
+function isRealIsoDate(value: string): boolean {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!m) return false;
+  const y = Number(m[1]);
+  const mo = Number(m[2]);
+  const d = Number(m[3]);
+  const round = new Date(y, mo - 1, d);
+  return round.getFullYear() === y && round.getMonth() === mo - 1 && round.getDate() === d;
+}
+
+/** The `visible` snapshot (§H.1): structural, allowlisted facts only, never
+ *  page text — rail collapsed/full; the last §D companion-layout announcement
+ *  (panel state + dock mode); orientation card + spotlight state; the section
+ *  anchors scrolled into view; which registered guide controls intersect the
+ *  viewport. */
+function visibilitySnapshot(companionPanel: Record<string, unknown> | null): Record<string, unknown> {
+  const intersectsViewport = (el: Element): boolean => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.bottom > 0 && r.top < window.innerHeight;
+  };
+  const railMode = document.querySelector('.app')?.getAttribute('data-rail') === 'icons' ? 'collapsed' : 'full';
+  const guide = readGuideState();
+  const scrolledSections = [...document.querySelectorAll('[data-section]')]
+    .filter(intersectsViewport)
+    .map((el) => el.getAttribute('data-section'))
+    .filter((anchor): anchor is string => Boolean(anchor))
+    .slice(0, 8);
+  const visibleControls = GUIDE_STEPS
+    .filter((step) => [...document.querySelectorAll(`[data-guide="${step.id}"]`)].some(intersectsViewport))
+    .map((step) => step.id);
+  return {
+    rail: railMode,
+    companionPanel,
+    orientation: {
+      completed: guide.completed,
+      step: guide.step,
+      targetHeld: Boolean(document.querySelector('.orientation-target')),
+      spotlight: Boolean(document.querySelector('.tour-spotlight')),
+    },
+    scrolledSections,
+    visibleControls,
+  };
+}
 
 export default function App() {
   const [db, setDb] = useState<CorpusDb | null>(null);
@@ -90,12 +162,117 @@ export default function App() {
   const [capture, setCapture] = useState<{ quote: string; quoteAlt?: string; anchor: string | null } | null>(null);
   const [trayOpen, setTrayOpen] = useState(false);
   const [updateReady, setUpdateReady] = useState(false);
+  // CL.2 (§H.1): the companion-commanded homily draft key, registered into
+  // guideContext's live context (the draft surface owns the ground truth and
+  // may re-register through the same merge).
+  const [openDraftKey, setOpenDraftKey] = useState<string | null>(null);
+  // CL.2: the last §D panel-layout announcement (companion panel state + dock
+  // mode), captured structurally for the `visible` snapshot.
+  const companionLayoutRef = useRef<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     const onUpdateReady = () => setUpdateReady(true);
     window.addEventListener(UPDATE_READY_EVENT, onUpdateReady);
     return () => window.removeEventListener(UPDATE_READY_EVENT, onUpdateReady);
   }, []);
+
+  // CL.2: capture §D companion layout announcements (panel state + dock mode)
+  // so the `visible` snapshot can report them structurally.
+  useEffect(() => {
+    const onLayout = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      companionLayoutRef.current = detail && typeof detail === 'object'
+        ? { ...(detail as Record<string, unknown>) }
+        : null;
+    };
+    window.addEventListener(COMPANION_LAYOUT, onLayout);
+    return () => window.removeEventListener(COMPANION_LAYOUT, onLayout);
+  }, []);
+
+  // CL.2 (§H.1): route COMPANION_ACT. `open` takes the rail's own state-set
+  // path; `focus` fires only when the section is live-rendered; `date`
+  // re-validates the ISO before committing; document-plane acts are forwarded
+  // as dedicated events for CL.5's surfaces (App never writes them itself).
+  // Invalid acts change nothing visible and land in Diagnostics.
+  useEffect(() => {
+    const reject = (detail: unknown) => debugEvent('companion', 'act.rejected', detail, 'warn');
+    const forward = (name: string, kind: string, value: string, reply: string) => {
+      window.dispatchEvent(new CustomEvent(name, { detail: { kind, value, reply } }));
+      debugEvent('companion', 'act.forward', { event: name, kind, value }, 'info');
+    };
+    const onAct = (event: Event) => {
+      const act = (event as CustomEvent).detail as CompanionActDetail | null;
+      if (!act || typeof act !== 'object' || typeof act.kind !== 'string' || typeof act.value !== 'string' || !act.value.trim()) {
+        reject({ raw: act ?? null });
+        return;
+      }
+      const value = act.value.trim();
+      const reply = typeof act.reply === 'string' ? act.reply : '';
+      switch (act.kind) {
+        case 'open':
+          // The same state-set path the rail buttons use — setView; the
+          // history effect records the layer for system-back.
+          if (!RAIL_VIEWS.has(value)) { reject({ kind: act.kind, value }); return; }
+          setView(value as View);
+          debugEvent('companion', 'act.open', { view: value }, 'info');
+          return;
+        case 'focus':
+          // Only when the section exists in the live DOM (attribute compare —
+          // no CSS-injection surface); nonce n+1 so the reader re-scrolls.
+          if (!value || ![...document.querySelectorAll('[data-section]')].some((el) => el.getAttribute('data-section') === value)) {
+            reject({ kind: act.kind, value });
+            return;
+          }
+          setFocus((f) => ({ section: value, nonce: f.nonce + 1 }));
+          debugEvent('companion', 'act.focus', { section: value }, 'info');
+          return;
+        case 'date':
+          if (!isRealIsoDate(value)) { reject({ kind: act.kind, value }); return; }
+          setDate(value);
+          debugEvent('companion', 'act.date', { date: value }, 'info');
+          return;
+        case 'homily-draft':
+          setOpenDraftKey(value);
+          forward(COMPANION_DRAFT, act.kind, value, reply);
+          return;
+        case 'annotate':
+          forward(COMPANION_ANNOTATE, act.kind, value, reply);
+          return;
+        case 'concordance':
+        case 'journal':
+          forward(COMPANION_SEARCH, act.kind, value, reply);
+          return;
+        case 'show-path': {
+          // Narration lines are split per step by the sender (CL.4); without
+          // them the targets still arrive, un-narrated.
+          const steps = Array.isArray(act.steps)
+            ? act.steps
+            : value.split('>').map((part) => ({ target: part.trim(), narration: '' })).filter((s) => s.target);
+          window.dispatchEvent(new CustomEvent(COMPANION_SHOWPATH, { detail: { steps } }));
+          debugEvent('companion', 'act.forward', { event: COMPANION_SHOWPATH, steps: steps.length }, 'info');
+          return;
+        }
+        default:
+          reject({ kind: act.kind, value });
+      }
+    };
+    window.addEventListener(COMPANION_ACT, onAct as EventListener);
+    return () => window.removeEventListener(COMPANION_ACT, onAct as EventListener);
+  }, []);
+
+  // CL.2 (§H.1): merge the app's live, allowlisted facts into guideContext()'s
+  // context JSON. No dependency array on purpose: re-registered on every
+  // commit, and the reader's scroll-spy re-renders App as sections cross the
+  // viewport, keeping the `visible` snapshot current.
+  useEffect(() => {
+    setGuideLiveContext({
+      currentView: view,
+      currentDate: date,
+      focusSection: focus.section,
+      openDraftKey,
+      visible: visibilitySnapshot(companionLayoutRef.current),
+    });
+  });
 
   useEffect(() => {
     const restoreTheme = () => {
