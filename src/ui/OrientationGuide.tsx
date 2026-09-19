@@ -3,6 +3,9 @@ import defaults from '../../config/companion-defaults.json';
 import { GUIDE_CHANGED, GUIDE_STEPS, OPEN_COMPANION, START_GUIDE, activateGuide, clampGuidePos,
   clearGuide, highlightGuide, readGuidePos, readGuideState, saveGuidePos, saveGuideState } from '../core/orientation/guide.ts';
 import type { GuidePos } from '../core/orientation/guide.ts';
+import { occupiedRects, resolveGuidePlacement } from '../core/orientation/layout.ts';
+
+const DRAG_THRESHOLD = 4;
 
 export default function OrientationGuide() {
   const [saved] = useState(readGuideState);
@@ -11,10 +14,13 @@ export default function OrientationGuide() {
   const [step, setStep] = useState(saved.step);
   const [pointed, setPointed] = useState<string | null>(null);
   const [unavailable, setUnavailable] = useState(false);
-  const [pos, setPos] = useState<GuidePos | null>(() => readGuidePos());
+  const [compact, setCompact] = useState(false);
+  const [pos, setPos] = useState<GuidePos | null>(null);
+  const posRef = useRef<GuidePos | null>(null);
   const cardRef = useRef<HTMLElement | null>(null);
-  const drag = useRef<{ dx: number; dy: number } | null>(null);
-  const last = useRef<GuidePos | null>(null);
+  const press = useRef<{ id: number; startX: number; startY: number; dx: number; dy: number; engaged: boolean } | null>(null);
+  const applyPos = (next: GuidePos) => { posRef.current = next; setPos(next); };
+  const cardSize = () => ({ w: cardRef.current?.offsetWidth ?? 340, h: cardRef.current?.offsetHeight ?? 200 });
   useEffect(() => {
     const restart = () => { setStep(0); setActive(true); setOffered(false); saveGuideState({ completed: false, step: 0 }); };
     const changed = (event: Event) => setPointed((event as CustomEvent<{ id: string }>).detail.id);
@@ -31,59 +37,150 @@ export default function OrientationGuide() {
     return () => clearTimeout(timer);
   }, [step, active]);
   useEffect(() => {
-    const reclamp = () => setPos((current) => {
-      if (!current) return current;
-      const card = cardRef.current;
-      const next = clampGuidePos(current, card?.offsetWidth ?? 340, card?.offsetHeight ?? 200);
+    const reclamp = () => {
+      const current = posRef.current;
+      if (!current) return;
+      const size = cardSize();
+      const next = clampGuidePos(current, size.w, size.h);
       saveGuidePos(next);
-      return next;
-    });
+      applyPos(next);
+    };
     window.addEventListener('resize', reclamp);
     return () => window.removeEventListener('resize', reclamp);
   }, []);
-  const clampWithCard = (raw: GuidePos): GuidePos =>
-    clampGuidePos(raw, cardRef.current?.offsetWidth ?? 340, cardRef.current?.offsetHeight ?? 200);
-  const onHeadingPointerDown = (event: React.PointerEvent<HTMLSpanElement>) => {
+  useEffect(() => {
+    const validatePlacement = () => {
+      const size = cardSize();
+      const resolved = resolveGuidePlacement(
+        { w: window.innerWidth, h: window.innerHeight },
+        occupiedRects(document),
+        size,
+        readGuidePos(),
+      );
+      if (resolved === 'compact') { setCompact(true); return; }
+      setCompact(false);
+      const current = posRef.current;
+      if (current && current.left === resolved.left && current.top === resolved.top) return;
+      saveGuidePos(resolved);
+      applyPos(resolved);
+    };
+    validatePlacement();
+    window.addEventListener('resize', validatePlacement);
+    window.addEventListener(START_GUIDE, validatePlacement);
+    window.addEventListener(OPEN_COMPANION, validatePlacement);
+    const observer = new ResizeObserver(validatePlacement);
+    observer.observe(document.documentElement);
+    return () => {
+      window.removeEventListener('resize', validatePlacement);
+      window.removeEventListener(START_GUIDE, validatePlacement);
+      window.removeEventListener(OPEN_COMPANION, validatePlacement);
+      observer.disconnect();
+    };
+  }, [step]);
+  const onCardPointerDown = (event: React.PointerEvent<HTMLElement>) => {
     const card = cardRef.current;
     if (!card) return;
     const rect = card.getBoundingClientRect();
-    drag.current = { dx: event.clientX - rect.left, dy: event.clientY - rect.top };
-    last.current = { left: rect.left, top: rect.top };
-    card.classList.add('dragging');
-    event.currentTarget.setPointerCapture(event.pointerId);
+    press.current = {
+      id: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      dx: event.clientX - rect.left,
+      dy: event.clientY - rect.top,
+      engaged: false,
+    };
   };
-  const onHeadingPointerMove = (event: React.PointerEvent<HTMLSpanElement>) => {
-    const state = drag.current;
-    if (!state) return;
-    const next = clampWithCard({ left: event.clientX - state.dx, top: event.clientY - state.dy });
-    last.current = next;
-    setPos(next);
-  };
-  const onHeadingPointerUp = () => {
+  const onCardPointerMove = (event: React.PointerEvent<HTMLElement>) => {
+    const state = press.current;
     const card = cardRef.current;
-    drag.current = null;
-    card?.classList.remove('dragging');
-    if (last.current) saveGuidePos(last.current);
+    if (!state || !card || event.pointerId !== state.id) return;
+    if (event.pointerType === 'mouse' && event.buttons === 0) { press.current = null; return; }
+    if (!state.engaged) {
+      const traveled = Math.hypot(event.clientX - state.startX, event.clientY - state.startY);
+      if (traveled <= DRAG_THRESHOLD) return;
+      state.engaged = true;
+      card.classList.add('dragging');
+      card.setPointerCapture(event.pointerId);
+    }
+    const next = clampGuidePos(
+      { left: event.clientX - state.dx, top: event.clientY - state.dy },
+      card.offsetWidth,
+      card.offsetHeight,
+    );
+    applyPos(next);
+  };
+  const endCardDrag = (event: React.PointerEvent<HTMLElement>) => {
+    const state = press.current;
+    if (!state || event.pointerId !== state.id) return;
+    press.current = null;
+    if (!state.engaged) return;
+    cardRef.current?.classList.remove('dragging');
+    if (posRef.current) saveGuidePos(posRef.current);
+  };
+  const resetPlacement = () => {
+    const size = cardSize();
+    const resolved = resolveGuidePlacement(
+      { w: window.innerWidth, h: window.innerHeight },
+      occupiedRects(document),
+      size,
+      null,
+    );
+    if (resolved === 'compact') { setCompact(true); return; }
+    setCompact(false);
+    saveGuidePos(resolved);
+    applyPos(resolved);
+  };
+  const onCardKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key === 'Home') { event.preventDefault(); resetPlacement(); return; }
+    if (!event.key.startsWith('Arrow')) return;
+    event.preventDefault();
+    const distance = event.shiftKey ? 96 : 16;
+    const left = event.key === 'ArrowLeft' ? -distance : event.key === 'ArrowRight' ? distance : 0;
+    const top = event.key === 'ArrowUp' ? -distance : event.key === 'ArrowDown' ? distance : 0;
+    const card = cardRef.current;
+    const rect = card?.getBoundingClientRect();
+    const base = posRef.current ?? (rect ? { left: Math.round(rect.left), top: Math.round(rect.top) } : { left: 16, top: 64 });
+    const size = cardSize();
+    const next = clampGuidePos({ left: base.left + left, top: base.top + top }, size.w, size.h);
+    saveGuidePos(next);
+    applyPos(next);
   };
   const leave = () => { setActive(false); setOffered(false); setPointed(null); clearGuide(); };
   const explain = () => window.dispatchEvent(new CustomEvent(OPEN_COMPANION, {
     detail: { prompt: `Please guide me through ${GUIDE_STEPS[step].label}. Explain what the highlighted control does and point it out.` },
   }));
-  if (offered) return <aside className="orientation-offer" aria-label="Welcome to SanctissiMissa">
-    <strong>Would you like a short tour?</strong>
-    <p>We will point out the controls, one at a time. The Companion can explain more when it is ready.</p>
+  const style = pos ? { left: pos.left, top: pos.top, right: 'auto' as const, bottom: 'auto' as const } : undefined;
+  if (offered) return <aside ref={cardRef} tabIndex={0} style={style}
+    className={compact ? 'orientation-offer orientation-compact' : 'orientation-offer'}
+    aria-label="Welcome to SanctissiMissa"
+    onPointerDown={onCardPointerDown} onPointerMove={onCardPointerMove} onPointerUp={endCardDrag}
+    onPointerCancel={endCardDrag} onKeyDown={onCardKeyDown}>
+    <strong><span className="orientation-grip" aria-hidden="true">⠿</span>Would you like a short tour?</strong>
+    <span className="orientation-drag-hint">Drag to move</span>
+    {compact
+      ? <details><summary>Details</summary><p>We will point out the controls, one at a time. The Companion can explain more when it is ready.</p></details>
+      : <p>We will point out the controls, one at a time. The Companion can explain more when it is ready.</p>}
     <button onClick={() => { setOffered(false); setActive(true); window.dispatchEvent(new CustomEvent(OPEN_COMPANION)); }}>Start orientation</button>
     <button onClick={leave}>Later</button>
+    <button onClick={resetPlacement}>Reset position</button>
   </aside>;
   if (!active && !pointed) return null;
   const label = GUIDE_STEPS.find((item) => item.id === pointed)?.label ?? GUIDE_STEPS[step].label;
-  const style = pos ? { left: pos.left, top: pos.top, right: 'auto' as const, bottom: 'auto' as const } : undefined;
-  return <aside ref={cardRef} className="orientation-guide" style={style} aria-label="Orientation guide">
-    <strong onPointerDown={onHeadingPointerDown} onPointerMove={onHeadingPointerMove} onPointerUp={onHeadingPointerUp}>
-      {active ? `Step ${step + 1} of ${GUIDE_STEPS.length}: ${GUIDE_STEPS[step].label}` : label}
-    </strong>
+  const stepBody = <>
     <p>{active ? GUIDE_STEPS[step].text : `The Companion has highlighted ${label}.`}</p>
     {unavailable && <p>This control is not visible just now. You can continue the tour or ask the Companion.</p>}
+  </>;
+  return <aside ref={cardRef} tabIndex={0} style={style}
+    className={compact ? 'orientation-guide orientation-compact' : 'orientation-guide'}
+    aria-label="Orientation guide"
+    onPointerDown={onCardPointerDown} onPointerMove={onCardPointerMove} onPointerUp={endCardDrag}
+    onPointerCancel={endCardDrag} onKeyDown={onCardKeyDown}>
+    <strong>
+      <span className="orientation-grip" aria-hidden="true">⠿</span>
+      {active ? `Step ${step + 1} of ${GUIDE_STEPS.length}: ${GUIDE_STEPS[step].label}` : label}
+    </strong>
+    <span className="orientation-drag-hint">Drag to move</span>
+    {compact ? <details><summary>Details</summary>{stepBody}</details> : stepBody}
     <div className="orientation-actions">
       <button onClick={() => setUnavailable(!activateGuide())}>Show me</button>
       {active && <button onClick={explain}>Ask Companion to explain</button>}
@@ -92,6 +189,7 @@ export default function OrientationGuide() {
         ? <button onClick={() => setStep((value) => value + 1)}>Next</button>
         : <button onClick={() => { saveGuideState({ completed: true, step }); leave(); }}>Finish orientation</button>)}
       <button onClick={leave}>{active ? 'Continue later' : 'Close guide'}</button>
+      <button onClick={resetPlacement}>Reset position</button>
     </div>
   </aside>;
 }
