@@ -195,3 +195,14 @@ CLAUDE.md at `3021d442`) requires before CHECKLIST derivation and code.
   (`OPENROUTER_API_KEY_SANCTISSIMISSA`, entry `04801ef`) and is the build's
   `VITE_OPENROUTER_API_KEY`; the old shared key is marked SUPERSEDED
   (session-log leak via the now-masked FATAL print — rotate/off).
+
+## 2026-09-18 — Panel-open announces itself (§D validation trigger correction)
+
+- Evidence (deployed v1.61 drive): with the Companion docked right, the
+  guide card sat fully inside the panel (overlap 340×261) — the badge click
+  opens the panel through React state only; a `position: fixed` panel never
+  changes the document root box, so neither the OPEN_COMPANION event nor the
+  ResizeObserver could fire. Fix: the badge `onToggle` dispatches
+  `OPEN_COMPANION` after opening (idempotent; the listener's `show` is
+  setOpen(true)); regression guard in tests/chatView.test.ts. Deployed
+  verification follows the next stamp (≥ v1.62).

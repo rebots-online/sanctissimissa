@@ -368,7 +368,13 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
     <>
       {/* Badge gets out of the way whenever the panel is open — the header ×
           closes and brings it back; fullscreen no longer needs a special case. */}
-      {!open && <ChatBadge open={open} onToggle={() => setOpen((o) => !o)} />}
+      {!open && <ChatBadge open={open} onToggle={() => {
+        setOpen((o) => !o);
+        // Announce the panel-layout change: the fixed-position panel never
+        // resizes the document root, so observers cannot see it — the
+        // orientation cards re-validate placement on this event (§D).
+        window.dispatchEvent(new CustomEvent(OPEN_COMPANION));
+      }} />}
       {open && (
         <section
           className={`chat-panel ${dock}`}

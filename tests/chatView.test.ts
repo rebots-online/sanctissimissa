@@ -118,6 +118,15 @@ test('CP.5: mock stand-in rotates deterministic formulas across turns', async ()
   assert.equal(fifth, first, 'four-formula cycle repeats deterministically');
 });
 
+test('HC/OG2: badge open announces OPEN_COMPANION so orientation cards re-validate (§D)', () => {
+  // A fixed-position panel never resizes the document root, so ResizeObserver
+  // cannot see it — panel-open MUST dispatch the event the placement
+  // validation listens for (regression: the guide sat inside the docked panel).
+  const toggleAt = chatView.indexOf('onToggle=');
+  const dispatchAt = chatView.indexOf('dispatchEvent(new CustomEvent(OPEN_COMPANION))');
+  assert.ok(toggleAt !== -1 && dispatchAt !== -1 && dispatchAt > toggleAt, 'badge onToggle dispatches OPEN_COMPANION after opening');
+});
+
 test('CP.7/9: ChatView presents real engine states — no mock surface', () => {
   assert.ok(chatView.includes('EngineChip'), 'engine state chip present');
   assert.ok(chatView.includes('resolveNativeEngine') && chatView.includes('resolveWebEngine'));
