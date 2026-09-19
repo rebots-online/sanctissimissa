@@ -14,6 +14,7 @@ export const companionFeedback = {
   stopped: 'Reply stopped. Your question is below if you would like to try again.',
   hostedKeyMissing: 'The hosted Companion is not configured on this build. On-device choices remain below; you can keep using the Missal.',
   hostedNetwork: 'The Companion could not reach the hosted service. Check the connection and try again — the Missal keeps working.',
+  hostedLimited: 'The hosted service is limiting requests right now. Wait a moment and try again — the Missal keeps working.',
 } as const;
 
 export function logCompanionFailure(stage: string, error: unknown): void {

@@ -397,7 +397,7 @@ details go to Diagnostics. The old mock remains an unconnected test helper.
 | `DiagnosticStore` / `installDiagnosticCapture` / `DiagnosticsWindow` | `src/core/diagnostics/store.ts`, `capture.ts`, `src/ui/DiagnosticsWindow.tsx`. Capture starts before React; viewer is mounted outside `App` under the shared model provider. |
 | `GUIDE_STEPS` / `OrientationGuide` | `src/core/orientation/guide.ts`, `src/ui/OrientationGuide.tsx`. Six registered targets; saved `{completed, step}` under localStorage `sanctissimissa.orientation.v1`; no arbitrary model-provided selector or JavaScript execution. |
 | `HostedOpenRouterProvider` | `reusable-chatbot/engines/hosted-openrouter/index.ts` — OpenAI-compatible SSE streaming provider over `https://openrouter.ai/api/v1`; **automatic debug default engine on every platform** (amendment §E, pending signoff): tried first by ChatView, local providers retained and picker-selectable; key by pointer (`VITE_OPENROUTER_API_KEY`), `debugEvent('hosted-openrouter', …)` diagnostics, never the key |
-| `resolveHostedEngine` / `hostedProvider` config | `src/core/chat/resolve.ts` + `config/companion-defaults.json` — `(key, onProgress?) => Promise<Resolution>`; config block `{ kind: 'openrouter', baseUrl, model: 'qwen/qwen3.8-27b:free', fallbackModel: 'z-ai/glm-5.2:free', modelLabel: 'Qwen 3.8 27B' }`; feedback `hostedKeyMissing` / `hostedNetwork` in `src/core/chat/feedback.ts` |
+| `resolveHostedEngine` / `hostedProvider` config | `src/core/chat/resolve.ts` + `config/companion-defaults.json` — `(key, onProgress?) => Promise<Resolution>`; config block `{ kind: 'openrouter', baseUrl, model: 'openrouter/free', fallbackModel: null, modelLabel: 'OpenRouter Free' }`; feedback `hostedKeyMissing` / `hostedNetwork` / `hostedLimited` in `src/core/chat/feedback.ts` |
 | `occupiedRects` / `resolveGuidePlacement` / `ORIENTATION_GAP` | `src/core/orientation/layout.ts` — workspace-aware placement for both orientation cards (amendment §D, pending signoff): live `.chat-panel`/`.rail`/`.masthead` rects; saved-position validity check; top-right → bottom-right → top-left → bottom-left anchor scan 16 px in / 64 px header zone; `'compact'` fallback presentation |
 | `RunnerPhases` | Phase 0 contract freeze → 1 dependable baseline (CP.2→CP.4, CP.7, CP.9) → 2 TurboQuant KV → 3 Bonsai → 4 LiteRT-LM → 5 llama.cpp-WebGPU consolidation (guide §10; Phases 2–5 expand to self-contained tasks when reached) |
 
@@ -1990,7 +1990,7 @@ Entities:
   selection of the hosted entry forces hosted. The engine chip reads `HOSTED`
   while the hosted engine is active.
 - **`config/companion-defaults.json`** gains exactly:
-  `"hostedProvider": { "kind": "openrouter", "baseUrl": "https://openrouter.ai/api/v1", "model": "qwen/qwen3.8-27b:free", "modelLabel": "Qwen 3.8 27B" }`
+  `"hostedProvider": { "kind": "openrouter", "baseUrl": "https://openrouter.ai/api/v1", "model": "openrouter/free", "modelLabel": "OpenRouter Free" }`
   (model id verified live on the public OpenRouter catalog 2026-09-18).
   **Fallback is a capability, not a configuration** (operator, 2026-09-18:
   "only specify openrouter/free for hosted openrouter"; "do not use

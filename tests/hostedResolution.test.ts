@@ -29,8 +29,8 @@ test('HC.2/2 a configured key resolves ready to a HostedOpenRouterProvider with 
   assert.equal(resolution.kind, 'ready');
   if (resolution.kind !== 'ready') throw new Error('unreachable');
   assert.ok(resolution.engine instanceof HostedOpenRouterProvider);
-  assert.equal(resolution.label, 'Qwen 3.8 27B · hosted (free)');
-  assert.equal(resolution.config.modelId, 'qwen/qwen3.8-27b:free');
+  assert.equal(resolution.label, 'OpenRouter Free · hosted (free)');
+  assert.equal(resolution.config.modelId, 'openrouter/free');
   assert.equal(resolution.config.artifactUrl, 'https://openrouter.ai/api/v1/chat/completions');
 });
 

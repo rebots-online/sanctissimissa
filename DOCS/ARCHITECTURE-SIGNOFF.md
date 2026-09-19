@@ -142,3 +142,39 @@ CLAUDE.md at `3021d442`) requires before CHECKLIST derivation and code.
   app name or domain is hardcoded in the reusable provider (dual-build
   sanctissimissa/helloword); (4) default UI placements are checked by
   rendered observation before ship (recorded as standing practice).
+
+## 2026-09-18 — Hosted default model switched to a working free provider (executed under §E, operator-reported failure)
+
+- **Operator report (verbatim):** "it fails" / "and potentially fails to clear also".
+- **Evidence (wire, this session):** the deployed v1.60.29651 hosted call
+  `POST openrouter.ai/api/v1/chat/completions` returned **HTTP 429
+  "Provider returned error"** — the key was accepted; the upstream provider
+  behind `qwen/qwen3.8-27b:free` was refusing. Live probes of the free
+  catalog: qwen3.8-27b / z-ai glm-5.2 / gemma-4-31b / gemma-4-26b all 429;
+  **deepseek/deepseek-v4-flash-0731:free 200**, nvidia/nemotron-3.5-lightning
+  200 (slow), liquid/lfm-2.5-2.6b 200.
+- **Executed:** hosted default model switched to
+  `deepseek/deepseek-v4-flash-0731:free` ("DeepSeek V4 Flash") — still the
+  ONLY specified hosted model, fallbackModel stays null (a provider that
+  currently refuses must not be configured anywhere); new authored feedback
+  `hostedLimited` for 429/402/5xx ("limiting requests right now…") distinct
+  from `hostedNetwork` (connection), mapped in ChatView's generation catch;
+  failed turns still retain the draft per the CP.11 doctrine (input clearing
+  is verified on the success path). Next build stamps ≥ v1.61.
+
+## 2026-09-18 — Hosted model is `openrouter/free`; project key assigned (operator, verbatim)
+
+- Directives: "use 'openrouter/free'. stop randomly experimenting";
+  "add and use ethefollowing openrouter api key assigned to sanctissimissa
+  project, valid for one year, \$50/month limited: sk-or-…d293b0 [value
+  recorded only in Admin-Manual]"; "add to admin-manual for this project".
+- Executed: hosted model is the OpenRouter free-router meta-model
+  `openrouter/free` (label "OpenRouter Free") — OpenRouter routes each
+  request to a working free provider (verified 200, routed
+  deepseek-v4-flash-0731:free, 2026-09-18); the earlier per-model probes
+  (qwen3.8/z-ai/gemma 429, deepseek 200) are diagnostic history, not
+  configuration. The dedicated SanctissiMissa project key (1yr, \$50/mo)
+  is recorded in Admin-Manual CREDENTIALS § OpenRouter
+  (`OPENROUTER_API_KEY_SANCTISSIMISSA`) and is the build's
+  `VITE_OPENROUTER_API_KEY`; the old shared key is marked SUPERSEDED
+  (session-log leak via the now-masked FATAL print — rotate/off).

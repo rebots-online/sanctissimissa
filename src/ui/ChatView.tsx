@@ -303,10 +303,19 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
     } catch (error) {
       logCompanionFailure('reply', error);
       setInput((draft) => draft || text);
-      // Hosted network/auth failures get the authored hosted line — an
-      // authored notice, never an assistant token (the empty assistant
-      // bubble is filtered out below).
-      setReplyNotice(hostedActive ? companionFeedback.hostedNetwork : companionFeedback.reply);
+      // Hosted failures get the authored hosted line matching what actually
+      // happened — 429/402/5xx are provider limits (the service was reached
+      // and refused), anything else is a connection problem. Authored
+      // notices only, never assistant tokens.
+      const hostedStatus = /hosted http (\d+)/.exec(String((error as Error | undefined)?.message ?? ''))?.[1];
+      const limited = hostedStatus === '429' || hostedStatus === '402' || (hostedStatus !== undefined && Number(hostedStatus) >= 500);
+      setReplyNotice(
+        hostedActive
+          ? limited
+            ? companionFeedback.hostedLimited
+            : companionFeedback.hostedNetwork
+          : companionFeedback.reply,
+      );
       setEngineState('failed');
     } finally {
       setMessages((m) => m.filter((message) => message.text.length > 0));
