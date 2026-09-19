@@ -12,6 +12,8 @@ export const companionFeedback = {
   unavailable: 'The Companion cannot run on this device with this version of the app. You can continue using the Missal.',
   reply: 'The Companion could not finish its reply. Your question is below so you can try again.',
   stopped: 'Reply stopped. Your question is below if you would like to try again.',
+  hostedKeyMissing: 'The hosted Companion is not configured on this build. On-device choices remain below; you can keep using the Missal.',
+  hostedNetwork: 'The Companion could not reach the hosted service. Check the connection and try again — the Missal keeps working.',
 } as const;
 
 export function logCompanionFailure(stage: string, error: unknown): void {

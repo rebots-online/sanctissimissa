@@ -6,6 +6,7 @@ import { buildCompanionCatalog, entryAsset, makeDownloadManager, makeLibrary, re
 import { companionInvoke } from '../core/chat/runtime.ts';
 import { selectedModelId, SELECTED_MODEL_KEY } from '../core/chat/resolve.ts';
 import { companionFeedback, logCompanionFailure } from '../core/chat/feedback.ts';
+import defaults from '../../config/companion-defaults.json' with { type: 'json' };
 import { debugEvent } from '../core/diagnostics/store.ts';
 import { storageRootName } from '../core/storage/root.ts';
 import type { DownloadHandle } from '../core/model-store/download-manager.ts';
@@ -72,7 +73,12 @@ function useModelState(invoke?: TauriInvoke, scopeDir = storageRootName()): Comp
           }));
         });
         const previous = selectedModelId();
-        const selectedId = catalog.ranked.find((m) => m.id === previous && !m.unsupported)?.id ?? catalog.defaultPick?.id ?? null;
+        // The hosted entry (§E) lives outside the ranked local catalogue —
+        // keep an explicit hosted choice selected instead of collapsing it
+        // back to the local default.
+        const selectedId = previous === 'hosted:openrouter'
+          ? 'hosted:openrouter'
+          : catalog.ranked.find((m) => m.id === previous && !m.unsupported)?.id ?? catalog.defaultPick?.id ?? null;
         setState({ catalog, states, progress: {}, selectedId, error: false });
       } catch (error) {
         logCompanionFailure('choices', error);
@@ -166,11 +172,19 @@ export default function ModelPicker({ hook, compact = false, disabled = false }:
   const [open, setOpen] = useState(false);
   const ranked = state.catalog?.ranked ?? [];
   const selected = ranked.find((m) => m.id === state.selectedId);
+  const hostedLabel = `${defaults.hostedProvider.modelLabel} · hosted (free)`;
   const content = <>
     {state.error && <p role="status">{companionFeedback.catalogue} <button onClick={hook.retryCatalog}>Try again</button></p>}
     {!state.catalog && !state.error && <p role="status">{companionFeedback.checking}</p>}
     {state.catalog && !state.catalog.defaultPick && <p>{companionFeedback.unavailable}</p>}
     <ul className="model-picker-menu" aria-label="Companion choices">
+      <li className="model-row hosted" key="hosted:openrouter">
+        <button type="button" className="model-row-main" disabled={disabled}
+          aria-pressed={state.selectedId === 'hosted:openrouter'} onClick={() => { select('hosted:openrouter'); setOpen(false); }}>
+          <span className="model-name">{hostedLabel}</span>
+          <span className="model-meta">Free hosted preview — needs internet. On-device choices below.</span>
+        </button>
+      </li>
       {ranked.map((model: RankedModel) => {
         const status = state.states[model.id] ?? 'idle';
         const busy = status === 'downloading' || status === 'verifying';

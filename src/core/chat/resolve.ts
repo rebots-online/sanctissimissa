@@ -10,8 +10,11 @@
 import type { EngineConfig, IInferenceEngine } from '../../../reusable-chatbot/core/engine-types.ts';
 import { NativeRunnerProvider, type TauriInvoke } from '../../../reusable-chatbot/engines/native/index.ts';
 import { loadWebLLM, webllmEntries } from '../../../reusable-chatbot/engines/webllm/index.ts';
+import { HostedOpenRouterProvider } from '../../../reusable-chatbot/engines/hosted-openrouter/index.ts';
+import defaults from '../../../config/companion-defaults.json' with { type: 'json' };
 import { debugEvent, debugTrace } from '../diagnostics/store.ts';
 import type { CapabilityReport } from '../../../reusable-chatbot/core/capability-broker.ts';
+import { companionFeedback } from './feedback.ts';
 
 export type Resolution =
   | { kind: 'ready'; engine: IInferenceEngine; config: EngineConfig; label: string }
@@ -112,5 +115,40 @@ export async function resolveWebEngine(
     engine: new WebLlmRunnerProvider(onProgress, module, (operation, detail) => debugEvent('webllm', operation, detail, 'info', pick.id)),
     config: { modelId: pick.id, artifactUrl: 'webllm-manifest:' },
     label: pick.displayName,
+  };
+}
+
+/**
+ * Hosted-first resolution (§E, amendment 2026-09-18): the debug hosted
+ * OpenRouter engine prepares before any local path whenever no local model
+ * choice is persisted (or the picker's hosted entry is chosen). An absent
+ * key is an honest unsupported with the authored hostedKeyMissing line —
+ * the caller then falls through to the existing local resolution. The key
+ * exists only inside the engine (Authorization header); it never crosses
+ * into diagnostics payloads.
+ */
+export async function resolveHostedEngine(
+  key: string | undefined,
+  onProgress?: (fraction: number, text: string) => void,
+): Promise<Resolution> {
+  const cfg = defaults.hostedProvider;
+  if (!key) {
+    return { kind: 'unsupported', reason: companionFeedback.hostedKeyMissing };
+  }
+  return {
+    kind: 'ready',
+    engine: new HostedOpenRouterProvider(
+      key,
+      cfg.model,
+      cfg.fallbackModel ?? null,
+      onProgress,
+      (operation, detail) => debugEvent('hosted-openrouter', operation, detail, 'info'),
+    ),
+    config: {
+      modelId: cfg.model,
+      artifactUrl: `${cfg.baseUrl}/chat/completions`,
+      contextTokens: 4096,
+    },
+    label: `${cfg.modelLabel} · hosted (free)`,
   };
 }

@@ -17,7 +17,7 @@ import { ChatController } from '../../reusable-chatbot/core/chat-controller.ts';
 import { companionInvoke } from '../core/chat/runtime.ts';
 import { debugEvent, debugTrace } from '../core/diagnostics/store.ts';
 import { companionFeedback, logCompanionFailure } from '../core/chat/feedback.ts';
-import { resolveNativeEngine, resolveWebEngine, type Resolution } from '../core/chat/resolve.ts';
+import { resolveHostedEngine, resolveNativeEngine, resolveWebEngine, selectedModelId, type Resolution } from '../core/chat/resolve.ts';
 
 type DockMode = 'dock-left' | 'dock-right' | 'floating' | 'inline' | 'fullscreen' | 'sheet';
 
@@ -113,6 +113,8 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
   const [slow, setSlow] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [replyNotice, setReplyNotice] = useState<string | null>(null);
+  const [hostedActive, setHostedActive] = useState(false);
+  const [hostedStatus, setHostedStatus] = useState<string | null>(null);
   const controllerRef = useRef<ChatController | null>(null);
 
   const modelsRef = useRef(models);
@@ -124,6 +126,11 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
 
   // Progress updates never restart initialization. Only a changed selection,
   // verified download or explicit retry creates a new engine attempt.
+  // Hosted-first (§E, amendment 2026-09-18): when no local choice is
+  // persisted — or the picker's hosted entry is the persisted choice — the
+  // debug hosted engine resolves BEFORE the local paths; a persisted local
+  // id keeps the existing local path unchanged, and a non-ready hosted
+  // result falls through to that same local resolution.
   useEffect(() => {
     let cancelled = false;
     let timeout: ReturnType<typeof setTimeout> | undefined;
@@ -134,7 +141,11 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
     setEngineState('idle');
     setEngineProgress(null);
     setSlow(false);
-    if (!catalog || !selectedId || selectedState !== 'downloaded') return;
+    setHostedActive(false);
+    setHostedStatus(null);
+    const persistedChoice = selectedModelId();
+    const hostedPreferred = persistedChoice === null || persistedChoice === 'hosted:openrouter';
+    if (!hostedPreferred && (!catalog || !selectedId || selectedState !== 'downloaded')) return;
     setEngineState('starting');
     const heartbeat = () => {
       clearTimeout(timeout);
@@ -150,16 +161,44 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
     slowTimer = setTimeout(() => { if (!cancelled) setSlow(true); }, 30_000);
     void (async () => {
       try {
-        const current = modelsRef.current;
         const invoke = companionInvoke();
-        const candidates = catalog.ranked.filter((model) => current.state.states[model.id] === 'downloaded');
         const traceId = debugTrace('companion-start');
-        debugEvent('companion', 'resolve.start', { selectedId, native: Boolean(invoke) }, 'info', traceId);
         const progress = (fraction: number) => {
           if (cancelled) return;
           heartbeat();
           setEngineProgress(Math.max(0, Math.min(100, Math.round(fraction * 100))));
         };
+        let hostedReason: string | null = null;
+        if (hostedPreferred) {
+          debugEvent('companion', 'resolve.start', { selectedId: persistedChoice, hosted: true }, 'info', traceId);
+          const hosted = await resolveHostedEngine(import.meta.env.VITE_OPENROUTER_API_KEY as string | undefined, progress);
+          debugEvent('companion', 'resolve.result', hosted.kind === 'ready' ? { kind: hosted.kind, config: hosted.config } : hosted, 'info', traceId);
+          if (cancelled) return;
+          if (hosted.kind === 'ready') {
+            await controller.useEngine(hosted.engine, hosted.config);
+            initialized = true;
+            debugEvent('companion', 'engine.ready', { selectedId: 'hosted:openrouter' }, 'info', traceId);
+            if (cancelled) { await controller.close(); return; }
+            controllerRef.current = controller;
+            setHostedActive(true);
+            setEngineState('ready');
+            return;
+          }
+          // Non-ready hosted (unconfigured key) falls through to the local
+          // paths below.
+          hostedReason = hosted.reason;
+        }
+        if (!catalog || !selectedId || selectedState !== 'downloaded') {
+          // Hosted preferred but unconfigured, and nothing local prepared
+          // either — the authored hosted line is the honest status while the
+          // Missal keeps working.
+          setHostedStatus(hostedReason);
+          setEngineState('idle');
+          return;
+        }
+        const current = modelsRef.current;
+        const candidates = catalog.ranked.filter((model) => current.state.states[model.id] === 'downloaded');
+        debugEvent('companion', 'resolve.start', { selectedId, native: Boolean(invoke) }, 'info', traceId);
         const resolved: Resolution = invoke
           ? await resolveNativeEngine(invoke, catalog.report, current.locate, candidates, selectedId, progress)
           : await resolveWebEngine(catalog.report, selectedId, progress);
@@ -264,7 +303,10 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
     } catch (error) {
       logCompanionFailure('reply', error);
       setInput((draft) => draft || text);
-      setReplyNotice(companionFeedback.reply);
+      // Hosted network/auth failures get the authored hosted line — an
+      // authored notice, never an assistant token (the empty assistant
+      // bubble is filtered out below).
+      setReplyNotice(hostedActive ? companionFeedback.hostedNetwork : companionFeedback.reply);
       setEngineState('failed');
     } finally {
       setMessages((m) => m.filter((message) => message.text.length > 0));
@@ -334,7 +376,7 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
           >
             <div className="chat-header-left">
               <h3>Companion</h3>
-              <EngineChip state={engineState} />
+              <EngineChip state={engineState} hosted={hostedActive} />
               <ModelPicker hook={models} compact disabled={streaming || engineState === 'starting'} />
             </div>
             <div className="chat-modes" role="group" aria-label="Panel placement">
@@ -380,8 +422,9 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
               <p role="status" aria-live="polite" aria-atomic="true">
                 {models.state.error ? companionFeedback.catalogue
                   : !catalog ? companionFeedback.checking
-                  : !selected || selected.unsupported ? companionFeedback.unavailable
                   : selectedState === 'failed' || engineState === 'failed' ? companionFeedback.failed
+                  : hostedStatus ? hostedStatus
+                  : !hostedActive && engineState !== 'starting' && (!selected || selected.unsupported) ? companionFeedback.unavailable
                   : selectedState === 'downloading' ? `${companionFeedback.downloading} ${models.state.progress[selectedId ?? ''] ?? 0}%`
                   : selectedState === 'verifying' ? companionFeedback.verifying
                   : engineState === 'starting' ? `${slow ? companionFeedback.slow : companionFeedback.starting}${engineProgress === null ? '' : ` ${engineProgress}%`}`
@@ -444,8 +487,8 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
   );
 }
 
-function EngineChip({ state }: { state: 'idle' | 'starting' | 'ready' | 'failed' }) {
+function EngineChip({ state, hosted }: { state: 'idle' | 'starting' | 'ready' | 'failed'; hosted: boolean }) {
   return <span className="chat-engine-chip">
-    {state === 'ready' ? 'Ready' : state === 'starting' ? 'Preparing…' : state === 'failed' ? 'Needs attention' : 'Setup'}
+    {hosted ? 'HOSTED' : state === 'ready' ? 'Ready' : state === 'starting' ? 'Preparing…' : state === 'failed' ? 'Needs attention' : 'Setup'}
   </span>;
 }
