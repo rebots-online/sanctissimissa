@@ -1,9 +1,9 @@
 {
-  "version": "1.58.28951",
-  "versionBase": "1.58",
-  "buildNumber": "28951",
-  "versionCode": 100058,
-  "buildDate": "2026-09-18T13:11:34.209Z",
+  "version": "1.59.29613",
+  "versionBase": "1.59",
+  "buildNumber": "29613",
+  "versionCode": 100059,
+  "buildDate": "2026-09-19T00:13:11.881Z",
   "productName": "SanctissiMissa",
   "internalName": "sanctissimissa",
   "packageName": "mba.robin.sanctissimissa"
