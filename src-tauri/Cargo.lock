@@ -2645,7 +2645,7 @@ dependencies = [
 
 [[package]]
 name = "sanctissimissa"
-version = "1.65.29845"
+version = "1.66.30030"
 dependencies = [
  "llama-cpp-2",
  "serde",
