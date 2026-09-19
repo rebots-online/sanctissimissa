@@ -2190,3 +2190,19 @@ command (§H.1 grammar) whose step list is walked by the tour engine:
   of `parseCompanionCommand`/`applyGuideCommand` (§H.1 file), and the
   narration-passing detail shape of `COMPANION_ACT`. CHECKLIST task OG.10
   derives 1:1.
+
+### H.5 Mascot presence cadence — the subtle "I'm here" idle (operator, 2026-09-19)
+
+"Have the intercom-stye mascot do the same animated but subtle 'i'm here'
+once in a while to emphwsize the USP DOM-aware chatbot." The intercom badge's
+existing gesture engine (`src/core/chat/gestures.ts`: jittered scheduler,
+alternating cross-sign / wave, `prefers-reduced-motion` → static states) is
+re-tuned from its frequent 12–20 s cadence to a deliberate **presence
+cadence**: a subtle "I'm here" gesture once in a while — jittered 45–120 s
+between gestures, each ≤ 1.2 s (a gentle scale-and-bob of the porthole plus
+the existing gesture glyph), never while a generation streams, and only
+while the badge is mounted (panel closed — the badge unmounts when open, by
+design). The idle is an attention whisper, not a demand: no sound, no
+overlay, nothing that touches the Mass view. Entity: the cadence constants
+in `gestures.ts` (`PRESENCE_MIN_MS = 45_000`, `PRESENCE_MAX_MS = 120_000`)
+replacing the current band; CHECKLIST task OG.11 derives 1:1.
