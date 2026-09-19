@@ -1,18 +1,20 @@
 /**
- * Companion badge idle-gesture scheduling (CP.5): occasional cross-signing
- * and waving in the kintsugi/natally house style, on a jittered cadence.
- * Pure logic — the badge component drives it with timers.
+ * Companion badge presence scheduling (CP.5 → OG.11 / §H.5): the subtle
+ * "I'm here" idle — an occasional soft presence pulse carrying the
+ * alternating cross-signing/waving glyph, on a gentle 45–120 s jittered
+ * band so the porthole feels present without nagging. Pure logic — the
+ * badge component drives it with timers.
  */
 
 export type BadgeGesture = 'cross' | 'wave';
 
-export const GESTURE_MIN_MS = 12_000;
-export const GESTURE_MAX_MS = 20_000;
+export const PRESENCE_MIN_MS = 45_000;
+export const PRESENCE_MAX_MS = 120_000;
 export const GESTURE_DURATION_MS = 2_400;
 
-/** Jittered idle delay before the next gesture (deterministic under a fixed rnd). */
+/** Jittered idle delay before the next presence gesture (deterministic under a fixed rnd). */
 export function nextGestureDelay(rnd: () => number = Math.random): number {
-  return GESTURE_MIN_MS + Math.floor(rnd() * (GESTURE_MAX_MS - GESTURE_MIN_MS));
+  return PRESENCE_MIN_MS + Math.floor(rnd() * (PRESENCE_MAX_MS - PRESENCE_MIN_MS));
 }
 
 /** Gestures alternate cross ↔ wave, starting with the cross. */

@@ -2855,3 +2855,90 @@ button:disabled { opacity: 0.55; cursor: not-allowed; }
 .chat-generating-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--gold, #b08d3e); border-top-color: transparent; animation: chat-gen-spin 1s linear infinite; flex: none; }
 @keyframes chat-gen-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .chat-generating-dot { animation: none; border-right-color: transparent; } }
+
+/* ===================== CL.6 (§H.6) — assistant reply formatting (.chat-md) ===================== */
+.chat-md { line-height: 1.55; overflow-wrap: anywhere; }
+.chat-md h3, .chat-md h4 { text-align: center; font-family: inherit; }
+.chat-md h3, .chat-md h4 { margin: 0.55em 0 0.3em; }
+.chat-md h3 { font-size: 1.02rem; letter-spacing: 0.02em; }
+.chat-md h4 { font-size: 0.95rem; }
+.chat-md p { margin: 0.3em 0; }
+.chat-md ul { margin: 0.3em 0; padding-left: 1.25em; }
+.chat-md li { margin: 0.12em 0; }
+.chat-md blockquote { margin: 0.4em 0; padding: 0.15em 0.75em; border-left: 3px solid var(--gold, #b08d3e); color: var(--ink-soft, #6b6353); }
+.chat-md hr { border: none; border-top: 1px solid var(--card-border, #ddd3bd); margin: 0.55em 0; }
+.chat-md .chat-md-table-wrap { overflow-x: auto; max-width: 100%; }
+.chat-md table { border-collapse: collapse; width: 100%; background: var(--card, #faf7f0); font-size: 0.88rem; }
+.chat-md th { padding: 4px 8px; text-align: left; border-bottom: 2px solid var(--gold, #b08d3e); font-family: inherit; }
+.chat-md td { padding: 4px 8px; border: 1px solid var(--card-border, #ddd3bd); }
+.chat-md code { font-family: ui-monospace, 'SF Mono', Consolas, monospace; font-size: 0.85em; padding: 1px 5px; border-radius: 6px; border: 1px solid var(--card-border, #ddd3bd); background: var(--card, #faf7f0); }
+
+/* ===================== CL.7 (§H.7) — starter-question chips (.chat-prompts) ===================== */
+.chat-prompts { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px 2px; }
+.chat-prompts .chat-prompt-chip { font: inherit; font-size: 0.85rem; padding: 6px 10px; min-height: 34px; color: var(--text, inherit); background: var(--card, #faf7f0); border: 1px solid var(--card-border, #ddd3bd); border-radius: 999px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease; }
+.chat-prompts .chat-prompt-chip:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 3px 10px #0002; border-color: var(--gold, #b08d3e); }
+@media (prefers-reduced-motion: reduce) {
+  .chat-prompts .chat-prompt-chip,
+  .chat-prompts .chat-prompt-chip:hover:not(:disabled) { transform: none; transition: none; }
+}
+
+/* ===================== OG.9 (§H.3) — tour spotlight: dim veil + halo cutout ===================== */
+/* The veil is painted by the cutout's own 200vmax box-shadow spread — the cutout itself stays fully
+   transparent and the whole overlay is pointer-events: none, so the haloed target remains directly
+   clickable and the Mass stays visible through the veil (max 50% dim). The overlay sits at z-index 84,
+   just under the orientation card (z-index 85). */
+.tour-spotlight { position: fixed; inset: 0; z-index: 84; pointer-events: none; }
+.tour-spotlight-cutout { position: fixed; border-radius: 12px; pointer-events: none; box-shadow: 0 0 0 200vmax rgba(24, 18, 8, 0.5); }
+.tour-spotlight-halo { position: fixed; border: 2px solid var(--gold, #b08d3e); border-radius: 14px; pointer-events: none; box-shadow: 0 0 18px 2px rgba(176, 141, 62, 0.45); animation: tour-halo-pulse 1.6s ease-in-out infinite; }
+@keyframes tour-halo-pulse {
+  0%, 100% { box-shadow: 0 0 14px 1px rgba(176, 141, 62, 0.35); }
+  50% { box-shadow: 0 0 26px 5px rgba(176, 141, 62, 0.6); }
+}
+/* reduced-motion: a static halo ring, no pulse */
+@media (prefers-reduced-motion: reduce) {
+  .tour-spotlight-halo { animation: none; }
+}
+/* ── §H.3 amendment: target-side attention — one shared grammar for tour steps, Show me pulses, and
+   show-path steps. A held .orientation-target flips to high contrast (surface --card, 2 px --gold
+   border, darkened ink) and waves/tilts: rotate ±2.5° with a 1 px bob, 0.9 s, 2 iterations.
+   :not(.orientation-showing) keeps the §D "Show me" pulse its own animation while both are held. */
+.orientation-target {
+  background: var(--card, #faf7f0) !important;
+  border: 2px solid var(--gold, #b08d3e) !important;
+  color: var(--ink, #221c14) !important;
+}
+.orientation-target:not(.orientation-showing) { animation: orientation-attention 0.9s ease-in-out 2; }
+@keyframes orientation-attention {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(2.5deg) translateY(-1px); }
+  75% { transform: rotate(-2.5deg) translateY(1px); }
+}
+/* reduced-motion: no wave — transform none */
+@media (prefers-reduced-motion: reduce) {
+  .orientation-target:not(.orientation-showing) { animation: none; transform: none; }
+}
+
+/* ===================== OG.10 (§H.4) — didactic path walkthrough: the active ribbon ===================== */
+.tour-ribbon { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 2px; }
+.tour-ribbon span { flex: none; width: 20px; height: 6px; border-radius: 3px; background: var(--card-border, #d8cdb4); }
+.tour-ribbon span.visited { background: var(--gold, #b08d3e); }
+.tour-ribbon span.current { background: var(--accent, #3f7a52); box-shadow: 0 0 0 2px var(--accent-soft, #3f7a5226); }
+
+/* ===================== OG.11 (§H.5) — mascot presence cadence: the subtle "I'm here" idle ===================== */
+/* Applied to the porthole for the gesture duration, alongside the alternating
+   gesture glyph (gesture-cross / gesture-wave); one gentle ≤ 1.2 s
+   scale(1.0→1.06→1.0) with a 2 px bob. */
+.chat-badge.presence { animation: chat-presence 1.2s ease-in-out; }
+@keyframes chat-presence {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.06) translateY(-2px); }
+}
+/* reduced-motion: no transform — the badge stays put; only an opacity blink of the glyph */
+@media (prefers-reduced-motion: reduce) {
+  .chat-badge.presence { animation: none !important; }
+  .chat-badge.presence .chat-badge-glyph { animation: chat-presence-blink 1.2s ease-in-out !important; }
+}
+@keyframes chat-presence-blink {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}

@@ -2,8 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  GESTURE_MAX_MS,
-  GESTURE_MIN_MS,
+  PRESENCE_MAX_MS,
+  PRESENCE_MIN_MS,
   badgeAnimationActive,
   nextGestureDelay,
   pickGesture,
@@ -16,11 +16,11 @@ const chatView = readFileSync(new URL('../src/ui/ChatView.tsx', import.meta.url)
 const chatBadge = readFileSync(new URL('../src/ui/ChatBadge.tsx', import.meta.url), 'utf8');
 const app = readFileSync(new URL('../src/App.tsx', import.meta.url), 'utf8');
 
-test('CP.5: gesture cadence is jittered within [12s, 20s)', () => {
-  assert.equal(nextGestureDelay(() => 0), GESTURE_MIN_MS);
-  assert.ok(nextGestureDelay(() => 0.999999) < GESTURE_MAX_MS);
+test('OG.11: presence cadence is jittered within [45s, 120s)', () => {
+  assert.equal(nextGestureDelay(() => 0), PRESENCE_MIN_MS);
+  assert.ok(nextGestureDelay(() => 0.999999) < PRESENCE_MAX_MS);
   const d = nextGestureDelay(() => 0.5);
-  assert.ok(d >= GESTURE_MIN_MS && d < GESTURE_MAX_MS, `delay ${d} inside the band`);
+  assert.ok(d >= PRESENCE_MIN_MS && d < PRESENCE_MAX_MS, `delay ${d} inside the band`);
 });
 
 test('CP.5: gestures alternate cross ↔ wave starting with the cross', () => {
