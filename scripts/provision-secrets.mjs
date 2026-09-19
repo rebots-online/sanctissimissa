@@ -174,6 +174,15 @@ function main() {
     const { pointer, target, requiredFor } = m;
     const raw = env[pointer];
     if (!raw) {
+      if (m.mode === 'identity') {
+        // Identity always materializes (this checkout's canonical fallback)
+        // so an unexpanded $REF from .env never reaches Vite. Fresh clones
+        // set VITE_APP_* directly in .env — Vite reads those natively.
+        const existing = existsSync(m.target) ? readFileSync(m.target, 'utf8') : '';
+        writeFileSync(m.target, renderEnvLocal(existing, m.envKey, m.fallback));
+        console.log(`[provision-secrets] ${pointer} unset — ${m.envKey}=${m.fallback} (canonical identity fallback)`);
+        continue;
+      }
       if (existsSync(target)) {
         console.log(`[provision-secrets] ${pointer} unset — keeping existing ${target}`);
       } else {
