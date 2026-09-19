@@ -2076,14 +2076,31 @@ the END of a reply, parsed by `stripGuideCommands`/`applyGuideCommand`:
   `data-section` anchor via the existing `focus {section, nonce}` routing.
 - `[[date:<iso>]]` — set the liturgical date through the existing date
   control's set path (valid ISO only; invalid recorded, not executed).
+- `[[homily-draft:<litKey>]]` — open the homily draft for that liturgical
+  key in `AccompanimentEditor` with the reply's text staged as an
+  insertable, provenance-marked (`generated`) block; the insert happens only
+  on the user's explicit **Insert** action — the Companion never silently
+  mutates a user's authored draft (§7.6 curation rule).
+- `[[annotate:<nodeKey>]]` — create an annotation (quote = the reply's cited
+  phrase or the current selection; note = the reply's explanation excerpt)
+  through the existing range-anchored annotation plane, only when
+  `<nodeKey>` matches a live rendered anchor; otherwise recorded, not
+  executed.
+- `[[concordance:<term>]]` — run the existing concordance/nucleated search
+  for `<term>` and open the results in `MeaningPanel`.
+- `[[journal:<term>]]` — same search, routed into `JournalSidecar` as a
+  capture-ready source list (the existing capture machinery).
 
 Every write-command resolves against the live DOM/allowlist at execution
 time; unknown ids, invalid dates, absent anchors and non-visible targets are
 recorded in Diagnostics (`companion` source, `command.rejected`) and never
 executed. `guideContext()`'s system block is extended to document the
 available commands AND to carry the live context the model needs to use them
-sensibly: current view, current date, active reading focus section, and the
-registered visible controls (existing list).
+sensibly: current view, current date, active reading focus section, the
+registered visible controls (existing list), and — when relevant — the open
+homily draft's liturgical key/title and the current text selection/section
+(so homily inserts and annotations target what the user is actually
+looking at).
 
 New entities: `COMPANION_ACT = 'sanctissimissa:companion-act'` window event
 (custom detail `{ kind: 'open'|'focus'|'date'; value: string }`); exported
@@ -2118,3 +2135,21 @@ Entity rows added to §7.8.6 by this amendment: `COMPANION_ACT` /
 `parseCompanionCommand` / extended `applyGuideCommand` (`guide.ts`);
 `CompanionMemory` (`src/core/companion/memory.ts`); ChatView `Save insight`
 action. CHECKLIST stanza CL.1–CL.4 derives 1:1.
+
+### H.3 Tour spotlight — dim the background, halo the point (operator, 2026-09-19)
+
+"The guided tour at the beginning must be able to dim background and 'halo'
+the oint eto be emphasized." While a tour step holds a highlighted target,
+a `tour-spotlight` overlay renders: a full-viewport translucent veil (max 50%
+dim — the Mass stays visible through it, honoring the never-obscured USP
+rule) with a transparent cutout hugging the `.orientation-target`'s live
+bounding rect (grown by 8 px), a soft `--gold` halo ring on the cutout edge,
+and the veil fully pointer-transparent so the target remains directly
+clickable ("Show me" keeps working through it). The cutout rect recomputes
+on window resize, scroll and panel-layout announcements (the §D triggers);
+`prefers-reduced-motion` removes the halo's gentle pulse (static ring). The
+veil is `aria-hidden` and never holds focus — the guide card remains the
+tour's control surface. Entities: the spotlight element + rect tracking in
+`src/ui/OrientationGuide.tsx`; `.tour-spotlight` / `.tour-spotlight-cutout`
+/ `.tour-spotlight-halo` rules in `src/styles.css`. CHECKLIST task OG.9
+derives 1:1.
