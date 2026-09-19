@@ -178,3 +178,20 @@ CLAUDE.md at `3021d442`) requires before CHECKLIST derivation and code.
   (`OPENROUTER_API_KEY_SANCTISSIMISSA`) and is the build's
   `VITE_OPENROUTER_API_KEY`; the old shared key is marked SUPERSEDED
   (session-log leak via the now-masked FATAL print — rotate/off).
+
+## 2026-09-18 — Hosted model is `openrouter/free`; project key assigned (operator, verbatim)
+
+- Directives: "use 'openrouter/free'. stop randomly experimenting";
+  "add and use ethefollowing openrouter api key assigned to sanctissimissa
+  project, valid for one year, $50/month limited: [value recorded only in
+  Admin-Manual]"; "add to admin-manual for this project".
+- Executed: hosted model is the OpenRouter free-router meta-model
+  `openrouter/free` (label "OpenRouter Free") — OpenRouter routes each
+  request to a working free provider (verified 200, routed
+  deepseek-v4-flash-0731:free, 2026-09-18); the earlier per-model probes
+  (qwen3.8/z-ai/gemma 429, deepseek 200) are diagnostic history, not
+  configuration. The dedicated SanctissiMissa project key (1yr, $50/mo) is
+  recorded in Admin-Manual CREDENTIALS § OpenRouter
+  (`OPENROUTER_API_KEY_SANCTISSIMISSA`, entry `04801ef`) and is the build's
+  `VITE_OPENROUTER_API_KEY`; the old shared key is marked SUPERSEDED
+  (session-log leak via the now-masked FATAL print — rotate/off).
