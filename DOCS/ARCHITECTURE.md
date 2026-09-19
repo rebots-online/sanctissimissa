@@ -2045,3 +2045,76 @@ build already used; and release verification must confirm the running app's
 displayed version, the produced artifacts, and the canonical version files
 (`package.json` / `src-tauri/tauri.conf.json` / `src-tauri/Cargo.toml`) all
 agree on that new version.
+
+## Companion DOM read/write and functional lore on the 32k budget (2026-09-19)
+
+**Status: drafted — PENDING OPERATOR SIGNOFF (amendment-sequence gate, CLAUDE.md).**
+No CHECKLIST execution and no code lands under this section until the operator
+signs off and `DOCS/ARCHITECTURE-SIGNOFF.md` records the entry.
+
+Operator directives (verbatim, this session): "It must not be 768: read/write
+DOM is stipuolted by spec. That is wholly vasdylu recklessl4y insufficient";
+"16384 to 32768"; "it was stipulated by spec at 32k"; "and r/w DOM access and
+funcional lore"; "ARCHITECTURE.md -> CHECLIST. then hold for sinoff".
+
+The 32768-token reply/context ceiling (executed this session) exists to serve
+two spec'd Companion capabilities this amendment now completes on the hosted
+path (local engines inherit the same contracts):
+
+### H.1 Companion DOM read/write (guide command plane)
+
+The Companion manipulates the real UI only through the same handlers a user's
+own clicks drive — never synthetic routing, never arbitrary JS/CSS selectors
+(existing security clause stands). Command grammar, appended by the model at
+the END of a reply, parsed by `stripGuideCommands`/`applyGuideCommand`:
+
+- `[[guide:<id>]]` — highlight a registered visible target (existing).
+- `[[open:<view>]]` — navigate to a rail view; `<view>` ∈ the `View` union
+  (`map|reader|annotations|calendar|office|bible|journal|homily|settings|about`);
+  executed by clicking the corresponding rail button's handler.
+- `[[focus:<section>]]` — scroll the active reader to a real rendered
+  `data-section` anchor via the existing `focus {section, nonce}` routing.
+- `[[date:<iso>]]` — set the liturgical date through the existing date
+  control's set path (valid ISO only; invalid recorded, not executed).
+
+Every write-command resolves against the live DOM/allowlist at execution
+time; unknown ids, invalid dates, absent anchors and non-visible targets are
+recorded in Diagnostics (`companion` source, `command.rejected`) and never
+executed. `guideContext()`'s system block is extended to document the
+available commands AND to carry the live context the model needs to use them
+sensibly: current view, current date, active reading focus section, and the
+registered visible controls (existing list).
+
+New entities: `COMPANION_ACT = 'sanctissimissa:companion-act'` window event
+(custom detail `{ kind: 'open'|'focus'|'date'; value: string }`); exported
+`parseCompanionCommand(text): { kind; value } | null` and an extended
+`applyGuideCommand(text): boolean` in `src/core/orientation/guide.ts`; the
+App-side listener routes `COMPANION_ACT` through the existing nav/focus/date
+handlers in `src/App.tsx`. ChatView strips the command suffix from the
+rendered reply exactly as it does `[[guide:…]]` today.
+
+### H.2 Functional lore (CompanionMemory on the chat path)
+
+`src/core/companion/memory.ts` — class `CompanionMemory` (the §7.6 row made
+real): `assemble(ctx: { view; date; focus }): string` builds the lore
+system-context block from the sidecar `lore` table (`kind ∈ journey|parish|
+persona`, user-visible AND user-editable elsewhere); `recall(query: string,
+k = 5): MemoryHit[]` cosine recall over `sidecar_embeddings` using the
+deterministic `embedText` (decision 4); `distill(turn: { question; answer }):
+Promise<void>` appends a size-capped lore row (`kind 'journey'`, provenance
+marked) after a debounced idle (2 min after the panel closes; capped at 64
+distilled rows, oldest pruned; never during an active generation).
+
+`ChatController`/`ChatView` integration (hosted path first, same assembly for
+local engines): per turn the system context is persona + `guideContext()`
+(DOM state + command grammar) + `CompanionMemory.assemble` + top-5 `recall`
+hits for the user's question; the reply's `[[…]]` command suffix is parsed
+and executed per H.1; a `Save insight` action on an assistant reply writes an
+accompaniment (`provenance: 'generated'`, anchored to the current day/section)
+through the existing accompaniment store — no new persistence surface (sidecar
+`lore` + `sidecar_embeddings` + `accompaniments` already exist in schema).
+
+Entity rows added to §7.8.6 by this amendment: `COMPANION_ACT` /
+`parseCompanionCommand` / extended `applyGuideCommand` (`guide.ts`);
+`CompanionMemory` (`src/core/companion/memory.ts`); ChatView `Save insight`
+action. CHECKLIST stanza CL.1–CL.4 derives 1:1.
