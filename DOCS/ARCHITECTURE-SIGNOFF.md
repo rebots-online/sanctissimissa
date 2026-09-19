@@ -206,3 +206,20 @@ CLAUDE.md at `3021d442`) requires before CHECKLIST derivation and code.
   `OPEN_COMPANION` after opening (idempotent; the listener's `show` is
   setOpen(true)); regression guard in tests/chatView.test.ts. Deployed
   verification follows the next stamp (≥ v1.62).
+
+## 2026-09-19 — Generation ceiling corrected (operator, verbatim)
+
+- Directive: "It must not be 768: read/write DOM is stipuolted by spec. That
+  is wholly vasdylu recklessl4y insufficient".
+- Evidence: deployed replies amputated mid-answer (the Liber Usualis reply
+  stopped at the promising colon); a routed provider's leaked
+  "User Safety: safe Response Safety: safe" preamble rendered as a whole
+  reply.
+- Amended minutes later by the operator: "16384 to 32768" — executed at
+  §E generate body default `max_tokens: req.maxTokens ?? 32768` (the top of
+  the directed range, equal to the hosted engine's 32768 context ceiling;
+  the per-request `req.maxTokens` override remains available); the
+  provider's SSE parser drops
+  whole-delta safety-classification preamble lines
+  (/^(user|response)\s+safety:/i), which are classifier artifacts, never
+  liturgical content.

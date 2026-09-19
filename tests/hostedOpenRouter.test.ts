@@ -56,7 +56,7 @@ test('two-delta SSE body yields tokens in order then ends', async (t) => {
   assert.equal(body.model, 'qwen/qwen3.8-27b:free');
   assert.deepEqual(body.messages, [{ role: 'user', content: 'hi' }]);
   assert.equal(body.stream, true);
-  assert.equal(body.max_tokens, 768);
+  assert.equal(body.max_tokens, 32768);
   assert.equal(body.temperature, 0.7);
 });
 

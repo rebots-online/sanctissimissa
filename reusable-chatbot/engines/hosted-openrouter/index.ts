@@ -138,7 +138,10 @@ export class HostedOpenRouterProvider implements IInferenceEngine {
         model,
         messages: req.messages,
         stream: true,
-        max_tokens: req.maxTokens ?? 768,
+        // Reply ceiling equals the context budget (§E, operator 2026-09-19:
+        // 768 was "wholly recklessly insufficient" — replies amputated
+        // mid-answer). The request may still pin a smaller budget.
+        max_tokens: req.maxTokens ?? 32768,
         temperature: 0.7,
       }),
       signal,
@@ -207,6 +210,14 @@ export class HostedOpenRouterProvider implements IInferenceEngine {
       };
       const piece = parsed.choices?.[0]?.delta?.content;
       if (typeof piece === 'string' && piece.length > 0) {
+        // Routed free providers sometimes leak their safety-classification
+        // preamble as content ("User Safety: safe / Response Safety: safe") —
+        // classifier artifacts, never liturgical content; drop whole-line
+        // matches (operator directive 2026-09-19: the attenuation is
+        // unacceptable).
+        if (/^\s*(user|response)\s+safety\s*:/.test(piece.trim())) {
+          return { done: false, token: null };
+        }
         return { done: false, token: { text: piece } };
       }
       return { done: false, token: null };

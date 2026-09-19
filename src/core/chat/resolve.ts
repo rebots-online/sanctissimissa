@@ -164,7 +164,7 @@ export async function resolveHostedEngine(
     config: {
       modelId: cfg.model,
       artifactUrl: `${cfg.baseUrl}/chat/completions`,
-      contextTokens: 4096,
+      contextTokens: 32768,
     },
     label: `${cfg.modelLabel} · hosted (free)`,
   };

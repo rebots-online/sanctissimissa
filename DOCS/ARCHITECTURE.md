@@ -1972,7 +1972,7 @@ Entities:
   (`VITE_APP_NAME` / `VITE_APP_URL`, supplied by the host at construction;
   the provider never bakes in one app's name or domain — the codebase
   dual-builds sanctissimissa and helloword, so everything app-specific is
-  `.env`-configured at build time) — and body `{ model, messages, stream: true, max_tokens: req.maxTokens ?? 768, temperature: 0.7 }`,
+  `.env`-configured at build time) — and body `{ model, messages, stream: true, max_tokens: req.maxTokens ?? 4096, temperature: 0.7 }`,
   parses SSE `data:` lines and yields real provider token deltas; HTTP errors
   throw with the status; an HTTP 404 for `model` retries exactly once with an
   explicitly configured `fallbackModel` when set and different (capability,
