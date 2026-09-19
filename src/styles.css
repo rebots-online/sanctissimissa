@@ -2821,7 +2821,14 @@ button.mstation, button.mstation.active, button.mstation.open {
 .diagnostics-copy textarea { height: 100px; }
 @media (max-width: 720px) { .diagnostics-window { width: calc(100vw - 16px); } .diagnostics-tools input[placeholder] { width: 100%; } }
 .orientation-offer, .orientation-guide { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: auto; top: 64px; z-index: 85; max-width: min(340px, calc(100vw - 32px)); max-height: 40dvh; overflow: auto; padding: 18px; color: var(--text); background: var(--card, #faf7f0); border: 2px solid var(--gold, #b08d3e); border-radius: 12px; box-shadow: 0 8px 28px #0006; line-height: 1.5; }
-.orientation-guide strong { cursor: grab; user-select: none; touch-action: none; display: block; }
+.orientation-guide strong { display: block; }
+.orientation-offer, .orientation-guide { cursor: grab; touch-action: none; }
+.orientation-offer.dragging, .orientation-guide.dragging { cursor: grabbing; user-select: none; }
+.orientation-grip { user-select: none; letter-spacing: 2px; color: var(--ink-soft, #6b6353); margin-right: 6px; }
+.orientation-drag-hint { display: block; font-size: 11px; font-style: italic; color: var(--ink-soft, #6b6353); margin-bottom: 6px; }
+.orientation-compact { padding: 10px; max-width: min(300px, calc(100vw - 24px)); max-height: 32dvh; }
+.orientation-compact details summary { cursor: pointer; font-size: 12px; }
+.orientation-offer:focus-visible, .orientation-guide:focus-visible { outline: 2px solid var(--gold, #b08d3e); outline-offset: 2px; }
 .orientation-guide.dragging strong { cursor: grabbing; }
 .orientation-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .orientation-offer button, .orientation-guide button { padding: 10px; min-height: 44px; font: inherit; border: 1px solid var(--gold, #b08d3e); border-radius: 8px; color: inherit; background: var(--card, #faf7f0); cursor: pointer; }
