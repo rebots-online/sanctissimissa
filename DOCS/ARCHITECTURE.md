@@ -2206,3 +2206,20 @@ design). The idle is an attention whisper, not a demand: no sound, no
 overlay, nothing that touches the Mass view. Entity: the cadence constants
 in `gestures.ts` (`PRESENCE_MIN_MS = 45_000`, `PRESENCE_MAX_MS = 120_000`)
 replacing the current band; CHECKLIST task OG.11 derives 1:1.
+
+### H.6 Reply formatting plane — bold, centred headings, tables (operator, 2026-09-19)
+
+"responses need to at least format better" / "bold, centre, tables". Assistant
+replies render through a **safe markdown renderer** — `src/ui/ChatMarkdown.tsx`
+(block parse: `#`–`###` headings, `-`/`*` lists, `>` quotes, `---` rules,
+GFM pipe tables, paragraphs; inline: `**bold**`, `*italic*`, `` `code` ``) —
+emitting React elements only, never `dangerouslySetInnerHTML`, never raw
+model HTML (the ResultSnippet security precedent). Presentation: section
+headings render **centred** in the app's liturgical serif (the house voice);
+bold/italic carry emphasis; tables render as bordered parchment tables
+(`--card` surface, `--card-border` rules, `--gold` header rule), horizontally
+scrollable when narrow; lists indent with proper markers. The renderer is
+streaming-safe (idempotent parse of the accumulated text; partial syntax at
+the tail renders literally until completed). ChatView renders assistant turns
+through `ChatMarkdown`; authored UI strings and user turns remain plain.
+CHECKLIST task CL.6 derives 1:1.
