@@ -117,6 +117,28 @@ const MATERIALIZATIONS = [
     envKey: 'VITE_OPENROUTER_API_KEY',
     mode: 'env',
   },
+  // Build-time app identity (operator, 2026-09-18: ".env references
+  // $ENV_VARIABLES; the build exports them"). .env carries
+  // VITE_APP_NAME=$SAM_APP_NAME / VITE_APP_URL=$SAM_APP_URL; the exported
+  // values are resolved into .env.local (which Vite loads with precedence).
+  // Unset exports default to THIS checkout's canonical identity; a sibling
+  // build (helloword) exports its own identity.
+  {
+    pointer: 'SAM_APP_NAME',
+    target: join(ROOT, '.env.local'),
+    requiredFor: 'build-time app identity (VITE_APP_NAME)',
+    envKey: 'VITE_APP_NAME',
+    mode: 'identity',
+    fallback: 'SanctissiMissa',
+  },
+  {
+    pointer: 'SAM_APP_URL',
+    target: join(ROOT, '.env.local'),
+    requiredFor: 'build-time app identity (VITE_APP_URL)',
+    envKey: 'VITE_APP_URL',
+    mode: 'identity',
+    fallback: 'https://sanctissimissa.surge.sh',
+  },
 ];
 
 /**
@@ -160,8 +182,28 @@ function main() {
       continue;
     }
     const source = expandHome(raw);
+    // Identity mode: the exported build-time value (or this checkout's
+    // canonical fallback) is resolved into .env.local so an unexpanded
+    // `$REF` from .env can never reach the bundle.
+    if (m.mode === 'identity') {
+      const value = raw && !raw.startsWith('$') ? raw : m.fallback;
+      const existing = existsSync(m.target) ? readFileSync(m.target, 'utf8') : '';
+      writeFileSync(m.target, renderEnvLocal(existing, m.envKey, value));
+      console.log(`[provision-secrets] ${pointer} -> ${m.target} (${m.envKey}=${value})`);
+      continue;
+    }
+    // Value-form (operator directive 2026-09-18: the key is exported in the
+    // current environment via .bashrc): when the variable directly carries a
+    // key value (sk-or-…), use it as-is. Pointer values are NEVER printed.
+    if (m.mode === 'env' && /^sk-or-/.test(raw)) {
+      const existing = existsSync(m.target) ? readFileSync(m.target, 'utf8') : '';
+      writeFileSync(m.target, renderEnvLocal(existing, m.envKey, raw));
+      execSync(`chmod 600 ${JSON.stringify(m.target)}`);
+      console.log(`[provision-secrets] ${pointer} -> ${m.target} (${m.envKey} materialized from exported environment value; value not logged)`);
+      continue;
+    }
     if (!existsSync(source)) {
-      console.error(`[provision-secrets] FATAL: ${pointer}=${raw} — canonical file missing. Admin-Manual is the only secrets repository; restore it there first.`);
+      console.error(`[provision-secrets] FATAL: ${pointer} names no existing canonical file and is not a direct key value (value masked; never printed). Admin-Manual is the only secrets repository; restore it there or export the value, then retry.`);
       failures += 1;
       continue;
     }

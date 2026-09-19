@@ -127,6 +127,21 @@ export async function resolveWebEngine(
  * exists only inside the engine (Authorization header); it never crosses
  * into diagnostics payloads.
  */
+/** Build-time identity (`VITE_APP_NAME`/`VITE_APP_URL` from `.env`'s `$REF`
+ * expansion or build-local `.env.local`): an unset or unexpanded (`$…`)
+ * value falls back to this checkout's canonical identity — a leaked
+ * reference never reaches a request header. The building script exports the
+ * per-app values at build time (dual-build sanctissimissa/helloword);
+ * Admin-Manual intentionally stores only paper-recoverable credentials — cleartext + QR; no machine-readable data to corrupt —
+ * never app configuration. */
+function buildIdentity(value: unknown, fallback: string): string {
+  return typeof value === 'string' && value.length > 0 && !value.startsWith('$') ? value : fallback;
+}
+
+/** Vite injects `import.meta.env` in bundles; plain-Node test runs have none. */
+const BUILD_ENV: Record<string, string | undefined> =
+  (import.meta as { env?: Record<string, string | undefined> }).env ?? {};
+
 export async function resolveHostedEngine(
   key: string | undefined,
   onProgress?: (fraction: number, text: string) => void,
@@ -141,6 +156,8 @@ export async function resolveHostedEngine(
       key,
       cfg.model,
       cfg.fallbackModel ?? null,
+      buildIdentity(BUILD_ENV.VITE_APP_NAME, 'SanctissiMissa'),
+      buildIdentity(BUILD_ENV.VITE_APP_URL, 'https://sanctissimissa.surge.sh'),
       onProgress,
       (operation, detail) => debugEvent('hosted-openrouter', operation, detail, 'info'),
     ),

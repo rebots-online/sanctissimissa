@@ -37,7 +37,7 @@ test('two-delta SSE body yields tokens in order then ends', async (t) => {
       'data: [DONE]',
     ]);
   });
-  const p = new HostedOpenRouterProvider('sk-or-test-key', 'qwen/qwen3.8-27b:free', null);
+  const p = new HostedOpenRouterProvider('sk-or-test-key', 'qwen/qwen3.8-27b:free', null, 'SanctissiMissa', 'https://sanctissimissa.surge.sh');
   const tokens: string[] = [];
   for await (const ev of p.generate('s', { messages: [{ role: 'user', content: 'hi' }] })) {
     tokens.push(ev.text);
@@ -77,6 +77,8 @@ test('404 on the primary model retries exactly once on fallback', async (t) => {
     'sk-or-test-key',
     'qwen/qwen3.8-27b:free',
     'z-ai/glm-5.2:free',
+    'SanctissiMissa',
+    'https://sanctissimissa.surge.sh',
     undefined,
     (op, detail) => logs.push({ op, detail }),
   );
@@ -97,7 +99,7 @@ test('a fallback 404 is NOT retried again — exactly one retry, then it throws'
     'fetch',
     async () => new Response('model gone', { status: 404 }),
   );
-  const p = new HostedOpenRouterProvider('sk-or-test-key', 'primary-m', 'fallback-m');
+  const p = new HostedOpenRouterProvider('sk-or-test-key', 'primary-m', 'fallback-m', 'SanctissiMissa', 'https://sanctissimissa.surge.sh');
   await assert.rejects(
     collect(p.generate('s', { messages: [{ role: 'user', content: 'hi' }] })),
     { message: 'hosted http 404' },
@@ -111,7 +113,7 @@ test('HTTP 500 throws hosted http 500 (no fallback attempt)', async (t) => {
     'fetch',
     async () => new Response('boom', { status: 500 }),
   );
-  const p = new HostedOpenRouterProvider('sk-or-test-key', 'primary-m', 'fallback-m');
+  const p = new HostedOpenRouterProvider('sk-or-test-key', 'primary-m', 'fallback-m', 'SanctissiMissa', 'https://sanctissimissa.surge.sh');
   await assert.rejects(
     collect(p.generate('s', { messages: [{ role: 'user', content: 'hi' }] })),
     { message: 'hosted http 500' },
@@ -124,7 +126,7 @@ test('an aborted AbortSignal stops iteration without throwing', async (t) => {
   const fetchMock = t.mock.method(globalThis, 'fetch', async () => respond());
 
   // (a) signal already aborted before generation: no fetch, empty iteration.
-  const pre = new HostedOpenRouterProvider('sk-or-test-key', 'm', null);
+  const pre = new HostedOpenRouterProvider('sk-or-test-key', 'm', null, 'SanctissiMissa', 'https://sanctissimissa.surge.sh');
   const ac = new AbortController();
   ac.abort();
   const before = await collect(pre.generate('s', { messages: [] }, ac.signal));
@@ -143,7 +145,7 @@ test('an aborted AbortSignal stops iteration without throwing', async (t) => {
     },
   });
   respond = () => ({ ok: true, status: 200, body: stream }) as unknown as Response;
-  const mid = new HostedOpenRouterProvider('sk-or-test-key', 'm', null);
+  const mid = new HostedOpenRouterProvider('sk-or-test-key', 'm', null, 'SanctissiMissa', 'https://sanctissimissa.surge.sh');
   const ac2 = new AbortController();
   const it = mid.generate('s', { messages: [] }, ac2.signal) as AsyncGenerator<{ text: string }>;
   const first = await it.next();
@@ -161,11 +163,11 @@ test('init throws without key or model and makes no network call', async (t) => 
     'fetch',
     async () => new Response('unused', { status: 500 }),
   );
-  const noKey = new HostedOpenRouterProvider('', 'some-model', null);
+  const noKey = new HostedOpenRouterProvider('', 'some-model', null, 'SanctissiMissa', 'https://sanctissimissa.surge.sh');
   await assert.rejects(noKey.init({ modelId: 'some-model', artifactUrl: '' }), {
     message: 'hosted key missing',
   });
-  const noModel = new HostedOpenRouterProvider('sk-or-test-key', '', null);
+  const noModel = new HostedOpenRouterProvider('sk-or-test-key', '', null, 'SanctissiMissa', 'https://sanctissimissa.surge.sh');
   await assert.rejects(noModel.init({ modelId: '', artifactUrl: '' }), {
     message: 'hosted model missing',
   });
@@ -188,12 +190,12 @@ test('no log/onProgress payload ever contains the key', async (t) => {
   });
   const record = (op: string, detail: unknown) => seen.push(JSON.stringify({ op, detail }));
   // Fallback path (emits a log) and error path (500 on the fallback try).
-  const p = new HostedOpenRouterProvider(KEY, 'primary-m', 'fallback-m', (f, txt) => {
+  const p = new HostedOpenRouterProvider(KEY, 'primary-m', 'fallback-m', 'SanctissiMissa', 'https://sanctissimissa.surge.sh', (f, txt) => {
     seen.push(JSON.stringify({ f, txt }));
   }, record);
   const tokens = (await collect(p.generate('s', { messages: [] }))).map((e) => e.text);
   assert.deepEqual(tokens, ['ok']);
-  const pErr = new HostedOpenRouterProvider(KEY, 'boom-m', 'primary-m', undefined, record);
+  const pErr = new HostedOpenRouterProvider(KEY, 'boom-m', 'primary-m', 'SanctissiMissa', 'https://sanctissimissa.surge.sh', undefined, record);
   await assert.rejects(collect(pErr.generate('s', { messages: [] })), {
     message: 'hosted http 500',
   });

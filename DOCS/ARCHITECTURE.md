@@ -1967,12 +1967,17 @@ Entities:
   key and model are non-empty (no network call; failures surface on first
   generation). `generate(session, req, signal?)` POSTs
   `<baseUrl>/chat/completions` with headers
-  `{ Authorization: 'Bearer <key>', 'Content-Type': 'application/json', 'HTTP-Referer': 'https://sanctissimissa.surge.sh', 'X-Title': 'SanctissiMissa' }`
-  and body `{ model, messages, stream: true, max_tokens: req.maxTokens ?? 768, temperature: 0.7 }`,
+  `{ Authorization: 'Bearer <key>', 'Content-Type': 'application/json', 'HTTP-Referer': <appUrl>, 'X-Title': <appTitle> }`
+  — `<appTitle>`/`<appUrl>` are **build-time `.env` identity**
+  (`VITE_APP_NAME` / `VITE_APP_URL`, supplied by the host at construction;
+  the provider never bakes in one app's name or domain — the codebase
+  dual-builds sanctissimissa and helloword, so everything app-specific is
+  `.env`-configured at build time) — and body `{ model, messages, stream: true, max_tokens: req.maxTokens ?? 768, temperature: 0.7 }`,
   parses SSE `data:` lines and yields real provider token deltas; HTTP errors
-  throw with the status; an HTTP 404 for `model` retries exactly once with
-  `fallbackModel` when set and different; `AbortSignal` cancellation stops the
-  stream. `close()` is a no-op; `batchScore` throws unsupported.
+  throw with the status; an HTTP 404 for `model` retries exactly once with an
+  explicitly configured `fallbackModel` when set and different (capability,
+  not configuration — see the config clause); `AbortSignal` cancellation
+  stops the stream. `close()` is a no-op; `batchScore` throws unsupported.
 - **`resolveHostedEngine`** in `src/core/chat/resolve.ts` —
   `(key: string | undefined, onProgress?) => Promise<Resolution>`: key absent
   → `{ kind: 'unsupported', reason: companionFeedback.hostedKeyMissing }`;
@@ -1985,9 +1990,15 @@ Entities:
   selection of the hosted entry forces hosted. The engine chip reads `HOSTED`
   while the hosted engine is active.
 - **`config/companion-defaults.json`** gains exactly:
-  `"hostedProvider": { "kind": "openrouter", "baseUrl": "https://openrouter.ai/api/v1", "model": "qwen/qwen3.8-27b:free", "fallbackModel": "z-ai/glm-5.2:free", "modelLabel": "Qwen 3.8 27B" }`
-  (model ids verified live on the public OpenRouter catalog 2026-09-18;
-  `liquid/lfm-2.5-2.6b:free` is the lightweight alternate).
+  `"hostedProvider": { "kind": "openrouter", "baseUrl": "https://openrouter.ai/api/v1", "model": "qwen/qwen3.8-27b:free", "modelLabel": "Qwen 3.8 27B" }`
+  (model id verified live on the public OpenRouter catalog 2026-09-18).
+  **Fallback is a capability, not a configuration** (operator, 2026-09-18:
+  "only specify openrouter/free for hosted openrouter"; "do not use
+  fallbacks that can fail more than the default" — the shipped config sets
+  no `fallbackModel`; `z-ai/glm-5.2:free` was removed from it because it can
+  fail more than the openrouter/free primary. The provider keeps the
+  mechanism: a 404 retries exactly once with an explicitly configured
+  `fallbackModel`, never with a heavier-flakiness default).
 - **Picker** (`src/ui/ModelPicker.tsx`): the first choice is the hosted entry
   — id `hosted:openrouter`, display name `<modelLabel> · hosted (free)`, no
   download state, instantly preparable. Local entries (including the Qwen 3.5

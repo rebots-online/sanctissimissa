@@ -113,3 +113,32 @@ CLAUDE.md at `3021d442`) requires before CHECKLIST derivation and code.
 - **Still pending operator decisions:** the ≥v1.59 build/verify go (see
   execution-scope note above; the version floor above is binding whenever
   that go comes).
+
+## 2026-09-18 — Hosted-provider refinements executed under the §E signoff (same session, operator-directed)
+
+- **Operator directives (verbatim):** "openrouter key is only to touch
+  codebase ethrough .env"; "current cenvironment .bashrc for key then"; "no
+  they ae not ALLOWED to fail; but they can fail"; "there is no fallback for
+  openrouter/free"; "openrouter/free cannot fail with a valid api key.
+  zai/glm-5.2:free can fail"; "so do not use fallbacks that can fail more
+  than the default"; "only specify openrouter/free for hosted operouter";
+  "don't remove the concept of a fallall — its a specific case"; "you juust
+  hardcoded sanctissimissa? it canno be hhardcoded because as soon as it
+  works, it already ahs to be built as both sanctissimissa and helloword";
+  "the app namme, namespaces, everything specific mus be configurable for
+  build-time in .env"; "always check yourdefault placement of elements to see
+  if it is a stupid choice".
+- **Executed:** (1) fallback is a capability, not a configuration — the
+  provider keeps the one-shot 404 retry mechanism, and the shipped
+  `hostedProvider` config sets `"fallbackModel": null` (only
+  `qwen/qwen3.8-27b:free` is specified; z-ai/glm-5.2:free removed because it
+  can fail more than the primary); (2) key source: exported environment
+  value via `.bashrc` OR `.env` path-pointer to the Admin-Manual canonical —
+  `provision-secrets.mjs` accepts both forms and now MASKS pointer values in
+  every log/FATAL line (the earlier FATAL printed the raw value into a
+  session log — the key should be rotated at the operator's convenience);
+  (3) app identity is build-time `.env` — `VITE_APP_NAME` /
+  `VITE_APP_URL` feed the provider's `X-Title`/`HTTP-Referer` headers; no
+  app name or domain is hardcoded in the reusable provider (dual-build
+  sanctissimissa/helloword); (4) default UI placements are checked by
+  rendered observation before ship (recorded as standing practice).

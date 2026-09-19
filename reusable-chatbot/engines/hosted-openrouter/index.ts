@@ -24,6 +24,11 @@ export class HostedOpenRouterProvider implements IInferenceEngine {
   readonly apiKey: string;
   model: string;
   readonly fallbackModel: string | null;
+  /** Host app identity (build-time .env: VITE_APP_NAME / VITE_APP_URL) — the
+   * provider is host-agnostic and must never bake in one app's name or domain
+   * (operator directive 2026-09-18: dual-build sanctissimissa + helloword). */
+  readonly appTitle: string;
+  readonly appUrl: string;
   readonly onProgress?: (fraction: number, text: string) => void;
   readonly log?: (operation: string, detail: unknown) => void;
   private completionsUrl: string;
@@ -32,12 +37,16 @@ export class HostedOpenRouterProvider implements IInferenceEngine {
     apiKey: string,
     model: string,
     fallbackModel: string | null,
+    appTitle: string,
+    appUrl: string,
     onProgress?: (fraction: number, text: string) => void,
     log?: (operation: string, detail: unknown) => void,
   ) {
     this.apiKey = apiKey;
     this.model = model;
     this.fallbackModel = fallbackModel;
+    this.appTitle = appTitle;
+    this.appUrl = appUrl;
     this.onProgress = onProgress;
     this.log = log;
     this.completionsUrl = DEFAULT_COMPLETIONS_URL;
@@ -70,6 +79,10 @@ export class HostedOpenRouterProvider implements IInferenceEngine {
     try {
       if (signal?.aborted) return;
       let res = await this.postCompletion(this.model, req, signal);
+      // Fallback is a capability, not a default: a fallbackModel is retried
+      // exactly once on HTTP 404 only when one is explicitly configured —
+      // never a fallback that can fail more than the primary (operator,
+      // 2026-09-18). The shipped config sets none.
       if (
         !res.ok &&
         res.status === 404 &&
@@ -118,8 +131,8 @@ export class HostedOpenRouterProvider implements IInferenceEngine {
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://sanctissimissa.surge.sh',
-        'X-Title': 'SanctissiMissa',
+        'HTTP-Referer': this.appUrl,
+        'X-Title': this.appTitle,
       },
       body: JSON.stringify({
         model,
