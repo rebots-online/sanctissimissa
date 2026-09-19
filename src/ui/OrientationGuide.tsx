@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import defaults from '../../config/companion-defaults.json';
-import { GUIDE_CHANGED, GUIDE_STEPS, OPEN_COMPANION, START_GUIDE, activateGuide, clampGuidePos,
+import { COMPANION_LAYOUT, GUIDE_CHANGED, GUIDE_STEPS, OPEN_COMPANION, START_GUIDE, activateGuide, clampGuidePos,
   clearGuide, highlightGuide, readGuidePos, readGuideState, saveGuidePos, saveGuideState } from '../core/orientation/guide.ts';
 import type { GuidePos } from '../core/orientation/guide.ts';
-import { occupiedRects, resolveGuidePlacement } from '../core/orientation/layout.ts';
+import { compactDock, occupiedRects, resolveGuidePlacement } from '../core/orientation/layout.ts';
 
 const DRAG_THRESHOLD = 4;
 
@@ -50,14 +50,19 @@ export default function OrientationGuide() {
   }, []);
   useEffect(() => {
     const validatePlacement = () => {
+      const viewport = { w: window.innerWidth, h: window.innerHeight };
+      const occupied = occupiedRects(document);
       const size = cardSize();
-      const resolved = resolveGuidePlacement(
-        { w: window.innerWidth, h: window.innerHeight },
-        occupiedRects(document),
-        size,
-        readGuidePos(),
-      );
-      if (resolved === 'compact') { setCompact(true); return; }
+      const resolved = resolveGuidePlacement(viewport, occupied, size, readGuidePos());
+      if (resolved === 'compact') {
+        // §D: compact docks at the TOP of the largest free horizontal band —
+        // never at the obstructed position it was displaced from.
+        const dock = compactDock(viewport, occupied, { w: Math.min(size.w, 300), h: Math.min(size.h, 200) });
+        saveGuidePos(dock);
+        applyPos(dock);
+        setCompact(true);
+        return;
+      }
       setCompact(false);
       const current = posRef.current;
       if (current && current.left === resolved.left && current.top === resolved.top) return;
@@ -67,13 +72,13 @@ export default function OrientationGuide() {
     validatePlacement();
     window.addEventListener('resize', validatePlacement);
     window.addEventListener(START_GUIDE, validatePlacement);
-    window.addEventListener(OPEN_COMPANION, validatePlacement);
+    window.addEventListener(COMPANION_LAYOUT, validatePlacement);
     const observer = new ResizeObserver(validatePlacement);
     observer.observe(document.documentElement);
     return () => {
       window.removeEventListener('resize', validatePlacement);
       window.removeEventListener(START_GUIDE, validatePlacement);
-      window.removeEventListener(OPEN_COMPANION, validatePlacement);
+      window.removeEventListener(COMPANION_LAYOUT, validatePlacement);
       observer.disconnect();
     };
   }, [step]);

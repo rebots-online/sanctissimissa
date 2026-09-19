@@ -2,6 +2,10 @@ import { debugEvent } from '../diagnostics/store.ts';
 export const GUIDE_CHANGED = 'sanctissimissa:guide-changed';
 export const START_GUIDE = 'sanctissimissa:start-guide';
 export const OPEN_COMPANION = 'sanctissimissa:open-companion';
+/** Pure panel-layout announcement (§D): dispatched AFTER a panel open/close
+ * commits, so orientation placement validation can query the live DOM. Never
+ * a command — listeners must not toggle panel state. */
+export const COMPANION_LAYOUT = 'sanctissimissa:companion-layout';
 export const GUIDE_KEY = 'sanctissimissa.orientation.v1';
 export const GUIDE_STEPS = [
   { id: 'nav-map', label: 'Holy Mass', text: 'This opens the map of the Mass. Choose a stop on the line to read that part.' },

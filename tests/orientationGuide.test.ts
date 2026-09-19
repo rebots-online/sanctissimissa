@@ -39,7 +39,7 @@ test('OG.7: placement validation imports resolveGuidePlacement from the OG.6 lay
   assert.ok(effect.includes('validatePlacement();'), 'effect runs on mount');
   assert.ok(effect.includes("window.addEventListener('resize', validatePlacement)"), 'revalidates on window resize');
   assert.ok(effect.includes('START_GUIDE, validatePlacement'), 'revalidates on START_GUIDE');
-  assert.ok(effect.includes('OPEN_COMPANION, validatePlacement'), 'revalidates on OPEN_COMPANION');
+  assert.ok(effect.includes('COMPANION_LAYOUT, validatePlacement'), 'revalidates on COMPANION_LAYOUT (panel layout announcement)');
   assert.ok(effect.includes('new ResizeObserver(validatePlacement)'), 'ResizeObserver attached');
   assert.ok(effect.includes('observer.observe(document.documentElement)'), 'observing document.documentElement');
   assert.ok(effect.includes('observer.disconnect()'), 'observer disconnected on unmount');

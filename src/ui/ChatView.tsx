@@ -10,7 +10,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
-import { OPEN_COMPANION, guideContext, stripGuideCommands, applyGuideCommand } from '../core/orientation/guide.ts';
+import { COMPANION_LAYOUT, OPEN_COMPANION, guideContext, stripGuideCommands, applyGuideCommand } from '../core/orientation/guide.ts';
 import ChatBadge from './ChatBadge.tsx';
 import ModelPicker, { formatBytes, useCompanionModels } from './ModelPicker.tsx';
 import { ChatController } from '../../reusable-chatbot/core/chat-controller.ts';
@@ -240,6 +240,15 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
     window.addEventListener(OPEN_COMPANION, show);
     return () => window.removeEventListener(OPEN_COMPANION, show);
   }, []);
+  // Announce panel-layout changes AFTER the render commits: a fixed-position
+  // panel never resizes the document root (observers cannot see it), and
+  // announcing inside the click handler races React's commit — the
+  // orientation cards' placement validation queries .chat-panel on this
+  // event (§D). Fires on open AND close; `show` re-running on the echo is an
+  // idempotent setOpen(true).
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent(COMPANION_LAYOUT));
+  }, [open]);
   useEffect(() => {
     if (orientationPrompt && engineState === 'ready' && !streaming) {
       setOrientationPrompt(null);
@@ -368,13 +377,7 @@ export default function ChatView({ sidecar = null }: { sidecar?: SettingsStore |
     <>
       {/* Badge gets out of the way whenever the panel is open — the header ×
           closes and brings it back; fullscreen no longer needs a special case. */}
-      {!open && <ChatBadge open={open} onToggle={() => {
-        setOpen((o) => !o);
-        // Announce the panel-layout change: the fixed-position panel never
-        // resizes the document root, so observers cannot see it — the
-        // orientation cards re-validate placement on this event (§D).
-        window.dispatchEvent(new CustomEvent(OPEN_COMPANION));
-      }} />}
+      {!open && <ChatBadge open={open} onToggle={() => setOpen((o) => !o)} />}
       {open && (
         <section
           className={`chat-panel ${dock}`}

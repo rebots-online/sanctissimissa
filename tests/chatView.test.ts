@@ -122,9 +122,9 @@ test('HC/OG2: badge open announces OPEN_COMPANION so orientation cards re-valida
   // A fixed-position panel never resizes the document root, so ResizeObserver
   // cannot see it — panel-open MUST dispatch the event the placement
   // validation listens for (regression: the guide sat inside the docked panel).
-  const toggleAt = chatView.indexOf('onToggle=');
-  const dispatchAt = chatView.indexOf('dispatchEvent(new CustomEvent(OPEN_COMPANION))');
-  assert.ok(toggleAt !== -1 && dispatchAt !== -1 && dispatchAt > toggleAt, 'badge onToggle dispatches OPEN_COMPANION after opening');
+  const effectAt = chatView.indexOf('window.dispatchEvent(new CustomEvent(COMPANION_LAYOUT));');
+  const depsAt = effectAt === -1 ? -1 : chatView.indexOf('}, [open]);', effectAt);
+  assert.ok(effectAt !== -1 && depsAt !== -1, 'panel-layout changes announce COMPANION_LAYOUT (never a command) from a post-commit effect keyed on [open]');
 });
 
 test('CP.7/9: ChatView presents real engine states — no mock surface', () => {

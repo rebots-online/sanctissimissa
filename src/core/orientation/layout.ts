@@ -126,3 +126,51 @@ export function resolveGuidePlacement(
   }
   return 'compact';
 }
+
+/** Compact-mode dock (§D): when no anchor fits, the card docks at the TOP of
+ * the largest free horizontal band, 16 px into the band and below the 64 px
+ * header zone, clamped to the viewport. Only occupied rectangles that
+ * vertically overlap the dock row shape the x-bands — a full-width header
+ * strip pushes the dock below itself instead of destroying every band; a
+ * tall side strip (rail, docked panel) removes its own x-interval. Falls
+ * back to the viewport top-left when no band fits the card. */
+export function compactDock(
+  viewport: { w: number; h: number },
+  occupied: OccupiedRect[],
+  card: { w: number; h: number },
+): { left: number; top: number } {
+  const clampTop = Math.max(8, viewport.h - 16 - card.h);
+  if (clampTop < 64) return { left: 8, top: clampTop };
+  // Wide header strips (spanning >= 60% of the width at the top of the dock
+  // row) push the dock row beneath them.
+  let top = 64;
+  for (const r of occupied) {
+    const wide = r.width >= viewport.w * 0.6;
+    if (wide && r.top - ORIENTATION_GAP < top + card.h && r.top + r.height + ORIENTATION_GAP > top) {
+      top = Math.max(top, Math.round(r.top + r.height + ORIENTATION_GAP));
+    }
+  }
+  top = Math.min(top, clampTop);
+  const rowTop = top, rowBottom = top + card.h;
+  const bands: Array<[number, number]> = [[0, viewport.w]];
+  const blocks = occupied
+    .filter((r) => r.top + r.height > rowTop - ORIENTATION_GAP && r.top < rowBottom + ORIENTATION_GAP)
+    .map((r) => [r.left - ORIENTATION_GAP, r.left + r.width + ORIENTATION_GAP] as [number, number])
+    .sort((a, b) => a[0] - b[0]);
+  for (const [b0, b1] of blocks) {
+    const next: Array<[number, number]> = [];
+    for (const [s0, e0] of bands) {
+      if (b1 <= s0 || b0 >= e0) { next.push([s0, e0]); continue; }
+      if (s0 < b0) next.push([s0, b0]);
+      if (b1 < e0) next.push([b1, e0]);
+    }
+    bands.length = 0;
+    bands.push(...next);
+  }
+  let best: [number, number] | null = null;
+  for (const band of bands) {
+    if (band[1] - band[0] >= card.w + 16 && (!best || band[1] - band[0] > best[1] - best[0])) best = band;
+  }
+  if (best) return { left: Math.round(Math.max(8, best[0] + 16)), top: Math.round(top) };
+  return { left: 8, top: Math.round(top) };
+}
