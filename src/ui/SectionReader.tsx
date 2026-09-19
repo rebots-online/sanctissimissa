@@ -18,6 +18,8 @@
  *  - the phrase echo: an exact character range aligned via `alignPhrase`
  *  - the word flyout, placed by `placeFloatingCallout`
  *  - the selection context menu, its dismissal, and the annotate popover
+ *  - CL.5 (§H.1): the companion's `[[annotate:<nodeKey>]]` write-command —
+ *    a range-anchored annotation only against a live rendered anchor
  *
  * Hosts supply `sections` and optional chrome. They do not re-implement any of
  * the above; a view that does is a defect.
@@ -63,6 +65,26 @@ import {
   type DOMRectLike,
   type FloatingCalloutPlacement,
 } from '../core/ui/calloutPlacement.ts';
+import { debugEvent } from '../core/diagnostics/store.ts';
+import { registerCompanionSurfaceProps } from './MeaningPanel.tsx';
+
+/**
+ * §H.1/CL.5 — App (CL.2) re-dispatches the companion's `[[annotate:…]]`
+ * command as this window event with detail `{ kind, value, reply }`. The
+ * name follows the `sanctissimissa:*` event convention of guide.ts.
+ */
+const COMPANION_ANNOTATE = 'sanctissimissa:companion-annotate';
+
+/** The reply's cited phrase — the first quoted span, else ''. */
+function companionCitedPhrase(reply: string): string {
+  const m = reply.match(/[“"]([^“”"]{1,300})[”"]/);
+  return m ? m[1].trim() : '';
+}
+
+/** The reply's explanation excerpt for the note body (≤ 300 chars, §H.1). */
+function companionNoteExcerpt(reply: string): string {
+  return reply.replace(/\s+/g, ' ').trim().slice(0, 300);
+}
 
 /** Opening distance the menu keeps below/above the text it acts on. */
 const MENU_GAP = 48;
@@ -666,6 +688,56 @@ export default function SectionReader({
     }
     return { src };
   }, [db, sectionFor]);
+
+  /**
+   * CL.5 (§H.1) — the companion's `[[annotate:<nodeKey>]]` write-command
+   * lands here, on the annotation call surface. A range-anchored annotation
+   * is created ONLY when the node key matches a live rendered anchor (a
+   * `section[data-nodekey]` in this reader); the quote is the reply's cited
+   * phrase or the live selection; the note is the reply excerpt (≤ 300
+   * chars). This reader also lends its db/sidecar handles to the companion
+   * surface bridge so MeaningPanel/JournalSidecar can self-open (§H.1)
+   * against the same store instances — no synthetic routing, no re-opens.
+   */
+  useEffect(() => {
+    registerCompanionSurfaceProps({ db, sidecar: sidecar ?? null });
+    const onCompanionAnnotate = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { kind?: string; value?: string; reply?: string } | null;
+      const nodeKey = String(detail?.value ?? '').trim();
+      const reply = String(detail?.reply ?? '');
+      const attr = nodeKey.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+      const live = nodeKey ? root.current?.querySelector(`section[data-nodekey="${attr}"]`) ?? null : null;
+      if (!nodeKey || !live) {
+        debugEvent('companion', 'command.rejected', { surface: 'annotate', reason: 'anchor-not-live', nodeKey }, 'warn');
+        return;
+      }
+      const cited = companionCitedPhrase(reply);
+      const selection = window.getSelection()?.toString().trim() ?? '';
+      const quote = (cited || selection).slice(0, 300);
+      if (!quote) {
+        debugEvent('companion', 'command.rejected', { surface: 'annotate', reason: 'no-quote', nodeKey }, 'warn');
+        return;
+      }
+      const range = resolveSelectionRange() ?? undefined;
+      const src = sectionFor(nodeKey);
+      const quoteAlt = src
+        ? alignSelection({ latin: src.latin, english: src.english }, quote)?.dstLine ?? undefined
+        : undefined;
+      addAnnotation({
+        nodeKey,
+        quote,
+        quoteAlt,
+        range: range?.src,
+        rangeAlt: range?.alt,
+        note: companionNoteExcerpt(reply),
+        color: 'gold',
+      });
+      setAnnVersion((v) => v + 1);
+      debugEvent('companion', 'annotate.created', { nodeKey, quoteChars: quote.length, ranged: Boolean(range?.src) }, 'info');
+    };
+    window.addEventListener(COMPANION_ANNOTATE, onCompanionAnnotate);
+    return () => window.removeEventListener(COMPANION_ANNOTATE, onCompanionAnnotate);
+  }, [db, sidecar, root, resolveSelectionRange, sectionFor]);
 
   const openMenuAt = (
     clientX: number,

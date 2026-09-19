@@ -7,9 +7,15 @@
  * resolved liturgical day via `matchesSelector`; resolveDay runs once per
  * visible cell, memoized per month. Priest/laity vocabulary from settings
  * `mode` ('priest' default → "Homily", laity → "Reflection").
+ *
+ * CL.5 (§H.1): this is the surface that OPENS a homily draft, so it consumes
+ * the companion's `[[homily-draft:<litKey>]]` write-command (re-dispatched by
+ * App/CL.2 as the COMPANION_DRAFT window event). The reply is staged as an
+ * insertable `generated`-provenance block behind an explicit Insert button —
+ * the companion never silently mutates an authored draft (§7.6 curation rule).
  */
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { resolveDay } from '../core/data/liturgicalDay.ts';
 import { matchesSelector } from '../core/accompaniment/resolve.ts';
 import type { DayProjection } from '../core/accompaniment/resolve.ts';
@@ -17,13 +23,49 @@ import type { CorpusDb } from '../core/data/corpusDb.ts';
 import type { SidecarDb } from '../core/accompaniment/store.ts';
 import type { Accompaniment } from '../core/accompaniment/types.ts';
 import type { DayInfo } from '../core/data/types.ts';
+import { debugEvent } from '../core/diagnostics/store.ts';
 import AccompanimentEditor from './AccompanimentEditor.tsx';
+import type { AccompanimentEditorApi } from './AccompanimentEditor.tsx';
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+/**
+ * §H.1/CL.5 — App (CL.2) re-dispatches the companion's `[[homily-draft:…]]`
+ * command as this window event with detail `{ kind, value, reply }`. The name
+ * follows the `sanctissimissa:*` event convention of core/orientation/guide.ts
+ * (GUIDE_CHANGED / START_GUIDE / OPEN_COMPANION / COMPANION_ACT).
+ */
+const COMPANION_DRAFT = 'sanctissimissa:companion-draft';
+
+/** The homily draft whose occurrence selectors name this liturgical key. */
+export function matchHomilyDraft(homilies: Accompaniment[], litKey: string): Accompaniment | null {
+  const key = litKey.trim();
+  if (!key) return null;
+  return homilies.find((a) => a.selectors.some((s) => s.value === key)) ?? null;
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/**
+ * The §H.1 insertable block: the reply's text carrying its `generated`
+ * provenance marker, so an inserted suggestion is always distinguishable from
+ * authored text inside `body_html`.
+ */
+export function companionGeneratedBlock(reply: string): string {
+  const text = reply.replace(/\s+/g, ' ').trim().slice(0, 2000);
+  return (
+    `<blockquote class="companion-generated" data-provenance="generated">` +
+    `<p>${escapeHtml(text)}</p>` +
+    `<p class="companion-marker">— Companion suggestion (provenance: generated)</p>` +
+    `</blockquote>`
+  );
+}
 
 function projectionOf(info: DayInfo): DayProjection {
   return { date: info.date, weekKey: info.weekKey, season: info.season, winner: info.winner };
@@ -50,6 +92,9 @@ export default function HomilyPlanner({ db, sidecar, day }: Props) {
   const [newOpen, setNewOpen] = useState(false);
   const [tick, setTick] = useState(0);
   const bump = () => setTick((t) => t + 1);
+  /** CL.5 — the staged companion suggestion awaiting an explicit Insert. */
+  const [staged, setStaged] = useState<{ litKey: string; reply: string; accId: string } | null>(null);
+  const homilyApiRef = useRef<AccompanimentEditorApi | null>(null);
 
   const mode = sidecar.getSetting('mode') ?? 'priest';
   const noun = mode === 'laity' ? 'Reflection' : 'Homily';
@@ -85,6 +130,47 @@ export default function HomilyPlanner({ db, sidecar, day }: Props) {
     return { iso, info, matches: homilies.filter((a) => a.selectors.some((s) => matchesSelector(s, proj))) };
   }, [db, homilies]);
 
+  /**
+   * CL.5 (§H.1) — `[[homily-draft:<litKey>]]`: open the draft for that
+   * liturgical key in the editor, with the reply staged (never written).
+   * An unknown key is recorded and never faked into a new draft.
+   */
+  useEffect(() => {
+    const onCompanionDraft = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { kind?: string; value?: string; reply?: string } | null;
+      const litKey = String(detail?.value ?? '').trim();
+      const reply = String(detail?.reply ?? '');
+      if (!litKey) {
+        debugEvent('companion', 'command.rejected', { surface: 'homily-draft', reason: 'missing-litKey' }, 'warn');
+        return;
+      }
+      const match = matchHomilyDraft(homilies, litKey);
+      if (!match) {
+        debugEvent('companion', 'command.rejected', { surface: 'homily-draft', reason: 'no-draft', litKey }, 'warn');
+        return;
+      }
+      setNewOpen(false);
+      setEditId(match.id);
+      setStaged({ litKey, reply, accId: match.id });
+      debugEvent('companion', 'homily.staged', { litKey, accId: match.id, replyChars: reply.length }, 'info');
+    };
+    window.addEventListener(COMPANION_DRAFT, onCompanionDraft);
+    return () => window.removeEventListener(COMPANION_DRAFT, onCompanionDraft);
+  }, [homilies]);
+
+  /** CL.5 — the explicit Insert: append the marked block into `body_html`. */
+  function insertStaged() {
+    if (!staged) return;
+    const api = homilyApiRef.current;
+    if (!api) {
+      debugEvent('companion', 'command.rejected', { surface: 'homily-draft', reason: 'editor-not-ready', litKey: staged.litKey }, 'warn');
+      return;
+    }
+    void api.insertSource(companionGeneratedBlock(staged.reply));
+    debugEvent('companion', 'homily.inserted', { litKey: staged.litKey, accId: staged.accId }, 'info');
+    setStaged(null);
+  }
+
   function shift(delta: number) {
     let [yy, mm] = ym;
     mm += delta;
@@ -94,6 +180,7 @@ export default function HomilyPlanner({ db, sidecar, day }: Props) {
     setSelectedIso(null);
     setNewOpen(false);
     setEditId(null);
+    setStaged(null);
   }
 
   const selected = selectedIso ? (cells.find((c) => c?.iso === selectedIso) ?? null) : null;
@@ -229,13 +316,43 @@ export default function HomilyPlanner({ db, sidecar, day }: Props) {
       )}
 
       {editing && (
-        <AccompanimentEditor
-          key={editing.id}
-          sidecar={sidecar}
-          acc={editing}
-          onSaved={bump}
-          onClose={() => setEditId(null)}
-        />
+        <>
+          {staged && staged.accId === editing.id && (
+            <section className="jsc-related" aria-label="Companion draft suggestion" data-companion-stage={staged.litKey}>
+              <div className="group-title">Companion suggestion — staged, not saved</div>
+              <div className="jsc-source">
+                <blockquote data-provenance="generated" style={{ margin: '6px 0 0' }}>
+                  “{staged.reply.replace(/\s+/g, ' ').trim().slice(0, 600)}{staged.reply.length > 600 ? '…' : ''}”
+                </blockquote>
+                <div className="jsc-toolbar">
+                  <button type="button" className="primary" onClick={insertStaged}>
+                    Insert
+                  </button>
+                  <button type="button" onClick={() => setStaged(null)}>
+                    Dismiss
+                  </button>
+                </div>
+                <div className="jsc-why">
+                  Inserting appends this reply into the draft marked provenance “generated” — nothing is written before you press Insert.
+                </div>
+              </div>
+            </section>
+          )}
+          <AccompanimentEditor
+            key={editing.id}
+            sidecar={sidecar}
+            acc={editing}
+            onSaved={bump}
+            onReady={(api) => {
+              homilyApiRef.current = api;
+            }}
+            onClose={() => {
+              setEditId(null);
+              setStaged(null);
+              homilyApiRef.current = null;
+            }}
+          />
+        </>
       )}
     </div>
   );

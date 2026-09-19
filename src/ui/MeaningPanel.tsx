@@ -4,10 +4,21 @@
  * grouped by liturgical concept (e.g. Doxology) instead of flat lists.
  * The fine-tuned ecclesiastical LLM slot ships in the next major; until
  * then no generated commentary is fabricated.
+ *
+ * CL.5 (§H.1): the companion's `[[concordance:<term>]]` write-command
+ * (re-dispatched by App/CL.2 as the COMPANION_SEARCH window event, kind
+ * 'concordance') runs the existing search for the term and opens the results
+ * here — in-place when the panel is mounted, and otherwise as a self-opened
+ * overlay fed by the companion surface bridge (live readers register their
+ * db/sidecar handles so the panel can open without synthetic routing).
  */
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import type { Root } from 'react-dom/client';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
+import type { SidecarDb } from '../core/accompaniment/store.ts';
+import type { DayInfo } from '../core/data/types.ts';
+import { debugEvent } from '../core/diagnostics/store.ts';
 import type { SelectionAction } from './ReaderView.tsx';
 import type {
   ConcordanceHit,
@@ -20,6 +31,109 @@ import { buildBilingualResult } from '../core/text/bilingualResult.ts';
 import { organizeResultsByCanon, type ResultGroupingMode } from '../core/text/resultHierarchy.ts';
 import { ResultSnippet } from './ResultSnippet.tsx';
 import SimilarityGlyph from './SimilarityGlyph.tsx';
+
+/* ------------------------------------------------------------------ */
+/* CL.5 companion surface bridge (§H.1)                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * §H.1/CL.5 — App (CL.2) re-dispatches the companion's `[[concordance:…]]` /
+ * `[[journal:…]]` commands as this window event with detail
+ * `{ kind, value, reply }`. The name follows the `sanctissimissa:*` event
+ * convention of core/orientation/guide.ts.
+ */
+export const COMPANION_SEARCH = 'sanctissimissa:companion-search';
+
+/** Safe read of a COMPANION_* event detail (missing fields read as ''). */
+export function readCompanionDetail(e: Event): { kind: string; value: string; reply: string } {
+  const d = (e as CustomEvent).detail as Record<string, unknown> | null | undefined;
+  if (!d || typeof d !== 'object') return { kind: '', value: '', reply: '' };
+  return { kind: String(d.kind ?? ''), value: String(d.value ?? ''), reply: String(d.reply ?? '') };
+}
+
+/**
+ * A live mounted surface (SectionReader / this panel / JournalSidecar) lends
+ * the bridge its handles, so a companion-opened overlay renders against the
+ * SAME CorpusDb/SidecarDb instances the app already uses — never second
+ * openings of the stores.
+ */
+export interface CompanionSurfaceProps {
+  db: CorpusDb;
+  sidecar: SidecarDb | null;
+  day?: DayInfo | null;
+}
+
+let companionSurfaceProps: CompanionSurfaceProps | null = null;
+
+export function registerCompanionSurfaceProps(props: CompanionSurfaceProps): void {
+  companionSurfaceProps = props;
+}
+
+export function companionBridgeProps(): CompanionSurfaceProps | null {
+  return companionSurfaceProps;
+}
+
+/** Mounted MeaningPanel instances; > 0 means the module listener stands down. */
+let meaningPanelMounted = 0;
+
+/** The self-opened overlay host (created only while no App instance shows). */
+let meaningOverlayHost: HTMLDivElement | null = null;
+let meaningOverlayRoot: Root | null = null;
+
+async function openMeaningOverlay(props: CompanionSurfaceProps, term: string): Promise<void> {
+  const { createRoot } = await import('react-dom/client');
+  if (!meaningOverlayHost || !meaningOverlayRoot) {
+    meaningOverlayHost = document.createElement('div');
+    Object.assign(meaningOverlayHost.style, {
+      position: 'fixed',
+      top: '0',
+      right: '0',
+      height: '100dvh',
+      width: 'min(440px, 100vw)',
+      zIndex: '60',
+      overflowY: 'auto',
+      background: 'var(--bg, #f7f2e7)',
+    });
+    document.body.appendChild(meaningOverlayHost);
+    meaningOverlayRoot = createRoot(meaningOverlayHost);
+  }
+  const close = () => {
+    meaningOverlayRoot?.unmount();
+    meaningOverlayHost?.remove();
+    meaningOverlayRoot = null;
+    meaningOverlayHost = null;
+  };
+  meaningOverlayRoot.render(
+    <MeaningPanel
+      db={props.db}
+      action={{ kind: 'meaning', term, nodeKey: null }}
+      onClose={close}
+      onOpenKey={() => {
+        /* overlay results are read-only; reader routing stays with the app */
+      }}
+    />,
+  );
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener(COMPANION_SEARCH, (e: Event) => {
+    const detail = readCompanionDetail(e);
+    if (detail.kind !== 'concordance') return; // 'journal' belongs to JournalSidecar
+    const term = detail.value.trim();
+    if (!term) {
+      debugEvent('companion', 'command.rejected', { surface: 'concordance', reason: 'bad-term' }, 'warn');
+      return;
+    }
+    if (meaningPanelMounted > 0) return; // the live panel instance handles it
+    const props = companionBridgeProps();
+    if (!props) {
+      debugEvent('companion', 'command.rejected', { surface: 'concordance', reason: 'no-corpus' }, 'warn');
+      return;
+    }
+    debugEvent('companion', 'concordance.opened', { term, via: 'overlay' }, 'info');
+    void openMeaningOverlay(props, term.slice(0, 300));
+  });
+}
 
 interface Props {
   db: CorpusDb;
@@ -463,12 +577,49 @@ function CanonicalResultTree({
 }
 
 export default function MeaningPanel({ db, action, onClose, onOpenKey }: Props) {
-  const { kind, term, nodeKey } = action;
   const [groupingMode, setGroupingMode] = useState<ResultGroupingMode>('themes');
+  /**
+   * CL.5 — a companion `[[concordance:<term>]]` overrides the action the
+   * panel was opened with, so the mounted panel repopulates with the term's
+   * existing search (concepts + concordance + nucleated similarity below).
+   */
+  const [companionAction, setCompanionAction] = useState<SelectionAction | null>(null);
+
+  useEffect(() => {
+    meaningPanelMounted++;
+    const onCompanionSearch = (e: Event) => {
+      const detail = readCompanionDetail(e);
+      if (detail.kind !== 'concordance') return;
+      const term = detail.value.trim();
+      if (!term) {
+        debugEvent('companion', 'command.rejected', { surface: 'concordance', reason: 'bad-term' }, 'warn');
+        return;
+      }
+      setCompanionAction({ kind: 'meaning', term: term.slice(0, 300), nodeKey: null });
+      debugEvent('companion', 'concordance.opened', { term, via: 'panel' }, 'info');
+    };
+    window.addEventListener(COMPANION_SEARCH, onCompanionSearch);
+    return () => {
+      meaningPanelMounted--;
+      window.removeEventListener(COMPANION_SEARCH, onCompanionSearch);
+    };
+  }, []);
+
+  const active = companionAction ?? action;
+  const { kind, term, nodeKey } = active;
 
   return (
     <aside className="exegesis">
-      <button className="close" onClick={onClose} title="Close panel">✕</button>
+      <button
+        className="close"
+        onClick={() => {
+          setCompanionAction(null);
+          onClose();
+        }}
+        title="Close panel"
+      >
+        ✕
+      </button>
 
       {kind === 'meaning' && (
         <>

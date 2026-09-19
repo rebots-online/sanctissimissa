@@ -7,17 +7,102 @@
  * Every rendered text is a corpus row, a sidecar row, or UI chrome. The
  * why-bridge lines name only corpus facts — the concept grouping, the
  * source, the COMMENTS_ON edge — never fabricated theological claims.
+ *
+ * CL.5 (§H.1): the companion's `[[journal:<term>]]` write-command
+ * (re-dispatched by App/CL.2 as the COMPANION_SEARCH window event, kind
+ * 'journal') routes the same concordance/nucleated search for the term into
+ * this sidecar as capture-ready sources — each connection card keeps its
+ * "Add as source" insert into the entry through the existing capture
+ * machinery. When no sidecar is mounted, the companion surface bridge
+ * (MeaningPanel.tsx) lets one self-open as an overlay.
  */
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import type { Root } from 'react-dom/client';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 import type { SidecarDb } from '../core/accompaniment/store.ts';
 import type { DayInfo, SimilarHit } from '../core/data/types.ts';
+import { debugEvent } from '../core/diagnostics/store.ts';
 import { embedText } from '../core/vector/embed.ts';
 import { bestClause } from '../core/vector/clause.ts';
 import AccompanimentEditor from './AccompanimentEditor.tsx';
 import type { AccompanimentEditorApi } from './AccompanimentEditor.tsx';
+import {
+  COMPANION_SEARCH,
+  companionBridgeProps,
+  readCompanionDetail,
+  type CompanionSurfaceProps,
+} from './MeaningPanel.tsx';
+
+/* ------------------------------------------------------------------ */
+/* CL.5 companion journal surface (§H.1)                               */
+/* ------------------------------------------------------------------ */
+
+/** Mounted JournalSidecar instances; > 0 means the module listener stands down. */
+let journalSidecarMounted = 0;
+
+/** The self-opened overlay host (created only while no App instance shows). */
+let journalOverlayHost: HTMLDivElement | null = null;
+let journalOverlayRoot: Root | null = null;
+
+async function openJournalOverlay(props: CompanionSurfaceProps, term: string, reply: string): Promise<void> {
+  const { createRoot } = await import('react-dom/client');
+  if (!journalOverlayHost || !journalOverlayRoot) {
+    journalOverlayHost = document.createElement('div');
+    Object.assign(journalOverlayHost.style, {
+      position: 'fixed',
+      top: '0',
+      right: '0',
+      height: '100dvh',
+      width: 'min(440px, 100vw)',
+      zIndex: '60',
+      overflowY: 'auto',
+      background: 'var(--bg, #f7f2e7)',
+    });
+    document.body.appendChild(journalOverlayHost);
+    journalOverlayRoot = createRoot(journalOverlayHost);
+  }
+  const close = () => {
+    journalOverlayRoot?.unmount();
+    journalOverlayHost?.remove();
+    journalOverlayRoot = null;
+    journalOverlayHost = null;
+  };
+  journalOverlayRoot.render(
+    <JournalSidecar
+      db={props.db}
+      sidecar={props.sidecar!}
+      capture={{ quote: term, quoteAlt: null, anchor: null }}
+      day={props.day ?? null}
+      companionSearch={{ term, reply }}
+      onClose={close}
+      onOpenKey={() => {
+        /* overlay sources are capture-ready in place; routing stays with the app */
+      }}
+    />,
+  );
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener(COMPANION_SEARCH, (e: Event) => {
+    const detail = readCompanionDetail(e);
+    if (detail.kind !== 'journal') return; // 'concordance' belongs to MeaningPanel
+    const term = detail.value.trim();
+    if (!term) {
+      debugEvent('companion', 'command.rejected', { surface: 'journal', reason: 'bad-term' }, 'warn');
+      return;
+    }
+    if (journalSidecarMounted > 0) return; // the mounted sidecar instance handles it
+    const props = companionBridgeProps();
+    if (!props?.db || !props.sidecar) {
+      debugEvent('companion', 'command.rejected', { surface: 'journal', reason: 'no-store' }, 'warn');
+      return;
+    }
+    debugEvent('companion', 'journal.opened', { term, via: 'overlay' }, 'info');
+    void openJournalOverlay(props, term.slice(0, 300), detail.reply);
+  });
+}
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
@@ -293,6 +378,7 @@ export default function JournalSidecar({
   sidecar,
   capture,
   day,
+  companionSearch = null,
   onClose,
   onOpenKey,
 }: {
@@ -300,6 +386,8 @@ export default function JournalSidecar({
   sidecar: SidecarDb;
   capture: { quote: string; quoteAlt?: string | null; anchor: string | null };
   day: DayInfo | null;
+  /** CL.5 — seed the companion source list (the overlay path passes this). */
+  companionSearch?: { term: string; reply: string } | null;
   onClose: () => void;
   onOpenKey: (k: string) => void;
 }) {
@@ -311,6 +399,31 @@ export default function JournalSidecar({
   const [schedValue, setSchedValue] = useState('');
   const [toast, setToast] = useState<{ msg: string; key: number } | null>(null);
   const toastTimer = useRef<number | null>(null);
+  /**
+   * CL.5 — the companion's `[[journal:<term>]]` term routed here by the
+   * module listener; its search results render as capture-ready sources.
+   */
+  const [companionSource, setCompanionSource] = useState<{ term: string; reply: string } | null>(companionSearch);
+
+  useEffect(() => {
+    journalSidecarMounted++;
+    const onCompanionSearch = (e: Event) => {
+      const detail = readCompanionDetail(e);
+      if (detail.kind !== 'journal') return;
+      const term = detail.value.trim();
+      if (!term) {
+        debugEvent('companion', 'command.rejected', { surface: 'journal', reason: 'bad-term' }, 'warn');
+        return;
+      }
+      setCompanionSource({ term: term.slice(0, 300), reply: detail.reply });
+      debugEvent('companion', 'journal.opened', { term, via: 'sidecar' }, 'info');
+    };
+    window.addEventListener(COMPANION_SEARCH, onCompanionSearch);
+    return () => {
+      journalSidecarMounted--;
+      window.removeEventListener(COMPANION_SEARCH, onCompanionSearch);
+    };
+  }, []);
 
   const mode = sidecar.getSetting('mode') ?? 'priest';
   const seedLabel = mode === 'laity' ? 'Promote to reflection seed' : 'Promote to homily seed';
@@ -394,10 +507,21 @@ export default function JournalSidecar({
         onClose={onClose}
       />
 
+      {companionSource && (
+        <div className="jsc-source" data-companion-journal={companionSource.term}>
+          <div style={{ fontStyle: 'normal', fontSize: 11, letterSpacing: '0.04em' }}>
+            COMPANION SOURCES · “{companionSource.term}”
+          </div>
+          <div className="jsc-why" style={{ margin: '4px 0 0' }}>
+            The search results below are capture-ready: “Add as source” inserts each one into this entry with its citation.
+          </div>
+        </div>
+      )}
+
       <ConnectionsPanel
         db={db}
         sidecar={sidecar}
-        text={capture.quote}
+        text={companionSource?.term ?? capture.quote}
         anchor={capture.anchor}
         excludeId={savedId}
         getText={() => apiRef.current?.getText() ?? ''}
