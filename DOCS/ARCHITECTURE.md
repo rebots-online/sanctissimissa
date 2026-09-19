@@ -2223,3 +2223,15 @@ streaming-safe (idempotent parse of the accumulated text; partial syntax at
 the tail renders literally until completed). ChatView renders assistant turns
 through `ChatMarkdown`; authored UI strings and user turns remain plain.
 CHECKLIST task CL.6 derives 1:1.
+
+**H.3 amendment (operator, 2026-09-19): "highlight on DOM, mke button wave/tilt
+and colour contrast it, etc."** — the attention language is two-sided. Besides
+the veil+halo, the highlighted target ITSELF reacts: an interactive
+`.orientation-target` gains (a) a gentle **wave/tilt** — rotate ±2.5° with a
+1 px bob, 0.9 s, two iterations, `prefers-reduced-motion` → no transform
+(colour only); and (b) a **high-contrast flip** — its surface elevates to
+`--card`, a 2 px `--gold` border, ink darkened — unmistakable against the
+dimmed surroundings. The same treatment (shared classes
+`.orientation-target`, `.orientation-showing`) drives tour steps, Show me
+pulses, and §H.4 show-path steps: one attention grammar everywhere the
+Companion points. OG.9's contract extends to these rules.

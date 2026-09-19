@@ -2705,7 +2705,7 @@ Self-contained. Files: `src/core/chat/models.ts` (+ its test).
 
 - [ ] **OG.9 — Tour spotlight: dim veil + halo cutout (§H.3).**
   Self-contained. Files: `src/ui/OrientationGuide.tsx`, `src/styles.css` (append-only orientation block), `tests/orientationSpotlight.test.ts` (new).
-  - **Do:** while a tour step holds a highlighted target, render `tour-spotlight`: fixed translucent veil (max 50% dim; Mass visible), transparent cutout hugging the live `.orientation-target` rect +8 px, soft `--gold` halo ring, whole overlay `pointer-events: none`; cutout recomputes on resize/scroll/§D triggers; reduced-motion → static ring; veil `aria-hidden`. CSS: `.tour-spotlight`, `.tour-spotlight-cutout`, `.tour-spotlight-halo`.
+  - **Do:** while a tour step holds a highlighted target, render `tour-spotlight`: fixed translucent veil (max 50% dim; Mass visible), transparent cutout hugging the live `.orientation-target` rect +8 px, soft `--gold` halo ring, whole overlay `pointer-events: none`; cutout recomputes on resize/scroll/§D triggers; reduced-motion → static ring; veil `aria-hidden`. CSS: `.tour-spotlight`, `.tour-spotlight-cutout`, `.tour-spotlight-halo`. **Target-side attention (§H.3 amendment):** an interactive `.orientation-target` additionally waves/tilts (rotate ±2.5° + 1 px bob, 0.9 s, 2 iterations; reduced-motion → transform none) and flips to high contrast (surface `--card`, 2 px `--gold` border, darkened ink) — one shared grammar for tour steps, Show me pulses, and show-path steps.
   - **Verify/Accept:** focused test exits 0; rendered — dim ≤50%, haloed target visible and clickable, Mass visible through veil, no spotlight without a target.
 
 - [ ] **OG.10 — Didactic path walkthrough: the active ribbon (§H.4).**
