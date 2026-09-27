@@ -1,0 +1,184 @@
+{
+  "project": "sanctissimissa",
+  "proposal_id": "SM-LG-20260927",
+  "version": "0.1",
+  "created": "2026-09-27",
+  "updated": "2026-09-27",
+  "owner": "Robin",
+  "author": "Codex",
+  "author_role": "architect-and-orchestrator",
+  "host": "asrock",
+  "source_task": "01a0e26e-5e4f-7ae1-9c3b-d58659d466a0",
+  "canonical_repository": "https://github.com/rebots-online/sanctissimissa",
+  "canonical_checkout": "/home/robin/Desktop/devProjects/sanctissimissa",
+  "source_commit": "040ff05b1eab8ae7ca4202784abfdffecbd6e0d4",
+  "source_architecture_sha256": "14d9eb741fe5c10c0fc0674b19ce2baa90f6ac5964982c08e6ae7760be826dbf",
+  "source_checklist_sha256": "f946430a5f973e32dac03e47c6e8a85606a4f63b11a0f127b685f82e417fb50c",
+  "status": "proposed-for-discussion",
+  "operator_signoff": "pending",
+  "implementation_authorized": false,
+  "executor": "ACP / GLM via zclaude-acp; zcode only after equivalent adapter qualification",
+  "reviewer": "Codex architect/orchestrator",
+  "archival": "KStore / PostgreSQL exact revisions; Qdrant asynchronous index",
+  "lab": "/home/robin/Admin-Manual/LOGS/EXPERIMENTS/acp-sdlc-20260927/LAB.md",
+  "header_provenance": "Comprehensive proposal fields; exact Natally/JSONIC template not found in 21927-point Qdrant scan or targeted PostgreSQL retrieval; do not claim template equivalence",
+  "preservation": "Includes current working architecture including pending orientation changes; source files remain unchanged",
+  "proposal_architecture_sha256": "9da1348eedefe84e6b2a999716e996aa47d7252028532e0b9b1922bd827c48d2",
+  "proposal_checklist_sha256": "cb75f98b7fb0fb016fa485c7198d51ba770cceae83c4873a80e7d0ef3bc96276",
+  "tasks": [
+    {
+      "id": "LG.01",
+      "title": "Durable sidecar persistence",
+      "files": [
+        "src-tauri/src/lib.rs",
+        "src-tauri/src/sidecar_store.rs",
+        "src/core/accompaniment/store.ts",
+        "tests/sidecarDurability.test.ts"
+      ],
+      "entities": [
+        "SidecarDb.persist",
+        "SidecarDb.importBytes",
+        "SidecarDb.persistenceState",
+        "load_sidecar",
+        "save_sidecar",
+        "SidecarReadError",
+        "SidecarWriteError",
+        "write_sidecar_snapshot",
+        "replace_sidecar_file",
+        "SidecarDb.open",
+        "sidecarOpenPromise"
+      ],
+      "do": "Keep the existing sidecar location, IPC command names and SQLite schema. Extract native file operations into sidecar_store.rs and route lib.rs commands through it. load_sidecar returns Result<Option<Vec<u8>>, SidecarReadError>: only io::ErrorKind::NotFound permits current-to-legacy fallback, and only absence at both paths returns None. Permission, directory-as-file, invalid bytes and other I/O failures propagate; never initialize a new empty database after a failed read. SQL parsing remains in SidecarDb.open and must fail visibly without overwriting unreadable data.\n\nSidecarDb.persist(): Promise<void> copies db.export() synchronously at invocation, assigns a monotonic revision, and enqueues that immutable byte snapshot behind the per-instance tail. One rejected write rejects its own caller but is caught on the scheduling tail so later explicit saves can run. Each call resolves only when its own snapshot is committed; no older completion can clear a newer pending/failed revision. persistenceState is {requestedRevision:number,durableRevision:number,status:'idle'|'saving'|'saved'|'failed',error:string|null}; saved requires requestedRevision===durableRevision. It is in-process metadata, not a schema migration. idbPut resolves only on transaction complete; retain that existing behavior. importBytes validates the candidate without replacing the current handle, queues its bytes on the same serialization lane, and swaps the live handle only after successful persistence; ordinary mutations are suspended during import and reported as an import-in-progress error, not silently lost. After a failed import, retain the old handle and database.\n\nNative writes take a process-wide mutex covering staging, flush, replacement and final durability acknowledgment. The supported sidecar has one app writer process; multi-process merge/synchronization is outside this change. Use a unique sibling sidecar.db.staging.<pid>.<counter> opened with create_new. write_all then sync_all before replacement. On Unix rename in the same directory, then open and sync_all the parent directory. On Windows call MoveFileExW with MOVEFILE_REPLACE_EXISTING|MOVEFILE_WRITE_THROUGH (UTF-16 NUL-terminated paths; kernel32 FFI inside cfg(windows)); no delete-then-rename fallback. Native error fields are {stage:'read'|'create'|'write'|'flush'|'replace'|'sync-directory',message:string,commitState:'not-committed'|'unknown'}. Read errors use {stage:'read',message:string}. Failures before replacement leave the live snapshot byte-identical. A post-replacement directory-sync failure returns unknown commit state, not a false rollback claim; next load accepts a valid old or new complete snapshot. Staging files are never promoted by load; retain failed staging for diagnosis and do not delete unrelated files. Lost power guarantees remain limited by the underlying filesystem/storage, and platform qualification is recorded separately.\n\nTests exercise A/B overlapping saves, failure then retry, IndexedDB transaction abort, import ordering, missing versus denied native read, failure injection before and after replacement, complete old/new reopen and no partial live bytes. Rust unit tests live in sidecar_store.rs and use isolated target/test-data directories. No new runtime dependency is required.\n\nReview clarification: native load returns unvalidated bytes; invalid SQLite bytes are a distinct SidecarDb.open validation failure, not an io::ErrorKind. Native and IndexedDB are mutually exclusive platform backends: exactly one backend commits per persist call, and the same JS serialization lane awaits either native durable acknowledgment or IndexedDB transaction completion. An unknown native commit outcome rejects that call, leaves durableRevision unchanged and sets failed; a later successful full-snapshot durable write establishes saved. Every explicit retry receives a new monotonic requestedRevision; only successful durable completion advances durableRevision to that retry revision. A readback alone cannot prove a missing disk flush succeeded. Reads during import continue on the old handle until swap; pre-import queued snapshots drain before the import snapshot. New ordinary mutations and explicit persist calls during import reject with import-in-progress. SidecarDb.open shares a module-scoped sidecarOpenPromise for the active storage target; rejected initialization clears it, successful opens reuse one live handle. Production callers use this factory; direct constructor use is restricted to independent test fixtures. Add tests proving simultaneous opens share a handle and failed initialization can retry.",
+      "verify": "node --experimental-strip-types --test tests/sidecarDurability.test.ts\ncargo test --manifest-path src-tauri/Cargo.toml --no-default-features sidecar_store",
+      "accept": "Both commands exit 0; committed regression cases assert serialization, failed-read preservation, complete snapshots and truthful acknowledgments.",
+      "deps": "none"
+    },
+    {
+      "id": "LG.02",
+      "title": "Compare every computed model digest",
+      "files": [
+        "src-tauri/src/model_store.rs"
+      ],
+      "entities": [
+        "model_lookup",
+        "file_sha256",
+        "verify_model_object"
+      ],
+      "do": "Remove REVERIFY_LIMIT and compare the computed digest for every native file size. Extract verify_model_object(path:&Path,expected_sha256:&str,expected_bytes:u64)->Result<bool,String>; it streams through file_sha256 once, returns false for either length or digest mismatch and propagates I/O failures. model_lookup retains its current missing/corrupt/ready response shape and metadata/marker checks, using corrupt reason \"content digest mismatch\" for same-length changed bytes. No path may report ready from marker, mtime or size alone. Keep the 1 MiB hash buffer and avoid a second pass inside one lookup. Do not add a metadata-only cache or hash the file on the UI thread. Existing checking state remains visible until lookup returns. Correctness has priority; current code already pays for a full hash, so removing the comparison cutoff adds no extra read pass. Add Rust tests in model_store.rs for valid and changed content at 64 MiB minus one, exactly 64 MiB, and 64 MiB plus one, including a same-length byte flip with unchanged catalogue metadata. Fixtures are generated deterministically into isolated target/test-data directories and are not committed as large binaries.",
+      "verify": "cargo test --manifest-path src-tauri/Cargo.toml --no-default-features model_store",
+      "accept": "Exit 0; all boundary sizes reject same-length corruption and accept matching bytes; lookup still distinguishes missing and I/O failure.",
+      "deps": "none"
+    },
+    {
+      "id": "LG.03",
+      "title": "Explicit stream completion and controller history",
+      "files": [
+        "reusable-chatbot/core/engine-types.ts",
+        "reusable-chatbot/core/chat-controller.ts",
+        "reusable-chatbot/engines/hosted-openrouter/index.ts",
+        "reusable-chatbot/engines/native/index.ts",
+        "reusable-chatbot/engines/webllm/index.ts",
+        "src/core/chat/session.ts",
+        "tests/generationLifecycle.test.ts",
+        "tests/hostedOpenRouter.test.ts",
+        "tests/nativeProvider.test.ts",
+        "tests/browserProviders.test.ts",
+        "src-tauri/src/inference.rs"
+      ],
+      "entities": [
+        "TokenEvent",
+        "GenerationResult",
+        "GenerationFailure",
+        "ChatController.generate",
+        "ChatController.useEngine",
+        "ChatController.close",
+        "ChatController.reset",
+        "InferenceCompletion",
+        "inference_generate"
+      ],
+      "do": "Extend TokenEvent compatibly to {text:string,tokenId?:number,completion?:{text:string,reason:'stop'|'length'|'cancelled'|'error'}}. Ordinary events contain text deltas and no completion. Exactly one successful terminal event has text:'' and completion containing the entire accumulated answer and reason:'stop'; it is yielded only after the provider has concluded without a later error. GenerationResult is {text:string,status:'complete'|'incomplete'|'cancelled'|'failed',reason:'stop'|'length'|'cancelled'|'error'|'unexpected-eof'|'empty'}. GenerationFailure extends Error with readonly reason and partialText fields. Do not infer success from received text or EOF.\n\nHosted SSE parser buffers complete events (including multi-line data fields), supports CRLF, comments and UTF-8 split across reads, and parses JSON inside try/catch. Malformed data is a protocol failure, never silently swallowed. Handle top-level error and choice.finish_reason; stop is the only successful reason for this text-only product. length is incomplete; content_filter, tool_calls and unknown non-null reasons are failures. Require a stop finish reason and stream terminator [DONE]; a terminator without a stop reason or EOF before terminator is unexpected-eof. Continue consuming after finish_reason until terminator so a late structured error overrides apparent success. Stream deltas immediately. On success, completion.text is the assembled whole generation. Abort never emits completion; throw GenerationFailure with cancelled reason. Empty/whitespace-only output fails. Cancel/release the reader in finally. Preserve current HTTP-status handling and configured fallback behavior.\n\nNative adapter emits completion only after inference_generate resolves successfully and queued tokens drain, provided signal is not aborted; a failed invocation overrides prior text and closes the queue. WebLLM adapter captures finish_reason and requires stop plus a clean iterator end; update its structural SDK type accordingly. MockEngine emits the same terminal event; all provider fixtures and existing tests use the explicit contract.\n\nChatController.generate continues forwarding live events. Stage the new user/assistant pair; commit both to history only on successful explicit terminal completion. Error, abort, length and unmarked EOF commit neither. The retry uses the original input once, not duplicate history entries. useEngine closes/replaces the engine session while preserving committed history; close releases resources without erasing history; reset alone intentionally clears history. Caller session replacement uses an epoch so a late previous engine initialization cannot become current. Preserve existing public method signatures except the TokenEvent extension. No command execution or distillation occurs in the controller.\n\nNative terminal reason is not inferred from a void IPC result. Add serde-serializable InferenceCompletion {text:String,reason:String}, with reason constrained at construction to stop|length|cancelled. Change both compiled and unavailable-stub inference_generate signatures to Result<InferenceCompletion,String>, retaining the command arguments. Accumulate exact emitted text; EOS yields stop, max token/context exhaustion yields length, cancellation yields cancelled. NativeRunnerProvider uses the returned full text and reason after queue drain; only stop is successful. Error still rejects. Preserve actual runtime context/output ceilings; this task does not increase them to 32768. Add native unit coverage of terminal reason classification and update adapter fixtures. The runtime capability ceiling takes precedence over the product maximum when allocating prompt plus output budget.",
+      "verify": "node --experimental-strip-types --test tests/generationLifecycle.test.ts tests/hostedOpenRouter.test.ts tests/nativeProvider.test.ts tests/browserProviders.test.ts\ncargo test --manifest-path src-tauri/Cargo.toml --no-default-features inference",
+      "accept": "Exit 0; fragmented live deltas precede completion, late/HTTP/SSE errors and truncation never commit history, cancellation is distinct, retry history has one pair and replacement final text is exact.",
+      "deps": "none"
+    },
+    {
+      "id": "LG.04",
+      "title": "Resolve semantic recall to live readable sources",
+      "files": [
+        "src/core/companion/memory.ts",
+        "src/core/companion/recall.ts",
+        "tests/companionRecall.test.ts",
+        "tests/companionMemory.test.ts"
+      ],
+      "entities": [
+        "MemoryHit",
+        "ResolvedMemoryHit",
+        "resolveMemoryHit",
+        "formatRecallContext",
+        "CompanionMemory.recall",
+        "CompanionMemory.distill"
+      ],
+      "do": "Keep existing CompanionMemory, tables and deterministic embedding. MemoryHit retains {refId:string,score:number}; ResolvedMemoryHit extends it with {source:'lore'|'accompaniment',title:string,text:string,updatedAt:string,provenance:'authored'|'generated'|'vendored',anchors:string[]}. Add recall.ts with resolveMemoryHit(db:Database,hit:MemoryHit):ResolvedMemoryHit|null and formatRecallContext(hits:ResolvedMemoryHit[]):string. CompanionMemory.recall(query:string,k=5):ResolvedMemoryHit[] validates vector dimension 128 and finite score, ranks descending score then ascending refId, resolves before limiting to k, and skips missing/deleted/empty/malformed records. Deduplicate by source/refId. A collision where the same ID resolves to both tables is skipped and reported in existing diagnostics rather than arbitrarily choosing content.\n\nResolve accompaniments only where deleted_at IS NULL; provenance, title, updated_at and anchors come from the live row. Read body_pm JSON using try/catch and recursively collect text nodes and paragraph breaks; if absent, convert body_html to text without DOM execution (strip tags and decode amp/lt/gt/quot/apos and numeric entities), then use nonempty quote as final fallback. Ignore script/style blocks while extracting plain text; this is source text conversion, not the deferred export-sanitization project. Malformed anchors become [] and cannot crash recall. Resolve lore from body_md and kind, with title 'Journey memory', 'Parish memory' or 'Personal context'. Existing journey rows are generated provenance; parish/persona rows are authored. Missing lore rows are excluded; no tombstone schema is invented.\n\nBound each text excerpt to 1200 Unicode code points and title to 120. formatRecallContext emits a heading 'Relevant saved context' followed by JSON-encoded records with source, refId, title, updatedAt, provenance, anchors (at most 8, each at most 160 code points) and text. Score is diagnostic metadata and need not enter the prompt. Cap the entire emitted block at 6000 UTF-8 bytes; trim text to fit complete JSON records, drop a record if metadata alone cannot fit, never emit cut JSON. At most five records. Label this as saved user context, not instructions or doctrinal authority. Recent assemble lore keeps its existing independent 4000-character cap. Both blocks count against the existing context budget; trim recall then oldest lore before removing the current question or live guide context. Do not increase the 32768 context ceiling. No readable content means no hit in the prompt, never UUID-only lines.\n\nFixtures cover an older relevant journal entry, generated insight and lore; edited content is fresh; deleted, missing, malformed and empty records are excluded; first-five stale embeddings do not starve a later live hit; ties, Unicode and total bound are deterministic. Private rows are resolved locally before inclusion under the user's selected provider, following the current hosted/local choice.\n\nMake distillation retryable with distill(turn:{question:string,answer:string},id?:string):Promise<string>. Allocate id when absent, upsert the journey row and embedding by that ID, preserve its initial creation semantics, return the ID and retain the existing 64-row cap. The caller chooses and retains the ID before first invocation, so a failed persist retry reuses it. No persistence is hidden inside this helper; the caller awaits SidecarDb.persist. Add a repeated-same-ID test proving one row and one embedding.",
+      "verify": "node --experimental-strip-types --test tests/companionRecall.test.ts tests/companionMemory.test.ts",
+      "accept": "Exit 0; actual readable live content and provenance appear, removed records do not, ordering and complete-record byte budgets hold.",
+      "deps": "none"
+    },
+    {
+      "id": "LG.05",
+      "title": "Truthful insight saving and other persistence callers",
+      "files": [
+        "src/core/companion/insight.ts",
+        "src/ui/AccompanimentEditor.tsx",
+        "src/ui/SettingsView.tsx",
+        "tests/insightPersistence.test.ts",
+        "tests/persistenceFeedback.test.ts"
+      ],
+      "entities": [
+        "InsightSaveState",
+        "saveInsightDurably",
+        "AccompanimentEditor.doSave",
+        "SettingsView"
+      ],
+      "do": "Add InsightSaveState = {status:'unsaved'|'saving'|'saved'|'failed',recordId:string|null,error:string|null}. Add saveInsightDurably(sidecar:SidecarDb,record:Accompaniment):Promise<string>, importing Accompaniment from src/core/accompaniment/types.ts (read-only dependency). Its caller allocates a UUID once for each displayed complete reply; the helper upserts that same record and awaits sidecar.persist before returning the ID. Failure rejects and leaves the record available for same-ID retry; do not insert duplicate records on retry. Concurrent clicks share one pending operation per reply. Current date/section anchor and generated provenance are frozen with that insight when save begins; later navigation cannot retarget a pending save.\n\nAccompanimentEditor.doSave handles rejection, retains the draft and displays 'Not saved. Try again.' alongside a retry using the existing editor save surface. 'Saving…' begins when persistence is queued; 'Saved' follows only its acknowledgment and only if no newer editor revision exists. An older success cannot overwrite newer failure/unsaved state. Debounced unmount flush attaches an error handler to a durable application-level save notice; never report success merely because the component unmounted. SettingsView awaits or explicitly handles each persist call, reports 'Saving…', 'Saved' or 'Not saved. Try again.', keeps a retryable intended setting value and does not reload after failed import. Calls that make two related setting writes persist one resulting snapshot. Do not change storage keys, schema or editor content format.\n\nThe complete current caller review is confined to SidecarDb.persist references returned by CodeGraph. The owned files here are the already-observed editor/settings paths; ChatView and distillation belong to LG.06. If another user-visible fire-and-forget caller appears at the approved baseline, report its exact path and behavior to the architect for an explicit task revision; no exploratory code changes. Tests inject rejected/late promises, repeat-click retries, navigation, editor version changes and import failure; verify status truthfulness and same-ID retry.",
+      "verify": "node --experimental-strip-types --test tests/insightPersistence.test.ts tests/persistenceFeedback.test.ts",
+      "accept": "Exit 0; saved state occurs only after durable acknowledgment, late older completion does not hide newer failure, retries do not duplicate insights and rejected imports do not trigger reload.",
+      "deps": "LG.01 interface fixed; integration after LG.01"
+    },
+    {
+      "id": "LG.06",
+      "title": "Liturgical Guide recovery and live-to-final UI",
+      "files": [
+        "src/ui/ChatView.tsx",
+        "src/ui/ModelPicker.tsx",
+        "src/core/chat/feedback.ts",
+        "src/core/chat/guide-labels.ts",
+        "src/App.tsx",
+        "src/core/orientation/guide.ts",
+        "tests/guideRecovery.test.ts",
+        "tests/chatView.test.ts",
+        "tests/guideLabels.test.ts",
+        "src/ui/OrientationGuide.tsx"
+      ],
+      "entities": [
+        "GUIDE_LABELS",
+        "ProviderReadiness",
+        "canRetryGuide",
+        "GenerationResult",
+        "InsightSaveState",
+        "ChatView",
+        "companionSystemContext"
+      ],
+      "do": "Use public name 'Liturgical Guide'. The concise label is 'Guide'; action strings are 'Open Liturgical Guide', 'Prepare Liturgical Guide', 'Ask the Guide to explain', 'Try again', 'Return to Missal', 'Save insight', 'Saving…', 'Saved', and 'Not saved. Try again.'. Define GUIDE_LABELS in guide-labels.ts as the single source for these strings. Scope this rename to rendered chat, picker, rail and orientation copy plus accessible names in owned files. Preserve CompanionMemory, companionFeedback, event names, persisted keys, CSS class names and existing imports as compatibility identifiers. It is a tool for liturgical study and navigation, not a priest, confessor, spiritual director or doctrinal authority. Do not introduce sacramental language or claim ecclesiastical approval. The chosen name is proposed for operator approval with this snapshot.\n\nProviderReadiness is {kind:'hosted'|'local',configured:boolean,available:boolean,requiresDownload:boolean,downloaded:boolean}; canRetryGuide(engineState:'idle'|'starting'|'ready'|'failed',readiness:ProviderReadiness):boolean returns engineState==='failed' && configured && available && (!requiresDownload || downloaded). Hosted readiness derives from existing provider configuration, never local catalogue membership. Same hosted selection and close/reopen do not need a model-selection detour. 'Try again' increments the existing attempt epoch and reinitializes that provider; it preserves draft, committed controller history and displayed messages. It does not automatically resubmit a question or bill for a new reply. Send becomes enabled only after readiness. Keep one ChatController across retries; reset only on explicit new-conversation action. Cancel stale initialization/generation work and reject late events with a generation ID/epoch guard.\n\nStream deltas into the current bubble as they arrive. Buffer only a possible command suffix until its grammar can be classified; no command executes while streaming. On explicit successful completion, replace the bubble with the entire completion.text after stripping the suffix; render once through the existing formatting pipeline; run approved commands once for that generation ID, set completed-turn memory input, and enable Save insight. Do not refetch a whole answer or start a second generation to get final text. length/EOF/error retains useful partial text with status 'Incomplete response. Try again.' and restores the original input; cancellation displays 'Response stopped.' and keeps the input. Empty failure creates no empty assistant answer. Partial replies remain visible in UI but never enter committed model history, command execution, saving or distillation. A technical failure uses authored notice, not raw exception text. Recovery controls remain visible for hosted and local providers independently of local download state.\n\ncompanionSystemContext uses formatRecallContext(memory.recall(question,5)), never UUID/cosine-only interpolation. Persona, live controls, recent lore and recall obey existing total context budget and LG.04 bounds. Save insight uses the per-reply InsightSaveState and saveInsightDurably contract; click changes to saving, await changes to saved, rejection changes to failed with retry. Distillation receives complete turns only, preserves the two-minute-after-close idle rule and 64-row cap, and awaits persist with reported failure; interrupted/failed generations do not distill. Distillation retries reuse the existing created row ID so a failed save cannot create duplicate memories. Keep the current tour/placement interfaces intact; the pending orientation §I remains separately gated.\n\nTests use hosted readiness without a catalogue entry, failed reply then same-provider retry, preserved history/draft, live first delta before finalization, full final replacement, late failure/abort, no command/save/distill on failed turns, and truthful saved state. Reuse existing screens and styling; this is a brownfield behavior/copy correction, no new screen design.\n\nOrientationGuide.tsx is owned for public copy only: replace the existing explanation button with GUIDE_LABELS.explain; define GUIDE_LABELS.highlighted(label:string) returning The Guide has highlighted <label>. and GUIDE_LABELS.unavailable as This control is not visible just now. You can continue the tour or ask the Guide. Use these for the current step notices. No placement/drag/route behavior changes are authorized by this copy task.",
+      "verify": "node --experimental-strip-types --test tests/guideRecovery.test.ts tests/chatView.test.ts tests/guideLabels.test.ts\nnode_modules/.bin/tsc --noEmit",
+      "accept": "Exit 0; hosted retry works without downloaded state, history/draft survive, only explicit completed generations can cause command/save/distill effects, all specified public labels use GUIDE_LABELS.",
+      "deps": "LG.01, LG.03, LG.04, LG.05; interfaces frozen before parallel authoring, integrate after their acceptance"
+    }
+  ],
+  "embedded_contracts": [
+    "DOCS/ARCHITECTURE/library-study-20260913.md",
+    "DOCS/ARCHITECTURE/bookstore-service-20260913.md",
+    "DOCS/ARCHITECTURE/chant-reference-20260913.md",
+    "DOCS/ARCHITECTURE/about-media-20260915.md",
+    "DOCS/ARCHITECTURE/sanctissimissa-v1.40.21223-fork-identity-20260913.md"
+  ]
+}
