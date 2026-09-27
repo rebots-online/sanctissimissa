@@ -11,7 +11,7 @@
   "source_task": "01a0e26e-5e4f-7ae1-9c3b-d58659d466a0",
   "canonical_repository": "https://github.com/rebots-online/sanctissimissa",
   "canonical_checkout": "/home/robin/Desktop/devProjects/sanctissimissa",
-  "source_commit": "040ff05b1eab8ae7ca4202784abfdffecbd6e0d4",
+  "source_commit": "c08d192f5cf2aa947bce9ae84a3645e60ff9ea75",
   "source_architecture_sha256": "14d9eb741fe5c10c0fc0674b19ce2baa90f6ac5964982c08e6ae7760be826dbf",
   "source_checklist_sha256": "f946430a5f973e32dac03e47c6e8a85606a4f63b11a0f127b685f82e417fb50c",
   "status": "proposed-for-discussion",
@@ -23,8 +23,8 @@
   "lab": "/home/robin/Admin-Manual/LOGS/EXPERIMENTS/acp-sdlc-20260927/LAB.md",
   "header_provenance": "Comprehensive proposal fields; exact Natally/JSONIC template not found in 21927-point Qdrant scan or targeted PostgreSQL retrieval; do not claim template equivalence",
   "preservation": "Includes current working architecture including pending orientation changes; source files remain unchanged",
-  "proposal_architecture_sha256": "9da1348eedefe84e6b2a999716e996aa47d7252028532e0b9b1922bd827c48d2",
-  "proposal_checklist_sha256": "cb75f98b7fb0fb016fa485c7198d51ba770cceae83c4873a80e7d0ef3bc96276",
+  "proposal_architecture_sha256": "d7b40d2190cd4a3bb16496df3c8154f835e22ef376b376fbd167e6dab59e15ff",
+  "proposal_checklist_sha256": "a0cec2d367d142d070ed59de8f8546bbb4bef31abb7593e5db50b71c36636fdb",
   "tasks": [
     {
       "id": "LG.01",
