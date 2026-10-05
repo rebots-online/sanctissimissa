@@ -2252,3 +2252,80 @@ propers" (label authored; the sent prompt may append the app's current
 date). ChatView renders the chip rail only while the conversation has no
 turns; tapping fills the composer and sends. CHECKLIST task CL.7 derives
 1:1.
+
+## J. Bookstore in the left sidebar — Google Stitch screen binding (2026-10-05)
+
+**Status: proposed amendment; awaiting operator signoff under CLAUDE.md.**
+This section changes the Library entry point requested by the operator. It does
+not approve the separate pending orientation amendment above. After explicit
+signoff, record the architecture digest and this section's execution scope in
+`DOCS/ARCHITECTURE-SIGNOFF.md` before deriving checklist tasks or changing code.
+
+Operator request: "can you move the library to the left sidebar and rename it
+bookstore and ensure it uses the Google stitch bookstore screen".
+
+### J.1 Finished navigation and screen
+
+The primary left navigation contains **Bookstore**, directly after Sacred
+Scripture and before My Journal. Its view key is `bookstore`, its icon is `📚`,
+its accessible name and collapsed-rail tooltip are `Bookstore`, and its guide
+target is `nav-bookstore`. It participates in the existing active-state,
+keyboard activation, responsive rail and browser/Android back-navigation flow.
+Activating it displays `BookstoreView` in the main content area. The top-level
+entry being moved is not also rendered as a Library button in the masthead or
+a right-hand panel. The screen title is `Bookstore`.
+
+The visual source is **SanctissiMissa Bookstore Screen**, Stitch project
+`7192660594233084032`, screen `eeb7643f00314991ab7a325c9daa2216`:
+https://stitch.withgoogle.com/projects/7192660594233084032 .
+The existing frozen source is
+`LIBS/UI/STITCH/sanctissimissa-library-20260913/bookstore.html`.
+On 2026-10-05 its live Google HTML export matched the manifest's original
+SHA-256 `dc5176385d927332e014e6bc4782aa34891113c5e9a64d74e0a6b0b5788245e9`;
+the frozen adapted export matched
+`fc877246d6cf20a1c64ebd6e351af48400b2a213c0f2daa1c8b833e57af64ebe`.
+
+Use that export's editorial masthead, public-domain banner, search/filter
+toolbar, category chips, catalogue cards and book-detail drawer. Preserve the
+addressable elements below and the LS contract's mechanical React adaptation,
+semantic theme tokens and 1100px responsive behavior. The app's existing rail
+and Mass strip supply shared chrome; do not mount the export's duplicate
+`#app-rail`, mobile header or specimen Mass journey strip. The editorial
+headline remains "A Catholic library, ready for study."; it describes the
+catalogue and is not a second navigation entry named Library.
+
+### J.2 Entity and source bindings
+
+| Exact entity | Target and anchor | Finished contract / exported binding |
+|---|---|---|
+| `View` | `src/App.tsx:42` | Add literal `bookstore` to the existing view union. |
+| `NAV` | `src/App.tsx:44` | Insert `{id:'bookstore',ico:'📚',label:'Bookstore'}` after `bible`; explicit array order, no fractional ordering. |
+| `RAIL_VIEWS` | `src/App.tsx:71` | Continue deriving from `NAV` and `UTIL_NAV`, so the existing allowlisted Companion open action reaches the same destination. |
+| `App` | `src/App.tsx:510` and `src/App.tsx:613` | Shared rail buttons expose `title={n.label}` and `aria-current='page'` for the active destination; the main-content switch mounts `BookstoreView` for `bookstore`, using the existing LS shared-controller contract. |
+| `BookstoreView` | `src/ui/library/BookstoreView.tsx:1` | Use `LibraryViewProps` from the LS entity table. Root `.library-surface`; bind the frozen `.editorial-masthead`, `.public-domain-banner`, `#catalogue-search`, `#author-filter`, `#state-filter`, `#offline-toggle`, `#category-filter`, `#results-count-text`, `#reset-filters`, `#catalogue-grid`, `#empty-state`, `#book-detail`, `#drawer-close`, `#edition-provenance`, `#purchase-options` and `#primary-action-btn` to LS catalogue, selection and access state. |
+| Library surface stylesheet | `src/ui/library/library.css:1` | Scope the exported layout/styles under `.library-surface`; retain drawer geometry, card layout, theme compatibility and responsive reflow. |
+
+`DOCS/ARCHITECTURE/library-study-20260913.md` remains the exact source of the
+`LibraryViewProps`, catalogue, controller, reader and navigation contracts.
+Its separate My Library collection semantics remain intact; this amendment
+names the requested catalogue entry **Bookstore**, without renaming storage
+entities or removing acquired books or personal study records. Its existing
+sample-data prohibition applies: real catalogue counts and availability,
+no specimen prices or ownership presented as live purchases. Purchase and
+download behavior remains governed by the existing LS/service contracts.
+
+### J.3 Baseline and verification boundary
+
+The inspected local baseline is `f4feb4bb`. CodeGraph's current `App` source
+contains neither a Library entry nor a mounted Bookstore screen; therefore
+this is a screen-integration requirement, not evidence of a completed rename.
+Preserve that distinction when deriving the execution recipe from LS.
+
+The post-signoff rubric must verify one left-rail Bookstore entry, its exact
+label and active state, activation of the exported bookstore surface, catalogue
+filter/reset behavior, detail-drawer open/close and Escape handling, and back
+navigation to the preceding view. Rendered verification compares the running
+screen with the frozen source at desktop and narrow widths, including collapsed
+rail discoverability and no horizontal overflow. Tests or presence of the
+export alone do not establish visual integration. This amendment records no
+implementation, build, deployment or runtime acceptance.
