@@ -2329,3 +2329,128 @@ screen with the frozen source at desktop and narrow widths, including collapsed
 rail discoverability and no horizontal overflow. Tests or presence of the
 export alone do not establish visual integration. This amendment records no
 implementation, build, deployment or runtime acceptance.
+
+## K. Android 16 KB page compatibility and coherent platform rebuild (2026-10-19)
+
+### K.1 Authority, evidence and scope
+
+This is the complete amendment for the operator's 2026-10-19 request to fix
+the Google Play 16 KB warning and rebuild all platforms. It awaits the explicit
+amendment signoff required by `CLAUDE.md` before checklist derivation or coding.
+Once signed, its implementation does not edit architecture. This section
+supersedes conflicting Android verification details in the shared release
+parity amendment; every other product contract remains in force.
+
+The baseline is `a09069620b0a178cec1a4671d7ea8f4e2f07f5ec`, version
+`1.66.30030`, from `https://github.com/rebots-online/sanctissimissa`. The
+2026-10-19 checkout initially contained StAndroidsMissal `dcfca61b`, 164
+commits behind that published fork, with different package identity. That
+original branch remains intact; the amendment uses the published fork on
+`codex/android-16kb-rebuild` at `msi4090:/opt/devProjects/sanctissimissa`.
+The four pre-existing untracked tool directories are preserved.
+
+Verified CodeGraph was synchronized before mapping. Its unsupported shell,
+TOML and Markdown coverage required named reads of `scripts/build-release.sh`,
+`scripts/package-android-symbols.sh`, `src-tauri/.cargo/config.toml`,
+`BUILD_INSTRUCTIONS.md` and the shared release parity architecture. Kotlin
+and JavaScript were read through CodeGraph. The current fork already declares
+both Android linker page flags, AGP 8.11.0, target SDK 36 and useful-symbol
+checks. The symbols script checks unstripped application LOAD segments;
+collection currently checks signatures/version, without enforcing packaged
+ELF/RELRO/ZIP/bundle alignment. The screenshots identify a rejected production
+release, but do not identify its version, package name or offending library.
+No rejected binary has been inspected: the exact historical cause is unproven.
+
+The normative technical reference is Android Developers,
+https://developer.android.com/guide/practices/page-sizes . ELF LOAD alignment,
+RELRO layout, APK ZIP alignment and AAB page-alignment configuration are
+separate requirements. Source flags or a successful build cannot certify them.
+
+### K.2 Finished entities and bindings
+
+Line anchors below name current definitions or insertion points; existing
+signatures remain unchanged except for the explicitly added report fields.
+
+| Exact entity | Target and anchor | Finished contract |
+|---|---|---|
+| Android crate link contract | `src-tauri/build.rs:1`, existing `main()` | When `CARGO_CFG_TARGET_OS` equals `android`, emit `cargo:rustc-link-arg=-Wl,-z,max-page-size=16384` and `cargo:rustc-link-arg=-Wl,-z,common-page-size=16384`, then run the existing `tauri_build::build()`. Other target OS values emit neither argument. Retain the existing four-target flags in `src-tauri/.cargo/config.toml`; crate-level link arguments reinforce the contract when caller rustflags replace Cargo configuration. |
+| Android toolchain binding | `scripts/release-state.mjs:441`, `runCommand`; `src-tauri/gen/android/app/build.gradle.kts:29`, `android` | The production Android recipe retains installed NDK `27.0.12077973`: default `NDK_HOME` to its SDK directory and set Gradle `ndkVersion` to that exact version. An explicit `NDK_HOME` must resolve to the same revision or fail before Android compilation. Keep SDK 36 and AGP 8.11.0. Set `packaging.jniLibs.useLegacyPackaging = false`. Preserve release signing, FULL symbols and all four ABIs. No package identity migration. |
+| `inspect_elf` | `scripts/verify-android-page-sizes.py:1`, new exported Python function | `(data: bytes, label: str) -> dict`. Standard-library parser of ELF32/ELF64 little-endian headers/program headers; validate all bounds before reading. Require ET_DYN, at least one PT_LOAD, power-of-two `p_align >= 16384`, congruent file offset/virtual address modulo alignment, `p_filesz <= p_memsz`, and segment data inside the input. Every PT_GNU_RELRO must end on a 16384-byte boundary. Require a GNU build-id note; return class, machine, buildId, LOAD records and RELRO records. Unsupported, truncated or malformed inputs fail with the archive/member label. |
+| `verify_archive` | `scripts/verify-android-page-sizes.py:1`, new exported Python function | `(path: pathlib.Path, kind: str) -> dict`, kind exactly `apk`, `aab` or `symbols`. Use `zipfile` in memory per member, without extracting files. Reject duplicate member names, encrypted members, corrupt CRC, missing expected libraries or ABI/machine disagreement. APK native members are `lib/<abi>/*.so`; AAB native members are `<module>/lib/<abi>/*.so`; symbols are `<abi>/libsanctissimissa_lib.so`. Inspect every native member, including dependencies and additional AAB modules. Require the application library for exactly arm64-v8a, armeabi-v7a, x86 and x86_64; machine/class pairs are 183/64, 40/32, 3/32 and 62/64. Additional known-ABI dependency libraries are allowed and inspected. Return archive SHA-256 and per-member SHA-256 plus ELF results. |
+| `main` of Android compatibility verifier | `scripts/verify-android-page-sizes.py:1`, new CLI | Required arguments `--apk PATH --aab PATH --symbols PATH --report PATH`; optional `--debug-apk PATH` verifies a retained debug APK independently. Resolve version/source from `version.json` and `sanctissimissa-release-state.json`; require non-pending stamp and matching Git HEAD. Compare application build IDs across APK, AAB and symbols for every ABI. For each supplied APK run SDK `zipalign -c -P 16 4 <apk>` from installed build-tools 36.1.0 and require success. Run `bundletool dump config --bundle=<aab>` and require its native-library alignment value exactly `PAGE_ALIGNMENT_16K`, rejecting a missing or contradictory value. Missing executable or nonzero exit fails closed. Raise `ValueError` for invalid inputs; the CLI catches validation/tool errors, prints a labelled diagnostic and exits 1 without writing a success report. Exit 0 prints the report path. Output labels identify the archive/member/check. |
+| `AndroidPageSizeReport` | `dist/rubric-runs/sanctissimissa-v<version>-android-16kb.json`, new JSON report | `{schema:'mba.robin.android-page-size.v1',version,sourceHead,pageSize:16384,verified:true,archives:{apk,aab,symbols,debugApk},zipalign:{tool,passed:true},bundletool:{alignment:'PAGE_ALIGNMENT_16K'}}`. Archive records contain file path, sha256 and native-member results; `debugApk` is null when not supplied. `zipalign.passed` requires every supplied APK to pass. Write only after every check passes. Preserve a differing predecessor report in a slug/version/timestamp-named outbox file before replacement. An old report is never proof of the current binaries. |
+| Android verification release binding | `scripts/release-state.mjs:551`, existing `symbols` stage | After the existing `npm run package:android-symbols` succeeds, invoke Python verifier with the current stamped release APK/AAB/symbol paths, retained debug APK via `--debug-apk`, and report path. Mark `symbols` complete only after both commands succeed. Keep stage order, host ownership, declarations, one-stamp resumption and pending-host exit 2. Failure remains resumable at `symbols`, with no restamp. |
+| Packaged Android collection gate | `scripts/collect-artifacts.mjs:306`, existing verification block | Whenever any Android artifact is selected, require the complete current APK/AAB/symbol trio and successful current verifier invocation, even in partial mode. Invoke the same verifier against the selected source paths, adding `--debug-apk` when selected, before durable artifact copies; parse its written JSON report with the existing guarded `readJson`. Recalculate selected source SHA-256 values and compare with the returned report. Validate report version/source/schema and all required fields. A failing Android verification is a hard error, never a missing-platform row or a skipped warning. |
+| Android manifest compatibility fields | `scripts/collect-artifacts.mjs:458`, existing `manifest.verification` | Add `android_16kb_verified:boolean` and `android_16kb_report:{filename,sha256}|null`. True requires successful current verification of the selected trio and the copied artifact hashes matching that report. Without Android artifacts in partial collection use false/null. Include equivalent XML fields. Keep `android_play_delivery` and Store acceptance independent. |
+| Android debug artifact accounting | `scripts/collect-artifacts.mjs:179`, existing `sources` | Restore required `android-apk-debug` row matching `sanctissimissa-v<version>-universal-debug.apk` under `outputs/apk/universal/debug`, destination `sanctissimissa-v<version>-android-universal-debug.apk`. Run signature/embedded-version and ELF/ZIP checks on it too; its own build ID need not match release symbols. Absence is a strict failure or explicit partial missing row. Never substitute the debug signing identity for production acceptance. |
+| Android verifier regressions | `tests/android_page_sizes_test.py:1`, new unittest module | Exercise production parser and archive functions using deterministic standard-library ELF/ZIP fixtures. Cover valid ELF32/64, 4 KB LOAD, 4 KB RELRO end, missing LOAD/build-id, truncated/out-of-range headers/segments, ABI-machine mismatch, duplicate/missing archive members, bad dependency in a non-base AAB module, CRC failure and differing application build IDs. Tests isolate verifier logic; fixtures never satisfy production acceptance. |
+| Release verification integration regressions | `tests/releaseState.test.ts:1` and `tests/collectArtifacts.test.ts:1` | Extend the existing release-state suite and create the new collector suite to prove failed Android compatibility cannot complete `symbols`, partial mode cannot turn incompatible Android files into success, missing report/trio fails, report hash/source/version mismatch fails, and absent Android yields false/null. Preserve existing host-selection/resume tests. |
+| Build recipe and rubric | `BUILD_INSTRUCTIONS.md:183`, `DOCS/BUILD.md:1`, `DOCS/TEST_RUBRIC.md:155` | After signoff, document pinned NDK, verifier command and report semantics; reform RP-V3 around final packaged bytes. Add the K.4 runtime protocol with screencast/timecodes as operator verification, never an idempotent checklist Accept. |
+| Release notes | `scripts/release-state.mjs:463`, existing stamp branch; `DOCS/CHANGELOG.md:1` | After the single stamp and before its scoped commit, prepend `## v<readVersion(root)> — Android 16 KB compatibility` with bullets `Enforce 16 KB native-library linking for Android.` and `Validate packaged APK/AAB native alignment and matching debug symbols before collection.` Include `DOCS/CHANGELOG.md` in that stamp commit. Preserve prior sections; if the exact version heading exists require the same entry rather than duplicate it. Release notes describe changes; actual build results remain separate evidence. |
+
+### K.3 Release flow and artifact accounting
+
+1. Record explicit operator signoff with this architecture's SHA-256 in
+   `DOCS/ARCHITECTURE-SIGNOFF.md`. Only then derive self-contained checklist
+   tasks and matching rubric rows. Freeze this architecture during coding.
+2. Implement K.2, run `python3 -m unittest discover -s tests -p
+   'android_page_sizes_test.py'`, the release-state and new collector suites and
+   their strict declaration check, then full project tests and TypeScript.
+   These are implementation evidence; they do not certify an unbuilt AAB.
+3. Use the current fork identity `mba.robin.sanctissimissa`, product
+   `SanctissiMissa`, slug `sanctissimissa`, and shared production signing
+   provenance. Verify the Play application's package identity matches before
+   any store submission; the screenshots alone do not authorize a rename.
+4. Run the sanctioned fresh `npm run build:release` once from the reconciled
+   checkout. Its existing stamp increments MINOR from 66 to 67, computes BUILD
+   normally, commits the exact stamped inputs, and freezes one source/input
+   identity for all hosts. Never independently stamp a leaf platform build.
+   If current published version advances before execution, integrate it and
+   take its next MINOR instead; do not overwrite another release's version.
+5. Produce web/PWA ZIP; Linux deb and AppImage; Windows cross standalone EXE
+   and NSIS; native Windows standalone EXE, MSI and MSIX; Android retained
+   debug APK, production APK, production AAB and four-ABI native-symbol ZIP.
+   This is the existing project-specific matrix, including the debug row
+   missing from the current collector. Root `dist/` remains tracked; Vite
+   owns `dist-web/`. Every output and receipt is slug/version named.
+6. Linux completes its supported work without falsely completing native
+   Windows stages. Use the existing frozen-state Windows continuation on an
+   actually reached Windows host; discover through configured host inventory
+   and verify OS/identity on connection. Preserve explicit pending entries and
+   exit 2 when no suitable host can be reached. Retain all available outputs
+   with partial collection; strict collection requires the entire matrix.
+7. Apply the existing web-deploy stage to the already authorized Surge target
+   and verify served version/assets. Preserve prior deployments. Do not infer
+   web deployment from local output or command configuration.
+8. Publish reviewed source/metadata through the configured SanctissiMissa
+   GitHub remote while the central Forgejo outage notice applies. Do not
+   contact Forgejo or activate GitHub LFS. Retain binary objects and tracked
+   pointers locally for the existing Forgejo LFS destination; report their
+   unpublished durability explicitly. Never advance a complete-release
+   pointer while any artifact/runtime/Store obligation is unverified.
+
+### K.4 Direct acceptance and runtime boundary
+
+Static artifact acceptance requires current APK/AAB/debug APK verification,
+all packaged native libraries passing LOAD/RELRO checks, release application
+build IDs matching symbols for all four ABIs, successful APK ZIP verification,
+AAB `PAGE_ALIGNMENT_16K`, matching embedded versions/package, production
+certificate continuity, and independently recalculated final artifact hashes.
+Fresh verification reads the actual final `dist/` files and report; passing
+source greps, synthetic fixtures or a build log is insufficient.
+
+Operator verification protocol: use an Android 15+ arm64 device/emulator whose
+`adb shell getconf PAGE_SIZE` returns `16384`; install the current signed
+release APK and APKs generated from the same AAB with bundletool, launch with
+page-size compatibility mode disabled, exercise Mass/Office reading and
+Companion opening, and inspect native-loader/crash output. Retain screencast,
+timecode table, version, device identity, package and artifact hashes. Repeat
+upgrade/launch on a 4096-byte device. Record unavailable environments as
+unverified, not passing. Device/install steps are not CHECKLIST Accept clauses.
+
+Google Play upload/review/production acceptance requires a separate observed
+Console result for this exact version; rebuilding alone cannot clear the
+production warning. The existing BP.1 corpus delivery obligation and Windows
+Store installation/identity gates remain explicit and distinct. This amendment
+contains a complete implementation contract but records no code, new stamp,
+artifact, device verification, deployment or store acceptance.
