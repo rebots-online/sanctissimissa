@@ -151,13 +151,42 @@ script review and actual Store/runtime validation have separate verdicts.
 | ID | Requirement | Driver | Steps / PASS criteria | Severity |
 |---|---|---|---|---|
 | RP-V1 | One frozen release across hosts | AUTO | Exercise real release driver: one stamp/source commit/input hashes; Linux leaves Windows native stages pending; Windows continuation uses same identity; changed input or missing resume state is rejected. Cite resulting state and logs. | HIGH |
-| RP-V2 | Complete artifact matrix | AUTO | Hash actual web ZIP, deb, AppImage, cross standalone EXE, NSIS, native EXE/MSI/MSIX, debug APK, production APK/AAB and native symbols. Each embeds canonical identity or the documented MSI/MSIX numeric mapping. No required artifact silently omitted. | HIGH |
-| RP-V3 | Useful native symbols | AUTO | For each AAB ABI, compare unstripped symbol library build identity and prove app source DWARF coverage; inspect ELF LOAD and RELRO 16 KB compatibility and APK ZIP alignment. | HIGH |
+| RP-V2 | Complete artifact matrix | AUTO | Hash actual web ZIP, deb, AppImage, cross standalone EXE, NSIS, native EXE/MSI/MSIX, production APK/AAB and four-ABI native symbols. Debug APKs are excluded. Each embeds canonical identity or the documented MSI/MSIX numeric mapping. No required artifact silently omitted. | HIGH |
+| RP-V3 | Final packaged Android 16 KB compatibility and useful symbols | AUTO | Run scripts/verify-android-page-sizes.py against final collected production APK/AAB/four-ABI symbols with --apk/--aab/--symbols/--report. Require every packaged native member in every AAB module/dependency to pass bounded ELF LOAD/RELRO/build-id/ABI checks, APK zipalign -c -P 16 4, AAB PAGE_ALIGNMENT_16K, four matching application build IDs, existing useful app DWARF coverage and current schema/version/source/hash report. Independently rehash final bytes and report against manifest; production package/version/certificate continuity must match. Synthetic fixture success or source flags do not pass this row. | HIGH |
 | RP-V4 | Windows native Store packaging | OPERATOR | On native Windows validate signatures, offline installation prerequisites, exact Partner Center identity/publisher and mapped versions. Install/launch applicable native packages and exercise M-1 and O-1. Separate these results from Store certification. | HIGH |
 | RP-V5 | Play delivery contract | OPERATOR | Build BP.1 PAD-backed AAB, verify corpus_pack and intended delivery mode, exercise download/progress/offline reopen through release app. An embedded-only AAB does not pass this row. | HIGH |
 
 Record evidence under a stamped release rubric directory with TC11 screencast
 and timecodes. This amendment creates no completed verdicts.
+
+### §K operator verification protocol — runtime and Store acceptance
+
+The 2026-10-20 release-only correction excludes debug APKs. RP-V3 is static
+final-byte acceptance; it does not establish any runtime or Google Play verdict.
+For the exact stamped version, record these separate operator observations:
+
+1. On an Android 15+ arm64 device/emulator, retain actual device identity and
+   `adb shell getconf PAGE_SIZE` output showing `16384`. Install the current
+   signed release APK; also generate/install APKs from that same AAB using
+   bundletool. Disable page-size compatibility mode, launch and exercise Mass
+   and Office reading plus Companion opening. Inspect native-loader/crash output.
+2. Repeat upgrade and launch on a device reporting page size `4096`; retain
+   installed version/package, production certificate and final artifact hashes.
+3. Archive screencast segments and a timecode table in the stamped rubric-run
+   directory, mapping every action/result to exact version, package, device and
+   hashes. Missing 16 KB or 4 KB environments remain unverified; a synthetic
+   parser fixture cannot substitute for either journey.
+4. For the exact version, independently observe Google Play upload/review and
+   production acceptance in Console, after confirming application package
+   identity. A rebuilt AAB or uploaded bundle does not prove production warning
+   clearance. RP-V5's BP.1 corpus delivery obligation remains separate and open
+   until actually exercised; Windows RP-V4 runtime/Store gates remain distinct.
+
+These are operator protocols, never idempotent CHECKLIST Accept clauses. No new
+verdict is granted by writing this protocol. RP-V1–RP-V5 evidence must distinguish
+implemented, built, statically verified, runtime verified, deployed and accepted
+by a Store.
+
 
 ## V — Platform parity (collinear rule)
 
