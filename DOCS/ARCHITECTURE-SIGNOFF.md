@@ -246,3 +246,12 @@ CLAUDE.md at `3021d442`) requires before CHECKLIST derivation and code.
   execute 1:1 from the signed §H text; delivery runs the sanctioned release
   train (next stamp ≥ v1.66), publishes surge, and renders-verified
   acceptance per task.
+
+## 2026-10-20 — Android 16 KB release-only rebuild (§K)
+
+- Operator directive: "Dont be a blocker. Build all".
+- Operator scope correction: "Global rules stipulate not building debug apk. Instructions were to build. Not wait".
+- Operator publication requirement: "Ensure you jhave been pushing a commit at every task in your checklist".
+- Authorized: corrected architecture §K, checklist derivation, implementation, release-only platform builds and verification without another signoff pause. No debug APK.
+- Architecture SHA-256: `d4a19bf627d5856fca6890d4b4e47faae17283269773752a9963fc56bcfd1960`.
+- Architecture revision: `d1ab8716`; implementation must leave architecture unchanged.
