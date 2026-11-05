@@ -86,6 +86,16 @@ export interface AccountApi extends AccountState {
   refreshCredits(): Promise<void>;
 }
 
+/**
+ * SK.4 (§K.3) — the credit visibility gate, pure: hosted Sacristan UI
+ * (badge/panel/orientation cards/tour affordances/didactic surfaces) mounts
+ * only for a signed-in user with remaining credits. Unknown credits (null)
+ * count as zero — never an optimistic yes.
+ */
+export function isSacristanVisible(user: AccountUser | null, creditUnits: number | null): boolean {
+  return user !== null && (creditUnits ?? 0) > 0;
+}
+
 const AccountContext = createContext<AccountApi | null>(null);
 
 export function AccountProvider({ children, creditReader = null }: { children: ReactNode; creditReader?: CreditReader | null }) {

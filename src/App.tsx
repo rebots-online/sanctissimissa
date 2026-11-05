@@ -25,6 +25,10 @@ import SettingsView from './ui/SettingsView.tsx';
 import ChatView from './ui/ChatView.tsx';
 import OrientationGuide from './ui/OrientationGuide.tsx';
 import AboutView from './ui/AboutView.tsx';
+import SignInView from './ui/account/SignInView.tsx';
+import AccountView from './ui/account/AccountView.tsx';
+import { AccountProvider, useAccount, isSacristanVisible } from './core/account/useAccount.ts';
+import { creditReaderFromEnv } from './core/billing/client.ts';
 import ResizableInspectorLayout from './ui/ResizableInspectorLayout.tsx';
 import TrayPanel from './ui/TrayPanel.tsx';
 import { useNarrow } from './ui/BilingualText.tsx';
@@ -39,7 +43,7 @@ import {
 } from './core/orientation/guide.ts';
 import { debugEvent } from './core/diagnostics/store.ts';
 
-type View = 'map' | 'reader' | 'annotations' | 'calendar' | 'office' | 'bible' | 'journal' | 'homily' | 'settings' | 'about';
+type View = 'map' | 'reader' | 'annotations' | 'calendar' | 'office' | 'bible' | 'journal' | 'homily' | 'settings' | 'about' | 'account';
 
 const NAV: { id: View; ico: string; label: string }[] = [
   { id: 'map', ico: '✠', label: 'Holy Mass' },
@@ -53,6 +57,7 @@ const NAV: { id: View; ico: string; label: string }[] = [
 ];
 
 const UTIL_NAV: { id: View; ico: string; label: string }[] = [
+  { id: 'account', ico: '👤', label: 'Account & Sync' },
   { id: 'settings', ico: '⚙', label: 'Settings' },
   { id: 'about', ico: 'ℹ', label: 'Help · About' },
 ];
@@ -122,7 +127,26 @@ function visibilitySnapshot(companionPanel: Record<string, unknown> | null): Rec
   };
 }
 
+/**
+ * SK.4 (§K.3): one AccountProvider above the shell. The credit reader is
+ * SK.3's production client (module-level: a stable identity — AccountView's
+ * refresh path and the watch callback share it). Signed-out default; the
+ * provider is inert until the user signs in.
+ */
+const CREDIT_READER = creditReaderFromEnv();
+
 export default function App() {
+  return (
+    <AccountProvider creditReader={CREDIT_READER}>
+      <AppShell />
+    </AccountProvider>
+  );
+}
+
+function AppShell() {
+  const account = useAccount();
+  /** §K.3 gate: hosted Sacristan UI exists only for a funded, signed-in account. */
+  const sacristanGate = isSacristanVisible(account.user, account.creditUnits);
   const [db, setDb] = useState<CorpusDb | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<View>('map');
@@ -593,7 +617,7 @@ export default function App() {
           </span>
         </header>
 
-        {view !== 'map' && view !== 'annotations' && (
+        {view !== 'map' && view !== 'annotations' && view !== 'account' && (
           <MapStrip
             db={db}
             day={day}
@@ -691,6 +715,10 @@ export default function App() {
                 <SettingsView sidecar={sidecar} corpus={db} onOpenJournal={() => setView('journal')} />
               )}
               {view === 'about' && <AboutView />}
+              {/* §K.2: the Account surface — the frozen sign-in screen when
+                  signed out (the tacit local-only use never blocks anything),
+                  the frozen account screen once signed in. */}
+              {view === 'account' && (account.user ? <AccountView /> : <SignInView />)}
             </>
           }
           inspector={
@@ -707,9 +735,13 @@ export default function App() {
         <TrayPanel sidecar={sidecar} open={trayOpen} onToggle={() => setTrayOpen((o) => !o)} />
       )}
 
-      {/* CP.5: Companion intercom badge — present on every workspace. */}
-      <ChatView sidecar={sidecar} />
-      <OrientationGuide />
+      {/* §K.3 credit gate: the Sacristan badge/panel and the orientation
+          cards/tour mount ONLY for a funded, signed-in account — conditional
+          mount, never display:none. Signed-out and zero-credit sessions see
+          no assistant UI and no prompt about it; funding is discoverable
+          through the always-present Account & Sync rail entry. */}
+      {sacristanGate && <ChatView sidecar={sidecar} />}
+      {sacristanGate && <OrientationGuide />}
 
       {/* Mandatory app chrome: version bottom-right on every surface. */}
       <div className="version-tag" title={`Build ${versionInfo.buildNumber} · ${versionInfo.buildDate}`}>

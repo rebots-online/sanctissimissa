@@ -73,8 +73,11 @@ describe('workspaceNavigation (BX.5)', () => {
     assert.equal(NAV.length, 8, 'NAV must have exactly 8 primary entries (Annotations added 2026-08-16)');
   });
 
-  test('UTIL_NAV has two utility entries', () => {
-    assert.equal(UTIL_NAV.length, 2, 'UTIL_NAV must have exactly 2 utility entries');
+  test('UTIL_NAV has three utility entries', () => {
+    assert.equal(UTIL_NAV.length, 3, 'UTIL_NAV must have exactly 3 utility entries (Account & Sync added by §K.2/§K.4, 2026-11-05)');
+    const account = UTIL_NAV.find((n) => n.id === 'account');
+    assert.ok(account, 'the Account & Sync rail entry exists — funding stays discoverable (§K.3)');
+    assert.equal(account.label, 'Account & Sync');
   });
 
   test('separate Journal and Homily Writer routes exist', () => {
