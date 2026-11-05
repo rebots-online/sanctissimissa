@@ -38,6 +38,11 @@ export interface BillingStore {
   read(uid: string): Promise<BillingRecord | null>;
 }
 
+/** Applies an admin/voucher code to the account (Firestore transaction server-side). */
+export interface RedeemStore {
+  apply(uid: string, code: string): Promise<{ ok: true; creditUnits: number } | { ok: false; reason: 'badCode' | 'usedCode' }>;
+}
+
 export interface OpenRouterMinter {
   createKey(input: { label: string; limitUsd: number; expiresAtIso: string }): Promise<{ key: string; expiresAt: string }>;
 }
@@ -52,6 +57,8 @@ export interface BillingDeps {
   verifyIdToken: TokenVerifier;
   store: BillingStore;
   minter: OpenRouterMinter;
+  /** Present when the deployment supports admin-code redemption (SK.3). */
+  redeemStore?: RedeemStore;
   now?: () => Date;
 }
 
@@ -185,6 +192,47 @@ export function createAccessHandler(deps: BillingDeps): (req: Request) => Promis
     } catch (error) {
       logFailure('store', error);
       return jsonResponse(502, { error: 'storeFailed', message: 'Your credit balance couldn’t be read — try again in a moment.' });
+    }
+  };
+}
+
+/* ── /billing/redeem (SK.3) ────────────────────────────────────────────── */
+
+/** POST /billing/redeem — apply an admin/voucher code: `{ creditUnits }` after grant. */
+export function createRedeemHandler(deps: BillingDeps): (req: Request) => Promise<Response> {
+  return async (req: Request): Promise<Response> => {
+    if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
+    if (req.method !== 'POST') return jsonResponse(405, { error: 'methodNotAllowed', message: 'POST only.' });
+
+    if (!deps.env.OPENROUTER_ADMIN_KEY || !deps.redeemStore) return unconfigured();
+
+    const verified = await verifyUid(req, deps);
+    if (verified instanceof Response) return verified;
+    const { uid } = verified;
+
+    let code = '';
+    try {
+      const body = (await req.json()) as { code?: unknown };
+      code = String(body?.code ?? '').trim();
+    } catch {
+      code = '';
+    }
+    if (!code) {
+      return jsonResponse(404, { error: 'badCode', message: 'Enter a code to redeem.' });
+    }
+
+    try {
+      const outcome = await deps.redeemStore.apply(uid, code);
+      if (!outcome.ok) {
+        if (outcome.reason === 'usedCode') {
+          return jsonResponse(409, { error: 'usedCode', message: 'That code has already been used.' });
+        }
+        return jsonResponse(404, { error: 'badCode', message: 'That code isn’t recognized.' });
+      }
+      return jsonResponse(200, { creditUnits: outcome.creditUnits });
+    } catch (error) {
+      logFailure('redeem', error);
+      return jsonResponse(502, { error: 'storeFailed', message: 'The code couldn’t be applied — try again in a moment.' });
     }
   };
 }

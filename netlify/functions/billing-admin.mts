@@ -68,6 +68,32 @@ export async function realBillingDeps(env: AdminEnv = process.env as AdminEnv): 
     },
   };
 
+  // SK.3 — single-use admin codes: `redeemCodes/{CODE}` docs carry unitsCents;
+  // the transaction marks use and increments the balance atomically.
+  const redeemStore = {
+    async apply(uid: string, code: string): Promise<{ ok: true; creditUnits: number } | { ok: false; reason: 'badCode' | 'usedCode' }> {
+      return db.runTransaction(async (tx) => {
+        const codeRef = db.collection('redeemCodes').doc(code.trim().toUpperCase());
+        const billRef = db.collection('billing').doc(uid);
+        const codeSnap = await tx.get(codeRef);
+        if (!codeSnap.exists) return { ok: false as const, reason: 'badCode' as const };
+        const data = codeSnap.data() as { unitsCents?: number; usedBy?: string; note?: string };
+        if (data.usedBy) return { ok: false as const, reason: 'usedCode' as const };
+        const billSnap = await tx.get(billRef);
+        const current = billSnap.exists ? ((billSnap.data() as BillingRecord).creditUnits ?? 0) : 0;
+        const prior = billSnap.exists ? ((billSnap.data() as BillingRecord).transactions ?? []) : [];
+        const grant = data.unitsCents ?? 0;
+        const at = new Date().toISOString();
+        tx.set(codeRef, { ...data, usedBy: uid, usedAt: at });
+        tx.set(billRef, {
+          creditUnits: current + grant,
+          transactions: [...prior, { kind: 'redeem', unitsCents: grant, at, note: data.note ?? 'admin code' }],
+        });
+        return { ok: true as const, creditUnits: current + grant };
+      });
+    },
+  };
+
   const verifyIdToken = async (token: string): Promise<{ uid: string }> => {
     const decoded = await admin.auth().verifyIdToken(token);
     return { uid: decoded.uid };
@@ -96,5 +122,5 @@ export async function realBillingDeps(env: AdminEnv = process.env as AdminEnv): 
     },
   };
 
-  return { env, verifyIdToken, store, minter };
+  return { env, verifyIdToken, store, minter, redeemStore };
 }

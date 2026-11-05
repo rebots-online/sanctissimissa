@@ -360,10 +360,329 @@
   margin: 24px 0 0;
 }
 
+/* ── SK.3 — AccountView (frozen account screen) ──────────────────────────
+   Top-aligned page variant: the account view is a tall scrolling column, and
+   center-justified flex containers clip overflow at BOTH ends (§K.5 defect
+   class — the top must never become unreachable). */
+.account-surface.as-page {
+  justify-content: flex-start;
+  padding-top: 36px;
+}
+
+.account-column {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Vellum panel — same vocabulary as the sign-in card, full column width. */
+.account-panel {
+  background: var(--vellum);
+  border: 1px solid var(--parchment-deep);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(34, 28, 20, 0.08);
+  padding: 22px 24px;
+}
+.account-panel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.account-panel-label {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 10px;
+}
+.account-panel-title {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin: 0 0 10px;
+}
+.account-panel-head { margin-bottom: 4px; }
+.account-panel-caption {
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+  margin: 8px 0 0;
+}
+.account-panel-note {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ink-faint);
+  margin: 0;
+  text-align: center;
+}
+
+/* Identity card */
+.account-identity { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.account-avatar {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--rail);
+  color: #fbf7ee;
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 700;
+}
+.account-email {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.account-sublabel {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--ink-faint);
+  margin: 2px 0 0;
+}
+.account-signout {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  background: none;
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  color: #8f6a0e;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms, color 160ms;
+}
+.account-signout:hover:not(:disabled) { background: rgba(169, 126, 19, 0.1); }
+.account-signout:disabled { opacity: 0.6; cursor: default; }
+
+/* Credits stat */
+.account-credit-line {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 2px 0 4px;
+}
+.account-credit-stat {
+  font-family: var(--serif);
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  line-height: 1;
+}
+.account-credit-unit {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* Top-up packs */
+.account-pack-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+.account-pack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 12px 14px;
+  background: rgba(246, 240, 226, 0.5);
+  border: 1px solid var(--parchment-deep);
+  border-radius: 6px;
+}
+.account-pack.recommended { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; }
+.account-pack-flag {
+  position: absolute;
+  top: -9px;
+  left: 10px;
+  padding: 1px 8px;
+  background: var(--gold);
+  color: #fbf7ee;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.account-pack-name {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.account-pack-price {
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.account-pack-caption {
+  font-family: var(--sans);
+  font-size: 10px;
+  line-height: 1.35;
+  color: var(--ink-faint);
+  margin: 0;
+}
+.account-pack-buy {
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: var(--rail);
+  color: #fbf7ee;
+  border: none;
+  border-radius: 4px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms;
+}
+.account-pack-buy:hover:not(:disabled) { background: #3b3226; }
+.account-pack-buy:disabled { opacity: 0.6; cursor: default; }
+
+/* Sync chips — honest phases; 'Local' until SK.6's engine syncs. */
+.account-sync-rows { display: flex; flex-direction: column; }
+.account-sync-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 2px;
+  border-bottom: 1px solid rgba(236, 226, 204, 0.7);
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink);
+}
+.account-sync-row:last-child { border-bottom: none; }
+.account-chip {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.account-chip.synced { background: rgba(63, 125, 78, 0.14); color: #2e6a3f; }
+.account-chip.syncing { background: rgba(169, 126, 19, 0.14); color: #8f6a0e; }
+.account-chip.error { background: rgba(156, 39, 51, 0.12); color: #9c2733; }
+.account-chip.idle { background: rgba(138, 125, 106, 0.14); color: var(--ink-faint); }
+
+/* Ledger */
+.account-ledger-rows { display: flex; flex-direction: column; gap: 2px; }
+.account-ledger-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 2px;
+  border-bottom: 1px solid rgba(236, 226, 204, 0.7);
+}
+.account-ledger-row:last-child { border-bottom: none; }
+.account-ledger-label {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0;
+}
+.account-ledger-date {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--ink-faint);
+  margin: 1px 0 0;
+}
+.account-ledger-amount {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.account-ledger-amount.credit { color: #2e6a3f; }
+.account-ledger-amount.debit { color: #9c2733; }
+
+/* Redeem */
+.account-redeem-row { display: flex; gap: 10px; margin-top: 12px; }
+.account-redeem-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 12px;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--vellum);
+  border: 1px solid var(--parchment-deep);
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 160ms, box-shadow 160ms;
+}
+.account-redeem-row input::placeholder { color: rgba(138, 125, 106, 0.6); }
+.account-redeem-row input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold);
+}
+.account-redeem-btn {
+  padding: 9px 18px;
+  background: linear-gradient(180deg, #b88c1b, #9c730e);
+  border: 1px solid #8f6a0e;
+  color: #fbf7ee;
+  border-radius: 4px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 160ms;
+}
+.account-redeem-btn:hover:not(:disabled) { filter: brightness(1.06); }
+.account-redeem-btn:disabled { opacity: 0.6; cursor: default; }
+
+/* Screen-reader-only label (redeem input). */
+.account-surface .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Narrow widths — the card breathes, never clips (§A defect class). */
 @media (max-width: 640px) {
   .account-surface { padding: 28px 12px 24px; }
+  .account-surface.as-page { padding-top: 24px; }
   .account-card { padding: 24px 18px 20px; }
+  .account-panel { padding: 18px 16px; }
   .account-title { font-size: 27px; }
   .account-tagline { font-size: 17px; }
+  .account-pack-grid { grid-template-columns: 1fr; }
+  .account-panel-row { flex-direction: column; align-items: stretch; }
+  .account-signout { width: 100%; }
+  .account-redeem-row { flex-direction: column; }
+  .account-credit-stat { font-size: 34px; }
 }

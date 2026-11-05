@@ -28,13 +28,17 @@ import {
   type AuthOutcome,
 } from './auth.ts';
 
-/** Surfaces that follow the account across devices (SK.6 wires the engine). */
-export type SyncSurface = 'journal' | 'homily' | 'annotations' | 'voice';
+/**
+ * Surfaces that follow the account across devices (SK.6 wires the engine).
+ * Five per §K.2/the frozen account screen: bookmarks ride separately from
+ * annotations (the freeze renders five distinct rows).
+ */
+export type SyncSurface = 'journal' | 'homily' | 'annotations' | 'bookmarks' | 'voice';
 export type SyncPhase = 'idle' | 'syncing' | 'synced' | 'error';
 export type SyncStateMap = Record<SyncSurface, SyncPhase>;
 
 /** Signed-out / pre-engine default — every surface quiet. */
-export const IDLE_SYNC: SyncStateMap = { journal: 'idle', homily: 'idle', annotations: 'idle', voice: 'idle' };
+export const IDLE_SYNC: SyncStateMap = { journal: 'idle', homily: 'idle', annotations: 'idle', bookmarks: 'idle', voice: 'idle' };
 
 /**
  * Reads the account's remaining credits from the billing backend, given a
