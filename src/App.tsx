@@ -23,7 +23,6 @@ import JournalView from './ui/JournalView.tsx';
 import HomilyPlanner from './ui/HomilyPlanner.tsx';
 import SettingsView from './ui/SettingsView.tsx';
 import ChatView from './ui/ChatView.tsx';
-import OrientationGuide from './ui/OrientationGuide.tsx';
 import AboutView from './ui/AboutView.tsx';
 import SignInView from './ui/account/SignInView.tsx';
 import AccountView from './ui/account/AccountView.tsx';
@@ -37,7 +36,6 @@ import {
   SACRISTAN_ACT,
   SACRISTAN_LAYOUT,
   GUIDE_STEPS,
-  readGuideState,
   setGuideLiveContext,
   type CompanionAct,
 } from './core/orientation/guide.ts';
@@ -95,16 +93,15 @@ function isRealIsoDate(value: string): boolean {
 
 /** The `visible` snapshot (§H.1): structural, allowlisted facts only, never
  *  page text — rail collapsed/full; the last §D companion-layout announcement
- *  (panel state + dock mode); orientation card + spotlight state; the section
- *  anchors scrolled into view; which registered guide controls intersect the
- *  viewport. */
+ *  (panel state + dock mode); the held [[guide:]] target (OG supersession:
+ *  card + spotlight are gone); the section anchors scrolled into view; which
+ *  registered guide controls intersect the viewport. */
 function visibilitySnapshot(companionPanel: Record<string, unknown> | null): Record<string, unknown> {
   const intersectsViewport = (el: Element): boolean => {
     const r = el.getBoundingClientRect();
     return r.width > 0 && r.bottom > 0 && r.top < window.innerHeight;
   };
   const railMode = document.querySelector('.app')?.getAttribute('data-rail') === 'icons' ? 'collapsed' : 'full';
-  const guide = readGuideState();
   const scrolledSections = [...document.querySelectorAll('[data-section]')]
     .filter(intersectsViewport)
     .map((el) => el.getAttribute('data-section'))
@@ -116,11 +113,11 @@ function visibilitySnapshot(companionPanel: Record<string, unknown> | null): Rec
   return {
     rail: railMode,
     companionPanel,
+    // OG supersession (operator 2026-11-05): the tour card and its spotlight
+    // are gone; only the held [[guide:]] target remains observable. HD.1's
+    // readVisibleContext() replaces this snapshot wholesale.
     orientation: {
-      completed: guide.completed,
-      step: guide.step,
       targetHeld: Boolean(document.querySelector('.orientation-target')),
-      spotlight: Boolean(document.querySelector('.tour-spotlight')),
     },
     scrolledSections,
     visibleControls,
@@ -607,15 +604,19 @@ function AppShell() {
       )}
 
       <div className="main">
-        <header className="masthead">
-          <h1>{day?.feastName ?? day?.weekKey ?? '—'}</h1>
-          {day?.winner?.rankClass && <span className="rank-badge">{day.winner.rankClass}</span>}
-          <span className="sub">
-            {day?.date} · {day?.season} · {day?.temporaPath}
-            {day && day.commemorations.length > 0 &&
-              ` · Comm.: ${day.commemorations.slice(0, 2).map((c) => c.title ?? c.key).join('; ')}`}
-          </span>
-        </header>
+        {/* §K.2: the account surface is a focused page — the feast masthead
+            would only push its content below the fold. */}
+        {view !== 'account' && (
+          <header className="masthead">
+            <h1>{day?.feastName ?? day?.weekKey ?? '—'}</h1>
+            {day?.winner?.rankClass && <span className="rank-badge">{day.winner.rankClass}</span>}
+            <span className="sub">
+              {day?.date} · {day?.season} · {day?.temporaPath}
+              {day && day.commemorations.length > 0 &&
+                ` · Comm.: ${day.commemorations.slice(0, 2).map((c) => c.title ?? c.key).join('; ')}`}
+            </span>
+          </header>
+        )}
 
         {view !== 'map' && view !== 'annotations' && view !== 'account' && (
           <MapStrip
@@ -735,13 +736,13 @@ function AppShell() {
         <TrayPanel sidecar={sidecar} open={trayOpen} onToggle={() => setTrayOpen((o) => !o)} />
       )}
 
-      {/* §K.3 credit gate: the Sacristan badge/panel and the orientation
-          cards/tour mount ONLY for a funded, signed-in account — conditional
-          mount, never display:none. Signed-out and zero-credit sessions see
-          no assistant UI and no prompt about it; funding is discoverable
-          through the always-present Account & Sync rail entry. */}
+      {/* §K.3 credit gate: the Sacristan badge/panel mounts ONLY for a funded,
+          signed-in account — conditional mount, never display:none. Signed-out
+          and zero-credit sessions see no assistant UI and no prompt about it;
+          funding is discoverable through the always-present Account & Sync rail
+          entry. (OG supersession, operator 2026-11-05: the orientation card was
+          removed; §K.8's didactic overlay is the successor surface.) */}
       {sacristanGate && <ChatView sidecar={sidecar} />}
-      {sacristanGate && <OrientationGuide />}
 
       {/* Mandatory app chrome: version bottom-right on every surface. */}
       <div className="version-tag" title={`Build ${versionInfo.buildNumber} · ${versionInfo.buildDate}`}>

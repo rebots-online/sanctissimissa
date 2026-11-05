@@ -110,13 +110,14 @@ test('CL.2: document-plane acts are forwarded on the dedicated channels', () => 
 
 test('CL.2: App registers the live context and visible snapshot', () => {
   assert.match(appSource, /setGuideLiveContext\(\{[\s\S]*?currentView: view,[\s\S]*?currentDate: date,[\s\S]*?focusSection: focus\.section,[\s\S]*?openDraftKey,[\s\S]*?visible: visibilitySnapshot\(companionLayoutRef\.current\),[\s\S]*?\}\)/);
-  assert.match(appSource, /readGuideState\(\)/);
+  // OG supersession (operator 2026-11-05): tour-completed state and the
+  // spotlight veil are gone with the card; the held [[guide:]] target stays.
   assert.match(appSource, /GUIDE_STEPS[\s\S]*?visibleControls/);
   assert.match(appSource, /scrolledSections/);
   assert.match(appSource, /data-rail/);
   assert.match(appSource, /companionPanel/);
-  assert.match(appSource, /\.tour-spotlight/);
   assert.match(appSource, /\.orientation-target/);
+  assert.doesNotMatch(appSource, /\.tour-spotlight/);
   assert.match(appSource, /SACRISTAN_LAYOUT/);
 });
 

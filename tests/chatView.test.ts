@@ -118,10 +118,10 @@ test('CP.5: mock stand-in rotates deterministic formulas across turns', async ()
   assert.equal(fifth, first, 'four-formula cycle repeats deterministically');
 });
 
-test('HC/OG2: badge open announces SACRISTAN_LAYOUT so orientation cards re-validate (§D)', () => {
+test('HC/OG2: badge open announces SACRISTAN_LAYOUT so live-context readers re-validate (§D)', () => {
   // A fixed-position panel never resizes the document root, so ResizeObserver
-  // cannot see it — panel-open MUST dispatch the event the placement
-  // validation listens for (regression: the guide sat inside the docked panel).
+  // cannot see it — panel-open MUST dispatch the event App's live `visible`
+  // snapshot listens for (regression: the guide sat inside the docked panel).
   const effectAt = chatView.indexOf('window.dispatchEvent(new CustomEvent(SACRISTAN_LAYOUT));');
   const depsAt = effectAt === -1 ? -1 : chatView.indexOf('}, [open]);', effectAt);
   assert.ok(effectAt !== -1 && depsAt !== -1, 'panel-layout changes announce SACRISTAN_LAYOUT (never a command) from a post-commit effect keyed on [open]');

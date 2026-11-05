@@ -4,11 +4,12 @@
  *  1. Real behavior: `isSacristanVisible` — hosted Sacristan UI mounts only
  *     for a signed-in user with remaining credits; null credits count as
  *     zero (never an optimistic yes); a credit drop to zero closes the gate.
- *  2. Source contract: App mounts the badge/panel (ChatView) and the
- *     orientation tour conditionally on that gate — never display:none — and
- *     the Account & Sync rail entry stays reachable so funding is
- *     discoverable without any nag. SettingsView's tour affordance obeys the
- *     same gate (no dead clicks when the tour cannot mount).
+ *  2. Source contract: App mounts the badge/panel (ChatView) conditionally
+ *     on that gate — never display:none — and the Account & Sync rail entry
+ *     stays reachable so funding is discoverable without any nag.
+ *     (OG supersession, operator 2026-11-05: the orientation card and its
+ *     Settings affordance were removed; the gate now covers the Sacristan
+ *     surface alone until §K.8's didactic overlay mounts under it.)
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -40,10 +41,10 @@ test('SK.4: gate is true only for a funded signed-in account; a drop to 0 closes
 
 const appSrc = readFileSync(new URL('../src/App.tsx', import.meta.url), 'utf8');
 
-test('SK.4: App mounts ChatView + OrientationGuide conditionally on the gate (never display:none)', () => {
+test('SK.4: App mounts ChatView conditionally on the gate (never display:none)', () => {
   assert.match(appSrc, /const sacristanGate = isSacristanVisible\(account\.user, account\.creditUnits\);/);
   assert.match(appSrc, /\{sacristanGate && <ChatView sidecar=\{sidecar\} \/>\}/, 'badge/panel unmount with the gate');
-  assert.match(appSrc, /\{sacristanGate && <OrientationGuide \/>\}/, 'orientation cards/tour unmount with the gate');
+  assert.ok(!appSrc.includes('OrientationGuide'), 'the orientation card is gone (OG supersession, operator 2026-11-05)');
   assert.ok(!appSrc.includes('display: none'), 'gating is by mount, never by CSS hiding');
 });
 
@@ -63,14 +64,4 @@ test('SK.4: one AccountProvider wraps the shell with the production credit reade
   assert.match(appSrc, /const CREDIT_READER = creditReaderFromEnv\(\);/, 'stable reader identity (module-level)');
   assert.match(appSrc, /<AccountProvider creditReader=\{CREDIT_READER\}>\s*\n\s*<AppShell \/>\s*\n\s*<\/AccountProvider>/);
   assert.match(appSrc, /function AppShell\(\) \{\s*\n\s*const account = useAccount\(\);/);
-});
-
-/* ───────────────────────── SettingsView tour affordance ───────────────── */
-
-const settingsSrc = readFileSync(new URL('../src/ui/SettingsView.tsx', import.meta.url), 'utf8');
-
-test('SK.4: the Settings tour affordance obeys the same gate (no dead clicks)', () => {
-  assert.match(settingsSrc, /isSacristanVisible\(account\.user, account\.creditUnits\) && \(\s*\n\s*<button[\s\S]*?>Restart orientation<\/button>/,
-    'Restart orientation mounts only while the tour can');
-  assert.match(settingsSrc, /const account = useAccount\(\);/);
 });

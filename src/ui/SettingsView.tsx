@@ -6,8 +6,6 @@
 
 import { useMemo, useState } from 'react';
 import ThemePicker from './ThemePicker.tsx';
-import { START_GUIDE } from '../core/orientation/guide.ts';
-import { useAccount, isSacristanVisible } from '../core/account/useAccount.ts';
 import { openDiagnostics } from './DiagnosticsWindow.tsx';
 import ModelPicker, { useCompanionModels } from './ModelPicker.tsx';
 import { SidecarDb } from '../core/accompaniment/store.ts';
@@ -65,7 +63,6 @@ export default function SettingsView({
   onOpenJournal?: () => void;
 }) {
   const companionModels = useCompanionModels();
-  const account = useAccount();
   const [tab, setTab] = useState<Tab>('appearance');
   const [, bump] = useState(0);
   const [syncBusy, setSyncBusy] = useState(false);
@@ -315,11 +312,6 @@ export default function SettingsView({
           )}
           {!sidecar && <p className="settings-desc">Sidecar unavailable — snapshots cannot be exported or restored.</p>}
         </section>
-      )}
-      {/* §K.3: a tour affordance only while the tour itself can mount —
-          otherwise this would be a dead click for gated-out sessions. */}
-      {isSacristanVisible(account.user, account.creditUnits) && (
-        <button type="button" className="settings-button" onClick={() => window.dispatchEvent(new Event(START_GUIDE))}>Restart orientation</button>
       )}
       <button type="button" className="settings-diagnostics" onClick={openDiagnostics}>Diagnostics</button>
     </div>

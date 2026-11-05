@@ -2820,15 +2820,10 @@ button.mstation, button.mstation.active, button.mstation.open {
 .diagnostics-copy { display: flex; flex-direction: column; padding: 8px; }
 .diagnostics-copy textarea { height: 100px; }
 @media (max-width: 720px) { .diagnostics-window { width: calc(100vw - 16px); } .diagnostics-tools input[placeholder] { width: 100%; } }
-.orientation-offer, .orientation-guide { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: auto; top: 64px; z-index: 85; max-width: min(340px, calc(100vw - 32px)); max-height: 40dvh; overflow: auto; padding: 18px; color: var(--text); background: var(--card, #faf7f0); border: 2px solid var(--gold, #b08d3e); border-radius: 12px; box-shadow: 0 8px 28px #0006; line-height: 1.5; }
-.orientation-guide strong { display: block; }
-.orientation-offer, .orientation-guide { cursor: grab; touch-action: none; }
-.orientation-offer.dragging, .orientation-guide.dragging { cursor: grabbing; user-select: none; }
-.orientation-grip { user-select: none; letter-spacing: 2px; color: var(--ink-soft, #6b6353); margin-right: 6px; }
-.orientation-drag-hint { display: block; font-size: 11px; font-style: italic; color: var(--ink-soft, #6b6353); margin-bottom: 6px; }
-.orientation-compact { padding: 10px; max-width: min(300px, calc(100vw - 24px)); max-height: 32dvh; }
-.orientation-compact details summary { cursor: pointer; font-size: 12px; }
-.orientation-compact details[open] { max-height: 24dvh; overflow-y: auto; overscroll-behavior: contain; }
+/* OG supersession (operator 2026-11-05): the orientation card chrome is gone.
+   What survives is the [[guide:]] target grammar — the highlight outline, the
+   "Show me" pulse, and the held-target attention styles below — used by
+   activateGuide()/highlightGuide() and, per §K.8, the didactic overlay to come. */
 .orientation-showing { animation: orientation-showing 1.4s ease-out 1; }
 @keyframes orientation-showing {
   0% { outline-offset: 4px; box-shadow: 0 0 0 0 #edc657cc; }
@@ -2836,11 +2831,6 @@ button.mstation, button.mstation.active, button.mstation.open {
   100% { outline-offset: 4px; box-shadow: 0 0 0 7px #edc65733; }
 }
 @media (prefers-reduced-motion: reduce) { .orientation-showing { animation: none; outline-offset: 8px; } }
-.orientation-offer:focus-visible, .orientation-guide:focus-visible { outline: 2px solid var(--gold, #b08d3e); outline-offset: 2px; }
-.orientation-guide.dragging strong { cursor: grabbing; }
-.orientation-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.orientation-offer button, .orientation-guide button { padding: 10px; min-height: 44px; font: inherit; border: 1px solid var(--gold, #b08d3e); border-radius: 8px; color: inherit; background: var(--card, #faf7f0); cursor: pointer; }
-.orientation-offer button { margin-right: 8px; }
 .orientation-target { outline: 3px solid #edc657 !important; outline-offset: 4px; box-shadow: 0 0 0 7px #edc65733 !important; }
 .companion-choice { font-size: .92rem; }
 
@@ -2882,26 +2872,12 @@ button:disabled { opacity: 0.55; cursor: not-allowed; }
   .chat-prompts .chat-prompt-chip:hover:not(:disabled) { transform: none; transition: none; }
 }
 
-/* ===================== OG.9 (§H.3) — tour spotlight: dim veil + halo cutout ===================== */
-/* The veil is painted by the cutout's own 200vmax box-shadow spread — the cutout itself stays fully
-   transparent and the whole overlay is pointer-events: none, so the haloed target remains directly
-   clickable and the Mass stays visible through the veil (max 50% dim). The overlay sits at z-index 84,
-   just under the orientation card (z-index 85). */
-.tour-spotlight { position: fixed; inset: 0; z-index: 84; pointer-events: none; }
-.tour-spotlight-cutout { position: fixed; border-radius: 12px; pointer-events: none; box-shadow: 0 0 0 200vmax rgba(24, 18, 8, 0.5); }
-.tour-spotlight-halo { position: fixed; border: 2px solid var(--gold, #b08d3e); border-radius: 14px; pointer-events: none; box-shadow: 0 0 18px 2px rgba(176, 141, 62, 0.45); animation: tour-halo-pulse 1.6s ease-in-out infinite; }
-@keyframes tour-halo-pulse {
-  0%, 100% { box-shadow: 0 0 14px 1px rgba(176, 141, 62, 0.35); }
-  50% { box-shadow: 0 0 26px 5px rgba(176, 141, 62, 0.6); }
-}
-/* reduced-motion: a static halo ring, no pulse */
-@media (prefers-reduced-motion: reduce) {
-  .tour-spotlight-halo { animation: none; }
-}
-/* ── §H.3 amendment: target-side attention — one shared grammar for tour steps, Show me pulses, and
-   show-path steps. A held .orientation-target flips to high contrast (surface --card, 2 px --gold
-   border, darkened ink) and waves/tilts: rotate ±2.5° with a 1 px bob, 0.9 s, 2 iterations.
-   :not(.orientation-showing) keeps the §D "Show me" pulse its own animation while both are held. */
+/* ── §H.3 amendment (survives the OG card supersession): target-side attention —
+   one shared grammar for held [[guide:]] targets and Show me pulses. A held
+   .orientation-target flips to high contrast (surface --card, 2 px --gold
+   border, darkened ink) and waves/tilts: rotate ±2.5° with a 1 px bob, 0.9 s,
+   2 iterations. :not(.orientation-showing) keeps the §D "Show me" pulse its
+   own animation while both are held. */
 .orientation-target {
   background: var(--card, #faf7f0) !important;
   border: 2px solid var(--gold, #b08d3e) !important;
@@ -2917,12 +2893,6 @@ button:disabled { opacity: 0.55; cursor: not-allowed; }
 @media (prefers-reduced-motion: reduce) {
   .orientation-target:not(.orientation-showing) { animation: none; transform: none; }
 }
-
-/* ===================== OG.10 (§H.4) — didactic path walkthrough: the active ribbon ===================== */
-.tour-ribbon { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 2px; }
-.tour-ribbon span { flex: none; width: 20px; height: 6px; border-radius: 3px; background: var(--card-border, #d8cdb4); }
-.tour-ribbon span.visited { background: var(--gold, #b08d3e); }
-.tour-ribbon span.current { background: var(--accent, #3f7a52); box-shadow: 0 0 0 2px var(--accent-soft, #3f7a5226); }
 
 /* ===================== OG.11 (§H.5) — mascot presence cadence: the subtle "I'm here" idle ===================== */
 /* Applied to the porthole for the gesture duration, alongside the alternating

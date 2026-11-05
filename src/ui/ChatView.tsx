@@ -189,7 +189,6 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
   );
   const [messages, setMessages] = useState<ChatMsgUi[]>([]);
   const [input, setInput] = useState('');
-  const [orientationPrompt, setOrientationPrompt] = useState<string | null>(null);
   const [streaming, setStreaming] = useState(false);
   const [genSeconds, setGenSeconds] = useState<number | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -325,29 +324,18 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
 
   const sendRef = useRef<(text?: string) => Promise<void>>(async () => {});
   useEffect(() => {
-    const show = (event: Event) => {
-      setOpen(true);
-      const prompt = (event as CustomEvent<{ prompt?: string }>).detail?.prompt;
-      if (prompt) setOrientationPrompt(prompt);
-    };
+    const show = () => setOpen(true);
     window.addEventListener(OPEN_SACRISTAN, show);
     return () => window.removeEventListener(OPEN_SACRISTAN, show);
   }, []);
   // Announce panel-layout changes AFTER the render commits: a fixed-position
   // panel never resizes the document root (observers cannot see it), and
-  // announcing inside the click handler races React's commit — the
-  // orientation cards' placement validation queries .chat-panel on this
-  // event (§D). Fires on open AND close; `show` re-running on the echo is an
-  // idempotent setOpen(true).
+  // announcing inside the click handler races React's commit — App's live
+  // `visible` context snapshot listens for this event (CL.2). Fires on open
+  // AND close; `show` re-running on the echo is an idempotent setOpen(true).
   useEffect(() => {
     window.dispatchEvent(new CustomEvent(SACRISTAN_LAYOUT));
   }, [open]);
-  useEffect(() => {
-    if (orientationPrompt && engineState === 'ready' && !streaming) {
-      setOrientationPrompt(null);
-      void sendRef.current(orientationPrompt);
-    }
-  }, [orientationPrompt, engineState, streaming]);
 
   // CL.4 (§H.2): CompanionMemory over the sidecar's own sql.js handle — one
   // database, shared with the accompaniment store; null (memory idle) when
@@ -673,7 +661,6 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
                 {engineState !== 'ready' && <button type="button" onClick={() => setOpen(false)}>Return to Missal</button>}
               </div>
             </div>
-            {orientationPrompt && <p role="status">Your orientation question is waiting. Prepare the Sacristan to hear its explanation; you can keep using the on-screen guide now.</p>}
             {replyNotice && <p className="companion-notice" role="status">{replyNotice}</p>}
             {streaming && genSeconds !== null && (
               <p className="chat-generating" role="status" aria-live="polite">
