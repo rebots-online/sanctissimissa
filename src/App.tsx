@@ -30,8 +30,8 @@ import TrayPanel from './ui/TrayPanel.tsx';
 import { useNarrow } from './ui/BilingualText.tsx';
 import { applyTheme, readThemePreference, systemMode } from './core/theme/themes.ts';
 import {
-  COMPANION_ACT,
-  COMPANION_LAYOUT,
+  SACRISTAN_ACT,
+  SACRISTAN_LAYOUT,
   GUIDE_STEPS,
   readGuideState,
   setGuideLiveContext,
@@ -57,11 +57,13 @@ const UTIL_NAV: { id: View; ico: string; label: string }[] = [
   { id: 'about', ico: 'ℹ', label: 'Help · About' },
 ];
 
-// ── CL.2 (§H.1): COMPANION_ACT routing + live/visibility context ──────
+// ── CL.2 (§H.1): SACRISTAN_ACT routing + live/visibility context ──────
 /** Document-plane events App forwards acts onto for CL.5's surfaces (and the
  *  tour engine for OG.10). Values follow the guide.ts event convention
- *  (COMPANION_ACT = 'sanctissimissa:companion-act'); App only forwards — it
- *  never performs the document-plane write itself. */
+ *  (SACRISTAN_ACT = 'sanctissimissa:sacristan-act'); App only forwards — it
+ *  never performs the document-plane write itself. The four document-plane
+ *  values below keep their §H spellings deliberately (§K.6): dispatcher and
+ *  listener must match, and these stay internal. */
 const COMPANION_DRAFT = 'sanctissimissa:companion-draft';
 const COMPANION_ANNOTATE = 'sanctissimissa:companion-annotate';
 const COMPANION_SEARCH = 'sanctissimissa:companion-search';
@@ -185,20 +187,20 @@ export default function App() {
         ? { ...(detail as Record<string, unknown>) }
         : null;
     };
-    window.addEventListener(COMPANION_LAYOUT, onLayout);
-    return () => window.removeEventListener(COMPANION_LAYOUT, onLayout);
+    window.addEventListener(SACRISTAN_LAYOUT, onLayout);
+    return () => window.removeEventListener(SACRISTAN_LAYOUT, onLayout);
   }, []);
 
-  // CL.2 (§H.1): route COMPANION_ACT. `open` takes the rail's own state-set
+  // CL.2 (§H.1): route SACRISTAN_ACT. `open` takes the rail's own state-set
   // path; `focus` fires only when the section is live-rendered; `date`
   // re-validates the ISO before committing; document-plane acts are forwarded
   // as dedicated events for CL.5's surfaces (App never writes them itself).
   // Invalid acts change nothing visible and land in Diagnostics.
   useEffect(() => {
-    const reject = (detail: unknown) => debugEvent('companion', 'act.rejected', detail, 'warn');
+    const reject = (detail: unknown) => debugEvent('sacristan', 'act.rejected', detail, 'warn');
     const forward = (name: string, kind: string, value: string, reply: string) => {
       window.dispatchEvent(new CustomEvent(name, { detail: { kind, value, reply } }));
-      debugEvent('companion', 'act.forward', { event: name, kind, value }, 'info');
+      debugEvent('sacristan', 'act.forward', { event: name, kind, value }, 'info');
     };
     const onAct = (event: Event) => {
       const act = (event as CustomEvent).detail as CompanionActDetail | null;
@@ -214,7 +216,7 @@ export default function App() {
           // history effect records the layer for system-back.
           if (!RAIL_VIEWS.has(value)) { reject({ kind: act.kind, value }); return; }
           setView(value as View);
-          debugEvent('companion', 'act.open', { view: value }, 'info');
+          debugEvent('sacristan', 'act.open', { view: value }, 'info');
           return;
         case 'focus':
           // Only when the section exists in the live DOM (attribute compare —
@@ -224,12 +226,12 @@ export default function App() {
             return;
           }
           setFocus((f) => ({ section: value, nonce: f.nonce + 1 }));
-          debugEvent('companion', 'act.focus', { section: value }, 'info');
+          debugEvent('sacristan', 'act.focus', { section: value }, 'info');
           return;
         case 'date':
           if (!isRealIsoDate(value)) { reject({ kind: act.kind, value }); return; }
           setDate(value);
-          debugEvent('companion', 'act.date', { date: value }, 'info');
+          debugEvent('sacristan', 'act.date', { date: value }, 'info');
           return;
         case 'homily-draft':
           setOpenDraftKey(value);
@@ -249,15 +251,15 @@ export default function App() {
             ? act.steps
             : value.split('>').map((part) => ({ target: part.trim(), narration: '' })).filter((s) => s.target);
           window.dispatchEvent(new CustomEvent(COMPANION_SHOWPATH, { detail: { steps } }));
-          debugEvent('companion', 'act.forward', { event: COMPANION_SHOWPATH, steps: steps.length }, 'info');
+          debugEvent('sacristan', 'act.forward', { event: COMPANION_SHOWPATH, steps: steps.length }, 'info');
           return;
         }
         default:
           reject({ kind: act.kind, value });
       }
     };
-    window.addEventListener(COMPANION_ACT, onAct as EventListener);
-    return () => window.removeEventListener(COMPANION_ACT, onAct as EventListener);
+    window.addEventListener(SACRISTAN_ACT, onAct as EventListener);
+    return () => window.removeEventListener(SACRISTAN_ACT, onAct as EventListener);
   }, []);
 
   // CL.2 (§H.1): merge the app's live, allowlisted facts into guideContext()'s

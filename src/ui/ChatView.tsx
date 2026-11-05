@@ -1,10 +1,10 @@
 /**
- * ChatView — Companion surface (CP.5, operator directive 2026-09-16).
+ * ChatView — Sacristan surface (CP.5, operator directive 2026-09-16; §K.6 rename).
  * Default presentation is the ChatBadge intercom porthole; it expands to a
  * fully dockable + resizeable chat panel: dock-left, dock-right, floating
  * (header drag + corner resize), inline, fullscreen, and the mobile bottom
- * sheet. Mode + geometry persist via sidecar settings chat.dock /
- * chat.rect / chat.dockWidth. Turns stream through ChatController over the
+ * sheet. Mode + geometry persist via sidecar settings sacristan.dock /
+ * sacristan.rect / sacristan.dockWidth. Turns stream through ChatController over the
  * mock engine (CP.3 WebGPU TurboQuant / CP.4 registry plug in unchanged).
  *
  * CL.4 (§H.2/§H.4): every turn is grounded in persona + guideContext() (live
@@ -13,7 +13,7 @@
  * insight action (generated study accompaniment anchored to the current day
  * + focus section); the panel closing idle-distills the last completed turn
  * (2-minute debounce, never mid-stream); a show-path reply forwards its
- * narration steps on COMPANION_ACT. CL.6 (§H.6): assistant replies render
+ * narration steps on SACRISTAN_ACT. CL.6 (§H.6): assistant replies render
  * through ChatMarkdown. CL.7 (§H.7): a fresh conversation offers the six
  * authored starter-question chips.
  */
@@ -22,9 +22,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import type { Database } from 'sql.js';
 import {
-  COMPANION_ACT,
-  COMPANION_LAYOUT,
-  OPEN_COMPANION,
+  OPEN_SACRISTAN,
+  SACRISTAN_ACT,
+  SACRISTAN_LAYOUT,
   applyGuideCommand,
   guideContext,
   parseCompanionCommand,
@@ -175,17 +175,17 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
   const models = useCompanionModels();
   const [open, setOpen] = useState(false);
   const [dock, setDock] = useState<DockMode>(
-    () => (sidecar?.getSetting('chat.dock') as DockMode | null) ?? 'dock-right',
+    () => (sidecar?.getSetting('sacristan.dock') as DockMode | null) ?? 'dock-right',
   );
   const [rect, setRect] = useState<Rect>(() => {
     try {
-      return { ...DEFAULT_RECT, ...(JSON.parse(sidecar?.getSetting('chat.rect') ?? '{}') as Partial<Rect>) };
+      return { ...DEFAULT_RECT, ...(JSON.parse(sidecar?.getSetting('sacristan.rect') ?? '{}') as Partial<Rect>) };
     } catch {
       return DEFAULT_RECT;
     }
   });
   const [dockWidth, setDockWidth] = useState(() =>
-    clamp(Number(sidecar?.getSetting('chat.dockWidth')) || 360, DOCK_MIN, DOCK_MAX),
+    clamp(Number(sidecar?.getSetting('sacristan.dockWidth')) || 360, DOCK_MIN, DOCK_MAX),
   );
   const [messages, setMessages] = useState<ChatMsgUi[]>([]);
   const [input, setInput] = useState('');
@@ -228,7 +228,6 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
   useEffect(() => {
     let cancelled = false;
     let timeout: ReturnType<typeof setTimeout> | undefined;
-    let slowTimer: ReturnType<typeof setTimeout> | undefined;
     const controller = new ChatController();
     let initialized = false;
     controllerRef.current = null;
@@ -252,11 +251,11 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
       }, 120_000);
     };
     heartbeat();
-    slowTimer = setTimeout(() => { if (!cancelled) setSlow(true); }, 30_000);
+    const slowTimer = setTimeout(() => { if (!cancelled) setSlow(true); }, 30_000);
     void (async () => {
       try {
         const invoke = companionInvoke();
-        const traceId = debugTrace('companion-start');
+        const traceId = debugTrace('sacristan-start');
         const progress = (fraction: number) => {
           if (cancelled) return;
           heartbeat();
@@ -264,14 +263,14 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
         };
         let hostedReason: string | null = null;
         if (hostedPreferred) {
-          debugEvent('companion', 'resolve.start', { selectedId: persistedChoice, hosted: true }, 'info', traceId);
+          debugEvent('sacristan', 'resolve.start', { selectedId: persistedChoice, hosted: true }, 'info', traceId);
           const hosted = await resolveHostedEngine(import.meta.env.VITE_OPENROUTER_API_KEY as string | undefined, progress);
-          debugEvent('companion', 'resolve.result', hosted.kind === 'ready' ? { kind: hosted.kind, config: hosted.config } : hosted, 'info', traceId);
+          debugEvent('sacristan', 'resolve.result', hosted.kind === 'ready' ? { kind: hosted.kind, config: hosted.config } : hosted, 'info', traceId);
           if (cancelled) return;
           if (hosted.kind === 'ready') {
             await controller.useEngine(hosted.engine, hosted.config);
             initialized = true;
-            debugEvent('companion', 'engine.ready', { selectedId: 'hosted:openrouter' }, 'info', traceId);
+            debugEvent('sacristan', 'engine.ready', { selectedId: 'hosted:openrouter' }, 'info', traceId);
             if (cancelled) { await controller.close(); return; }
             controllerRef.current = controller;
             setHostedActive(true);
@@ -292,16 +291,16 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
         }
         const current = modelsRef.current;
         const candidates = catalog.ranked.filter((model) => current.state.states[model.id] === 'downloaded');
-        debugEvent('companion', 'resolve.start', { selectedId, native: Boolean(invoke) }, 'info', traceId);
+        debugEvent('sacristan', 'resolve.start', { selectedId, native: Boolean(invoke) }, 'info', traceId);
         const resolved: Resolution = invoke
           ? await resolveNativeEngine(invoke, catalog.report, current.locate, candidates, selectedId, progress)
           : await resolveWebEngine(catalog.report, selectedId, progress);
-        debugEvent('companion', 'resolve.result', resolved.kind === 'ready' ? { kind: resolved.kind, config: resolved.config } : resolved, 'info', traceId);
+        debugEvent('sacristan', 'resolve.result', resolved.kind === 'ready' ? { kind: resolved.kind, config: resolved.config } : resolved, 'info', traceId);
         if (cancelled) return;
         if (resolved.kind !== 'ready') throw new Error(resolved.reason);
         await controller.useEngine(resolved.engine, resolved.config);
         initialized = true;
-        debugEvent('companion', 'engine.ready', { selectedId }, 'info', traceId);
+        debugEvent('sacristan', 'engine.ready', { selectedId }, 'info', traceId);
         if (cancelled) { await controller.close(); return; }
         controllerRef.current = controller;
         setEngineState('ready');
@@ -331,8 +330,8 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
       const prompt = (event as CustomEvent<{ prompt?: string }>).detail?.prompt;
       if (prompt) setOrientationPrompt(prompt);
     };
-    window.addEventListener(OPEN_COMPANION, show);
-    return () => window.removeEventListener(OPEN_COMPANION, show);
+    window.addEventListener(OPEN_SACRISTAN, show);
+    return () => window.removeEventListener(OPEN_SACRISTAN, show);
   }, []);
   // Announce panel-layout changes AFTER the render commits: a fixed-position
   // panel never resizes the document root (observers cannot see it), and
@@ -341,7 +340,7 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
   // event (§D). Fires on open AND close; `show` re-running on the echo is an
   // idempotent setOpen(true).
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent(COMPANION_LAYOUT));
+    window.dispatchEvent(new CustomEvent(SACRISTAN_LAYOUT));
   }, [open]);
   useEffect(() => {
     if (orientationPrompt && engineState === 'ready' && !streaming) {
@@ -395,8 +394,8 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
       const targets = act.value.split('>').map((step) => step.trim()).filter(Boolean);
       const narrations = pathNarrations(response, targets.length);
       const steps: PathStep[] = targets.map((target, index) => ({ target, narration: narrations[index] ?? '' }));
-      window.dispatchEvent(new CustomEvent(COMPANION_ACT, { detail: { ...act, steps } }));
-      debugEvent('companion', 'command.dispatch', { kind: act.kind, steps: steps.length }, 'info');
+      window.dispatchEvent(new CustomEvent(SACRISTAN_ACT, { detail: { ...act, steps } }));
+      debugEvent('sacristan', 'command.dispatch', { kind: act.kind, steps: steps.length }, 'info');
       return;
     }
     applyGuideCommand(response);
@@ -416,14 +415,14 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
     const saved = sidecar.save({
       exposure: 'study',
       provenance: 'generated',
-      title: (question || body.split('\n')[0] || 'Companion insight').slice(0, 80),
+      title: (question || body.split('\n')[0] || 'Sacristan insight').slice(0, 80),
       bodyHtml: ensureNoteHtml(body),
       anchors: facts.focus ? [`section:${facts.focus}`] : [],
       selectors: [{ id: '', accompanimentId: '', kind: 'date', value: facts.date }],
     });
     void sidecar.persist();
     setSavedInsights((previous) => new Set(previous).add(index));
-    debugEvent('companion', 'insight.saved', { id: saved.id, day: facts.date, focus: facts.focus }, 'info');
+    debugEvent('sacristan', 'insight.saved', { id: saved.id, day: facts.date, focus: facts.focus }, 'info');
   };
 
   // CL.4 (§H.2): distill-on-idle — after the panel closes with no active
@@ -479,7 +478,7 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
 
   const changeDock = (mode: DockMode) => {
     setDock(mode);
-    persist('chat.dock', mode);
+    persist('sacristan.dock', mode);
   };
 
   useEffect(() => {
@@ -574,8 +573,8 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
   const onPointerUp = () => {
     if (!dragRef.current) return;
     dragRef.current = null;
-    persist('chat.rect', JSON.stringify(rect));
-    persist('chat.dockWidth', String(dockWidth));
+    persist('sacristan.rect', JSON.stringify(rect));
+    persist('sacristan.dockWidth', String(dockWidth));
   };
 
   const panelStyle =
@@ -594,8 +593,8 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
         <section
           className={`chat-panel ${dock}`}
           role="complementary"
-          aria-label="Companion chat"
-          data-guide="companion"
+          aria-label="Sacristan chat"
+          data-guide="sacristan"
           style={panelStyle}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
@@ -605,7 +604,7 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
             onPointerDown={dock === 'floating' ? onPointerDown('move') : undefined}
           >
             <div className="chat-header-left">
-              <h3>Companion</h3>
+              <h3>Sacristan</h3>
               <EngineChip state={engineState} hosted={hostedActive} />
               <ModelPicker hook={models} compact disabled={streaming || engineState === 'starting'} />
             </div>
@@ -648,7 +647,7 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
           )}
           <div className="chat-log" ref={listRef}>
             <div className="companion-guidance">
-              <p className="companion-choice">{selected ? `Selected: ${selected.displayName}${selected.id === catalog?.defaultPick?.id ? " · recommended" : ""}. Change it with Companion choices above.` : ""}</p>
+              <p className="companion-choice">{selected ? `Selected: ${selected.displayName}${selected.id === catalog?.defaultPick?.id ? " · recommended" : ""}. Change it with Sacristan choices above.` : ""}</p>
               <p role="status" aria-live="polite" aria-atomic="true">
                 {models.state.error ? companionFeedback.catalogue
                   : !catalog ? companionFeedback.checking
@@ -661,20 +660,20 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
                   : engineState === 'ready' ? companionFeedback.ready
                   : companionFeedback.setup}
               </p>
-              {selectedState === 'downloading' && <progress aria-label="Companion download" max={100} value={models.state.progress[selectedId ?? ''] ?? 0} />}
-              {engineState === 'starting' && <progress aria-label="Preparing Companion" max={100} value={engineProgress ?? undefined} />}
+              {selectedState === 'downloading' && <progress aria-label="Sacristan download" max={100} value={models.state.progress[selectedId ?? ''] ?? 0} />}
+              {engineState === 'starting' && <progress aria-label="Preparing Sacristan" max={100} value={engineProgress ?? undefined} />}
               <div className="companion-actions">
                 {models.state.error && <button type="button" onClick={models.retryCatalog}>Try again</button>}
                 {selected && !selected.unsupported && !streaming && (selectedState === 'idle' || selectedState === 'failed') &&
                   <button type="button" onClick={() => models.download(selected.id)}>
-                    {selectedState === 'failed' ? 'Try again' : `Prepare Companion · about ${formatBytes(selected.bytes)}`}
+                    {selectedState === 'failed' ? 'Try again' : `Prepare Sacristan · about ${formatBytes(selected.bytes)}`}
                   </button>}
                 {engineState === 'failed' && selectedState === 'downloaded' && <button type="button" onClick={() => setAttempt((value) => value + 1)}>Try again</button>}
                 {(selectedState === 'downloading' || engineState === 'starting') && selected && <button type="button" onClick={() => models.cancel(selected.id)}>Cancel preparation</button>}
                 {engineState !== 'ready' && <button type="button" onClick={() => setOpen(false)}>Return to Missal</button>}
               </div>
             </div>
-            {orientationPrompt && <p role="status">Your orientation question is waiting. Prepare the Companion to hear its explanation; you can keep using the on-screen guide now.</p>}
+            {orientationPrompt && <p role="status">Your orientation question is waiting. Prepare the Sacristan to hear its explanation; you can keep using the on-screen guide now.</p>}
             {replyNotice && <p className="companion-notice" role="status">{replyNotice}</p>}
             {streaming && genSeconds !== null && (
               <p className="chat-generating" role="status" aria-live="polite">
@@ -715,8 +714,8 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
             <textarea
               rows={2}
               value={input}
-              placeholder="Ask the companion…"
-              aria-label="Message the companion"
+              placeholder="Ask the Sacristan…"
+              aria-label="Message the Sacristan"
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {

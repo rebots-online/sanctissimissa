@@ -67,9 +67,9 @@ test('CP.5: ChatView implements all six placement modes with persisted geometry'
     assert.ok(chatView.includes(`'${mode}'`), `mode ${mode} present`);
   }
   assert.ok(chatView.includes('chat-panel ${dock}'), 'panel class derives from the dock mode');
-  assert.ok(chatView.includes(`'chat.dock'`));
-  assert.ok(chatView.includes(`'chat.rect'`));
-  assert.ok(chatView.includes(`'chat.dockWidth'`));
+  assert.ok(chatView.includes(`'sacristan.dock'`));
+  assert.ok(chatView.includes(`'sacristan.rect'`));
+  assert.ok(chatView.includes(`'sacristan.dockWidth'`));
 });
 
 test('CP.5: streaming turns are cancellable through an AbortController', () => {
@@ -86,7 +86,7 @@ test('CP.5: badge is the default surface and honors prefers-reduced-motion', () 
   assert.ok(chatBadge.includes('✠'), 'cross-signing glyph');
 });
 
-test('CP.5: badge mounts globally — every workspace carries the companion', () => {
+test('CP.5: badge mounts globally — every workspace carries the Sacristan', () => {
   assert.ok(app.includes('<ChatView sidecar={sidecar} />'));
 });
 
@@ -118,13 +118,13 @@ test('CP.5: mock stand-in rotates deterministic formulas across turns', async ()
   assert.equal(fifth, first, 'four-formula cycle repeats deterministically');
 });
 
-test('HC/OG2: badge open announces OPEN_COMPANION so orientation cards re-validate (§D)', () => {
+test('HC/OG2: badge open announces SACRISTAN_LAYOUT so orientation cards re-validate (§D)', () => {
   // A fixed-position panel never resizes the document root, so ResizeObserver
   // cannot see it — panel-open MUST dispatch the event the placement
   // validation listens for (regression: the guide sat inside the docked panel).
-  const effectAt = chatView.indexOf('window.dispatchEvent(new CustomEvent(COMPANION_LAYOUT));');
+  const effectAt = chatView.indexOf('window.dispatchEvent(new CustomEvent(SACRISTAN_LAYOUT));');
   const depsAt = effectAt === -1 ? -1 : chatView.indexOf('}, [open]);', effectAt);
-  assert.ok(effectAt !== -1 && depsAt !== -1, 'panel-layout changes announce COMPANION_LAYOUT (never a command) from a post-commit effect keyed on [open]');
+  assert.ok(effectAt !== -1 && depsAt !== -1, 'panel-layout changes announce SACRISTAN_LAYOUT (never a command) from a post-commit effect keyed on [open]');
 });
 
 test('CP.7/9: ChatView presents real engine states — no mock surface', () => {
@@ -135,6 +135,6 @@ test('CP.7/9: ChatView presents real engine states — no mock surface', () => {
 
 test('CP.11: setup and failures use authored guidance outside assistant messages', () => {
   assert.ok(chatView.includes('companionFeedback.setup'));
-  assert.ok(chatView.includes('Prepare Companion'));
+  assert.ok(chatView.includes('Prepare Sacristan'));
   assert.ok(!chatView.includes('error.message'));
 });

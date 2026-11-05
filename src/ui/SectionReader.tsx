@@ -708,14 +708,14 @@ export default function SectionReader({
       const attr = nodeKey.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
       const live = nodeKey ? root.current?.querySelector(`section[data-nodekey="${attr}"]`) ?? null : null;
       if (!nodeKey || !live) {
-        debugEvent('companion', 'command.rejected', { surface: 'annotate', reason: 'anchor-not-live', nodeKey }, 'warn');
+        debugEvent('sacristan', 'command.rejected', { surface: 'annotate', reason: 'anchor-not-live', nodeKey }, 'warn');
         return;
       }
       const cited = companionCitedPhrase(reply);
       const selection = window.getSelection()?.toString().trim() ?? '';
       const quote = (cited || selection).slice(0, 300);
       if (!quote) {
-        debugEvent('companion', 'command.rejected', { surface: 'annotate', reason: 'no-quote', nodeKey }, 'warn');
+        debugEvent('sacristan', 'command.rejected', { surface: 'annotate', reason: 'no-quote', nodeKey }, 'warn');
         return;
       }
       const range = resolveSelectionRange() ?? undefined;
@@ -733,7 +733,7 @@ export default function SectionReader({
         color: 'gold',
       });
       setAnnVersion((v) => v + 1);
-      debugEvent('companion', 'annotate.created', { nodeKey, quoteChars: quote.length, ranged: Boolean(range?.src) }, 'info');
+      debugEvent('sacristan', 'annotate.created', { nodeKey, quoteChars: quote.length, ranged: Boolean(range?.src) }, 'info');
     };
     window.addEventListener(COMPANION_ANNOTATE, onCompanionAnnotate);
     return () => window.removeEventListener(COMPANION_ANNOTATE, onCompanionAnnotate);

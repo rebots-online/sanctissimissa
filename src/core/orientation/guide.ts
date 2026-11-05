@@ -1,11 +1,11 @@
 import { debugEvent } from '../diagnostics/store.ts';
 export const GUIDE_CHANGED = 'sanctissimissa:guide-changed';
 export const START_GUIDE = 'sanctissimissa:start-guide';
-export const OPEN_COMPANION = 'sanctissimissa:open-companion';
+export const OPEN_SACRISTAN = 'sanctissimissa:open-sacristan';
 /** Pure panel-layout announcement (§D): dispatched AFTER a panel open/close
  * commits, so orientation placement validation can query the live DOM. Never
  * a command — listeners must not toggle panel state. */
-export const COMPANION_LAYOUT = 'sanctissimissa:companion-layout';
+export const SACRISTAN_LAYOUT = 'sanctissimissa:sacristan-layout';
 export const GUIDE_KEY = 'sanctissimissa.orientation.v1';
 export const GUIDE_STEPS = [
   { id: 'nav-map', label: 'Holy Mass', text: 'This opens the map of the Mass. Choose a stop on the line to read that part.' },
@@ -13,7 +13,7 @@ export const GUIDE_STEPS = [
   { id: 'nav-bible', label: 'Sacred Scripture', text: 'Open Scripture here. Holy Mass in the sidebar always takes you back to the Mass.' },
   { id: 'nav-office', label: 'Divine Office', text: 'The prayers for the hours of the day have their own place here.' },
   { id: 'nav-settings', label: 'Settings', text: 'Adjust the appearance and reading preferences here. You can also restart this tour.' },
-  { id: 'companion', label: 'Companion', text: 'Ask about the Mass or how to use the app. Prepare the Companion once to receive answers on this device.' },
+  { id: 'sacristan', label: 'Sacristan', text: 'Ask the Sacristan about the Mass or how to use the app. Prepare the Sacristan once to receive answers on this device.' },
 ] as const;
 export type GuideId = typeof GUIDE_STEPS[number]['id'];
 export interface GuideState { completed: boolean; step: number }
@@ -27,7 +27,9 @@ export function saveGuideState(value: GuideState, storage: Pick<Storage, 'setIte
   try { storage.setItem(GUIDE_KEY, JSON.stringify(value)); }
   catch (error) { debugEvent('orientation', 'persist.error', error, 'error'); }
 }
-export const GUIDE_POS_KEY = 'sanctissimissa.orientation.pos.v1';
+// §K.6: placement key gained a fresh name at the Sacristan rename — the old
+// v1 key is ignored, never read (reset-not-migrate; users re-place the card).
+export const GUIDE_POS_KEY = 'sanctissimissa.orientation.pos.v2';
 export interface GuidePos { left: number; top: number }
 export function clampGuidePos(pos: GuidePos, width: number, height: number, viewport: { innerWidth: number; innerHeight: number } = window): GuidePos {
   const maxX = Math.max(8, viewport.innerWidth - width - 8);
@@ -108,13 +110,14 @@ export function guideContext(): string {
   // setGuideLiveContext (currentView/currentDate/focusSection/openDraftKey +
   // the structural `visible` snapshot).
   const context = { controls: targets, ...guideLiveContext };
-  return `You are SanctissiMissa's Companion. Explain the app patiently in plain language, one small step at a time. The following are actual visible DOM controls: ${JSON.stringify(context)}. Current orientation target: ${activeId ?? 'none'}. To point to a control, append exactly [[guide:<id>]] using one listed id. You may append exactly one of [[guide:<id>]], [[open:<view>]], [[focus:<section>]], [[date:<iso>]], [[homily-draft:<litKey>]], [[annotate:<nodeKey>]], [[concordance:<term>]], [[journal:<term>]], [[show-path:a > b > c]] at the very end. This highlights the real control; the user can press Show me to activate it. Do not claim to have clicked anything. Do not invent unavailable controls or hide uncertainty. If the Companion needs setup, the user presses Prepare Companion; the preferred native model is Qwen 3.5 2B. Keep explanations short.`;
+  return `You are SanctissiMissa's Sacristan. Explain the app patiently in plain language, one small step at a time. The following are actual visible DOM controls: ${JSON.stringify(context)}. Current orientation target: ${activeId ?? 'none'}. To point to a control, append exactly [[guide:<id>]] using one listed id. You may append exactly one of [[guide:<id>]], [[open:<view>]], [[focus:<section>]], [[date:<iso>]], [[homily-draft:<litKey>]], [[annotate:<nodeKey>]], [[concordance:<term>]], [[journal:<term>]], [[show-path:a > b > c]] at the very end. This highlights the real control; the user can press Show me to activate it. Do not claim to have clicked anything. Do not invent unavailable controls or hide uncertainty. If the Sacristan needs setup, the user presses Prepare Sacristan; the preferred native model is Qwen 3.5 2B. Keep explanations short.`;
 }
-// §H.1 — Companion command grammar (CL.1). A reply may end with exactly one
+// §H.1 — Sacristan command grammar (CL.1). A reply may end with exactly one
 // trailing command. [[guide:<id>]] keeps its pre-existing meaning; the
-// CompanionAct forms below drive navigation and the document-plane surfaces
-// through one COMPANION_ACT window event (consumed by App, §H.1 CL.2).
-export const COMPANION_ACT = 'sanctissimissa:companion-act';
+// CompanionAct forms below (internal grammar names retained per §K.6) drive
+// navigation and the document-plane surfaces through one SACRISTAN_ACT
+// window event (consumed by App, §H.1 CL.2).
+export const SACRISTAN_ACT = 'sanctissimissa:sacristan-act';
 export type CompanionActKind = 'open' | 'focus' | 'date' | 'homily-draft' | 'annotate' | 'concordance' | 'journal' | 'show-path';
 export interface CompanionAct { kind: CompanionActKind; value: string }
 /** One [[show-path:…]] step: the target token as parsed (view:<View> /
@@ -193,7 +196,7 @@ export function applyGuideCommand(text: string): boolean {
       const built = buildCompanionAct(match[1] as CompanionActKind, match[2]);
       // Invalid command: recorded, never executed — and it aborts the batch,
       // so a malformed suffix cannot half-apply a reply.
-      if (!built) { debugEvent('companion', 'command.rejected', { raw: text }, 'warn'); return false; }
+      if (!built) { debugEvent('sacristan', 'command.rejected', { raw: text }, 'warn'); return false; }
       if (act !== null) break;
       act = built;
     }
@@ -202,8 +205,8 @@ export function applyGuideCommand(text: string): boolean {
   let applied = false;
   if (guideId !== null) applied = highlightGuide(guideId);
   if (act) {
-    window.dispatchEvent(new CustomEvent(COMPANION_ACT, { detail: act }));
-    debugEvent('companion', 'command.dispatch', act, 'info');
+    window.dispatchEvent(new CustomEvent(SACRISTAN_ACT, { detail: act }));
+    debugEvent('sacristan', 'command.dispatch', act, 'info');
     applied = true;
   }
   return applied;

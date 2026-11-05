@@ -15,9 +15,9 @@ const source = readFileSync(new URL('../src/ui/ChatView.tsx', import.meta.url), 
 /* Per-turn system context: persona+guideContext + lore + top-5 recall */
 /* ------------------------------------------------------------------ */
 
-test('CL.4: the authoritative exports are imported — parseCompanionCommand, COMPANION_ACT, PathStep, CompanionMemory', () => {
+test('CL.4: the authoritative exports are imported — parseCompanionCommand, SACRISTAN_ACT, PathStep, CompanionMemory', () => {
   assert.match(source, /import type \{ Database \} from 'sql\.js';/, 'the raw sidecar handle type');
-  assert.match(source, /\bCOMPANION_ACT,/, 'COMPANION_ACT from the CL.1 grammar module');
+  assert.match(source, /\bSACRISTAN_ACT,/, 'SACRISTAN_ACT from the CL.1 grammar module');
   assert.match(source, /\bparseCompanionCommand,/, 'parseCompanionCommand from the CL.1 grammar module');
   assert.match(source, /type PathStep,/, 'PathStep narration shape');
   assert.match(
@@ -93,10 +93,10 @@ test('CL.4: the reply command suffix parses and executes per the grammar; show-p
   );
   assert.match(
     body,
-    /window\.dispatchEvent\(new CustomEvent\(COMPANION_ACT, \{ detail: \{ \.\.\.act, steps \} \}\)\);/,
-    'the forwarded COMPANION_ACT carries the steps',
+    /window\.dispatchEvent\(new CustomEvent\(SACRISTAN_ACT, \{ detail: \{ \.\.\.act, steps \} \}\)\);/,
+    'the forwarded SACRISTAN_ACT carries the steps',
   );
-  assert.ok(body.includes("debugEvent('companion', 'command.dispatch'"), 'the dispatch is recorded');
+  assert.ok(body.includes("debugEvent('sacristan', 'command.dispatch'"), 'the dispatch is recorded');
   assert.ok(
     body.lastIndexOf('applyGuideCommand(response);') > body.indexOf('return;'),
     'every other act executes through applyGuideCommand after the show-path branch returns',
@@ -140,7 +140,7 @@ test('CL.4: Save insight writes a generated study accompaniment anchored to the 
     'anchored to the current day via a date occurrence selector',
   );
   assert.ok(body.includes('void sidecar.persist();'), 'the write persists');
-  assert.ok(body.includes("debugEvent('companion', 'insight.saved'"), 'the save is recorded in Diagnostics');
+  assert.ok(body.includes("debugEvent('sacristan', 'insight.saved'"), 'the save is recorded in Diagnostics');
 });
 
 test('CL.4: each completed assistant reply offers Save insight — never on the still-streaming tail', () => {

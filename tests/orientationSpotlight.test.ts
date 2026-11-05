@@ -34,7 +34,7 @@ test('OG.9: the cutout recomputes on resize, scroll, and the §D validation trig
   for (const trigger of [
     "window.addEventListener('resize', recompute)",
     "window.addEventListener('scroll', recompute, { capture: true, passive: true })",
-    'window.addEventListener(COMPANION_LAYOUT, recompute)', // a §D validation trigger
+    'window.addEventListener(SACRISTAN_LAYOUT, recompute)', // a §D validation trigger
     'window.addEventListener(GUIDE_CHANGED, recompute)', // the held target changed
     'new ResizeObserver(recompute)',
     'observer.observe(document.documentElement)',
@@ -44,7 +44,7 @@ test('OG.9: the cutout recomputes on resize, scroll, and the §D validation trig
   for (const removal of [
     "window.removeEventListener('resize', recompute)",
     "window.removeEventListener('scroll', recompute, true)",
-    'window.removeEventListener(COMPANION_LAYOUT, recompute)',
+    'window.removeEventListener(SACRISTAN_LAYOUT, recompute)',
     'window.removeEventListener(GUIDE_CHANGED, recompute)',
     'observer.disconnect()',
   ]) {
@@ -54,7 +54,7 @@ test('OG.9: the cutout recomputes on resize, scroll, and the §D validation trig
 
 test('OG.9: no spotlight renders when no target is highlighted', () => {
   assert.match(source, /const held = active \|\| path !== null;/,
-    'the veil belongs to the card-held grammar (tour step or show-path step), not a bare companion pointer');
+    'the veil belongs to the card-held grammar (tour step or show-path step), not a bare Sacristan pointer');
   assert.match(source, /if \(!held\) \{ setSpotRect\(null\); return; \}/,
     'card not holding a target — overlay cleared');
   assert.match(source, /if \(!target \|\| !rect \|\| rect\.width <= 0\) \{ setSpotRect\(null\); return; \}/,

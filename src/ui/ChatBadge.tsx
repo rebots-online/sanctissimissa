@@ -1,5 +1,5 @@
 /**
- * ChatBadge — the default Companion surface (CP.5): intercom-style badge
+ * ChatBadge — the default Sacristan surface (CP.5): intercom-style badge
  * ("porthole"), persistent on every workspace, animated in the kintsugi/
  * natally house style; occasional idle gestures (signing with a cross ✠,
  * waving) on a jittered cadence, honoring prefers-reduced-motion.
@@ -63,9 +63,9 @@ export default function ChatBadge({ open, onToggle }: Props) {
         reduced ? ' static' : ''
       }`}
       onClick={onToggle}
-      aria-label={open ? 'Close companion chat' : 'Open companion chat'}
+      aria-label={open ? 'Close Sacristan chat' : 'Open Sacristan chat'}
       aria-pressed={open}
-      title="Companion"
+      title="Sacristan"
     >
       <svg viewBox="0 0 64 64" aria-hidden="true" className="chat-badge-avatar">
         <defs>

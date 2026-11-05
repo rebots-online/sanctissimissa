@@ -93,7 +93,7 @@ test('CP.4: picker states are honest — no mock/preview anywhere in the surface
   }
   assert.ok(!/mock:\/\//.test(pickerSource) && !/MockEngine/.test(pickerSource), 'picker never presents a mock engine');
   assert.ok(chatViewSource.includes('<ModelPicker hook={models} compact'), 'ChatView header carries the picker');
-  assert.ok(settingsSource.includes('Companion models'), 'Settings carries the models surface');
+  assert.ok(settingsSource.includes('Sacristan models'), 'Settings carries the models surface');
 });
 
 /* OG.5 — universal default model is the preferred 2B repo only; heavier models never auto-selected (2026-09-18 amendment §C). */

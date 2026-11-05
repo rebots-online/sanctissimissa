@@ -16,13 +16,13 @@ globalScope.document ??= {
 
 const guide = await import('../src/core/orientation/guide.ts');
 
-// CL.1 owns the COMPANION_ACT export; its quoted value is the contract this
-// task codes against. Whether or not CL.1 has landed yet, the act channel
-// name must be exactly this string.
-const COMPANION_ACT_NAME = (guide as { COMPANION_ACT?: string }).COMPANION_ACT ?? 'sanctissimissa:companion-act';
+// CL.1 owns the SACRISTAN_ACT export (§K.6 rename); its quoted value is the
+// contract this task codes against. The act channel name must be exactly
+// this string.
+const SACRISTAN_ACT_NAME = (guide as { SACRISTAN_ACT?: string }).SACRISTAN_ACT ?? 'sanctissimissa:sacristan-act';
 
-test('CL.2: COMPANION_ACT channel name matches the quoted contract', () => {
-  assert.equal(COMPANION_ACT_NAME, 'sanctissimissa:companion-act');
+test('CL.2: SACRISTAN_ACT channel name matches the quoted contract', () => {
+  assert.equal(SACRISTAN_ACT_NAME, 'sanctissimissa:sacristan-act');
 });
 
 test('CL.2: guideContext carries the live context fields', () => {
@@ -74,10 +74,10 @@ test('CL.2: instruction sentence documents the full command grammar', () => {
 // ── App.tsx source contract ─────────────────────────────────────────────
 const appSource = readFileSync(new URL('../src/App.tsx', import.meta.url), 'utf8');
 
-test('CL.2: App listens for COMPANION_ACT from the guide module', () => {
-  assert.match(appSource, /import\s*\{[^}]*COMPANION_ACT[^}]*\}\s*from\s*'\.\/core\/orientation\/guide\.ts'/);
-  assert.match(appSource, /window\.addEventListener\(COMPANION_ACT,\s*onAct/);
-  assert.match(appSource, /window\.removeEventListener\(COMPANION_ACT,\s*onAct/);
+test('CL.2: App listens for SACRISTAN_ACT from the guide module', () => {
+  assert.match(appSource, /import\s*\{[^}]*SACRISTAN_ACT[^}]*\}\s*from\s*'\.\/core\/orientation\/guide\.ts'/);
+  assert.match(appSource, /window\.addEventListener\(SACRISTAN_ACT,\s*onAct/);
+  assert.match(appSource, /window\.removeEventListener\(SACRISTAN_ACT,\s*onAct/);
 });
 
 test('CL.2: open routes through the rail view set before setView', () => {
@@ -117,12 +117,12 @@ test('CL.2: App registers the live context and visible snapshot', () => {
   assert.match(appSource, /companionPanel/);
   assert.match(appSource, /\.tour-spotlight/);
   assert.match(appSource, /\.orientation-target/);
-  assert.match(appSource, /COMPANION_LAYOUT/);
+  assert.match(appSource, /SACRISTAN_LAYOUT/);
 });
 
 test('CL.2: invalid acts are rejected to Diagnostics, not executed', () => {
-  assert.match(appSource, /debugEvent\('companion', 'act\.rejected', detail, 'warn'\)/);
-  assert.match(appSource, /debugEvent\('companion', 'act\.open', \{ view: value \}, 'info'\)/);
+  assert.match(appSource, /debugEvent\('sacristan', 'act\.rejected', detail, 'warn'\)/);
+  assert.match(appSource, /debugEvent\('sacristan', 'act\.open', \{ view: value \}, 'info'\)/);
 });
 
 test('CL.2: no page text leaves through the snapshot', () => {

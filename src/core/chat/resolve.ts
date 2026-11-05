@@ -73,7 +73,7 @@ export async function resolveNativeEngine(
           artifactUrl: locator,
           contextTokens: Math.min(report.contextCeiling, 4096),
         },
-        label: candidates.find((candidate) => candidate.id === id)?.displayName ?? 'Companion',
+        label: candidates.find((candidate) => candidate.id === id)?.displayName ?? 'Sacristan',
       };
     }
   }

@@ -62,7 +62,7 @@ export function companionGeneratedBlock(reply: string): string {
   return (
     `<blockquote class="companion-generated" data-provenance="generated">` +
     `<p>${escapeHtml(text)}</p>` +
-    `<p class="companion-marker">— Companion suggestion (provenance: generated)</p>` +
+    `<p class="companion-marker">— Sacristan suggestion (provenance: generated)</p>` +
     `</blockquote>`
   );
 }
@@ -141,18 +141,18 @@ export default function HomilyPlanner({ db, sidecar, day }: Props) {
       const litKey = String(detail?.value ?? '').trim();
       const reply = String(detail?.reply ?? '');
       if (!litKey) {
-        debugEvent('companion', 'command.rejected', { surface: 'homily-draft', reason: 'missing-litKey' }, 'warn');
+        debugEvent('sacristan', 'command.rejected', { surface: 'homily-draft', reason: 'missing-litKey' }, 'warn');
         return;
       }
       const match = matchHomilyDraft(homilies, litKey);
       if (!match) {
-        debugEvent('companion', 'command.rejected', { surface: 'homily-draft', reason: 'no-draft', litKey }, 'warn');
+        debugEvent('sacristan', 'command.rejected', { surface: 'homily-draft', reason: 'no-draft', litKey }, 'warn');
         return;
       }
       setNewOpen(false);
       setEditId(match.id);
       setStaged({ litKey, reply, accId: match.id });
-      debugEvent('companion', 'homily.staged', { litKey, accId: match.id, replyChars: reply.length }, 'info');
+      debugEvent('sacristan', 'homily.staged', { litKey, accId: match.id, replyChars: reply.length }, 'info');
     };
     window.addEventListener(COMPANION_DRAFT, onCompanionDraft);
     return () => window.removeEventListener(COMPANION_DRAFT, onCompanionDraft);
@@ -163,11 +163,11 @@ export default function HomilyPlanner({ db, sidecar, day }: Props) {
     if (!staged) return;
     const api = homilyApiRef.current;
     if (!api) {
-      debugEvent('companion', 'command.rejected', { surface: 'homily-draft', reason: 'editor-not-ready', litKey: staged.litKey }, 'warn');
+      debugEvent('sacristan', 'command.rejected', { surface: 'homily-draft', reason: 'editor-not-ready', litKey: staged.litKey }, 'warn');
       return;
     }
     void api.insertSource(companionGeneratedBlock(staged.reply));
-    debugEvent('companion', 'homily.inserted', { litKey: staged.litKey, accId: staged.accId }, 'info');
+    debugEvent('sacristan', 'homily.inserted', { litKey: staged.litKey, accId: staged.accId }, 'info');
     setStaged(null);
   }
 
@@ -318,8 +318,8 @@ export default function HomilyPlanner({ db, sidecar, day }: Props) {
       {editing && (
         <>
           {staged && staged.accId === editing.id && (
-            <section className="jsc-related" aria-label="Companion draft suggestion" data-companion-stage={staged.litKey}>
-              <div className="group-title">Companion suggestion — staged, not saved</div>
+            <section className="jsc-related" aria-label="Sacristan draft suggestion" data-companion-stage={staged.litKey}>
+              <div className="group-title">Sacristan suggestion — staged, not saved</div>
               <div className="jsc-source">
                 <blockquote data-provenance="generated" style={{ margin: '6px 0 0' }}>
                   “{staged.reply.replace(/\s+/g, ' ').trim().slice(0, 600)}{staged.reply.length > 600 ? '…' : ''}”

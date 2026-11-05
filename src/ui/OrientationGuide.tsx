@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import defaults from '../../config/companion-defaults.json';
-import { COMPANION_LAYOUT, GUIDE_CHANGED, GUIDE_STEPS, OPEN_COMPANION, START_GUIDE, activateGuide, clampGuidePos,
+import { GUIDE_CHANGED, GUIDE_STEPS, OPEN_SACRISTAN, SACRISTAN_LAYOUT, START_GUIDE, activateGuide, clampGuidePos,
   clearGuide, guideTarget, highlightGuide, readGuidePos, readGuideState, saveGuidePos, saveGuideState } from '../core/orientation/guide.ts';
 import type { GuidePos, PathStep } from '../core/orientation/guide.ts';
 import { compactDock, occupiedRects, resolveGuidePlacement } from '../core/orientation/layout.ts';
@@ -69,7 +69,7 @@ export default function OrientationGuide() {
   useEffect(() => {
     if (!active) return;
     const id = GUIDE_STEPS[step].id;
-    if (id === 'companion') window.dispatchEvent(new CustomEvent(OPEN_COMPANION));
+    if (id === 'sacristan') window.dispatchEvent(new CustomEvent(OPEN_SACRISTAN));
     const timer = setTimeout(() => setUnavailable(!highlightGuide(id)), 0);
     saveGuideState({ completed: false, step });
     return () => clearTimeout(timer);
@@ -131,14 +131,14 @@ export default function OrientationGuide() {
     recompute();
     window.addEventListener('resize', recompute);
     window.addEventListener('scroll', recompute, { capture: true, passive: true });
-    window.addEventListener(COMPANION_LAYOUT, recompute); // a §D validation trigger
+    window.addEventListener(SACRISTAN_LAYOUT, recompute); // a §D validation trigger
     window.addEventListener(GUIDE_CHANGED, recompute); // the held target changed
     const observer = new ResizeObserver(recompute);
     observer.observe(document.documentElement);
     return () => {
       window.removeEventListener('resize', recompute);
       window.removeEventListener('scroll', recompute, true);
-      window.removeEventListener(COMPANION_LAYOUT, recompute);
+      window.removeEventListener(SACRISTAN_LAYOUT, recompute);
       window.removeEventListener(GUIDE_CHANGED, recompute);
       observer.disconnect();
     };
@@ -179,13 +179,13 @@ export default function OrientationGuide() {
     validatePlacement();
     window.addEventListener('resize', validatePlacement);
     window.addEventListener(START_GUIDE, validatePlacement);
-    window.addEventListener(COMPANION_LAYOUT, validatePlacement);
+    window.addEventListener(SACRISTAN_LAYOUT, validatePlacement);
     const observer = new ResizeObserver(validatePlacement);
     observer.observe(document.documentElement);
     return () => {
       window.removeEventListener('resize', validatePlacement);
       window.removeEventListener(START_GUIDE, validatePlacement);
-      window.removeEventListener(COMPANION_LAYOUT, validatePlacement);
+      window.removeEventListener(SACRISTAN_LAYOUT, validatePlacement);
       observer.disconnect();
     };
   }, [step]);
@@ -290,7 +290,7 @@ export default function OrientationGuide() {
     debugEvent('orientation', 'path.activate', { target: current.target, index: path.index }, 'info');
     (element.closest('button, a, [role="button"]') as HTMLElement | null)?.click();
   };
-  const explain = () => window.dispatchEvent(new CustomEvent(OPEN_COMPANION, {
+  const explain = () => window.dispatchEvent(new CustomEvent(OPEN_SACRISTAN, {
     detail: { prompt: `Please guide me through ${GUIDE_STEPS[step].label}. Explain what the highlighted control does and point it out.` },
   }));
   const style = pos ? { left: pos.left, top: pos.top, right: 'auto' as const, bottom: 'auto' as const } : undefined;
@@ -302,9 +302,9 @@ export default function OrientationGuide() {
     <strong><span className="orientation-grip" aria-hidden="true">⠿</span>Would you like a short tour?</strong>
     <span className="orientation-drag-hint">Drag to move</span>
     {compact
-      ? <details><summary>Details</summary><p>We will point out the controls, one at a time. The Companion can explain more when it is ready.</p></details>
-      : <p>We will point out the controls, one at a time. The Companion can explain more when it is ready.</p>}
-    <button onClick={() => { setOffered(false); setActive(true); window.dispatchEvent(new CustomEvent(OPEN_COMPANION)); }}>Start orientation</button>
+      ? <details><summary>Details</summary><p>We will point out the controls, one at a time. The Sacristan can explain more when it is ready.</p></details>
+      : <p>We will point out the controls, one at a time. The Sacristan can explain more when it is ready.</p>}
+    <button onClick={() => { setOffered(false); setActive(true); window.dispatchEvent(new CustomEvent(OPEN_SACRISTAN)); }}>Start orientation</button>
     <button onClick={leave}>Later</button>
     <button onClick={resetPlacement}>Reset position</button>
   </aside>;
@@ -316,8 +316,8 @@ export default function OrientationGuide() {
     ? `Walkthrough ${path.index + 1} of ${path.steps.length}: ${pathTargetLabel(pathStep.target)}`
     : active ? `Step ${step + 1} of ${GUIDE_STEPS.length}: ${GUIDE_STEPS[step].label}` : label;
   const stepBody = <>
-    <p>{active ? GUIDE_STEPS[step].text : `The Companion has highlighted ${label}.`}</p>
-    {unavailable && <p>This control is not visible just now. You can continue the tour or ask the Companion.</p>}
+    <p>{active ? GUIDE_STEPS[step].text : `The Sacristan has highlighted ${label}.`}</p>
+    {unavailable && <p>This control is not visible just now. You can continue the tour or ask the Sacristan.</p>}
   </>;
   const pathBody = path && pathStep && (<>
     <p>{pathStep.narration || `Here: ${pathTargetLabel(pathStep.target)}.`}</p>
@@ -348,7 +348,7 @@ export default function OrientationGuide() {
           <button onClick={endPath}>End walkthrough</button>
         </> : <>
           <button onClick={() => setUnavailable(!activateGuide())}>Show me</button>
-          {active && <button onClick={explain}>Ask Companion to explain</button>}
+          {active && <button onClick={explain}>Ask Sacristan to explain</button>}
           {active && step > 0 && <button onClick={() => setStep((value) => value - 1)}>Back</button>}
           {active && (step < GUIDE_STEPS.length - 1
             ? <button onClick={() => setStep((value) => value + 1)}>Next</button>

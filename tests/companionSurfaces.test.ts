@@ -168,7 +168,7 @@ test('CL.5: JournalSidecar routes COMPANION_SEARCH kind journal as capture-ready
 
 test('CL.5: every path records companion diagnostics on success and rejection', () => {
   for (const [name, src] of [['HomilyPlanner', homily], ['SectionReader', reader], ['MeaningPanel', meaning], ['JournalSidecar', journal]] as const) {
-    assert.match(src, /debugEvent\('companion',/, `${name} records companion events`);
+    assert.match(src, /debugEvent\('sacristan',/, `${name} records sacristan events`);
     assert.match(src, /'command\.rejected'/, `${name} records rejections`);
   }
   assert.match(homily, /'homily\.staged'/);

@@ -39,7 +39,7 @@ test('OG.7: placement validation imports resolveGuidePlacement from the OG.6 lay
   assert.ok(effect.includes('validatePlacement();'), 'effect runs on mount');
   assert.ok(effect.includes("window.addEventListener('resize', validatePlacement)"), 'revalidates on window resize');
   assert.ok(effect.includes('START_GUIDE, validatePlacement'), 'revalidates on START_GUIDE');
-  assert.ok(effect.includes('COMPANION_LAYOUT, validatePlacement'), 'revalidates on COMPANION_LAYOUT (panel layout announcement)');
+  assert.ok(effect.includes('SACRISTAN_LAYOUT, validatePlacement'), 'revalidates on SACRISTAN_LAYOUT (panel layout announcement)');
   assert.ok(effect.includes('new ResizeObserver(validatePlacement)'), 'ResizeObserver attached');
   assert.ok(effect.includes('observer.observe(document.documentElement)'), 'observing document.documentElement');
   assert.ok(effect.includes('observer.disconnect()'), 'observer disconnected on unmount');
@@ -103,8 +103,8 @@ test('OG.7: keyboard placement — arrows nudge 16 px, Shift+arrows 96 px, Home 
 });
 
 test('OG.7: existing orientation semantics are preserved', () => {
-  for (const needle of ['Start orientation', 'Later', 'Show me', 'Ask Companion to explain', 'Back', 'Next', 'Finish orientation',
-    'Continue later', 'Close guide', 'GUIDE_STEPS', 'START_GUIDE', 'GUIDE_CHANGED', 'OPEN_COMPANION', 'activateGuide',
+  for (const needle of ['Start orientation', 'Later', 'Show me', 'Ask Sacristan to explain', 'Back', 'Next', 'Finish orientation',
+    'Continue later', 'Close guide', 'GUIDE_STEPS', 'START_GUIDE', 'GUIDE_CHANGED', 'OPEN_SACRISTAN', 'activateGuide',
     'highlightGuide', 'clearGuide', 'saveGuideState', 'readGuideState', 'Would you like a short tour?',
     'This control is not visible just now.']) {
     assert.ok(source.includes(needle), `preserved: ${needle}`);

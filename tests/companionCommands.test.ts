@@ -2,8 +2,8 @@ import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  COMPANION_ACT,
   GUIDE_CHANGED,
+  SACRISTAN_ACT,
   applyGuideCommand,
   parseCompanionCommand,
   stripGuideCommands,
@@ -14,7 +14,7 @@ import {
 interface RecordedEvent { type: string; detail: unknown }
 const recorded: RecordedEvent[] = [];
 const shimWindow = new EventTarget();
-shimWindow.addEventListener(COMPANION_ACT, (event) => { recorded.push({ type: event.type, detail: (event as CustomEvent).detail }); });
+shimWindow.addEventListener(SACRISTAN_ACT, (event) => { recorded.push({ type: event.type, detail: (event as CustomEvent).detail }); });
 shimWindow.addEventListener(GUIDE_CHANGED, (event) => { recorded.push({ type: event.type, detail: (event as CustomEvent).detail }); });
 (globalThis as unknown as { window: unknown }).window = shimWindow;
 
@@ -43,13 +43,13 @@ function fakeGuideElement(): object {
 };
 liveGuideTargets.set('nav-office', fakeGuideElement());
 
-const companionDispatches = () => recorded.filter((e) => e.type === COMPANION_ACT);
+const companionDispatches = () => recorded.filter((e) => e.type === SACRISTAN_ACT);
 const guideHighlights = () => recorded.filter((e) => e.type === GUIDE_CHANGED);
 
 beforeEach(() => { recorded.length = 0; });
 
-test('COMPANION_ACT carries the §H.1 event name', () => {
-  assert.equal(COMPANION_ACT, 'sanctissimissa:companion-act');
+test('SACRISTAN_ACT carries the §H.1 event name (§K.6 rename)', () => {
+  assert.equal(SACRISTAN_ACT, 'sanctissimissa:sacristan-act');
 });
 
 test('parseCompanionCommand recognizes every command form', () => {
@@ -152,6 +152,6 @@ test('stripGuideCommands removes every command form', () => {
 
 test('diagnostics contract — dispatch and rejection are recorded (§H.1)', () => {
   const source = readFileSync(new URL('../src/core/orientation/guide.ts', import.meta.url), 'utf8');
-  assert.ok(source.includes("debugEvent('companion', 'command.dispatch', act, 'info')"), 'dispatch event present');
-  assert.ok(source.includes("debugEvent('companion', 'command.rejected', { raw: text }, 'warn')"), 'rejection event present');
+  assert.ok(source.includes("debugEvent('sacristan', 'command.dispatch', act, 'info')"), 'dispatch event present');
+  assert.ok(source.includes("debugEvent('sacristan', 'command.rejected', { raw: text }, 'warn')"), 'rejection event present');
 });

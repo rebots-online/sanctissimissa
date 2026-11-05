@@ -242,7 +242,7 @@ export default function SettingsView({
             Additional public-domain modules (Catena Aurea, Guéranger, Roman Catechism, Summa, …) arrive with the
             Library &amp; Bookstore update — this list shows only what is actually attached.
           </p>
-          <h3>Companion models</h3>
+          <h3>Sacristan models</h3>
           <p className="settings-desc">
             On-device chat models from the Atomic Chat catalog, ranked for this device. Downloads are verified
             (SHA-256) and stored once in the shared mba.robin library.

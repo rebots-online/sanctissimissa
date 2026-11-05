@@ -1,4 +1,4 @@
-/** Companion choices and verified download lifecycle; ready belongs to the engine. */
+/** Sacristan choices and verified download lifecycle; ready belongs to the engine. */
 import { createContext, useContext, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { RankedModel } from '../../reusable-chatbot/model-registry/rank.ts';
 import { buildCompanionCatalog, entryAsset, makeDownloadManager, makeLibrary, readInstalledAssets,
@@ -177,7 +177,7 @@ export default function ModelPicker({ hook, compact = false, disabled = false }:
     {state.error && <p role="status">{companionFeedback.catalogue} <button onClick={hook.retryCatalog}>Try again</button></p>}
     {!state.catalog && !state.error && <p role="status">{companionFeedback.checking}</p>}
     {state.catalog && !state.catalog.defaultPick && <p>{companionFeedback.unavailable}</p>}
-    <ul className="model-picker-menu" aria-label="Companion choices">
+    <ul className="model-picker-menu" aria-label="Sacristan choices">
       <li className="model-row hosted" key="hosted:openrouter">
         <button type="button" className="model-row-main" disabled={disabled}
           aria-pressed={state.selectedId === 'hosted:openrouter'} onClick={() => { select('hosted:openrouter'); setOpen(false); }}>
@@ -204,7 +204,7 @@ export default function ModelPicker({ hook, compact = false, disabled = false }:
   </>;
   return <div className={`model-picker ${compact ? 'compact' : 'full'}`}>
     {compact && <button type="button" className="model-picker-chip" aria-expanded={open} disabled={disabled}
-      onClick={() => setOpen((value) => !value)} title={selected?.displayName}>Companion choices ⌄</button>}
+      onClick={() => setOpen((value) => !value)} title={selected?.displayName}>Sacristan choices ⌄</button>}
     {(!compact || open) && <div className="model-picker-content">{content}</div>}
   </div>;
 }

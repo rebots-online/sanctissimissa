@@ -90,16 +90,16 @@ if (typeof window !== 'undefined') {
     if (detail.kind !== 'journal') return; // 'concordance' belongs to MeaningPanel
     const term = detail.value.trim();
     if (!term) {
-      debugEvent('companion', 'command.rejected', { surface: 'journal', reason: 'bad-term' }, 'warn');
+      debugEvent('sacristan', 'command.rejected', { surface: 'journal', reason: 'bad-term' }, 'warn');
       return;
     }
     if (journalSidecarMounted > 0) return; // the mounted sidecar instance handles it
     const props = companionBridgeProps();
     if (!props?.db || !props.sidecar) {
-      debugEvent('companion', 'command.rejected', { surface: 'journal', reason: 'no-store' }, 'warn');
+      debugEvent('sacristan', 'command.rejected', { surface: 'journal', reason: 'no-store' }, 'warn');
       return;
     }
-    debugEvent('companion', 'journal.opened', { term, via: 'overlay' }, 'info');
+    debugEvent('sacristan', 'journal.opened', { term, via: 'overlay' }, 'info');
     void openJournalOverlay(props, term.slice(0, 300), detail.reply);
   });
 }
@@ -412,11 +412,11 @@ export default function JournalSidecar({
       if (detail.kind !== 'journal') return;
       const term = detail.value.trim();
       if (!term) {
-        debugEvent('companion', 'command.rejected', { surface: 'journal', reason: 'bad-term' }, 'warn');
+        debugEvent('sacristan', 'command.rejected', { surface: 'journal', reason: 'bad-term' }, 'warn');
         return;
       }
       setCompanionSource({ term: term.slice(0, 300), reply: detail.reply });
-      debugEvent('companion', 'journal.opened', { term, via: 'sidecar' }, 'info');
+      debugEvent('sacristan', 'journal.opened', { term, via: 'sidecar' }, 'info');
     };
     window.addEventListener(COMPANION_SEARCH, onCompanionSearch);
     return () => {
@@ -510,7 +510,7 @@ export default function JournalSidecar({
       {companionSource && (
         <div className="jsc-source" data-companion-journal={companionSource.term}>
           <div style={{ fontStyle: 'normal', fontSize: 11, letterSpacing: '0.04em' }}>
-            COMPANION SOURCES · “{companionSource.term}”
+            SACRISTAN SOURCES · “{companionSource.term}”
           </div>
           <div className="jsc-why" style={{ margin: '4px 0 0' }}>
             The search results below are capture-ready: “Add as source” inserts each one into this entry with its citation.

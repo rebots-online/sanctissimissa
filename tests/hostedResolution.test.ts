@@ -20,7 +20,7 @@ test('HC.2/1 resolveHostedEngine without a key is honestly unsupported with the 
   assert.equal(resolution.reason, companionFeedback.hostedKeyMissing);
   assert.equal(
     resolution.reason,
-    'The hosted Companion is not configured on this build. On-device choices remain below; you can keep using the Missal.',
+    'The hosted Sacristan is not configured on this build. On-device choices remain below; you can keep using the Missal.',
   );
 });
 

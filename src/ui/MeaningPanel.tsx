@@ -121,16 +121,16 @@ if (typeof window !== 'undefined') {
     if (detail.kind !== 'concordance') return; // 'journal' belongs to JournalSidecar
     const term = detail.value.trim();
     if (!term) {
-      debugEvent('companion', 'command.rejected', { surface: 'concordance', reason: 'bad-term' }, 'warn');
+      debugEvent('sacristan', 'command.rejected', { surface: 'concordance', reason: 'bad-term' }, 'warn');
       return;
     }
     if (meaningPanelMounted > 0) return; // the live panel instance handles it
     const props = companionBridgeProps();
     if (!props) {
-      debugEvent('companion', 'command.rejected', { surface: 'concordance', reason: 'no-corpus' }, 'warn');
+      debugEvent('sacristan', 'command.rejected', { surface: 'concordance', reason: 'no-corpus' }, 'warn');
       return;
     }
-    debugEvent('companion', 'concordance.opened', { term, via: 'overlay' }, 'info');
+    debugEvent('sacristan', 'concordance.opened', { term, via: 'overlay' }, 'info');
     void openMeaningOverlay(props, term.slice(0, 300));
   });
 }
@@ -592,11 +592,11 @@ export default function MeaningPanel({ db, action, onClose, onOpenKey }: Props) 
       if (detail.kind !== 'concordance') return;
       const term = detail.value.trim();
       if (!term) {
-        debugEvent('companion', 'command.rejected', { surface: 'concordance', reason: 'bad-term' }, 'warn');
+        debugEvent('sacristan', 'command.rejected', { surface: 'concordance', reason: 'bad-term' }, 'warn');
         return;
       }
       setCompanionAction({ kind: 'meaning', term: term.slice(0, 300), nodeKey: null });
-      debugEvent('companion', 'concordance.opened', { term, via: 'panel' }, 'info');
+      debugEvent('sacristan', 'concordance.opened', { term, via: 'panel' }, 'info');
     };
     window.addEventListener(COMPANION_SEARCH, onCompanionSearch);
     return () => {
