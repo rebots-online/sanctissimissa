@@ -2615,6 +2615,6 @@ the missal: she acts on the page while she answers.
 Order (operator: "build BEGINS with webapp deploy so that time building isn't
 wasted if i find problems in the web app deployed early"): tests + typecheck +
 lint green → `build:vite` → `deploy:web` (surge publication) → desktop and
-Android stages. Next stamp: **v1.67** (one minor increment per the §F
+Android stages. Next stamp: **v1.68** (one minor increment per the §F
 doctrine). Rendered verification at desktop and narrow widths gates every UI
 stanza; the 583-test suite plus new stanza tests gate the train.

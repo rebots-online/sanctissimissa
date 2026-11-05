@@ -2817,6 +2817,6 @@ Dependency additions for this stanza: `firebase`, `onnxruntime-web`, `phonemizer
   - **Accept:** rendered — Bookstore in the rail opens the frozen-designed catalogue; search/filter reset work; detail drawer + provenance tab render; purchase asks for sign-in, never fakes a checkout.
 
 - [ ] **REL.K — Web-first release train (§K.9).** Self-contained. Files: `scripts/release-state.mjs` (stage order only), `package.json` (version stamp executes via the existing fresh-release stamp at the next build).
-  - **Do:** release stage order becomes: gate → web build → **deploy:web (surge publication)** → desktop → Android; the web stage publishes before the heavy platform builds so the operator can probe early. Next stamp **v1.67** via the existing one-minor-increment fresh-release stamp. No other release semantics change (REL.1 build-then-publish contract preserved).
+  - **Do:** release stage order becomes: gate → web build → **deploy:web (surge publication)** → desktop → Android; the web stage publishes before the heavy platform builds so the operator can probe early. Next stamp **v1.68.98009** via the existing one-minor-increment fresh-release stamp (operator floor 1.68; wave opened on this stamp 2026-11-05, release.lock frozen). No other release semantics change (REL.1 build-then-publish contract preserved).
   - **Verify:** `node --test tests/deployWeb.test.ts` and the release-state tests exit 0 with the new order.
-  - **Accept:** a release run publishes the web build to surge before desktop/Android stages begin; served version ≥ v1.67.
+  - **Accept:** a release run publishes the web build to surge before desktop/Android stages begin; served version ≥ v1.68.

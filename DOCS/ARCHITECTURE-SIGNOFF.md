@@ -286,7 +286,7 @@ CLAUDE.md at `3021d442`) requires before CHECKLIST derivation and code.
   Stitch freezes (sign-in frozen 2026-11-05; account screen freezes into
   `LIBS/UI/STITCH/sanctissimissa-account-20261105/` with manifest hashes
   before its view code lands), K.1–K.9, CHECKLIST derivation, and the
-  web-first release train (next stamp v1.67). The stop-for-signoff round
+  web-first release train (next stamp v1.68 — bumped past the v1.67 floor per explicit operator directive 2026-11-05: "this version absolutely CANNOT be anything less than 1.68"). The stop-for-signoff round
   trip is waived by the operator for this wave; this ledger entry is the
   recorded waiver and authorization in its place.
 - **Standing rules bound into the wave:** NO GREP (CodeGraph/semantic
