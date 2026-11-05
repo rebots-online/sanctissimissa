@@ -23,6 +23,7 @@ import JournalView from './ui/JournalView.tsx';
 import HomilyPlanner from './ui/HomilyPlanner.tsx';
 import SettingsView from './ui/SettingsView.tsx';
 import ChatView from './ui/ChatView.tsx';
+import DidacticOverlay from './ui/reader/DidacticOverlay.tsx';
 import AboutView from './ui/AboutView.tsx';
 import SignInView from './ui/account/SignInView.tsx';
 import AccountView from './ui/account/AccountView.tsx';
@@ -34,8 +35,8 @@ import { useNarrow } from './ui/BilingualText.tsx';
 import { applyTheme, readThemePreference, systemMode } from './core/theme/themes.ts';
 import {
   SACRISTAN_ACT,
-  SACRISTAN_LAYOUT,
-  GUIDE_STEPS,
+  DIDACTIC_ACT,
+  COMPANION_SHOWPATH_EVENT,
   setGuideLiveContext,
   type CompanionAct,
 } from './core/orientation/guide.ts';
@@ -61,8 +62,8 @@ const UTIL_NAV: { id: View; ico: string; label: string }[] = [
 ];
 
 // ── CL.2 (§H.1): SACRISTAN_ACT routing + live/visibility context ──────
-/** Document-plane events App forwards acts onto for CL.5's surfaces (and the
- *  tour engine for OG.10). Values follow the guide.ts event convention
+/** Document-plane events App forwards acts onto for CL.5's surfaces (and
+ *  HD.2's didactic overlay). Values follow the guide.ts event convention
  *  (SACRISTAN_ACT = 'sanctissimissa:sacristan-act'); App only forwards — it
  *  never performs the document-plane write itself. The four document-plane
  *  values below keep their §H spellings deliberately (§K.6): dispatcher and
@@ -70,7 +71,9 @@ const UTIL_NAV: { id: View; ico: string; label: string }[] = [
 const COMPANION_DRAFT = 'sanctissimissa:companion-draft';
 const COMPANION_ANNOTATE = 'sanctissimissa:companion-annotate';
 const COMPANION_SEARCH = 'sanctissimissa:companion-search';
-const COMPANION_SHOWPATH = 'sanctissimissa:companion-showpath';
+// COMPANION_SHOWPATH moved to guide.ts as the exported single authority
+// (COMPANION_SHOWPATH_EVENT) when the OG card — its mirrored declaration —
+// was removed; App imports it above.
 
 /** The rail's own view set — an `open` act routes through exactly these. */
 const RAIL_VIEWS = new Set<string>([...NAV, ...UTIL_NAV].map((n) => n.id));
@@ -89,39 +92,6 @@ function isRealIsoDate(value: string): boolean {
   const d = Number(m[3]);
   const round = new Date(y, mo - 1, d);
   return round.getFullYear() === y && round.getMonth() === mo - 1 && round.getDate() === d;
-}
-
-/** The `visible` snapshot (§H.1): structural, allowlisted facts only, never
- *  page text — rail collapsed/full; the last §D companion-layout announcement
- *  (panel state + dock mode); the held [[guide:]] target (OG supersession:
- *  card + spotlight are gone); the section anchors scrolled into view; which
- *  registered guide controls intersect the viewport. */
-function visibilitySnapshot(companionPanel: Record<string, unknown> | null): Record<string, unknown> {
-  const intersectsViewport = (el: Element): boolean => {
-    const r = el.getBoundingClientRect();
-    return r.width > 0 && r.bottom > 0 && r.top < window.innerHeight;
-  };
-  const railMode = document.querySelector('.app')?.getAttribute('data-rail') === 'icons' ? 'collapsed' : 'full';
-  const scrolledSections = [...document.querySelectorAll('[data-section]')]
-    .filter(intersectsViewport)
-    .map((el) => el.getAttribute('data-section'))
-    .filter((anchor): anchor is string => Boolean(anchor))
-    .slice(0, 8);
-  const visibleControls = GUIDE_STEPS
-    .filter((step) => [...document.querySelectorAll(`[data-guide="${step.id}"]`)].some(intersectsViewport))
-    .map((step) => step.id);
-  return {
-    rail: railMode,
-    companionPanel,
-    // OG supersession (operator 2026-11-05): the tour card and its spotlight
-    // are gone; only the held [[guide:]] target remains observable. HD.1's
-    // readVisibleContext() replaces this snapshot wholesale.
-    orientation: {
-      targetHeld: Boolean(document.querySelector('.orientation-target')),
-    },
-    scrolledSections,
-    visibleControls,
-  };
 }
 
 /**
@@ -189,27 +159,11 @@ function AppShell() {
   // guideContext's live context (the draft surface owns the ground truth and
   // may re-register through the same merge).
   const [openDraftKey, setOpenDraftKey] = useState<string | null>(null);
-  // CL.2: the last §D panel-layout announcement (companion panel state + dock
-  // mode), captured structurally for the `visible` snapshot.
-  const companionLayoutRef = useRef<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     const onUpdateReady = () => setUpdateReady(true);
     window.addEventListener(UPDATE_READY_EVENT, onUpdateReady);
     return () => window.removeEventListener(UPDATE_READY_EVENT, onUpdateReady);
-  }, []);
-
-  // CL.2: capture §D companion layout announcements (panel state + dock mode)
-  // so the `visible` snapshot can report them structurally.
-  useEffect(() => {
-    const onLayout = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      companionLayoutRef.current = detail && typeof detail === 'object'
-        ? { ...(detail as Record<string, unknown>) }
-        : null;
-    };
-    window.addEventListener(SACRISTAN_LAYOUT, onLayout);
-    return () => window.removeEventListener(SACRISTAN_LAYOUT, onLayout);
   }, []);
 
   // CL.2 (§H.1): route SACRISTAN_ACT. `open` takes the rail's own state-set
@@ -223,9 +177,17 @@ function AppShell() {
       window.dispatchEvent(new CustomEvent(name, { detail: { kind, value, reply } }));
       debugEvent('sacristan', 'act.forward', { event: name, kind, value }, 'info');
     };
+    /** HD.1 (§K.8): live-anchor lookup by attribute compare — the focus case's
+     *  own pattern. An act whose anchor is not live is rejected, never faked. */
+    const liveSectionAnchor = (anchor: string): HTMLElement | null =>
+      [...document.querySelectorAll<HTMLElement>('[data-section]')]
+        .find((el) => el.getAttribute('data-section') === anchor) ?? null;
     const onAct = (event: Event) => {
       const act = (event as CustomEvent).detail as CompanionActDetail | null;
-      if (!act || typeof act !== 'object' || typeof act.kind !== 'string' || typeof act.value !== 'string' || !act.value.trim()) {
+      // HD.1: [[focus-swap]] is the one valueless act; every other kind must
+      // carry a non-empty value.
+      if (!act || typeof act !== 'object' || typeof act.kind !== 'string' || typeof act.value !== 'string'
+        || (act.kind !== 'focus-swap' && !act.value.trim())) {
         reject({ raw: act ?? null });
         return;
       }
@@ -254,12 +216,53 @@ function AppShell() {
           setDate(value);
           debugEvent('sacristan', 'act.date', { date: value }, 'info');
           return;
+        // ── HD.1/HD.2 (§K.8): the didactic acts ──────────────────────────
+        case 'scroll': {
+          // The same state-set path `focus` uses — the reader scrolls; no halo.
+          if (!liveSectionAnchor(value)) { reject({ kind: act.kind, value }); return; }
+          setFocus((f) => ({ section: value, nonce: f.nonce + 1 }));
+          debugEvent('sacristan', 'act.scroll', { section: value }, 'info');
+          return;
+        }
+        case 'highlight': {
+          if (!liveSectionAnchor(value)) { reject({ kind: act.kind, value }); return; }
+          window.dispatchEvent(new CustomEvent(DIDACTIC_ACT, { detail: { kind: 'highlight', anchor: value, reply } }));
+          debugEvent('sacristan', 'act.forward', { event: DIDACTIC_ACT, kind: 'highlight', anchor: value }, 'info');
+          return;
+        }
+        case 'annotate': {
+          // HD.1 anchor|note form: map the live [data-section] anchor to the
+          // section's nodeKey so SectionReader's nodeKey contract holds
+          // untouched; the note rides along as `note`.
+          const note = typeof act.note === 'string' && act.note ? act.note : null;
+          const el = liveSectionAnchor(value);
+          const nodeKey = el?.getAttribute('data-nodekey') ?? value;
+          window.dispatchEvent(new CustomEvent(COMPANION_ANNOTATE, { detail: { kind: act.kind, value: nodeKey, note, reply } }));
+          debugEvent('sacristan', 'act.forward', { event: COMPANION_ANNOTATE, anchor: value, nodeKey, noted: Boolean(note) }, 'info');
+          return;
+        }
+        case 'circle': {
+          if (!liveSectionAnchor(value)) { reject({ kind: act.kind, value }); return; }
+          window.dispatchEvent(new CustomEvent(DIDACTIC_ACT, { detail: { kind: 'circle', anchor: value, note: act.note ?? null, reply } }));
+          debugEvent('sacristan', 'act.forward', { event: DIDACTIC_ACT, kind: 'circle', anchor: value }, 'info');
+          return;
+        }
+        case 'arrow': {
+          const parts = value.split('->').map((part) => part.trim());
+          const a = parts[0] ?? '';
+          const b = parts[1] ?? '';
+          if (!a || !b || !liveSectionAnchor(a) || !liveSectionAnchor(b)) { reject({ kind: act.kind, value }); return; }
+          window.dispatchEvent(new CustomEvent(DIDACTIC_ACT, { detail: { kind: 'arrow', anchor: a, anchorB: b, reply } }));
+          debugEvent('sacristan', 'act.forward', { event: DIDACTIC_ACT, kind: 'arrow', anchor: a, anchorB: b }, 'info');
+          return;
+        }
+        case 'focus-swap':
+          window.dispatchEvent(new CustomEvent(DIDACTIC_ACT, { detail: { kind: 'focus-swap', reply } }));
+          debugEvent('sacristan', 'act.forward', { event: DIDACTIC_ACT, kind: 'focus-swap' }, 'info');
+          return;
         case 'homily-draft':
           setOpenDraftKey(value);
           forward(COMPANION_DRAFT, act.kind, value, reply);
-          return;
-        case 'annotate':
-          forward(COMPANION_ANNOTATE, act.kind, value, reply);
           return;
         case 'concordance':
         case 'journal':
@@ -271,8 +274,8 @@ function AppShell() {
           const steps = Array.isArray(act.steps)
             ? act.steps
             : value.split('>').map((part) => ({ target: part.trim(), narration: '' })).filter((s) => s.target);
-          window.dispatchEvent(new CustomEvent(COMPANION_SHOWPATH, { detail: { steps } }));
-          debugEvent('sacristan', 'act.forward', { event: COMPANION_SHOWPATH, steps: steps.length }, 'info');
+          window.dispatchEvent(new CustomEvent(COMPANION_SHOWPATH_EVENT, { detail: { steps } }));
+          debugEvent('sacristan', 'act.forward', { event: COMPANION_SHOWPATH_EVENT, steps: steps.length }, 'info');
           return;
         }
         default:
@@ -288,12 +291,14 @@ function AppShell() {
   // commit, and the reader's scroll-spy re-renders App as sections cross the
   // viewport, keeping the `visible` snapshot current.
   useEffect(() => {
+    // HD.1 (§K.8): the `visible` field is no longer registered here —
+    // guideContext() itself reads the live DOM through readVisibleContext()
+    // at every turn (src/core/chat/visibleContext.ts).
     setGuideLiveContext({
       currentView: view,
       currentDate: date,
       focusSection: focus.section,
       openDraftKey,
-      visible: visibilitySnapshot(companionLayoutRef.current),
     });
   });
 
@@ -743,6 +748,10 @@ function AppShell() {
           entry. (OG supersession, operator 2026-11-05: the orientation card was
           removed; §K.8's didactic overlay is the successor surface.) */}
       {sacristanGate && <ChatView sidecar={sidecar} />}
+      {/* HD.2 (§K.8): the didactic overlay — circles, arrows, highlight halo,
+          focus-swap recede, and the show-path walkthrough (successor to the
+          removed OG card's surfaces). Mounts with the same §K.3 gate. */}
+      {sacristanGate && <DidacticOverlay view={view} />}
 
       {/* Mandatory app chrome: version bottom-right on every surface. */}
       <div className="version-tag" title={`Build ${versionInfo.buildNumber} · ${versionInfo.buildDate}`}>

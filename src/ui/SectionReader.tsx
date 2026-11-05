@@ -702,9 +702,13 @@ export default function SectionReader({
   useEffect(() => {
     registerCompanionSurfaceProps({ db, sidecar: sidecar ?? null });
     const onCompanionAnnotate = (e: Event) => {
-      const detail = (e as CustomEvent).detail as { kind?: string; value?: string; reply?: string } | null;
+      const detail = (e as CustomEvent).detail as { kind?: string; value?: string; reply?: string; note?: string } | null;
       const nodeKey = String(detail?.value ?? '').trim();
       const reply = String(detail?.reply ?? '');
+      // HD.1 (§K.8): App maps the [[annotate:<anchor>|<note>]] form to a
+      // nodeKey and attaches the note explicitly; it wins over the reply
+      // excerpt when present.
+      const explicitNote = typeof detail?.note === 'string' && detail.note.trim() ? detail.note.trim().slice(0, 300) : null;
       const attr = nodeKey.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
       const live = nodeKey ? root.current?.querySelector(`section[data-nodekey="${attr}"]`) ?? null : null;
       if (!nodeKey || !live) {
@@ -729,7 +733,7 @@ export default function SectionReader({
         quoteAlt,
         range: range?.src,
         rangeAlt: range?.alt,
-        note: companionNoteExcerpt(reply),
+        note: explicitNote ?? companionNoteExcerpt(reply),
         color: 'gold',
       });
       setAnnVersion((v) => v + 1);

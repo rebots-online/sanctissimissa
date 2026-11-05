@@ -7,12 +7,21 @@ import assert from 'node:assert/strict';
 // contract; the guideContext() live-context extension is verified functionally.
 
 // Minimal DOM stub: guideContext() probes the live DOM for registered
-// controls; headless Node only needs the query surface to exist.
-const globalScope = globalThis as unknown as { document?: unknown };
+// controls AND (HD.1) reads the visible context from [data-section] nodes;
+// headless Node needs those surfaces to exist.
+const makeEl = (attrs: Record<string, string>, heading: string | null) => ({
+  getAttribute: (name: string) => attrs[name] ?? null,
+  querySelector: () => (heading === null ? null : { textContent: heading }),
+  getBoundingClientRect: () => ({ top: 0, bottom: 10, width: 100 }),
+});
+const stubSections = [makeEl({ 'data-section': 'Canon' }, 'Canon Missae')];
+const globalScope = globalThis as unknown as { document?: unknown; window?: unknown };
 globalScope.document ??= {
-  querySelectorAll: () => [],
+  documentElement: { scrollHeight: 2000 },
+  querySelectorAll: (selector: string) => (selector.includes('data-section') ? stubSections : []),
   querySelector: () => null,
 };
+globalScope.window ??= { innerHeight: 800, scrollY: 100 };
 
 const guide = await import('../src/core/orientation/guide.ts');
 
@@ -39,22 +48,13 @@ test('CL.2: guideContext carries the live context fields', () => {
   assert.match(text, /"openDraftKey":"Sancti\/09-19#Homily"/);
 });
 
-test('CL.2: guideContext carries the structural visible snapshot', () => {
-  guide.setGuideLiveContext({
-    visible: {
-      rail: 'collapsed',
-      companionPanel: { open: true, dock: 'right' },
-      orientation: { completed: false, step: 3, targetHeld: true, spotlight: false },
-      scrolledSections: ['Canon'],
-      visibleControls: ['nav-office'],
-    },
-  });
+test('HD.1: guideContext carries the visible context READ from the DOM (not registered)', () => {
+  guide.setGuideLiveContext({ currentView: 'reader', focusSection: 'Canon' });
   const text = guide.guideContext();
-  assert.match(text, /"rail":"collapsed"/);
-  assert.match(text, /"companionPanel":\{"open":true,"dock":"right"\}/);
-  assert.match(text, /"targetHeld":true/);
-  assert.match(text, /"scrolledSections":\["Canon"\]/);
-  assert.match(text, /"visibleControls":\["nav-office"\]/);
+  // The stub DOM carries one [data-section] anchor "Canon" (heading "Canon
+  // Missae", intersecting an 800 px viewport) with scrollY 100 of a 2000 px
+  // document: depth = round(100 / 1200 × 100) = 8.
+  assert.match(text, /"visible":\{"view":"reader","rail":"full","focusSection":"Canon","sections":\[\{"anchor":"Canon","heading":"Canon Missae","visible":true\}\],"scrollDepth":8\}/);
 });
 
 test('CL.2: live-context patches merge per field (last write wins per field)', () => {
@@ -66,9 +66,13 @@ test('CL.2: live-context patches merge per field (last write wins per field)', (
   assert.match(text, /"focusSection":"Introitus"/);
 });
 
-test('CL.2: instruction sentence documents the full command grammar', () => {
-  const sentence = 'You may append exactly one of [[guide:<id>]], [[open:<view>]], [[focus:<section>]], [[date:<iso>]], [[homily-draft:<litKey>]], [[annotate:<nodeKey>]], [[concordance:<term>]], [[journal:<term>]], [[show-path:a > b > c]] at the very end.';
-  assert.ok(guide.guideContext().includes(sentence));
+test('CL.2/HD.1: the instruction sentence documents the full command grammar', () => {
+  const text = guide.guideContext();
+  const tokens = ['[[guide:<id>]]', '[[open:<view>]]', '[[focus:<section>]]', '[[date:<iso>]]', '[[homily-draft:<litKey>]]',
+    '[[annotate:<anchor>|<note>]]', '[[concordance:<term>]]', '[[journal:<term>]]', '[[show-path:a > b > c]]',
+    '[[scroll:<anchor>]]', '[[highlight:<anchor>]]', '[[circle:<anchor>]]', '[[arrow:<a>-><b>]]', '[[focus-swap]]'];
+  for (const token of tokens) assert.ok(text.includes(token), `documents ${token}`);
+  assert.match(text, /Do not claim to see anything not in the live view/, 'HD.1 teaching law present');
 });
 
 // ── App.tsx source contract ─────────────────────────────────────────────
@@ -101,24 +105,19 @@ test('CL.2: document-plane acts are forwarded on the dedicated channels', () => 
   assert.match(appSource, /const COMPANION_DRAFT = 'sanctissimissa:companion-draft'/);
   assert.match(appSource, /const COMPANION_ANNOTATE = 'sanctissimissa:companion-annotate'/);
   assert.match(appSource, /const COMPANION_SEARCH = 'sanctissimissa:companion-search'/);
-  assert.match(appSource, /const COMPANION_SHOWPATH = 'sanctissimissa:companion-showpath'/);
+  assert.match(appSource, /COMPANION_SHOWPATH_EVENT/, 'the show-path channel name comes from guide.ts (HD.2 single authority)');
   assert.match(appSource, /forward\(COMPANION_DRAFT, act\.kind, value, reply\)/);
-  assert.match(appSource, /forward\(COMPANION_ANNOTATE, act\.kind, value, reply\)/);
   assert.match(appSource, /case 'concordance':[\s\S]*?case 'journal':[\s\S]*?forward\(COMPANION_SEARCH, act\.kind, value, reply\)/);
-  assert.match(appSource, /new CustomEvent\(COMPANION_SHOWPATH, \{ detail: \{ steps \} \}\)/);
+  assert.match(appSource, /new CustomEvent\(COMPANION_SHOWPATH_EVENT, \{ detail: \{ steps \} \}\)/);
 });
 
-test('CL.2: App registers the live context and visible snapshot', () => {
-  assert.match(appSource, /setGuideLiveContext\(\{[\s\S]*?currentView: view,[\s\S]*?currentDate: date,[\s\S]*?focusSection: focus\.section,[\s\S]*?openDraftKey,[\s\S]*?visible: visibilitySnapshot\(companionLayoutRef\.current\),[\s\S]*?\}\)/);
-  // OG supersession (operator 2026-11-05): tour-completed state and the
-  // spotlight veil are gone with the card; the held [[guide:]] target stays.
-  assert.match(appSource, /GUIDE_STEPS[\s\S]*?visibleControls/);
-  assert.match(appSource, /scrolledSections/);
-  assert.match(appSource, /data-rail/);
-  assert.match(appSource, /companionPanel/);
-  assert.match(appSource, /\.orientation-target/);
-  assert.doesNotMatch(appSource, /\.tour-spotlight/);
-  assert.match(appSource, /SACRISTAN_LAYOUT/);
+test('CL.2/HD.1: App registers the live facts; the visible snapshot is a real DOM read in guideContext', () => {
+  assert.match(appSource, /setGuideLiveContext\(\{[\s\S]*?currentView: view,[\s\S]*?currentDate: date,[\s\S]*?focusSection: focus\.section,[\s\S]*?openDraftKey,[\s\S]*?\}\)/);
+  // HD.1 (§K.8): visible moved from a registered App snapshot into
+  // guideContext()'s per-turn readVisibleContext() DOM read.
+  assert.ok(!appSource.includes('visibilitySnapshot'), 'App no longer curates a visible snapshot');
+  const guideSrc = readFileSync(new URL('../src/core/orientation/guide.ts', import.meta.url), 'utf8');
+  assert.match(guideSrc, /visible: readVisibleContext\(guideLiveContext\)/);
 });
 
 test('CL.2: invalid acts are rejected to Diagnostics, not executed', () => {

@@ -1,4 +1,5 @@
 import { debugEvent } from '../diagnostics/store.ts';
+import { readVisibleContext } from '../chat/visibleContext.ts';
 export const GUIDE_CHANGED = 'sanctissimissa:guide-changed';
 export const START_GUIDE = 'sanctissimissa:start-guide';
 export const OPEN_SACRISTAN = 'sanctissimissa:open-sacristan';
@@ -86,13 +87,14 @@ export function clearGuide(): void {
 /** CL.2 (§H.1): live, allowlisted app facts merged into guideContext()'s
  *  context JSON. Structural values only — never page text. Surfaces merge
  *  partials (last write wins per field), so App and the document-plane
- *  surfaces each contribute what they own without coupling. */
+ *  surfaces each contribute what they own without coupling.
+ *  HD.1 (§K.8): the `visible` field is no longer registered — guideContext
+ *  itself reads the live DOM through readVisibleContext() each turn. */
 export interface GuideLiveContext {
   currentView?: string;
   currentDate?: string;
   focusSection?: string | null;
   openDraftKey?: string | null;
-  visible?: Record<string, unknown>;
 }
 let guideLiveContext: GuideLiveContext = {};
 /** CL.2: merge a partial live-context patch; present fields appear in the
@@ -106,11 +108,11 @@ export function guideContext(): string {
     const element = guideTarget(step.id);
     return element ? [{ id: step.id, label: step.label, tag: element.tagName, active: element.classList.contains('active') }] : [];
   });
-  // CL.2: the documented context JSON gains the live facts registered through
-  // setGuideLiveContext (currentView/currentDate/focusSection/openDraftKey +
-  // the structural `visible` snapshot).
-  const context = { controls: targets, ...guideLiveContext };
-  return `You are SanctissiMissa's Sacristan. Explain the app patiently in plain language, one small step at a time. The following are actual visible DOM controls: ${JSON.stringify(context)}. Current orientation target: ${activeId ?? 'none'}. To point to a control, append exactly [[guide:<id>]] using one listed id. You may append exactly one of [[guide:<id>]], [[open:<view>]], [[focus:<section>]], [[date:<iso>]], [[homily-draft:<litKey>]], [[annotate:<nodeKey>]], [[concordance:<term>]], [[journal:<term>]], [[show-path:a > b > c]] at the very end. This highlights the real control; the user can press Show me to activate it. Do not claim to have clicked anything. Do not invent unavailable controls or hide uncertainty. If the Sacristan needs setup, the user presses Prepare Sacristan; the preferred native model is Qwen 3.5 2B. Keep explanations short.`;
+  // HD.1 (§K.8): `visible` is a REAL DOM read at prompt-build time — the live
+  // section anchors (with headings), viewport visibility, rail mode, focus
+  // target, and scroll depth — replacing §H.1's registered snapshot.
+  const context = { controls: targets, ...guideLiveContext, visible: readVisibleContext(guideLiveContext) };
+  return `You are SanctissiMissa's Sacristan. Explain the app patiently in plain language, one small step at a time. The following are actual visible DOM controls and the live page view: ${JSON.stringify(context)}. Current orientation target: ${activeId ?? 'none'}. You teach ON the page: scroll to the passage ([[scroll:<anchor>]]), highlight it ([[highlight:<anchor>]]), circle it ([[circle:<anchor>]]), connect two passages with an arrow ([[arrow:<a>-><b>]]), annotate it with a note ([[annotate:<anchor>|<1-300 char note>]]), or recede so the page takes attention ([[focus-swap]]). Use only anchors listed in visible.sections. You may append exactly one of [[guide:<id>]], [[open:<view>]], [[focus:<section>]], [[date:<iso>]], [[homily-draft:<litKey>]], [[annotate:<anchor>|<note>]], [[concordance:<term>]], [[journal:<term>]], [[show-path:a > b > c]], [[scroll:<anchor>]], [[highlight:<anchor>]], [[circle:<anchor>]], [[arrow:<a>-><b>]], [[focus-swap]] at the very end. This highlights the real control; the user can press Show me to activate it. Do not claim to have clicked anything. Do not claim to see anything not in the live view. Do not invent unavailable controls or anchors, and never hide uncertainty. If the Sacristan needs setup, the user presses Prepare Sacristan; the preferred native model is Qwen 3.5 2B. Keep explanations short.`;
 }
 // §H.1 — Sacristan command grammar (CL.1). A reply may end with exactly one
 // trailing command. [[guide:<id>]] keeps its pre-existing meaning; the
@@ -118,21 +120,60 @@ export function guideContext(): string {
 // navigation and the document-plane surfaces through one SACRISTAN_ACT
 // window event (consumed by App, §H.1 CL.2).
 export const SACRISTAN_ACT = 'sanctissimissa:sacristan-act';
-export type CompanionActKind = 'open' | 'focus' | 'date' | 'homily-draft' | 'annotate' | 'concordance' | 'journal' | 'show-path';
-export interface CompanionAct { kind: CompanionActKind; value: string }
+/** HD.2 (§K.8): the didactic overlay's channel — App forwards circle/arrow/
+ * highlight/focus-swap acts here after live-anchor validation; the overlay is
+ * the sole listener (successor to the removed OG card's surfaces). */
+export const DIDACTIC_ACT = 'sanctissimissa:didactic-act';
+/** CL.2 (§H.1)→HD.2: the show-path channel App forwards [[show-path:…]] steps
+ *  on (detail { steps: PathStep[] }). Single authority since the OG card (the
+ *  former second, mirrored declaration) was removed. */
+export const COMPANION_SHOWPATH_EVENT = 'sanctissimissa:companion-showpath';
+export type CompanionActKind = 'open' | 'focus' | 'date' | 'homily-draft' | 'annotate' | 'concordance' | 'journal' | 'show-path'
+  | 'scroll' | 'highlight' | 'circle' | 'arrow' | 'focus-swap';
+export interface CompanionAct { kind: CompanionActKind; value: string; /** HD.1: the annotate note ([[annotate:<anchor>|<note>]]). */
+  note?: string }
 /** One [[show-path:…]] step: the target token as parsed (view:<View> /
  * section:<anchor> / a registered guide id) plus the narration line the reply
  * carries for it (attached by the chat sender, §H.4). */
 export interface PathStep { target: string; narration: string }
+/** HD.2 (§K.8): the didactic overlay event detail App forwards. */
+export interface DidacticActDetail {
+  kind: 'circle' | 'arrow' | 'highlight' | 'focus-swap';
+  anchor?: string;
+  anchorB?: string;
+  note?: string | null;
+  reply?: string;
+}
 /** The App `View` union (src/App.tsx), mirrored here for validation. */
 const COMPANION_VIEWS = ['map', 'reader', 'annotations', 'calendar', 'office', 'bible', 'journal', 'homily', 'settings', 'about'] as const;
 const GUIDE_COMMAND_ID = /^[a-z-]+$/;
 /** Trailing [[<kind>:<value>]] token. The value can never contain brackets,
  * so an earlier bracketed token in prose can never swallow the real trailing
  * command. */
-const TRAILING_COMMAND = /\[\[(guide|open|focus|date|homily-draft|annotate|concordance|journal|show-path):([^[\]]*)\]\]\s*$/;
+const TRAILING_COMMAND = /\[\[(guide|open|focus|date|homily-draft|annotate|concordance|journal|show-path|scroll|highlight|circle|arrow):([^[\]]*)\]\]\s*$/;
+/** HD.1: the valueless trailing token — [[focus-swap]]. */
+const BARE_TRAILING_COMMAND = /\[\[(focus-swap)\]\]\s*$/;
 /** First command-shaped token through end-of-text — what display strips. */
-const ANY_COMMAND_PREFIX = /\[\[(?:guide|open|focus|date|homily-draft|annotate|concordance|journal|show-path):[\s\S]*$/;
+const ANY_COMMAND_PREFIX = /\[\[(?:guide|open|focus|date|homily-draft|annotate|concordance|journal|show-path|scroll|highlight|circle|arrow|focus-swap)(?::[\s\S]*|\]\][\s\S]*)$/;
+/** HD.1: a section anchor value — 1–80 chars, no grammar metacharacters
+ *  (brackets, pipe, arrow, '>' path separator). */
+const ANCHOR_VALUE = /^[^<>[\]|]{1,80}$/;
+
+/** Resolve one didactic/show-path target token to its live element — never
+ *  faked: view:<View> → the rail's nav button ([data-guide="nav-<view>"]);
+ *  section:<anchor> → the live [data-section] node; a registered guide id →
+ *  guideTarget. Attribute-compare only (App's own pattern), and a target with
+ *  no live element resolves null. (Re-homed from the removed OG card.) */
+export function pathTargetElement(target: string, root: Document = document): HTMLElement | null {
+  const findByAttribute = (name: string, value: string): HTMLElement | null =>
+    [...root.querySelectorAll<HTMLElement>(`[${name}]`)]
+      .find((element) => element.getAttribute(name) === value && element.getBoundingClientRect().width > 0 && !element.hasAttribute('disabled')) ?? null;
+  const view = /^view:([a-z-]+)$/.exec(target);
+  if (view) return findByAttribute('data-guide', `nav-${view[1]}`);
+  const section = /^section:(.+)$/.exec(target);
+  if (section) { const anchor = section[1].trim(); return anchor ? findByAttribute('data-section', anchor) : null; }
+  return guideTarget(target, root);
+}
 
 function isRealIsoDate(value: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
@@ -162,6 +203,32 @@ function buildCompanionAct(kind: CompanionActKind, raw: string): CompanionAct | 
       if (steps.length < 2 || steps.length > 6 || steps.some((step) => !isPathStepTarget(step))) return null;
       return { kind, value: steps.join(' > ') };
     }
+    // HD.1 (§K.8): the didactic tokens. Anchors are 1–80 chars without
+    // grammar metacharacters; the anchor forms are validated against the
+    // LIVE document at apply time (App), never faked here.
+    case 'scroll':
+    case 'highlight':
+    case 'circle':
+      return ANCHOR_VALUE.test(value) ? { kind, value } : null;
+    case 'annotate': {
+      // New HD.1 form [[annotate:<anchor>|<1-300 chars>]]; the bare
+      // [[annotate:<nodeKey>]] form keeps its §H meaning.
+      const pipe = value.indexOf('|');
+      if (pipe < 0) return value.length >= 1 && value.length <= 80 ? { kind, value } : null;
+      const anchor = value.slice(0, pipe).trim();
+      const note = value.slice(pipe + 1).trim();
+      if (!ANCHOR_VALUE.test(anchor) || note.length < 1 || note.length > 300) return null;
+      return { kind, value: anchor, note };
+    }
+    case 'arrow': {
+      const parts = value.split('->');
+      if (parts.length !== 2) return null;
+      const a = parts[0].trim();
+      const b = parts[1].trim();
+      return ANCHOR_VALUE.test(a) && ANCHOR_VALUE.test(b) ? { kind, value: `${a}->${b}` } : null;
+    }
+    case 'focus-swap':
+      return value === '' ? { kind, value: '' } : null;
     default:
       // focus / homily-draft / annotate / concordance / journal: a trimmed 1–80 char value
       return value.length >= 1 && value.length <= 80 ? { kind, value } : null;
@@ -172,9 +239,9 @@ export function parseCompanionCommand(text: string): CompanionAct | null {
   // The trailing token may be the pre-existing [[guide:<id>]]; look one token
   // further back so a combined "guide + act" reply still yields its act.
   for (let scanned = 0; scanned < 2; scanned++) {
-    const match = TRAILING_COMMAND.exec(rest);
+    const match = TRAILING_COMMAND.exec(rest) ?? BARE_TRAILING_COMMAND.exec(rest);
     if (!match) return null;
-    if (match[1] !== 'guide') return buildCompanionAct(match[1] as CompanionActKind, match[2]);
+    if (match[1] !== 'guide') return buildCompanionAct(match[1] as CompanionActKind, match[2] ?? '');
     rest = rest.slice(0, match.index);
   }
   return null;
@@ -186,14 +253,15 @@ export function applyGuideCommand(text: string): boolean {
   let act: CompanionAct | null = null;
   // Consume the trailing [[guide:<id>]] plus at most one CompanionAct, in
   // either order; anything earlier in the reply is prose, never a command.
+  // (HD.1: the valueless [[focus-swap]] token matches the bare form.)
   for (let consumed = 0; consumed < 2; consumed++) {
-    const match = TRAILING_COMMAND.exec(rest);
+    const match = TRAILING_COMMAND.exec(rest) ?? BARE_TRAILING_COMMAND.exec(rest);
     if (!match) break;
     if (match[1] === 'guide') {
       if (guideId !== null || !GUIDE_COMMAND_ID.test(match[2])) break;
       guideId = match[2];
     } else {
-      const built = buildCompanionAct(match[1] as CompanionActKind, match[2]);
+      const built = buildCompanionAct(match[1] as CompanionActKind, match[2] ?? '');
       // Invalid command: recorded, never executed — and it aborts the batch,
       // so a malformed suffix cannot half-apply a reply.
       if (!built) { debugEvent('sacristan', 'command.rejected', { raw: text }, 'warn'); return false; }

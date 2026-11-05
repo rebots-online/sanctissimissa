@@ -60,11 +60,12 @@ test('CL.4: CompanionMemory is built over the sidecar store\'s own sql.js handle
   assert.ok(memory.includes('handle ? new CompanionMemory(handle) : null'), 'absent handle → memory idle, never a crash');
 });
 
-test('CL.4: the live facts (view/date/focus) come from guideContext()\'s documented context JSON', () => {
+test('CL.4/HD.1: the live facts (view/date/focus) come from guideContext()\'s documented context JSON', () => {
   const start = source.indexOf('function liveFacts');
   assert.ok(start > 0, 'liveFacts exists');
   const body = source.slice(start, source.indexOf('\n}', start) + 2);
-  assert.match(body, /actual visible DOM controls: \(\[\\s\\S\]\*\?\)\\\. Current orientation target/, 'reads the documented CL.2 context JSON');
+  // HD.1: the lead-in changed when `visible` became a live DOM read.
+  assert.match(body, /actual visible DOM controls and the live page view: \(\[\\s\\S\]\*\?\)\\\. Current orientation target/, 'reads the documented CL.2/HD.1 context JSON');
   assert.match(body, /currentDate/, 'currentDate consumed');
   assert.match(body, /focusSection/, 'focusSection consumed');
   assert.match(body, /\/\^\\d\{4\}-\\d\{2\}-\\d\{2\}\$\//, 'the date is ISO-validated before use as the day anchor');

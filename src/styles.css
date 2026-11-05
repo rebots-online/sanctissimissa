@@ -2894,6 +2894,64 @@ button:disabled { opacity: 0.55; cursor: not-allowed; }
   .orientation-target:not(.orientation-showing) { animation: none; transform: none; }
 }
 
+/* ===================== HD.2 (§K.8) — didactic overlay: circles, arrows, focus-swap, show-path caption ===================== */
+/* Fixed full-viewport SVG above the page but BELOW the Sacristan panel (z-54 vs
+   .chat-panel z-55): the whole layer is pointer-events: none, so every haloed
+   target stays directly clickable; only the show-path caption is interactive. */
+.didactic-overlay { position: fixed; inset: 0; z-index: 54; width: 100vw; height: 100dvh; pointer-events: none; }
+.didactic-circle {
+  fill: none;
+  stroke: var(--gold, #b08d3e);
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: didactic-draw 600ms ease-out forwards, didactic-fade 6s ease-in forwards;
+}
+.didactic-circle.annotated { animation: didactic-draw 600ms ease-out forwards; }
+.didactic-arrow {
+  fill: none;
+  stroke: var(--gold, #b08d3e);
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: didactic-draw 600ms ease-out forwards, didactic-fade 6s ease-in forwards;
+}
+.didactic-arrow-head {
+  fill: var(--gold, #b08d3e);
+  stroke: none;
+  animation: didactic-fade 6s ease-in forwards;
+}
+@keyframes didactic-draw { to { stroke-dashoffset: 0; } }
+@keyframes didactic-fade { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
+/* reduced-motion: static geometry, no draw, no fade — annotated persistence and
+   the 6 s JS removal are unchanged; only the motion is dropped. */
+@media (prefers-reduced-motion: reduce) {
+  .didactic-circle, .didactic-arrow { animation: none; stroke-dashoffset: 0; }
+  .didactic-arrow-head { animation: none; }
+}
+/* focus-swap: the panel recedes to its edge — opacity only, never unmounted
+   (its React state and stream stay alive); the held target keeps the halo. */
+.chat-panel.receded { opacity: 0.25; pointer-events: none; transition: opacity 350ms ease; }
+.chat-panel.receded:hover { opacity: 0.25; }
+/* show-path narration caption — the overlay's only interactive surface. */
+.didactic-caption {
+  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+  z-index: 56; max-width: min(520px, calc(100vw - 32px));
+  padding: 12px 16px; background: var(--card, #faf7f0); color: var(--ink, #221c14);
+  border: 2px solid var(--gold, #b08d3e); border-radius: 12px;
+  box-shadow: 0 8px 28px #0006; font-family: var(--serif, serif); line-height: 1.5;
+}
+.didactic-caption p { margin: 0 0 8px; font-size: .95rem; }
+.didactic-caption-actions { display: flex; align-items: center; gap: 8px; }
+.didactic-caption-actions span { font-size: .8rem; color: var(--ink-soft, #6b6353); margin-right: auto; }
+.didactic-caption-actions button {
+  padding: 8px 14px; min-height: 44px; font: inherit; cursor: pointer;
+  border: 1px solid var(--gold, #b08d3e); border-radius: 8px;
+  background: var(--card, #faf7f0); color: inherit;
+}
+
 /* ===================== OG.11 (§H.5) — mascot presence cadence: the subtle "I'm here" idle ===================== */
 /* Applied to the porthole for the gesture duration, alongside the alternating
    gesture glyph (gesture-cross / gesture-wave); one gentle ≤ 1.2 s

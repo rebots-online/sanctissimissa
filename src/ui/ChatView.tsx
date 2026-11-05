@@ -131,7 +131,9 @@ function sidecarHandle(store: SettingsStore | null): Database | null {
  *  date suffix of the §H.7 feast chip, without any new coupling surface. */
 function liveFacts(): { view: string; date: string; focus: string | null } {
   const today = new Date().toISOString().slice(0, 10);
-  const match = /actual visible DOM controls: ([\s\S]*?)\. Current orientation target/.exec(guideContext());
+  // HD.1: the context JSON's lead-in changed when `visible` became a live
+  // DOM read — parse the new documented phrasing.
+  const match = /actual visible DOM controls and the live page view: ([\s\S]*?)\. Current orientation target/.exec(guideContext());
   if (!match) return { view: '', date: today, focus: null };
   try {
     const parsed = JSON.parse(match[1]) as { currentView?: unknown; currentDate?: unknown; focusSection?: unknown };
