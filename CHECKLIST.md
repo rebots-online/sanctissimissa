@@ -2741,7 +2741,7 @@ Dependency additions for this stanza: `firebase`, `onnxruntime-web`, `phonemizer
   - **Verify:** `npm test` exits 0 (updated tests); semantic evaluation confirms no user-visible "Companion" string remains in `src/`.
   - **Accept:** rendered — every visible mention reads Sacristan; OPEN_SACRISTAN/SACRISTAN_ACT dispatch and handle; placements reset silently.
 
-- [ ] **SK.1 — Firebase auth core + useAccount (§K.2).** Self-contained. Files: `src/core/account/auth.ts` (new), `src/core/account/useAccount.ts` (new), `tests/accountAuth.test.ts` (new). Adds the `firebase` dependency.
+- [x] **SK.1 — Firebase auth core + useAccount (§K.2).** Self-contained. Files: `src/core/account/auth.ts` (new), `src/core/account/useAccount.ts` (new), `tests/accountAuth.test.ts` (new). Adds the `firebase` dependency.
   - **Do:** lazy `initializeApp` from `VITE_FIREBASE_*` env (absent env → `isAuthConfigured(): false`, app runs signed-out with zero auth UI pressure); `getAuth` Google popup provider + email/password `signIn`/`signUp`/`resetPassword`; `useAccount(): { user, creditUnits, syncState, signIn*, signOut }` — auth state subscription, credit read via SK.3's client, `syncState` per surface from SK.6's sync engine. All Firebase handles injectable so unit tests run with fakes (no network in tests).
   - **Verify:** focused test exits 0 (signed-out default; fake sign-in sets user; creditUnits from injected reader; unconfigured-env → null user, no throw).
   - **Accept:** fresh clone without Firebase env boots and works fully signed out; sign-in feels additive, never blocking.
