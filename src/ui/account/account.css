@@ -1,0 +1,369 @@
+/* SK.2 (§K.0) — account surfaces, scoped under `.account-surface`.
+   Palette and metrics from the frozen Stitch sign-in screen
+   (LIBS/UI/STITCH/sanctissimissa-account-20261105/sign-in.html); the tokens
+   are the app's own :root parchment/ink/gold vocabulary (the specimen was
+   generated from this design system). Cinzel matches the freeze's heading
+   face; offline builds fall back to the app serif. */
+
+.account-surface {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 44px 24px 40px;
+  overflow-y: auto;
+  color: var(--ink);
+  font-family: var(--serif);
+}
+
+/* Decorative cross watermark — verbatim geometry/opacity from the freeze. */
+.account-watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0.035;
+}
+.account-watermark svg {
+  width: 520px;
+  height: 520px;
+  fill: var(--ink);
+}
+
+/* ── Masthead ─────────────────────────────────────────────────────────── */
+.account-masthead {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 36rem;
+  margin-bottom: 26px;
+}
+.account-kicker {
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.account-title {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+.account-tagline {
+  font-style: italic;
+  font-size: 19px;
+  color: var(--ink-soft);
+  margin: 0;
+}
+.account-surface .ornament-rule {
+  width: 96px;
+  height: 1px;
+  margin: 16px auto 0;
+  background: linear-gradient(90deg, transparent, var(--gold) 30%, var(--gold) 70%, transparent);
+}
+
+/* ── Vellum card ──────────────────────────────────────────────────────── */
+.account-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 490px;
+  background: var(--vellum);
+  border: 1px solid var(--parchment-deep);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(34, 28, 20, 0.08);
+  padding: 34px 34px 26px;
+}
+.account-card-head {
+  text-align: center;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(236, 226, 204, 0.8);
+  margin-bottom: 22px;
+}
+.account-card-head h2 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin: 0;
+}
+.account-card-head p {
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin: 6px 0 0;
+}
+
+/* Benefit rows */
+.benefit-rows {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.benefit-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  transition: border-color 160ms, background-color 160ms;
+}
+.benefit-row:hover {
+  border-color: var(--parchment-deep);
+  background: rgba(246, 240, 226, 0.5);
+}
+.benefit-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--parchment);
+  border: 1px solid rgba(169, 126, 19, 0.4);
+  color: var(--gold);
+}
+.benefit-icon svg {
+  width: 14px;
+  height: 14px;
+}
+.benefit-row p {
+  font-size: 15px;
+  line-height: 1.35;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0;
+}
+
+/* Auth actions */
+.account-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.google-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid #8f6a0e;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #b88c1b, #9c730e);
+  color: #fbf7ee;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: filter 160ms, transform 80ms;
+}
+.google-btn:hover:not(:disabled) { filter: brightness(1.06); }
+.google-btn:active:not(:disabled) { transform: translateY(1px); }
+.google-btn:disabled { opacity: 0.6; cursor: default; }
+.google-btn svg { width: 16px; height: 16px; opacity: 0.9; }
+
+/* Email accordion */
+.email-accordion {
+  border: 1px solid var(--parchment-deep);
+  border-radius: 4px;
+  background: rgba(246, 240, 226, 0.4);
+  overflow: hidden;
+}
+.email-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background-color 160ms, color 160ms;
+}
+.email-toggle:hover {
+  background: rgba(236, 226, 204, 0.5);
+  color: var(--ink);
+}
+.email-toggle-lead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.email-toggle-lead svg { width: 14px; height: 14px; color: var(--ink-faint); }
+.email-toggle-hint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--serif);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gold);
+}
+.email-toggle-hint .chevron {
+  width: 14px;
+  height: 14px;
+  transition: transform 160ms;
+}
+.email-toggle-hint .chevron.open { transform: rotate(180deg); }
+
+.email-panel {
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--parchment-deep);
+  background: var(--vellum);
+}
+.auth-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--parchment-deep);
+  margin-bottom: 14px;
+}
+.auth-tab {
+  padding: 6px 12px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: color 160ms, border-color 160ms;
+}
+.auth-tab:hover { color: var(--ink); }
+.auth-tab.active {
+  font-weight: 600;
+  color: #9c2733;
+  border-bottom-color: #9c2733;
+}
+
+.auth-field { margin-bottom: 12px; }
+.auth-field label {
+  display: block;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  margin-bottom: 4px;
+}
+.auth-field-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.forgot-link {
+  font-family: var(--sans);
+  font-size: 10px;
+  color: var(--gold);
+  text-decoration: none;
+}
+.forgot-link:hover { text-decoration: underline; }
+.auth-field input {
+  width: 100%;
+  padding: 8px 12px;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--vellum);
+  border: 1px solid var(--parchment-deep);
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 160ms, box-shadow 160ms;
+}
+.auth-field input::placeholder { color: rgba(138, 125, 106, 0.6); }
+.auth-field input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold);
+}
+
+.submit-btn {
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px 12px;
+  background: var(--rail);
+  color: #fbf7ee;
+  border: none;
+  border-radius: 4px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms;
+}
+.submit-btn:hover:not(:disabled) { background: #3b3226; }
+.submit-btn:disabled { opacity: 0.6; cursor: default; }
+
+/* Honest states */
+.account-unconfigured {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ink-faint);
+  text-align: center;
+  padding: 10px 0 4px;
+  margin: 0;
+}
+.account-alert {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: #9c2733;
+  margin: 12px 0 0;
+  text-align: center;
+}
+.account-status {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin: 12px 0 0;
+  text-align: center;
+}
+.account-card-footer {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(236, 226, 204, 0.7);
+  text-align: center;
+}
+.account-card-footer p {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--ink-faint);
+  margin: 0;
+}
+
+/* Honest quiet footnote outside the card */
+.account-footnote {
+  position: relative;
+  z-index: 1;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ink-faint);
+  text-align: center;
+  max-width: 28rem;
+  margin: 24px 0 0;
+}
+
+/* Narrow widths — the card breathes, never clips (§A defect class). */
+@media (max-width: 640px) {
+  .account-surface { padding: 28px 12px 24px; }
+  .account-card { padding: 24px 18px 20px; }
+  .account-title { font-size: 27px; }
+  .account-tagline { font-size: 17px; }
+}
