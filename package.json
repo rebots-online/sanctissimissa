@@ -41,6 +41,7 @@
     "ckeditor5": "^48.5.0",
     "dompurify": "^3.4.14",
     "firebase": "^13.2.0",
+    "firebase-admin": "^14.5.0",
     "onnxruntime-web": "^1.31.1",
     "phonemizer": "^1.2.1",
     "react": "^18.3.1",

@@ -2,6 +2,13 @@
   publish = "dist-web"
   command = "npm run build"
 
+# BK.1 (§K.1) — billing functions: /billing/key, /billing/access.
+# Secrets (OPENROUTER_ADMIN_KEY, FIREBASE_ADMIN_*) are server env only —
+# never VITE_*, never in any client bundle (SK.5 semantic check).
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 [[headers]]
   for = "/*"
   [headers.values]
