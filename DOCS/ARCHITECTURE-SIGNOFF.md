@@ -246,3 +246,50 @@ CLAUDE.md at `3021d442`) requires before CHECKLIST derivation and code.
   execute 1:1 from the signed §H text; delivery runs the sanctioned release
   train (next stamp ≥ v1.66), publishes surge, and renders-verified
   acceptance per task.
+
+## 2026-11-05 — §K wave: signoff round-trip waived (operator, verbatim)
+
+- **Amendment:** DOCS/ARCHITECTURE.md § "K. Identity, per-user hosted keys,
+  credit visibility, on-device Supertonic voice, the Sacristan rename, and
+  didactic DOM actions (2026-11-05)".
+- **Operator directives (verbatim, this session):** "rearchitect openrouter
+  keys; use .env-specified $OPENROUTER_ADMIN_KEY to provision an
+  $OPENROUTER_API_KEY per user, spend limit defined by amount of prepaid x
+  40% default defined in .env. By default uses openrouter/free model.";
+  "Do not display chatbot or orientation card if only hosted api is
+  implemented, because it is pay as you go--so only display chatbot at all
+  if the user has credits in logged in firebase account"; "firebase login to
+  be added, but not required to be logged in except for certain features";
+  "This release IS to include the google stitch-designed 'bookstore'";
+  "english content is to offer tts ... using the same implementation as
+  natally-ai-studio: supertonic tts ... multithreaded generate one sentence
+  using expressive supertonic on device tts while rendering the previous";
+  "supertonic is used in the deployed https://natally.surge.sh"; "look at
+  rebots-online/natally-ai-studio at the v1.32 that was flawless (we
+  regressed to a not as good implementation where words are frequently
+  dropped now)"; "ensure it works flawlessly by calibrating cpu/android gpu
+  resources on startup and background load the supertonic tts model during
+  init so that it never makes the user wait"; "Change name from Companion to
+  something more appropriate"; "it looks like you dont have frozen prototype
+  from google stitch yet" / "architecting is preceded by the frozen UI";
+  "note it is Sanctissimissa, not St Androids Missal"; "people need to be
+  presented with a true choice of why they want to opt in, not an extractive
+  only" / "a true choice means they are presented with a log in, and they
+  feel the benefits instead of trauma associated with it"; "if you ask a
+  question to the chatbot, it must be encouraged to scroll to the relevant
+  portions, highlight and annotate, draw circle around, draw arrows
+  connecting parts of texts, etc."; "remember build BEGINS with webapp
+  deploy"; and the waiver: "what are you dawdling for--the only reason for
+  not having to get signoff is so youd one shot and be finished 12 hours
+  ago".
+- **Authorized by this entry:** executing §K end to end in one wave — K.0
+  Stitch freezes (sign-in frozen 2026-11-05; account screen freezes into
+  `LIBS/UI/STITCH/sanctissimissa-account-20261105/` with manifest hashes
+  before its view code lands), K.1–K.9, CHECKLIST derivation, and the
+  web-first release train (next stamp v1.67). The stop-for-signoff round
+  trip is waived by the operator for this wave; this ledger entry is the
+  recorded waiver and authorization in its place.
+- **Standing rules bound into the wave:** NO GREP (CodeGraph/semantic
+  evaluation only); visual self-verification with rendered screenshots at
+  desktop and narrow widths before any turn ends; no security/hardening
+  work items; kstore local caching until the server returns.

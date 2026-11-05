@@ -398,7 +398,7 @@ details go to Diagnostics. The old mock remains an unconnected test helper.
 | `GUIDE_STEPS` / `OrientationGuide` | `src/core/orientation/guide.ts`, `src/ui/OrientationGuide.tsx`. Six registered targets; saved `{completed, step}` under localStorage `sanctissimissa.orientation.v1`; no arbitrary model-provided selector or JavaScript execution. |
 | `HostedOpenRouterProvider` | `reusable-chatbot/engines/hosted-openrouter/index.ts` — OpenAI-compatible SSE streaming provider over `https://openrouter.ai/api/v1`; **automatic debug default engine on every platform** (amendment §E, pending signoff): tried first by ChatView, local providers retained and picker-selectable; key by pointer (`VITE_OPENROUTER_API_KEY`), `debugEvent('hosted-openrouter', …)` diagnostics, never the key |
 | `resolveHostedEngine` / `hostedProvider` config | `src/core/chat/resolve.ts` + `config/companion-defaults.json` — `(key, onProgress?) => Promise<Resolution>`; config block `{ kind: 'openrouter', baseUrl, model: 'openrouter/free', fallbackModel: null, modelLabel: 'OpenRouter Free' }`; feedback `hostedKeyMissing` / `hostedNetwork` / `hostedLimited` in `src/core/chat/feedback.ts` |
-| `occupiedRects` / `resolveGuidePlacement` / `ORIENTATION_GAP` | `src/core/orientation/layout.ts` — workspace-aware placement for both orientation cards (amendment §D, pending signoff): live `.chat-panel`/`.rail`/`.masthead` rects; saved-position validity check; top-right → bottom-right → top-left → bottom-left anchor scan 16 px in / 64 px header zone; `'compact'` fallback presentation |
+| `occupiedRects` / `resolveGuidePlacement` / `ORIENTATION_GAP` | `src/core/orientation/layout.ts` — workspace-aware placement for both orientation cards (amendment §D, pending signoff): live `.chat-panel`/`.rail`/`.masthead` rects **plus the panel's interaction-critical rows `.chat-panel .chat-header` and `.chat-panel .chat-input` (§I.3)**; saved-position validity check; top-right → bottom-right → top-left → bottom-left anchor scan 16 px in / 64 px header zone; `'compact'` fallback presentation with the viewport-spanning (≥90% both axes) strip exemption and the `{8, 64}` top-left terminal fallback — bottom-corner docking removed (§I.3) |
 | `RunnerPhases` | Phase 0 contract freeze → 1 dependable baseline (CP.2→CP.4, CP.7, CP.9) → 2 TurboQuant KV → 3 Bonsai → 4 LiteRT-LM → 5 llama.cpp-WebGPU consolidation (guide §10; Phases 2–5 expand to self-contained tasks when reached) |
 
 The historical Stanza CP derivation remains recorded in `CHECKLIST.md`. This
@@ -616,7 +616,7 @@ Supersessions within the entity table: `PlannerView`/`HomilyEditor` (P-D) are **
 | `SharePayload` routes | type | `src/core/share/shareLink.ts` | P-S | extends P-F deep links | adds `#/verse/<book>/<ch>/<v>`, `#/acc/<id>`, `#/day/<iso>` |
 | `reusable-chatbot` core — `IInferenceEngine` / `ChatController` / `turboquant-policy` | interface/classes | `reusable-chatbot/core/{engine-types,chat-controller,turboquant-policy}.ts:1` | P-S | swappable TurboQuant inference on every viable platform (WebGPU TQ-KV / WASM-SIMD fallback / native `atomic-llama-cpp-turboquant` / Android NDK); models from the Atomic Chat catalogs fused with `probe()` truth; KV owned by the engine — no tensors across postMessage, no per-token IPC | `IInferenceEngine { probe(): Promise<EngineCapabilities>; init(config): Promise<SessionId>; generate(session, req, signal?): AsyncIterable<TokenEvent>; batchScore(session, req): Promise<Float32Array>; kvStats(session); reset(session); close(session) }` |
 | `CompanionMemory` | class | `src/core/companion/memory.ts:1` | P-S | lore docs + distillation loop + vector recall over sidecar_embeddings (§7.6) | `assemble(ctx): string`, `distill(newItems): Promise<void>`, `recall(query, k): MemoryHit[]` |
-| `ChatView` (badge-porthole default) | comp | `src/ui/ChatView.tsx:1` | P-S | intercom-style animated badge (kintsugi/natally style; occasional cross-sign/wave idles) expanding to fully dockable/resizeable chat — dock-left/right, floating, inline, fullscreen, mobile sheet; save-insight → accompaniment(`generated`) | props `{ db, sidecar, day, position }` |
+| `ChatView` (badge-porthole default) | comp | `src/ui/ChatView.tsx:1` | P-S | intercom-style animated badge (kintsugi/natally style; occasional cross-sign/wave idles) expanding to fully dockable/resizeable chat — dock-left/right, floating, inline, fullscreen, mobile sheet; save-insight → accompaniment(`generated`); **orientation-initiated opens (`OPEN_COMPANION` with `layout:'non-occluding'`) are sidebar-only (`dock-right`) and view-preserving — never fullscreen, never persisted (§I.2)** | props `{ db, sidecar, day, position }` |
 | `MissalWidgetProvider` | Kotlin class | `src-tauri/gen/android/app/src/main/java/mba/robin/sanctissimissa/widget/MissalWidgetProvider.kt:1` | P-S | home-screen widget: today's feast + readings, deep-link intent | AppWidgetProvider; data JSON in app files, daily refresh |
 | `VENDORED/haydock/` | vendored corpus | `VENDORED/haydock/PROVENANCE.md` | P-S | public-domain DR commentary, verse-keyed; read-only layer in BibleView; `vendored` material in StudyBuilder | vendoring regime: provenance lock before assimilation |
 | tests | node:test | `tests/{bible,accompaniment}.test.ts` | P-S | ingest counts (73 books, canon verse counts, Gen 1:1 exact, CITES spots); selector resolution incl. moveable feasts across year boundaries; migration | `npm test` |
@@ -1884,7 +1884,9 @@ capture, gains the `dragging` class, suppresses text selection
 (`user-select: none`) and clamps through the existing `clampGuidePos`; release
 persists through the existing `saveGuidePos`
 (`sanctissimissa.orientation.pos.v1`). The whole card shows `cursor: grab`
-(`grabbing` while dragging) and `touch-action: none`. The card header carries
+(`grabbing` while dragging) and `touch-action: none`. *(Superseded by §I.4:
+the card body shows the four-way `cursor: move`; buttons show
+`cursor: pointer` with hover inversion + 3D raise.)* The card header carries
 a visible grip glyph `⠿` and the hint "Drag to move", so the affordance is
 discoverable even though the whole card is the handle. Recorded tradeoff
 (operator-selected): drags starting on body text move the card rather than
@@ -1921,7 +1923,11 @@ card renders with class `orientation-compact` — padding 10 px,
 body collapsed behind a `<details><summary>Details</summary></details>`
 disclosure, actions row preserved (wrapping) — docked at the top of the
 largest free horizontal band. The card never expands to solve overlap
-(§A caps stand: 340 px / 40 dvh non-compact).
+(§A caps stand: 340 px / 40 dvh non-compact). *(Superseded in part by §I.3:
+the compact/terminal path now protects the panel's `.chat-header` and
+`.chat-input` rows, exempts viewport-spanning rects from the push-beneath
+rule, and falls back to `{left: 8, top: 64}` — bottom-corner docking
+removed.)*
 
 Validation triggers — placement is recomputed on: card mount, every `step`
 change, the `START_GUIDE` and `OPEN_COMPANION` window events, window
@@ -2253,6 +2259,116 @@ date). ChatView renders the chip rail only while the conversation has no
 turns; tapping fills the composer and sends. CHECKLIST task CL.7 derives
 1:1.
 
+## Orientation non-occlusion, sidebar-only Companion opens, and pointer-invitation correction (2026-09-20)
+
+**Status: drafted — PENDING OPERATOR SIGNOFF (amendment-sequence gate, CLAUDE.md).**
+No CHECKLIST stanza derives from this section and no code is written under it
+until the operator signs off and `DOCS/ARCHITECTURE-SIGNOFF.md` records the entry.
+
+Operator directives (verbatim, this session):
+
+- "When clicking 'Start Orientation on first load in appimage (maybe all
+  platforms), the app STILL disastrously goes to full-screen chatbot making the
+  entire substance of the app-the Mass-totally disappear AND the
+  toast-notification, though movable (but a hidden functionality to the average
+  user) is STILL obscuring the worst possible place on the screen! Those two
+  were not fixed and already surfaced--so you still are failing to check your
+  work"
+- "The cursor when entering the card must change to the four-way arrow 'can
+  move this thing' mouse pointer, except over buttons, which should change then
+  to 'push me' mouse pointer and invert colour /3D to invite clicks on buttons"
+- "And do not change the view; only slide out the default right-hand sidebar
+  chatbot sidebar"
+
+### Diagnosis of record (static analysis, 2026-09-20)
+
+Two operator-surfaced regressions, one causal chain:
+
+1. **"Start orientation" opens the Companion full-screen.**
+   `src/ui/OrientationGuide.tsx:307` — the offer card's "Start orientation"
+   button dispatches `OPEN_COMPANION` as part of starting the tour.
+   `src/ui/ChatView.tsx:328-336` answers with a bare `setOpen(true)`, opening
+   the panel in whatever dock mode is persisted (`chat.dock`,
+   ChatView.tsx:177-179) — including `fullscreen` — so the Companion covers
+   the whole window at the tour's very first click. This violates §B ("A
+   supporting surface may delay, but never destroy, the user's view of the
+   Mass") and §A's never-obscuring default law.
+2. **Tour card docks bottom-left over the composer/Send.** With the panel
+   full-screen, `occupiedRects` (`src/core/orientation/layout.ts:27-43`)
+   returns a whole-viewport `.chat-panel` rect; every §D anchor fails →
+   `'compact'`; `compactDock` (layout.ts:137-176) treats that whole-viewport
+   rect as a "wide header strip" and pushes the dock row *beneath* it, clamped
+   only to the bottom — landing the card at the bottom-left, exactly over
+   `.chat-input` (the composer/Send row, ChatView.tsx:714). §A's "never over
+   the chat composer" was enforced only on the anchor scan, never on the
+   compact/terminal path.
+
+### I.1 Start orientation shows the Mass
+
+The "Start orientation" action is exactly: dismiss the offer → activate step 1
+(`nav-map` — the Holy Mass control, highlighted in the still-visible Mass
+view) → §D placement. The `OPEN_COMPANION` dispatch is removed from that
+button (OrientationGuide.tsx:307). No `.chat-panel` mounts on tour start, on
+any platform. The Companion remains reachable during the tour only at the
+`companion` step and via "Ask Companion to explain" — both through §I.2.
+
+### I.2 Sidebar-only, view-preserving Companion opens
+
+The `OPEN_COMPANION` window-event detail is extended to
+`{ prompt?: string; layout?: 'non-occluding' }`. Tour-initiated opens — the
+`companion` tour step (OrientationGuide.tsx:72) and `explain()`
+(OrientationGuide.tsx:293) — MUST carry `layout: 'non-occluding'`. ChatView's
+`show` handler, under that contract:
+
+- The active view is **never changed** (no navigation, no `setView`); the
+  Mass/reader/whatever is on screen stays mounted and visible.
+- The panel slides out as the **right-hand dock (`dock-right`)** on wide
+  viewports regardless of the persisted `chat.dock` — `fullscreen`, `sheet`,
+  `floating` and `inline` are downgraded for that open. `fullscreen` is
+  forbidden for orientation-initiated opens.
+- The downgrade **never writes** the persisted `chat.dock` preference; the
+  user's own later manual choice through the panel's placement control wins
+  unchanged.
+- On ≤720 px viewports the existing mobile bottom-sheet stands (the view
+  remains mounted underneath).
+- Spotlight guard: while a tour or §H.4 walkthrough step holds its target, a
+  panel already in `fullscreen` is stepped down to `dock-right`
+  (non-persisted), so the haloed control stays visible.
+
+### I.3 Placement terminal law (amends §D's compact clause)
+
+`occupiedRects` additionally returns the panel's interaction-critical rows —
+`.chat-panel .chat-header` (ChatView.tsx:604) and `.chat-panel .chat-input`
+(ChatView.tsx:714) — as occupied rects, so no placement path (saved-position
+validity, anchor scan, band subtraction) can rest the card on them.
+`compactDock`'s wide-strip push-beneath rule exempts any occupied rect
+spanning ≥90% of both viewport axes (a whole-viewport panel is not a strip to
+duck under). The terminal fallback when no band fits becomes
+`{left: 8, top: 64}` — top-left below the 64 px header zone; bottom-corner
+docking is removed from the placement grammar. Net law: no viewport state
+exists in which the card covers the composer/Send, the panel header controls,
+or the full Mass view.
+
+### I.4 Pointer invitation plane on the orientation cards (extends §B, card-scoped; supersedes §D's `cursor: grab` sentence)
+
+Both cards (`.orientation-guide`, `.orientation-offer`) show the four-way
+"can move this thing" cursor over the card body — `cursor: move` — retained
+while dragging. Buttons on the cards show `cursor: pointer`. On-card button
+hover = colour inversion (a `--gold` fill with ink text — the inverse of the
+resting parchment button) plus a 3D raise (1 px lift + bevel shadow) to
+invite the click; `:active` = §B's 3D press (pressed-in inset shadow).
+`prefers-reduced-motion` removes the transforms; the inversion remains.
+Recorded rationale: the correct automatic default position (§I.3) is the
+primary fix — dragging is fine-tuning, now legible from the four-way cursor
+instead of a hidden functionality.
+
+Entity rows in §7.8.6 are updated in place: the
+`src/core/orientation/layout.ts` row gains the protected
+`.chat-header`/`.chat-input` rows, the viewport-spanning exemption and the
+`{8, 64}` terminal fallback; the `ChatView` row gains the sidebar-only,
+view-preserving open contract (§I.2). CHECKLIST stanza derives 1:1 after
+signoff.
+
 ## J. Bookstore in the left sidebar — Google Stitch screen binding (2026-10-05)
 
 **Status: proposed amendment; awaiting operator signoff under CLAUDE.md.**
@@ -2329,3 +2445,176 @@ screen with the frozen source at desktop and narrow widths, including collapsed
 rail discoverability and no horizontal overflow. Tests or presence of the
 export alone do not establish visual integration. This amendment records no
 implementation, build, deployment or runtime acceptance.
+
+## K. Identity, per-user hosted keys, credit visibility, on-device Supertonic voice, the Sacristan rename, and didactic DOM actions (2026-11-05)
+
+Operator directives (2026-11-05, this session): per-user OpenRouter keys minted
+from a server-held `$OPENROUTER_ADMIN_KEY` with spend limits from prepaid
+credits (40% default allocation); `openrouter/free` stays the default model;
+Firebase login added but not required except for certain features; the chatbot
+and orientation cards render only when the signed-in user holds credits; the
+Stitch-designed bookstore ships in this release; English content offers TTS
+"using the same implementation as natally-ai-studio: supertonic tts …
+multithreaded generate one sentence using expressive supertonic on device tts
+while rendering the previous … calibrating cpu/android gpu resources on
+startup and background load the supertonic tts model during init so that it
+never makes the user wait"; orientation cards are corrected so scrolled
+content is reachable ("Visual errors and artifacts like the unreachable
+content are unacceptable"); the assistant is renamed from Companion to
+something appropriate (default **Sacristan**; alternates recorded at signoff
+time remain Acolyte and Viator); the assistant must truly read/write the DOM —
+"it must be encouraged to scroll to the relevant portions, highlight and
+annotate, draw circle around, draw arrows connecting parts of texts, etc."
+like Natally highlighting the natal chart region she is describing; and the
+release train begins with the web build + publication so problems are found
+early.
+
+The operator waived the stop-for-signoff round trip for this wave ("the only
+reason for not having to get signoff is so you'd one shot and be finished 12
+hours ago"): this amendment, its CHECKLIST derivation and the implementation
+execute as one wave; DOCS/ARCHITECTURE-SIGNOFF.md records the waiver. The
+frozen-UI-first doctrine still binds: Stitch screens freeze before code
+consumes them (K.0).
+
+### K.0 Frozen UI precedents (Stitch bindings)
+
+Design precedes code. The sign-in screen is frozen and pinned; the account
+view freezes into the same directory before `AccountView` code lands, with its
+IDs and SHA-256s recorded in the freeze manifest — the manifest is the hash
+authority, and no code may mount a view whose screen is not yet frozen.
+
+| Frozen target | Binding |
+|---|---|
+| Stitch project | `7192660594233084032` — "SanctissiMissa — Library, Bookstore, Gregorian Chant & Mass Reference" (design system `assets/cd26ffde389c4dbd815c33499a804303`) |
+| Sign-in screen | `b54212dd53234ad6a81670e985919031` — "SanctissiMissa - Sign In Screen" (DESKTOP, generated 2026-11-05) |
+| Sign-in freeze | `LIBS/UI/STITCH/sanctissimissa-account-20261105/` — verbatim `original/generated/sign-in-b54212dd53234ad6a81670e985919031.html` (SHA-256 `b729f113…`), adapted `sign-in.html` (SHA-256 `3651736d…`), screenshot PNG, `manifest.json`, `README.md`; DOM ids preserved: `#toggle-email-btn`, `#email-form-section`, `#tab-login`, `#tab-signup`, `#submit-auth-btn`, `#forgot-link` |
+| Account screen | Same project; brief: credits balance (Cr ≈ US$0.01 of Sacristan inference), top-up packs (US$5/10/25, 40% allocation), sync status rows (journal, homily drafts, annotations & highlights, bookmarks, voice notes), transactions table, redeem-a-code card, quiet sign-out; freezes as `account.html` in the same directory, pending Stitch delivery — no `AccountView` code before the freeze + manifest entry exist |
+| Bookstore screen | Already frozen by §J (`sanctissimissa-library-20260913/bookstore.html`); §J executes in this wave per K.7 |
+
+Sign-in presentation law (operator, verbatim): sign-in is presented as a true
+choice that feels like a benefit — "people need to be presented with a true
+choice of why they want to opt in, not an extractive only" and "they are
+presented with a log in, and they feel the benefits instead of trauma
+associated with it". The UI never nag-walls, never shames declination, never
+withholds already-working local features to force login; signed-out use
+remains a silent, tacit fallback.
+
+### K.1 Per-user hosted keys (amends §E)
+
+The 2026-09-18 §E debug default (bundled `VITE_OPENROUTER_API_KEY`) is
+retired as a shipped configuration. `openrouter/free` remains the only
+specified hosted model and the automatic default. The admin key never enters
+a bundle, an environment of the client, or a repo file.
+
+| Entity | Signature | Role |
+|---|---|---|
+| `OPENROUTER_ADMIN_KEY` | env, server-only | Held only by the billing function on the existing Netlify mechanism (natally-v2 pattern, `Natally-v2.0-4nov2026/DOCS/ARCHITECTURE.md` §2/§5.2); never client-visible |
+| `POST /billing/key` | `(Firebase ID token) → {key, expiresAt}` | Verifies the Firebase ID token; mints a per-user OpenRouter key via the admin key; expires now + 60 s; spend limit = remaining allowance cents × `BILLING_ALLOCATION_BPS` / 10000 (default 4000 = 40% of prepaid) |
+| `BILLING_ALLOCATION_BPS` | env, default 4000 | Spend-limit allocation of prepaid balance; the ".env-specified 40% default" |
+| `readHostedKey` | `() → {key, expiresAt}` client | Before every hosted call: use the held key if valid and funded, else mint. Mirrors natally-v2 `readingKey` |
+| `provision-secrets.mjs` | retired materialization | The `VITE_OPENROUTER_API_KEY` materialization row is removed; no `VITE_`-prefixed OpenRouter key may exist in any bundle |
+| `hostedProvider` config | unchanged model | `openrouter/free` only; `fallbackModel: null` per the 2026-09-18 executed refinements |
+
+Out-of-credits and signed-out behavior is K.3's gate, not an engine concern:
+the hosted engine simply never mounts without a funded account.
+
+### K.2 Firebase identity and full personal sync
+
+| Entity | Signature | Role |
+|---|---|---|
+| Firebase Auth | Google + Email/password | `VITE_FIREBASE_*` env configuration (natally-v2 §6); no other providers |
+| `useAccount` | React hook | Exposes `{ user, creditUnits, syncState, signIn, signOut }`; reads auth state, `/billing/access`-style credit read, and sync status |
+| Sync surfaces | journal, homily drafts, annotations/highlights/bookmarks, voice notes, Sacristan conversations | Firestore per-uid documents are the signed-in authority; the existing sql.js/local stores remain the device cache and the signed-out store (natally-v2 conversations pattern: authority + working copy) |
+| `SignInView` | `src/ui/account/SignInView.tsx` | Mounts the K.0 sign-in binding: benefit rows, Google button, email accordion (`#tab-login`/`#tab-signup`), honest signed-out footnote |
+| `AccountView` | `src/ui/account/AccountView.tsx` | Mounts the K.0 account binding once frozen: credits, top-up, per-surface sync rows, transactions, redeem, quiet sign-out |
+| Auth requirement boundary | hard gates | Hosted Sacristan chat (credits live on the account) and bookstore purchase require sign-in. Everything else works signed out, silently, with local-only persistence and no UI pressure |
+
+### K.3 Credit visibility gate
+
+The chatbot is pay-as-you-go; nothing of it may render when it cannot work.
+
+| Rule | Contract |
+|---|---|
+| Gate | Sacristan badge, panel, orientation cards, and the §H didactic affordances mount only when `user != null && creditUnits > 0`. Not mounted — not merely hidden (`display:none` is a defect) |
+| Zero credits while signed in | The Account view (top-up + redeem) stays reachable so the user can fund; the assistant surfaces stay unmounted until funded |
+| Local inference | Not in this release (operator: "this release will not include working local inference chatbot"); the engine picker's hosted-only surface follows the gate |
+
+### K.4 On-device Supertonic voice (English reading content + Sacristan replies)
+
+The engine is Supertonic as deployed at `https://natally.surge.sh`; the
+pipeline discipline is natally-ai-studio v1.32.28929
+(`rebots-online/natally` @ `1ed23645f8`, verified this session: whole-text
+eSpeak IPA phonemization with punctuation retained, chunk boundaries snapped
+to punctuation, AudioWorklet PCM playback with resampling and 20 ms RMS
+envelope frames, WebGPU→WASM adapter probe, no CDN/browser-speech fallback —
+`apps/local/src/voice/web.ts`, `onnxruntime-web` + `phonemizer`). The deployed
+site's word-dropping regression came from losing the whole-text discipline;
+this amendment restores it inside a sentence pipeline.
+
+| Entity | Signature | Role |
+|---|---|---|
+| `SupertonicVoice` | `createSupertonicVoice(options): Promise<Voice>` | `Voice { backend: 'webgpu'\\|'wasm'; speak(text, {signal}) : Promise<void>; stop(); dispose() }` — the natally `WebVoice` contract shape |
+| `Voice` (new file) | `src/core/voice/voice.ts` | Shared contract + sentence segmentation |
+| Engine | `src/core/voice/supertonic.ts` | Supertonic ONNX sessions via `onnxruntime-web` (same-origin assets, content-addressed cache); no browser `speechSynthesis`, no CDN |
+| Sentence pipeline | `src/core/voice/pipeline.ts` | Split narration into sentences; **synthesize sentence N+1 in a worker while sentence N renders through the AudioWorklet** (≥1 sentence ahead always); every sentence phonemizes from the whole-sentence stream with v1.32 punctuation-boundary discipline — no word may vanish at a boundary |
+| Calibration | `calibrate(): {backend, threads}` at startup | Probe WebGPU adapter (desktop and Android GPU), size ORT worker threads to the CPU; pick the backend once and record it (v1.32 adapter-probe pattern) |
+| Background init | idle-time after first paint | Model + phonemizer + session warm up during app init so the first play never waits; progress surfaces honestly if the user plays before warm-up completes |
+| Playback | AudioWorklet | Resampling + RMS envelope frames drive the spoken-sentence highlight; tasteful glow/blur tracks the sentence being spoken in reading content and Sacristan replies |
+| Scope | English content | Reading views and Sacristan replies; free, on-device, no login and no credits |
+
+### K.5 Orientation card internal scroll (extends §I)
+
+The pending §I amendment (2026-09-20) stands unchanged (§I.1–§I.4). Added:
+orientation and tour cards scroll INTERNALLY within the §A/§D size caps —
+clipped, unreachable content is a defect class ("Visual errors and artifacts
+like the unreachable content are unacceptable"). Acceptance is rendered
+verification at desktop and narrow widths: the last line of every card is
+reachable by scrolling inside the card, §I.3 terminal law still protects
+`.chat-header`/`.chat-input`, and the visual self-verification standing rule
+applies before any turn ends.
+
+### K.6 Companion → Sacristan rename
+
+The assistant's product name is **Sacristan** (operator default; alternates
+Acolyte and Viator remain recorded for a signoff-time swap without rework).
+
+| Entity | New name | Notes |
+|---|---|---|
+| Events | `OPEN_SACRISTAN`, `SACRISTAN_ACT`, `SACRISTAN_LAYOUT` | `sanctissimissa:open-sacristan`, `sanctissimissa:sacristan-act`, `sanctissimissa:sacristan-layout`; same payloads |
+| Files/components | `ChatView` stays; user-facing strings, `GUIDE_STEPS` labels, aria-labels, docs | "Companion" no longer appears in UI copy or GUIDE text |
+| Storage keys | reset, not migrated | Orientation/panel placement keys gain fresh names; users' old placements reset silently |
+| Guide copy | `GUIDE_STEPS[companion]` | "Ask the Sacristan about the Mass or how to use the app. Prepare the Sacristan once to receive answers on this device." — wording finalized in the CHECKLIST derivation |
+
+### K.7 Bookstore activation (§J executes)
+
+§J (2026-10-05) executes in this wave: `View` gains `bookstore`, NAV gains the
+📚 Bookstore entry after `bible`, `BookstoreView` binds the frozen
+`bookstore.html` ids, `library.css` scopes the exported styles. Browsing is
+free and works signed out; the purchase action requires sign-in (K.2 hard
+gate) and follows the existing LS/service contracts — no specimen prices ever
+present as live purchases.
+
+### K.8 Didactic DOM actions (extends §H)
+
+§H's DOM read/write becomes real and didactic — the Natally pattern applied to
+the missal: she acts on the page while she answers.
+
+| Entity | Signature | Role |
+|---|---|---|
+| `readVisibleContext` | `() → VisibleContext` | The current view, the visible section anchors and headings, scroll position, and the target under discussion enter the model context — the chatbot sees what is on screen |
+| `SACRISTAN_ACT` vocabulary | `scroll`, `highlight`, `annotate`, `circle`, `arrow`, `focus-swap` | Structured actions, streamed as trailing command tokens parsed like §H's (validated, batch-atomic: a malformed action aborts the batch) |
+| `scroll` | `(anchor)` | `scrollIntoView` the relevant portion — she navigates to what she talks about |
+| `highlight` | `(anchor, range?)` | Extends the existing SectionReader `highlight` path; the glow rides K.4's envelope so highlight follows the spoken sentence |
+| `annotate` | `(anchor, text)` | Persists through the existing sidecar annotation store; also usable into homily drafts and the journal (§H surfaces) |
+| `circle` / `arrow` | `(anchor|point, anchor|point)` | SVG overlay above the current view: circles around elements, arrows connecting related passages; overlay is ephemeral unless `annotate`d |
+| `focus-swap` | `()` | The panel recedes while the demonstrated region takes attention — the Natally focus swap from her to the inset chart |
+| System prompt | hosted provider config | The model is instructed it teaches ON the page: scroll, highlight, annotate, circle, connect with arrows; never describe the screen from memory — it reads the real DOM context |
+
+### K.9 Release train (this wave)
+
+Order (operator: "build BEGINS with webapp deploy so that time building isn't
+wasted if i find problems in the web app deployed early"): tests + typecheck +
+lint green → `build:vite` → `deploy:web` (surge publication) → desktop and
+Android stages. Next stamp: **v1.67** (one minor increment per the §F
+doctrine). Rendered verification at desktop and narrow widths gates every UI
+stanza; the 583-test suite plus new stanza tests gate the train.
