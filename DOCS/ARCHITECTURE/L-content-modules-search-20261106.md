@@ -120,7 +120,7 @@ replaces an entry when its `revision` is greater). **"Newer"** = integer `revisi
 
 ### 2.5 Module host, naming and deploy (R3, decision 19)
 
-- `MODULE_BASE_URL` = `import.meta.env.VITE_MODULE_BASE_URL ?? 'https://sanctissimissa.robin.mba/modules'` in
+- `MODULE_BASE_URL` = `import.meta.env.VITE_MODULE_BASE_URL ?? 'https://sanctissimissa.robin.mba/runtime/modules'` in
   `src/core/library/moduleHost.ts` (host file; the module core never reads it). Same URL on web, PWA, Linux, Windows, sideload APK.
   Surge stays the web-PWA deploy only; no Surge or upstream URL is ever a fallback.
 - Host file names are immutable: `modules/catena-aurea-en-r<N>.db`; a new revision is a new name. `modules/modules.json` is the
@@ -323,7 +323,7 @@ Postconditions: base has 0 nodes with `key LIKE 'commentary:catena-aurea/%' OR k
   `{corpus:{file,corpusVersion,sha256,sizeBytes}, modules:[{editionId,revision,file,sha256,sizeBytes}]}`, copies module files into
   the Android pack asset path (§2.5). Never overwrites an existing `dist/` file with different bytes (exit 3).
 - `modules-deploy` (`node scripts/modules-deploy.mjs`, Ubuntu environment only, once): `rsync --ignore-existing` each module file
-  to `${SAM_ASSET_HOST_RSYNC}modules/` (env var, operator-provisioned in `.env`, key listed in `.env.example`), verifies
+  to `${SANCTISSIMISSA_RUNTIME_SSH}:${SANCTISSIMISSA_RUNTIME_ROOT}/modules/` (the release partial's env keys, operator-provisioned in `.env`, keys listed in `.env.example`), verifies
   `GET ${MODULE_BASE_URL}/<file>` sha256, then uploads `modules.json` and verifies it plus the CORS header. Any mismatch → exit 1.
 
 ### 3.3 Install and attach (BA.2)
