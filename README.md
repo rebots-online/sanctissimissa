@@ -18,7 +18,11 @@ databases**, serving a beautiful, exegetical UI:
   vector-similar passages today; fine-tuned ecclesiastical LLM in the next major
 - 🕸️ **Graph corpus** — `vide C10`-style cross-references, section membership, and the
   ordo itself as first-class edges
-- 🔍 **Vector similarity** — offline, deterministic embeddings over every section
+- 🔍 **Vector similarity** — today: offline, deterministic *lexical* vectors (hashed
+  character trigrams) over every section. These match spelling, not meaning, so they
+  are not true semantic search. Real semantic embeddings (256-d, on-device, with a
+  reranker) are being architected; see
+  `DOCS/ARCHITECTURE/semantic-embedding-research-20261106.md`.
 - 📅 **Perpetual universal calendar** — Butcher's Easter computus, computed on demand,
   never pre-generated
 - 🕰️ **Divine Office cursus** — the eight hours as a loop line (full Breviary texts:
@@ -133,11 +137,19 @@ Canonical source: `version.txt`; `version.json` is the generated mirror.
 - `DOCS/BUILD.md` — compatibility pointer to the root recipe
 - `DOCS/ARCHITECTURE.md` — authoritative entity table, data flows, decisions
 - `DOCS/CORPUS-SCHEMA.md` — corpus schema, concept taxonomy, text normalization
+- `DOCS/ARCHITECTURE/semantic-embedding-research-20261106.md` — why semantic embeddings
+  must replace the trigram vectors: research, operator decisions, open choices
 - `DOCS/ARCHITECTURE/StAndroidsMissal-v1.md` — inherited, frozen v0.1 historical baseline
 - `CHECKLIST.md` — execution contract and audit trail
 
-Corpus source only is licenced MIT: [Divinum Officium](https://github.com/DivinumOfficium/divinum-officium)
-(MIT), by László Kiss and contributors. Latin is the normative reference language.
+Upstream source: [Divinum Officium](https://github.com/DivinumOfficium/divinum-officium)
+flat-text files (MIT), by László Kiss and contributors; their copyright and permission
+notice is retained with the vendored source. The SanctissiMissa corpus is **not** a
+straight import of that text database. Kiss's text was transformed and embedded,
+inference was run over all of it to build the graph, and the result no longer resembles
+or functions like the flat-text original. The SanctissiMissa corpus is licensed by
+Robin L. M. Cheung, MBA as part of SanctissiMissa. Latin is the normative reference
+language.
 
 SanctissiMissa is proprietary software: unauthorized copying, use, or distribution is prohibited.
 Copyright © 2026 Robin L. M. Cheung, MBA. All rights reserved.

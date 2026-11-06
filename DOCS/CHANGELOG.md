@@ -22,6 +22,18 @@ them one sentence each and written for a reader of the app, not of the diff.
 
 ---
 
+## Unreleased — 2026-11-06 (architecture in progress)
+
+The next release adds a working Bookstore and audiobooks. Search will understand meaning, not just spelling.
+
+- The Bookstore becomes its own entry in the left sidebar, with Catalogue and My Books tabs designed in Google Stitch.
+- Books are bought through Google Play on Android and secure checkout on web and desktop. Prices always come from the store.
+- Catena Aurea, Aquinas's golden chain of the Fathers on the four Gospels, is the first book you can buy and download.
+- Purchased books can be read aloud on your device by the Supertonic voice. The current line is shown in bold while it plays.
+- An honest correction: "vector similarity" until now meant matching spelling patterns, not meaning. True meaning-based search, shared by the Meaning panel, Journal, Homily Writer and the Sacristan, is being built (see `DOCS/ARCHITECTURE/semantic-embedding-research-20261106.md`).
+
+---
+
 ## v1.45.27008 — 2026-09-17
 
 The Companion arrives, and every Settings tab becomes real.
