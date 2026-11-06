@@ -293,3 +293,32 @@ CLAUDE.md at `3021d442`) requires before CHECKLIST derivation and code.
   evaluation only); visual self-verification with rendered screenshots at
   desktop and narrow widths before any turn ends; no security/hardening
   work items; kstore local caching until the server returns.
+
+## 2026-11-06 — §L wave: Bookstore purchases, Catena module, semantic search, Supertonic audiobook (executed)
+
+- **Amendment:** `DOCS/ARCHITECTURE.md` §L (L.0–L.9) at `3eb3baad`, sha256
+  `51aeeb1282d728c114061c4d3c18edd84b3ec1ecfa488adcb912549ee7d568c0`, with the normative
+  partials `DOCS/ARCHITECTURE/L-{bookstore-commerce,bookstore-ui,content-modules-search,native-embed-engine,audiobook,release}-20261106.md`
+  and the decision record `DOCS/ARCHITECTURE/semantic-embedding-research-20261106.md` (D1–D12).
+  UI frozen at FREEZE 1 (`0832c755`, `88675d16`).
+- **Operator directives (verbatim, 2026-11-06):**
+  - "make sure we have an admin access that I can manually review pricing and pricing model … probably in revenuecat as products … to access the google play one-click purchase ease";
+  - "ensure bookstore is a top-level left-side sidebar component";
+  - "supertonic tts, load background on app init so as to be ready when needed; background render with multithreaded generate while playing ahead based on initialization calibration";
+  - "we're supposed to be using actual vector similarity search for synthesis so ingest using ollama for example qwen3-embedding model";
+  - "performance over precision here. if there is performance gain using 256 then that";
+  - "if it is complex and risks agentic coding breaking the codebase add it now" (reranker);
+  - "windows is never excluded";
+  - "we cross-compile; the ONLY thing deferred to windows build environment is msi/msix";
+  - "I don't think we need to wait for anything further";
+  - FREEZE 1 clearances W1 (one Bookstore entry), W6 ("use bold the whole current line, with a glow around the 'current' word, approximate"), W8 (Import Text deferred);
+  - value principle: "We are all cases adding more value than simply printing a book adds … don't agree with how it considers value only in one dimension";
+  - "these are all either already-defined under current conventions or for you to complete and document … not blockers".
+- **Authorized by this entry:** D1–D12 as amended (Qwen3-Embedding-0.6B pinned Ollama blob; Atomic fork on Linux/Windows/Android arm64; wllama for embeddings only on web/PWA and non-arm64 Android; D4 byte-stability waiver replaced by the cosine ≥ 0.99 parity gate; reranker; re-embed all; Catena wholly in the paid module; robin.mba runtime host; Catena rights public domain worldwide, reviewed 2026-11-06), CHECKLIST derivation (Stanza BA) and per-task commit+push execution.
+- **Standing rules bound into the wave:**
+  - no unit tests (TEST_RUBRIC gauntlet on release artifacts);
+  - Forgejo is never contacted (GitHub is the sole origin; push with `--no-verify` while `.lfsconfig` names Forgejo);
+  - phases are never mixed (Stitch → architect → checklist → coders), each frozen;
+  - commit and push every task as it finishes;
+  - rules serve completion and are never blockers;
+  - CC11 Tauri 2 multiplatform build matrix in both environments.
