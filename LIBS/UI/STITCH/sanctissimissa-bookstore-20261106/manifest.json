@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "projectId": "7192660594233084032",
+  "frozenAt": "2026-11-06",
+  "source": "Google Stitch (operator-completed screens)",
+  "designSystem": "assets/cd26ffde389c4dbd815c33499a804303",
+  "carriedForward": {
+    "freeze": "../sanctissimissa-library-20260913/manifest.json",
+    "screens": [
+      {
+        "file": "bookstore.html",
+        "screenId": "eeb7643f00314991ab7a325c9daa2216",
+        "liveSourceSha256": "dc5176385d927332e014e6bc4782aa34891113c5e9a64d74e0a6b0b5788245e9",
+        "verified": "byte-identical to live Stitch export 2026-11-06"
+      },
+      {
+        "file": "library.html",
+        "screenId": "83d9c89c5d0f42d29707648c9a4b1acd",
+        "verified": "content markers match live export 2026-11-06"
+      },
+      {
+        "file": "reader.html",
+        "screenId": "0918fcd8e0174446b17b14df6611830b",
+        "verified": "content markers match live export 2026-11-06"
+      }
+    ]
+  },
+  "newlyFrozen": [
+    {
+      "file": "original/library-tts-karaoke-studio.html",
+      "screenId": "36a7c3e63bc54a8a8ce7159682d66066",
+      "title": "SanctissiMissa - My Library & Liturgical TTS Karaoke Studio",
+      "sha256": "34dcd7dea7430391967c1afa45a215bcfe5489b192d5a129f240f5c1f51d45f4"
+    },
+    {
+      "file": "original/library-tts-karaoke-studio.png",
+      "screenId": "36a7c3e63bc54a8a8ce7159682d66066",
+      "sha256": "23e410527524ed5f2e3c1a8e921df788cc6f842b0fc6a6a8e035bc7f0342bc63"
+    },
+    {
+      "file": "original/bookstore.png",
+      "screenId": "eeb7643f00314991ab7a325c9daa2216",
+      "sha256": "c21fe0f0f9d766d62cdfdbda199f3281bd41d9ece5074d47c47493122209a1dd"
+    }
+  ],
+  "status": "design-specimen; specimen values never render as live data (ARCHITECTURE §K.7)",
+  "reviewLog": "README.md"
+}
