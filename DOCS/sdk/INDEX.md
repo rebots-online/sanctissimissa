@@ -28,6 +28,11 @@ production code cites these local, version-pinned snapshots instead of web URLs,
 | [`ollama-embed/`](ollama-embed/INDEX.md) | Ollama /api/embed | Ollama docs at main branch on 2026-11-06 (latest release v0.40.15) | 2 |
 | [`media-session/`](media-session/INDEX.md) | Media Session API (W3C + MDN) | W3C Media Session Editor's Draft dated 5 June 2026; MDN content main branch on 2026-11-06 | 6 |
 | [`tauri-plugins-ipc/`](tauri-plugins-ipc/INDEX.md) | Tauri 2 — mobile plugins (Kotlin), commands/IPC, capabilities | Tauri 2.x docs (tauri-docs `v2` branch on 2026-11-06); repo pins tauri = "2" | 7 |
+| [`network-information/`](network-information/INDEX.md) | Network Information API (navigator.connection: saveData, type, effectiveType) | MDN content main branch on 2026-11-06 | 5 |
+| [`html-media-element/`](html-media-element/INDEX.md) | HTMLMediaElement (playbackRate, preservesPitch) | MDN content main branch on 2026-11-06 | 3 |
+| [`indexeddb/`](indexeddb/INDEX.md) | IndexedDB API + StorageManager.estimate | MDN content main branch on 2026-11-06 | 4 |
+| [`onnxruntime-web-1.31/`](onnxruntime-web-1.31/INDEX.md) | onnxruntime-web (JS/Web) | onnxruntime-web 1.31.1 (repo package.json); README at git tag v1.31.1 | 2 |
+| [`play-asset-delivery/`](play-asset-delivery/INDEX.md) | Google Play Asset Delivery (asset packs, AssetPackManager) | com.google.android.play:asset-delivery(-ktx) 2.3.0 per page on 2026-11-06 | 2 |
 | [`qwen3-embedding/`](qwen3-embedding/INDEX.md) | Qwen3-Embedding-0.6B model card | HF Qwen/Qwen3-Embedding-0.6B @ 97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3 (lastModified 2026-04-20); GGUF card Qwen/Qwen3-Embedding-0.6B-GGUF @ 370f27d7550e0def9b39c1f16d3fbaa13aa67728 | 2 |
 | [`qwen3-reranker/`](qwen3-reranker/INDEX.md) | Qwen3-Reranker-0.6B model card | HF Qwen/Qwen3-Reranker-0.6B @ e61197ed45024b0ed8a2d74b80b4d909f1255473 (lastModified 2026-04-16) | 1 |
 
