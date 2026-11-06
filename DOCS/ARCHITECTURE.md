@@ -2765,10 +2765,12 @@ store (`src/core/model-store`, `models/sha256/<digest>`):
 
 | Role | Model | Artifact | Output |
 |---|---|---|---|
-| Embedder | EmbeddingGemma-2, text encoder (Apache-2.0) | `ggml-org/embeddinggemma-2-GGUF` Q8_0 | 768-d, truncated to the first 256, L2-renormalized, int8 (×127) |
-| Reranker | Qwen3-Reranker-0.6B (Apache-2.0) | GGUF Q8_0 | rank pooling; P(yes) relevance score |
+| Embedder | Qwen3-Embedding-0.6B (Apache-2.0) | Ollama blob `qwen3-embedding:0.6b`, GGUF Q8_0, `sha256-06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439`, redistributed byte-identical | 1024-d last-token pooled, truncated to the first 256, L2-renormalized, int8 (×127) |
+| Reranker | Qwen3-Reranker-0.6B (Apache-2.0) | GGUF Q8_0, pinned by sha256 | rank pooling; P(yes) relevance score |
 
-- Embedder prefixes: query `task: search result | query: <text>`, document `title: none | text: <text>`.
+- Embedder input: documents have no prefix. Queries are
+  `Instruct: Given a passage of Catholic liturgy, Scripture or commentary, retrieve passages relevant to this query\nQuery:{text}`.
+  EOS is always appended.
 
 **Runtimes (D2), behind the existing contract.** `IInferenceEngine.embed?()`
 (`reusable-chatbot/core/engine-types.ts:98`) carries embeddings; `batchScore` carries
@@ -2776,8 +2778,8 @@ reranking.
 
 | Engine | Where it runs | What it adds |
 |---|---|---|
-| `NativeEmbedEngine` | Linux and Android arm64 | Rust commands `embed_load`, `embed_texts`, `rerank_scores` in `src-tauri/src/embedding.rs`, using `llama-cpp-2` (`with_embeddings`, pooling Last/Rank) |
-| `WllamaEmbedEngine` | web/PWA, Windows, other Android ABIs | wllama, single-threaded; no COOP/COEP, so Firebase popups and RevenueCat checkout keep working |
+| `NativeEmbedEngine` | **Linux, Windows, Android arm64** | Rust commands `embed_load`, `embed_texts`, `rerank_scores` in `src-tauri/src/embedding.rs`, via `llama-cpp-2` built against **Atomic Chat's llama.cpp fork** (`AtomicBot-ai/atomic-llama-cpp-turboquant`). Embeddings set pooling Last / Rank and **no turbo KV**. The `not(target_os = "windows")` gates are removed (D10). The Windows binary is produced by the existing cargo-xwin cross-build with clang ≥ 19 (D11). |
+| `WllamaEmbedEngine` | web/PWA build and Android ABIs other than arm64 | wllama 3.8.1, single-threaded, wasm self-hosted (not jsDelivr). No COOP/COEP, so Firebase popups and RevenueCat checkout keep working. |
 | `embedderFor(runtime)` | all | picks the engine and is the only selector |
 
 - LiteRT-LM is not used in this release.
@@ -2796,9 +2798,10 @@ never attached, and the bookstore shows it as needing an update.
 **Ingest (D6).** `scripts/embed-corpus.mjs` is new and runs after `ingest-corpus.mjs`. It
 never edits `ingest-corpus.mjs`, because Stanza CD is still finishing that ingest.
 
-1. It runs llama.cpp with the pinned GGUF (`llama-embedding` CLI from the
-   `llama-cpp-2`-matching build) over every `text_blocks` row: English, plus Latin where
-   present, as one document string.
+1. It calls **local Ollama** `POST /api/embed` with model `qwen3-embedding:0.6b`. Before
+   running, it verifies that the model's blob digest equals the pinned sha256 (D1). It
+   embeds every `text_blocks` row: English, plus Latin where present, as one document
+   string with no prefix. It keeps the full 1024-d output and truncates client-side.
 2. It rewrites `embeddings` as dim 256.
 3. It writes `embed_meta`.
 4. It recomputes concept centroids and semantic `INSTANCE_OF` edges: cosine ≥ 0.45 to a
@@ -2976,7 +2979,7 @@ unit, smoke, mock or dev-build checks.
 | `embed-corpus.mjs`, `embed_meta`, semantic `INSTANCE_OF`, `SIMILAR_TO` | `scripts/embed-corpus.mjs`, `assets/missal.db` | BA.10 |
 | `parseCatenaQuotations`, `father:` nodes, `PART_OF`/`ATTRIBUTED_TO`/`CITES` | `scripts/ingest-commentary.mjs` | BA.11 |
 | `build-modules.mjs`, `modules.json`, `public/modules/catena-aurea-en.db` | `scripts/`, `content/library/`, `public/modules/` | BA.1 |
-| `NativeEmbedEngine`, `embed_load`/`embed_texts`/`rerank_scores` | `reusable-chatbot/engines/native/embed.ts`, `src-tauri/src/embedding.rs` | BA.12 |
+| `NativeEmbedEngine`, `embed_load`/`embed_texts`/`rerank_scores`; Windows gates removed; llama.cpp source → Atomic fork; cross toolchain clang ≥ 19 | `reusable-chatbot/engines/native/embed.ts`, `src-tauri/src/embedding.rs`, `src-tauri/src/inference.rs`, `src-tauri/Cargo.toml`, `scripts/build-windows.sh` | BA.12 |
 | `WllamaEmbedEngine`, `embedderFor` | `reusable-chatbot/engines/wllama/embed.ts`, `src/core/vector/embedder.ts` | BA.13 |
 | `EmbedMeta`, `similarToText` (new stack), `graphNeighbours`, `migrateSidecarVectors`, `verifyEmbedParity`, `embed-probe.json` | `src/core/vector/{meta,parity}.ts`, `src/core/data/corpusDb.ts`, `src/core/accompaniment/store.ts`, `content/library/embed-probe.json` | BA.14 |
 | `sacristanContext` | `src/core/chat/retrieval.ts`, `src/ui/ChatView.tsx` | BA.15 |
