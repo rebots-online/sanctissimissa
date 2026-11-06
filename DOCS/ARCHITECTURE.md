@@ -2618,3 +2618,305 @@ lint green → `build:vite` → `deploy:web` (surge publication) → desktop and
 Android stages. Next stamp: **v1.68** (one minor increment per the §F
 doctrine). Rendered verification at desktop and narrow widths gates every UI
 stanza; the 583-test suite plus new stanza tests gate the train.
+
+## L. Bookstore purchases, the Catena Aurea module, and the Supertonic audiobook (2026-11-06)
+
+Operator goal (2026-11-06): a working release where the Bookstore is a top-level
+left-sidebar component, built from the frozen Google Stitch screens. Purchases go
+through RevenueCat (paywalls, entitlements as content licences, Google Play
+one-click purchase and Play gift-card balance), and purchased works can be read
+aloud as an audiobook with multithreaded, background-generated English Supertonic
+TTS. Security hardening is muted. Scope is **one work end-to-end** (Catena Aurea):
+bought, downloaded, read, heard, found by similarity search, and used by the
+Sacristan together with the Mass, the Office and other owned works. The remaining
+catalogue follows as continuous upsells.
+
+**Supersessions (operator decisions, this section governs):**
+- The LS service annex (BS-S1–S5) is dropped for launch: OIDC `IdentityController`,
+  `BookstoreApi`, `AccessTokenProvider` and signed envelopes.
+- Identity is Firebase (§K.2).
+- Content modules are plain static binary blobs (not LFS, not signed).
+- The §K.4 sentence-only glow is replaced, for the audiobook, by the L.6 line + word
+  highlight.
+- The Stitch screens frozen in FREEZE 1 govern (§L.0).
+
+### L.0 Frozen UI (FREEZE 1, commits `0832c755`, `88675d16`)
+
+`LIBS/UI/STITCH/sanctissimissa-bookstore-20261106/` (manifest + review log):
+
+- Bookstore `eeb7643f` = `../sanctissimissa-library-20260913/bookstore.html`
+  (live export byte-identical, `dc517638…`).
+- My Library `83d9c89c` = `…/library.html`.
+- Shared Book Reader `0918fcd8` = `…/reader.html`.
+- TTS Karaoke Studio `36a7c3e6` = `original/library-tts-karaoke-studio.html`.
+
+Operator clearances:
+- **W1:** one rail entry.
+- **W6:** bold line + approximate word glow.
+- **W8:** Import Text deferred.
+- **W2–W5, W7, W9–W13:** the logged defaults apply.
+
+Specimen values in the exports never render; every bound element shows real state.
+
+### L.1 Navigation and surfaces
+
+- `View` gains exactly one literal, `bookstore`. `NAV` gains
+  `{id:'bookstore',ico:'📚',label:'Bookstore'}` directly after `bible` (§J.1/J.2
+  unchanged).
+- No `library`, `chant` or `mass-reference` view exists in this release.
+- `BookstoreView` renders a masthead segmented control `.bookstore-tabs` with two
+  buttons, `#tab-catalogue` "Catalogue" and `#tab-my-books` "My Books"
+  (`role="tab"`, `aria-selected`). The default tab is `catalogue`; the selection
+  persists in sidecar setting `bookstore.tab` (`'catalogue'|'my-books'`).
+- **Catalogue tab** binds the bookstore export exactly as §J.2 lists. The detail
+  drawer's `#purchase-options`, `#modal-plan-name`, `#modal-plan-price` and
+  `#primary-action-btn` carry L.3 offers and actions. `#drawer-tiers-list` lists
+  one row per `PurchaseOffer`. `#drawer-state-badge` shows the L.2 badge.
+- **My Books tab** (`MyBooksPanel`) binds the library export:
+  - Bound: `#library-search`, `#author-filter`, `#category-filter`,
+    `#library-grid`, `#library-count-badge`, `#download-manager`,
+    `#edition-drawer` and its `#drawer-*` fields.
+  - The grid lists only works whose access is `free`, `owned` or `subscription`.
+  - Not mounted: the `#import-book-btn` (W8), the export's own `#main-nav-rail`,
+    `#mobile-toggle`, filter chips that count fabricated tiers, and the export's
+    "Proactive Concept Surfacing" metrics strings.
+  - The concept card binds to real `nucleatedSimilarToText` groups for the
+    currently open chapter and shows `contextScore` as a percentage.
+- **Book reader** (`LibraryReader`) binds the reader export:
+  - `#book-toc` lists the module chapters (L.4 `chapterKey` order).
+  - `#book-reader-host` mounts the existing `SectionReader` over the chapter's
+    blocks.
+  - `#reader-tools` exposes bookmark, highlight and comment through the existing
+    annotation pipeline.
+  - `#notebook-panel` "Passage Citation" links each block to its Gospel verse
+    (opens Sacred Scripture at that verse).
+  - `#recording-panel` is not mounted this release.
+- **Audiobook dock** (`AudiobookDock`) binds the TTS export's `#supertonic-tts-dock`
+  region inside My Books (L.6). It also appears above `#book-reader-host` while a
+  book is open.
+
+### L.2 Catalogue and access (closed sets)
+
+Catalogue sources: `content/library/catalogue.seed.json` and
+`content/library/commerce.seed.json`. C003 Catena Aurea becomes
+`publication:'ready'`, `editionId:'catena-aurea-en'`. C002 Haydock stays free
+forever (§J, `RESERVED_FREE_EDITION_IDS`). All other works keep their seed
+publication.
+
+`EntitlementController.accessFor(editionId)` → `AccessState`:
+
+| AccessState | Rule | Badge (`#drawer-state-badge`, card badge) | `#primary-action-btn` |
+|---|---|---|---|
+| `free` | reserved free edition | `Free included` | `Read` |
+| `owned` | active `reference_<editionId>` | `Owned` | `Read` |
+| `subscription` | active `study_library_all` | `Subscription access` | `Read` |
+| `locked` | ready, not entitled, offers present | `Available` | `Buy · <priceText>` |
+| `unavailable` | not ready, or no offers / commerce unconfigured | `Edition review` | disabled, `Purchases unavailable` |
+
+**Prices are never compiled in.** `priceText` is RevenueCat's localized store price
+from the `bookstore` offering. `commerce.seed.json` `priceUSD` is documentation and
+never renders. The operator administers prices and the pricing model in the
+RevenueCat dashboard (products, offering `bookstore`, paywalls) and in Play Console
+(Play products and gift-card redemption). This is the operator-facing pricing
+admin; no in-app admin exists.
+
+### L.3 Commerce (RevenueCat)
+
+- **Identity:**
+  - The RevenueCat app user id is the Firebase `uid` from `useAccount` (§K.2).
+  - Purchase and restore require sign-in (§K.2 hard gate). Signed out, the
+    primary action reads `Sign in to buy` and opens `SignInView`. Browsing stays
+    signed-out-capable.
+- **`EntitlementController`** (`src/core/entitlements/index.ts`) is the single
+  authority:
+  - `has(entitlementId)`, `refresh()`, `subscribe(listener)`,
+    `accessFor(editionId)`.
+  - It refreshes on sign-in, on app start (signed in) and after every
+    purchase/restore.
+  - Fail-closed for paid works when unconfigured; free works are unaffected.
+- **`PurchaseController`** (`src/core/entitlements/purchases.ts`):
+  - `offers(editionId)`, `purchase(offerId)`, `restore()`.
+  - `PurchaseOffer {id,title,priceText,currency,kind:'lifetime'|'subscription',terms}`.
+  - It maps `editionId` to the store product
+    `mba.robin.sanctissimissa.iap.book.<editionId>` and to the
+    `study_library_all_*` subscriptions found in the `bookstore` offering.
+- **Channel adapters (closed set):**
+  - `WebPurchaseAdapter` (`src/core/entitlements/web.ts`): `@revenuecat/purchases-js`
+    Web Billing (Stripe checkout), key `VITE_REVENUECAT_API_KEY`. Used on web/PWA
+    and on Tauri desktop (Linux/Windows).
+  - `PlayPurchaseAdapter` (`src/core/entitlements/play.ts`): Tauri IPC
+    `commerce_configure|commerce_offers|commerce_purchase|commerce_restore`
+    (`src-tauri/src/commerce.rs`) → `CommercePlugin.kt` (RevenueCat
+    `purchases-android`), key `VITE_REVENUECAT_ANDROID_API_KEY`. Play Billing
+    supplies one-click purchase and gift-card balance natively.
+- **After a successful purchase or restore:** `EntitlementController.refresh()`,
+  then L.4 install, then `CorpusDb.attachModule`, then the drawer shows `Owned`
+  and `Read`.
+
+### L.4 Content module (DLC) — fulltext + vector + graph
+
+Catena Aurea is already ingested into `missal.db` (815
+`commentary:catena-aurea/<Book>/<ch>/<verseStart>` nodes, `COMMENTS_ON` edges to
+`verse:` nodes, embeddings, FTS rows). The ingest is still being completed
+(Stanza CD), so module emission is a **separate post-ingest step** that never
+edits `scripts/ingest-corpus.mjs`.
+
+- **`scripts/build-modules.mjs`:**
+  - Opens `assets/missal.db`.
+  - Copies every `commentary:catena-aurea/%` node and its `text_blocks`,
+    `embeddings`, `search` rows and `COMMENTS_ON` edges into
+    `public/modules/catena-aurea-en.db`.
+  - Deletes those rows from `assets/missal.db`, then `VACUUM`.
+  - Writes `content/library/modules.json`.
+  - Idempotent: when the base holds no Catena rows and the module file's sha
+    matches `modules.json`, it exits 0 without writing.
+  - npm `ingest` runs it after `ingest-corpus.mjs`. Both `.db` files are committed
+    as regular binary blobs.
+- **Module schema** (keys, never row ids):
+
+  | Table | Columns |
+  |---|---|
+  | `module_meta` | `key TEXT PRIMARY KEY, value TEXT` (`id`, `revision`, `title`) |
+  | `mnodes` | `key, kind, title, category, meta` |
+  | `mtext` | `node_key, section, latin, english` |
+  | `medges` | `src_key, dst_key, rel, weight, meta` |
+  | `memb` | `node_key, dim, vec` |
+  | `msearch` | `key, section, content` |
+- **`modules.json`:**
+  `{schemaVersion:1, modules:[{id:'catena-aurea-en', file:'modules/catena-aurea-en.db', revision:1, sha256, bytes, entitlements:['reference_catena-aurea-en','study_library_all'], chapters:89}]}`.
+- **`ModuleInstaller`** (`src/core/library/modules.ts`):
+  - `install(id,signal,onProgress)` fetches `<base>/modules/<file>`. The base is
+    same-origin on web and `https://sanctissimissa.surge.sh` on Tauri.
+  - It verifies sha256 and stores bytes in IndexedDB
+    `sanctissimissa.library.packages.v1` store `packages` (key = module id).
+  - Also `load(id)` and `remove(id)`.
+  - `#download-manager` shows installed module count, real byte sizes and
+    "Update available" when `modules.json` revision > installed revision.
+  - Remove, then reload the app.
+- **`CorpusDb.attachModule(bytes): {id, nodes}`:**
+  - Opens the module with sql.js as a second Database.
+  - INSERTs its rows into the main tables, resolving `medges` keys to
+    `nodes.id`, and clears the `vectors` cache.
+  - At startup it attaches every installed module whose entitlements
+    `EntitlementController.has()`. It also attaches immediately after purchase.
+  - Afterwards `commentaryFor`, `similarToText`, `concordance`,
+    `nucleatedSimilarToText`, MeaningPanel, JournalSidecar, HomilyPlanner and
+    Sacristan retrieval include Catena with no further change.
+  - Unentitled modules are never attached, so they are absent from all search and
+    reading.
+- **Chapters:** `chapterKey` = `<Book>/<ch>`, ordered Matt 1–28, Marc 1–16,
+  Luc 1–24, Joann 1–21 (89). A chapter's blocks are its nodes ordered by
+  `verseStart`.
+
+### L.5 Reading a purchased work
+
+`LibraryReader` sections = one `ReaderSection` per block:
+- anchor `book:catena-aurea-en#<Book>/<ch>/<verseStart>`;
+- title `St. <Evangelist>, Chapter <ch>` at chapter start;
+- English only (Latin null).
+
+The Read action from either tab opens it at the last-read chapter (sidecar setting
+`library.progress.<editionId>`), or Matthew 1.
+
+### L.6 Audiobook (Supertonic, multithreaded, background)
+
+- **Engine:** §K.4 entities unchanged, consumed through the `Voice` contract:
+  - `SupertonicVoice`, `calibrate()`.
+  - Background init after first paint.
+  - Supertonic (~250 MB) loads in the background at app init on unmetered
+    networks. On metered networks (`navigator.connection.saveData`, or `type`
+    `cellular`, or `effectiveType` in `2g|3g|slow-2g`) it waits: the dock status
+    reads `English voice not downloaded (≈250 MB)` and `#tts-play-toggle` reads
+    `⬇ Download voice` until tapped.
+- **`AudiobookController`** (`src/core/audiobook/controller.ts`):
+  - One app-lifetime instance; playback continues across view changes.
+  - `open(editionId, chapterKey)`, `play()`, `pause()`, `skip(seconds)`
+    (±15), `nextBlock()`, `seek(seconds)`, `setRate(0.85|1|1.2)`,
+    `subscribe(listener)`.
+  - `state {editionId, chapterKey, blockIndex, sentenceIndex, positionSec, playing, readyThrough:chapterKey|null, voice:'loading'|'ready'|'waiting-metered'|'error'}`.
+  - `nextBlock` serves the frozen "⏭ Next Verse" (next commentary block).
+- **`chapterSentences(db, editionId, chapterKey)`** (`src/core/audiobook/text.ts`):
+  the chapter's block English text, split by the §K.4 sentence segmentation, each
+  sentence tagged with its `blockIndex`.
+- **`RenderQueue`** (`src/core/audiobook/queue.ts`): N workers, where N =
+  `min(calibrate().threads, 4)`.
+  1. Priority 1 is the unsynthesized sentences from the playhead forward.
+  2. Let `rtf` be calibrate's measured synthesis seconds per audio second, and
+     `rtfEff = rtf/N`.
+  3. If `rtfEff ≤ 0.5`, it fills the whole current chapter, then following
+     chapters ("idle fill").
+  4. Otherwise it keeps ≥ 120 s of audio buffered ahead of the playhead.
+  5. It resumes from stored chunks after reload.
+- **`ChunkStore`** (`src/core/audiobook/store.ts`):
+  - IndexedDB `sanctissimissa.audiobook.v1` store `chunks`.
+  - Key `<editionId>/<revision>/<chapterKey>/<sentenceIndex>`.
+  - Value `{pcm:Float32Array, sampleRate:24000, durationSec, text}`.
+- **`approxWordTimes(sentence, durationSec)`** (`src/core/audiobook/timing.ts`):
+  - Weight per word = letters (min 1); +2 after `, ; :`; +4 after `. ! ?`.
+  - `start_i = durationSec · (Σ weights before i)/total`; `end_i` = next start.
+  - No forced alignment (operator W6).
+- **`AudiobookDock`** (`src/ui/library/AudiobookDock.tsx`), bound to the TTS export:
+  - Title line: `<edition title> — St. <Evangelist>, Chapter <ch>`.
+  - Status span (export's render-ahead span): `Audio ready through <chapter label>`
+    or the metered/voice states.
+  - `.karaoke-vernacular` renders the current sentence with the whole line bold
+    (weight 700) and `.karaoke-word-active` on the current word per
+    `approxWordTimes`.
+  - `.karaoke-latin`, the `⚙ Voice Mode` button and the Latin param tags are not
+    mounted (W5).
+  - Controls in export order: `↺ 15s`, `#tts-play-toggle`, `↻ 15s`,
+    `⏭ Next Verse`.
+  - `.tts-track-scrub` / `.tts-track-progress` seek within the chapter.
+  - Tick labels show elapsed and chapter length; the length becomes known when the
+    chapter is fully synthesized, and until then reads `preparing…`.
+  - Speed select options exactly `0.85x`, `1.0x`, `1.2x` (export labels).
+  - Media Session metadata/actions: play, pause, seekbackward, seekforward,
+    nexttrack.
+- Playback uses §K.4's AudioWorklet; `setRate` changes playback rate, not
+  synthesis.
+
+### L.7 Verification (TEST_RUBRIC gauntlet; no unit tests)
+
+Verification is the `DOCS/TEST_RUBRIC.md` gauntlet on stamped release artifacts.
+Evidence and a TC11 screencast go in `dist/rubric-runs/v<VERSION>-…`. There are no
+unit, smoke, mock or dev-build checks.
+
+**Rows:**
+1. The rail shows one `Bookstore` entry after Sacred Scripture; Catalogue/My Books
+   tabs switch.
+2. Signed out: Catena shows `Available` / `Sign in to buy`; Haydock shows
+   `Free included`.
+3. Signed in, web: the RevenueCat sandbox checkout completes, the drawer flips to
+   `Owned` with no reload, and the module downloads.
+4. MeaningPanel similarity and Journal connections show Catena hits; the Sacristan
+   cites Catena with the day's Gospel.
+5. The reader opens Matthew 1, and the TOC lists 89 chapters.
+6. Listen starts. The current line is bold and the word glow advances.
+   `Audio ready through` advances while playing. Reload resumes generation.
+7. Android internal track: a Play purchase (licence tester, gift-card balance)
+   unlocks the same flow, and Restore works after reinstall.
+8. Unentitled: Catena is absent from search and reading.
+9. The price shown equals the RevenueCat/Play price the operator configured.
+
+### L.8 Entity table (engaged-by = planned checklist task ids)
+
+| Entity | Target | Engaged by |
+|---|---|---|
+| `build-modules.mjs`, `modules.json`, `public/modules/catena-aurea-en.db` | `scripts/`, `content/library/`, `public/modules/` | BA.1 |
+| `CorpusDb.attachModule` | `src/core/data/corpusDb.ts` | BA.2 |
+| `ModuleInstaller` | `src/core/library/modules.ts` | BA.2 |
+| `EntitlementController`, `useEntitlement`, `AccessState` | `src/core/entitlements/index.ts` | BA.3 |
+| `PurchaseController`, `PurchaseOffer` | `src/core/entitlements/purchases.ts` | BA.3 |
+| `WebPurchaseAdapter` | `src/core/entitlements/web.ts` | BA.3 |
+| `PlayPurchaseAdapter` | `src/core/entitlements/play.ts` | BA.4 |
+| `commerce_configure/offers/purchase/restore` | `src-tauri/src/commerce.rs` | BA.4 |
+| `CommercePlugin` | `src-tauri/gen/android/app/src/main/java/mba/robin/sanctissimissa/CommercePlugin.kt` | BA.4 |
+| `View` `bookstore`, `NAV` entry, `.bookstore-tabs`, `#tab-catalogue`, `#tab-my-books` | `src/App.tsx`, `src/ui/library/BookstoreView.tsx` | BA.5 |
+| `BookstoreView` (catalogue bindings §J.2 + L.1/L.2) | `src/ui/library/BookstoreView.tsx`, `src/ui/library/library.css` | BA.5 |
+| `MyBooksPanel` | `src/ui/library/MyBooksPanel.tsx` | BA.6 |
+| `LibraryReader` | `src/ui/library/LibraryReader.tsx` | BA.6 |
+| `LibraryViewProps` (L.1 subset) | `src/ui/library/viewTypes.ts` | BA.6 |
+| `AudiobookController`, `chapterSentences`, `RenderQueue`, `ChunkStore`, `approxWordTimes` | `src/core/audiobook/{controller,text,queue,store,timing}.ts` | BA.7 |
+| `AudiobookDock`, Media Session wiring | `src/ui/library/AudiobookDock.tsx` | BA.8 |
+| Release stamp, TEST_RUBRIC rows L.7, all-platform artifacts, web deploy | `DOCS/TEST_RUBRIC.md`, `dist/` | BA.9 |
+| `SupertonicVoice`, `Voice`, `calibrate`, pipeline, worklet | §K.4 (`src/core/voice/*`) | TT.1–TT.3 (existing; tests removed per W13) |
