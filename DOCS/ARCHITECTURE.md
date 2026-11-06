@@ -2971,6 +2971,7 @@ unit, smoke, mock or dev-build checks.
 8. Unentitled: Catena is absent from search and reading.
 9. The price shown equals the RevenueCat/Play price the operator configured.
 10. The embedding parity gate passes on web, Linux, Windows and Android (min cosine ≥ 0.99). Meaning search finds a Latin passage from an English paraphrase.
+11. Build matrix (D12): the Ubuntu **and** Windows build environments each produce Android AAB/APK plus the symbols zip, AppImage/deb/rpm, web plus PWA, and Windows exe/NSIS, all with the native embedding engine. MSI/MSIX come from the Windows environment only. Every artifact runs rows 1–10.
 
 ### L.8 Entity table (engaged-by = planned checklist task ids)
 
