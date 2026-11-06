@@ -2822,3 +2822,39 @@ Dependency additions for this stanza: `firebase`, `onnxruntime-web`, `phonemizer
   - **Do:** release stage order becomes: gate → web build → **deploy:web (surge publication)** → desktop → Android; the web stage publishes before the heavy platform builds so the operator can probe early. Next stamp **v1.68.98009** via the existing one-minor-increment fresh-release stamp (operator floor 1.68; wave opened on this stamp 2026-11-05, release.lock frozen). No other release semantics change (REL.1 build-then-publish contract preserved).
   - **Verify:** `node --test tests/deployWeb.test.ts` and the release-state tests exit 0 with the new order.
   - **Accept:** a release run publishes the web build to surge before desktop/Android stages begin; served version ≥ v1.68.
+
+## Stanza CD — Content defects & release-tooling fixes (2026-11-06; operator defect reports, architect-assigned; each task ends commit+push atomically)
+
+Evidence base (live-verified 2026-11-06 on tree 92f98985): D1 the Kyrie/Gloria Ordo section renders literal `! Gloria` bang-lines and the Gloria text is absent even on a Gloria-Sunday (2026-11-08, Dominica V post Epiphaniam: 2079 chars, no "Gloria in excelsis"); D2 `[offertorium]`-class source directives leak as text in ordo:Offertorium/Præfatio/Canon/Conclusio (operator example: "Postea dicit: Orémus, et Offertorium. v. Orémus. [offertorium]"); D3 "blank Credo" observed by the operator — not reproduced on the working tree (feria 1121 / Sunday 3011 chars); consistent with the DEPLOYED site being stale (the v1.69 train died at build:vite SIGSEGV and the resume hit an unexplained release-state lock mismatch) — re-verify against a fresh deploy after C5/C6; D4 the hover callout keeps too much distance from the pointer (constants MENU_GAP 48 / POINTER_CLEARANCE 72 / POINTER_BAND 48, src/ui/SectionReader.tsx:87-96, plus src/core/ui/calloutPlacement.ts); D5 deploys overwrite the canonical host, losing previously deployed builds.
+
+- [ ] **C1 — Ingest normalization + missal.db regeneration (D1, D2).** Files: `scripts/ingest-corpus.mjs` (bang-line classification + bilingual pairing — suspect `pairedEnglish` ~line 388; bracketed `[xxx]` insertion-directive resolution), corpus sources, `scripts/sync-db.mjs` if regeneration paths require it.
+  - **Do:** classify/resolve every DO-source directive at ingest — bang-lines become structure (never text), bracketed insertion directives (`[offertorium]` class) are resolved or stripped with a diagnostics count (never 0 silently, never rendered); regenerate missal.db; the Ordo/Missae `Kyrie` section carries the full Gloria text behind its `!*GloriaM` control so omission logic works on an intact block.
+  - **Verify:** ingest fixtures assert: zero `!`-prefixed or `[a-z]{3,}`-bracketed lines in any generated text block; Gloria text present in Ordo/Missae#Kyrie; `npm test` green.
+  - **Accept:** deployed reader shows Kyrie→Gloria intact on a Gloria-Sunday and the omit-day rubric on ferias; zero directive leaks in any Ordo section.
+
+- [ ] **C2 — Rendering-side directive guard (D1 defense-in-depth).** Files: `src/core/liturgy/massSpecials.ts` (`classifyBangLine`/`shouldRenderPairedBangLine`), `src/ui/SectionReader.tsx` text pipeline.
+  - **Do:** no unmatched bang-line or bracketed directive can EVER reach the DOM as visible text — unknown forms are swallowed with a diagnostics record (fail-visible in Diagnostics, invisible on the page).
+  - **Verify:** focused unit tests with adversarial fixtures (`! X`, `[foo]`, `[[]]`, mixed-language pairs).
+  - **Accept:** even with a stale corpus, the page never displays `!`/`[x]` artifacts.
+
+- [ ] **C3 — Hover callout placement retune (D4).** Files: `src/ui/SectionReader.tsx` (constants + retreat logic), `src/core/ui/calloutPlacement.ts`.
+  - **Do:** callout keeps the minimum distance that still never covers the pointer or the hovered line — retune MENU_GAP/POINTER_CLEARANCE/POINTER_BAND down and re-derive the force-field bands; both reader layouts.
+  - **Verify:** focused placement tests (existing calloutPlacement tests extended for the new distances).
+  - **Accept:** deployed reader — callout visibly near the hovered word, never overlapping pointer or line, at desktop + narrow widths.
+
+- [ ] **C4 — Release-state lock-mismatch diagnosis + fix.** Files: `scripts/release-state.mjs` (`lockMatchesCurrent` and its error surface).
+  - **Do:** instrument/reproduce the 2026-11-06 resume failure (lock fields version/HEAD/assets+env hashes all hand-verified equal, yet mismatch returned false) — find the real comparison defect, fix it, and make every mismatch message name the EXACT differing field. No behavior change to resume semantics.
+  - **Verify:** release-state tests with lock fixtures covering the failing case; error messages assert field-level specificity.
+  - **Accept:** a fresh `--restart` train interrupted mid-stage resumes cleanly with `--resume-only` at the same version.
+
+- [ ] **C5 — Staged deploy scheme (D5).** Files: `scripts/deploy-web.mjs` (multi-host publication), `scripts/provision-secrets.mjs` (new pointers), `.env.example`, tests/deployWeb.test.ts.
+  - **Do:** every web deploy publishes to (a) canonical `sanctissimissa.surge.sh`, (b) versioned `sanctissimissa-v<major>.<minor>.surge.sh`, (c) dated alias `sanctissimissa-<dMYYYY>.surge.sh`, and sets/refreshes the `.robin.mba` DNS alias (Namecheap API) — credentials live in Admin-Manual; `.env` carries POINTERS translated at build time by provision-secrets (existing pattern); a deploy never deletes/overwrites a versioned host (deployed builds are never lost).
+  - **Verify:** deployWeb tests with a stubbed surge/Namecheap stack assert all hosts receive the project and the versioned host name derives from version.txt.
+  - **Accept:** a real train leaves N versioned hosts live and reachable; canonical updated; no prior versioned host disturbed.
+
+- [ ] **C6 — Fresh release train + deployed-only verification.** After C1–C5 land and are committed+pushed.
+  - **Do:** `./build_all.sh --restart` (auto-stamps v1.70.x; deploy-first order stands); atomic commit+push with the stamp; verification ONLY against the deployed versioned host — never localhost.
+  - **Verify:** train completes test → web → web-deploy → platform stages; stamp commit pushed same-second.
+  - **Accept:** deployed build shows Gloria/Credo correct (D1/D3 re-check on a say-day and a feria), no directive leaks, retuned callout; every prior deployed version still reachable at its versioned host.
+
+Standing rules for this stanza (operator, 2026-11-05/06): architect never codes — these are coder-subagent assignments; CodeGraph unconditional (no index → `codegraph init -i`; failure never halts, next query same path; never grep for code evaluation); each task = commit AND push atomically, never separated; never start a task unless the previous is committed+pushed; version = byte attestation (auto-increment after every build, never manual); never delete — `cp` to `~/outbox/`; no temp folders; no common ports; deployed-only verification; Forgejo never contacted, references preserved.
