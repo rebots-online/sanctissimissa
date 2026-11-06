@@ -640,7 +640,7 @@ Supersessions within the entity table: `PlannerView`/`HomilyEditor` (P-D) are **
 | `AboutProse` / `inline` | comp/fn | `src/ui/AboutView.tsx:13` | ✅ | About prose splits on BLANK lines, not every newline (which emitted an empty `<p>` per blank line); bullet runs become real lists with one nesting level; `**bold**` renders | `AboutProse({ text: string })` |
 | `content/origin-story.md` | tracked content | `content/origin-story.md` | ✅ | the operator's own account, imported verbatim at build time via `?raw`. There is deliberately NO fallback string: a missing file fails the build, because a placeholder here would publish fabricated biography. Replaces the invented "St. Android of the Circuits" origin | consumed by `ABOUT_CONTENT.origin` |
 | `DOCS/CHANGELOG.md` / `readChangeNotes` | build input | `DOCS/CHANGELOG.md`, `scripts/collect-artifacts.mjs` | ✅ | change notes are a build INPUT: the `## v<version>` section is parsed into `change_notes {source, present, heading, highlights[], markdown}`, embedded in the JSON manifest and as `<change_notes>` in the XML, and written out as `RELEASE_NOTES-v<version>.md`. A missing section yields empty notes that say so — it does NOT fall back to boilerplate, which is how every release since v0.5 silently reprinted the same hardcoded paragraph | manifest schema stays `mba.robin.release-manifest.v1`: the field is additive, so existing CC8 consumers keep working |
-| `windows-msi` / `windows-msix` stages | release stages | `scripts/release-state.mjs:186` | ✅ | the installers are part of `build:release` rather than produced out of band; skipped with a clear log on non-Windows hosts because WiX and winapp do not cross-build (BUGS #7) | `STAGE_ORDER` = test · web · linux · windows · windows-msi · windows-msix · android-debug · android-release · symbols · collect |
+| `windows-msi` / `windows-msix` stages | release stages | `scripts/release-state.mjs:186` | ✅ | the installers are part of `build:release` rather than produced out of band; skipped with a clear log on non-Windows hosts because WiX and winapp do not cross-build (BUGS #7) | [Superseded → §L.9] `STAGE_ORDER` = test · web · linux · windows · windows-msi · windows-msix · android-debug · android-release · symbols · collect |
 | MSIX package identity | build contract | `scripts/stamp-version.mjs`, `Package.appxmanifest` | ✅ | `Identity/@Version` = `MAJOR.MINOR.0.0`. Appx parts must be ≤ 65535 and the Store requires revision 0, but display BUILD is `epoch-minutes % 100000` — so ~a third of builds would mint a package Windows rejects outright. MINOR is the monotonic per-release quantity, exactly as for Play's `versionCode` | stamped by `npm run stamp`; nothing stamped it before, so it sat at 1.24.37311.0 |
 | `AtlasMode` / `ScriptureAtlas` | type/comp | `src/ui/ScriptureAtlas.tsx:1` | P-T | imagery + parallels navigation modes hosted by BibleView's mode switch | `AtlasMode = 'canonical' \| 'imagery' \| 'parallels'`; props `{ db: CorpusDb; mode: AtlasMode; onOpenKey: (k: string) => void }` |
 | `CorpusDb.commentaryFor` / `conceptVerseCounts` / `chapterCiteCounts` | methods | `src/core/data/corpusDb.ts` | P-T | interpretive-layer + atlas query surface | `commentaryFor(book: string, ch: number, verse?: number): SectionText[]`, `conceptVerseCounts(): { conceptId: string; label: string; count: number }[]`, `chapterCiteCounts(book: string): Map<number, number>` |
@@ -1608,7 +1608,7 @@ verification remain explicit release obligations.
 Every successful web build in the release train publishes the generated PWA to
 `https://sanctissimissa.surge.sh`. Add `web-deploy` immediately after `web` in
 `scripts/release-state.mjs` and its declaration/acceptance contracts. Both native
-Linux and Windows may execute this stage; a shared release state records success
+Linux and Windows may execute this stage; [Superseded → §L.9: `web-deploy` and `modules-deploy` run in the Ubuntu environment only] a shared release state records success
 once. It runs before platform packaging, so a pending Windows installer does not
 prevent web publication. `collect` requires this stage along with the other
 required stages. Existing release states from an earlier source continue to use
@@ -2610,7 +2610,7 @@ the missal: she acts on the page while she answers.
 | `focus-swap` | `()` | The panel recedes while the demonstrated region takes attention — the Natally focus swap from her to the inset chart |
 | System prompt | hosted provider config | The model is instructed it teaches ON the page: scroll, highlight, annotate, circle, connect with arrows; never describe the screen from memory — it reads the real DOM context |
 
-### K.9 Release train (this wave)
+### K.9 Release train (this wave) **[Superseded → §L.9]** (no unit-test gate; STAGE_ORDER and v1.70.x per `L-release-20261106.md`).
 
 Order (operator: "build BEGINS with webapp deploy so that time building isn't
 wasted if i find problems in the web app deployed early"): tests + typecheck +
@@ -2855,11 +2855,10 @@ attribution is parseable, keyed `catena:<Book>/<ch>/<verseStart>/q<n>`.
 
 **Delivery and attach.**
 - `ModuleInstaller` (`src/core/library/modules.ts`): `install`, `load`, `remove`.
-  - It fetches `<base>/modules/<file>`: same-origin on web, `https://sanctissimissa.surge.sh`
-    on Tauri.
+  - It fetches `<base>/modules/<file>`: [Superseded → §L.9: `https://sanctissimissa.robin.mba/runtime/modules` on every platform; Play asset packs on Android]
   - It checks sha256 and stores the bytes in IndexedDB
     `sanctissimissa.library.packages.v1` store `packages`.
-- `CorpusDb.attachModule(bytes)`:
+- `CorpusDb.attachModule(id, bytes)` (host-agnostic module core, decision 19; see `L-content-modules-search-20261106.md`):
   - opens the module as a second sql.js Database;
   - checks `EmbedMeta.compatible` against the base;
   - inserts rows, resolving `medges` keys to `nodes.id`;
@@ -2899,7 +2898,7 @@ attribution is parseable, keyed `catena:<Book>/<ch>/<verseStart>/q<n>`.
 The Read action from either tab opens it at the last-read chapter (sidecar setting
 `library.progress.<editionId>`), or Matthew 1.
 
-### L.6 Audiobook (Supertonic, multithreaded, background)
+### L.6 Audiobook (Supertonic, multithreaded, background) **[Superseded → §L.9]** (S1–S10 in `L-audiobook-20261106.md`: `Voice.synthesize`, HTMLAudioElement playback, Int16 ChunkStore, `synthWorkers`, measured rtf, chunk budget).
 
 - **Engine:** §K.4 entities unchanged, consumed through the `Voice` contract:
   - `SupertonicVoice`, `calibrate()`.
@@ -2981,7 +2980,7 @@ unit, smoke, mock or dev-build checks.
 10. The embedding parity gate passes on web, Linux, Windows and Android (min cosine ≥ 0.99). Meaning search finds a Latin passage from an English paraphrase.
 11. Build matrix (D12): the Ubuntu **and** Windows build environments each produce Android AAB/APK plus the symbols zip, AppImage/deb/rpm, web plus PWA, and Windows exe/NSIS, all with the native embedding engine. MSI/MSIX come from the Windows environment only. Every artifact runs rows 1–10.
 
-### L.8 Entity table (engaged-by = planned checklist task ids)
+### L.8 Entity table (engaged-by = planned checklist task ids) **[Superseded → §L.9]** — this table is the summary index. The normative, column-complete entity tables are in the §L.9 partials.
 
 | Entity | Target | Engaged by |
 |---|---|---|
@@ -3007,5 +3006,45 @@ unit, smoke, mock or dev-build checks.
 | `LibraryViewProps` (L.1 subset) | `src/ui/library/viewTypes.ts` | BA.6 |
 | `AudiobookController`, `chapterSentences`, `RenderQueue`, `ChunkStore`, `approxWordTimes` | `src/core/audiobook/{controller,text,queue,store,timing}.ts` | BA.7 |
 | `AudiobookDock`, Media Session wiring | `src/ui/library/AudiobookDock.tsx` | BA.8 |
-| Release stamp, TEST_RUBRIC rows L.7, all-platform artifacts, web deploy | `DOCS/TEST_RUBRIC.md`, `dist/` | BA.9 |
+| Release plumbing (STAGE_ORDER, rpm, dual-env naming, modules-deploy), the release invocation and the gauntlet; TEST_RUBRIC rows are a plan-phase commit before checklist approval (§L.9) | `scripts/release-state.mjs`, `src-tauri/tauri.conf.json`, `dist/` | BA.9 |
 | `SupertonicVoice`, `Voice`, `calibrate`, pipeline, worklet | §K.4 (`src/core/voice/*`) | TT.1–TT.3 (existing; tests removed per W13) |
+
+### L.9 Normative partials and applied supersessions (2026-11-06)
+
+§L.0–§L.8 are the summary. These TC13 partials are **normative**. Where a partial is
+more specific than or differs from §L.0–§L.8, the partial governs.
+
+| Partial | Owns |
+|---|---|
+| `DOCS/ARCHITECTURE/L-bookstore-commerce-20261106.md` | Catalogue and My Books bindings (every selector), access and rights gate, RevenueCat commerce, `ids.ts`, entitlement cache, Tauri commerce wiring |
+| `DOCS/ARCHITECTURE/L-bookstore-ui-20261106.md` | `LibraryReader` (reader export) through the existing `SectionReader`, annotations and `onOpenKey` |
+| `DOCS/ARCHITECTURE/L-content-modules-search-20261106.md` | Corpus pipeline (never mutated in place), module formats and DDL, module core `attachModule(id, bytes)`, `embedText` caller migration (async), Catena graph and closed Father table, search, Sacristan context |
+| `DOCS/ARCHITECTURE/L-native-embed-engine-20261106.md` | `SemanticEmbedder` / `Reranker`, `NativeEmbedEngine` (Atomic fork, Windows included, clang ≥ 19 cross toolchain), `WllamaEmbedEngine`, runtime asset manifest |
+| `DOCS/ARCHITECTURE/L-audiobook-20261106.md` | Audiobook (S1–S10), §K.4 `Voice.synthesize` amendment, TT.1–TT.3 contract amendments |
+| `DOCS/ARCHITECTURE/L-release-20261106.md` | STAGE_ORDER, v1.70.x stamp, D12 dual-environment naming, rpm, PWA returning visitor, runtime host `https://sanctissimissa.robin.mba/runtime/`, rubric re-formation plan |
+
+Local SDK snapshots for every external API: `DOCS/sdk/INDEX.md` (TC7).
+
+**Applied supersessions (markers placed inline):**
+- §K.9 has no unit-test gate. Verification is the TEST_RUBRIC gauntlet only.
+- Line 643 `STAGE_ORDER` and the "Automatic Surge web publication" stage placement are
+  superseded by the release partial.
+- §L.4 Tauri module fetch from surge.sh becomes `https://sanctissimissa.robin.mba/runtime/modules`
+  on every platform, with Play asset packs on Android. Surge is the web-PWA deploy only.
+- `attachModule(bytes)` becomes `attachModule(id, bytes)` behind the host-agnostic
+  module core (decision 19).
+- §L.6 is amended by audiobook S1–S10.
+- §L.8 is a summary index. The BA.9 row is release plumbing, and the TEST_RUBRIC rows are
+  committed in the plan phase.
+- Decision 19's non-operator "never for the public-domain texts" sentence is struck. The
+  operator's value principle governs (§L supersessions).
+- wllama is re-admitted **for embeddings only** (D2). Chat inference exclusions stand.
+- Android x86_64 runs the native engine (64-bit build), per the "Windows / no platform
+  excluded" rule.
+
+**Operator-provisioned items.** These are checklist operator tasks, not blockers:
+- RevenueCat Web Billing and Play products and offering `bookstore`, matching `ids.ts`;
+- the robin.mba runtime upload target (`SANCTISSIMISSA_RUNTIME_SSH`,
+  `SANCTISSIMISSA_RUNTIME_ROOT`) with CORS on `/runtime/`;
+- RevenueCat keys in `.env`.
+
