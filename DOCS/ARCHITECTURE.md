@@ -2753,60 +2753,130 @@ admin; no in-app admin exists.
   then L.4 install, then `CorpusDb.attachModule`, then the drawer shows `Owned`
   and `Read`.
 
-### L.4 Content module (DLC) — fulltext + vector + graph
+### L.4 Semantic corpus, content modules and search (rewritten 2026-11-06; decisions D1–D9)
 
-Catena Aurea is already ingested into `missal.db` (815
-`commentary:catena-aurea/<Book>/<ch>/<verseStart>` nodes, `COMMENTS_ON` edges to
-`verse:` nodes, embeddings, FTS rows). The ingest is still being completed
-(Stanza CD), so module emission is a **separate post-ingest step** that never
-edits `scripts/ingest-corpus.mjs`.
+Evidence and rationale: `DOCS/ARCHITECTURE/semantic-embedding-research-20261106.md`.
+Today's `embedText` (`src/core/vector/embed.ts`, 128-d FNV trigram hashing) is lexical,
+not semantic. It is **retired**. Decision 4's byte-stability is waived for
+model-computed query vectors and replaced by the parity gate (D4).
 
-- **`scripts/build-modules.mjs`:**
-  - Opens `assets/missal.db`.
-  - Copies every `commentary:catena-aurea/%` node and its `text_blocks`,
-    `embeddings`, `search` rows and `COMMENTS_ON` edges into
-    `public/modules/catena-aurea-en.db`.
-  - Deletes those rows from `assets/missal.db`, then `VACUUM`.
-  - Writes `content/library/modules.json`.
-  - Idempotent: when the base holds no Catena rows and the module file's sha
-    matches `modules.json`, it exits 0 without writing.
-  - npm `ingest` runs it after `ingest-corpus.mjs`. Both `.db` files are committed
-    as regular binary blobs.
-- **Module schema** (keys, never row ids):
+**Models (D1, D3).** Both are pinned by sha256 in the existing content-addressed model
+store (`src/core/model-store`, `models/sha256/<digest>`):
 
-  | Table | Columns |
-  |---|---|
-  | `module_meta` | `key TEXT PRIMARY KEY, value TEXT` (`id`, `revision`, `title`) |
-  | `mnodes` | `key, kind, title, category, meta` |
-  | `mtext` | `node_key, section, latin, english` |
-  | `medges` | `src_key, dst_key, rel, weight, meta` |
-  | `memb` | `node_key, dim, vec` |
-  | `msearch` | `key, section, content` |
-- **`modules.json`:**
-  `{schemaVersion:1, modules:[{id:'catena-aurea-en', file:'modules/catena-aurea-en.db', revision:1, sha256, bytes, entitlements:['reference_catena-aurea-en','study_library_all'], chapters:89}]}`.
-- **`ModuleInstaller`** (`src/core/library/modules.ts`):
-  - `install(id,signal,onProgress)` fetches `<base>/modules/<file>`. The base is
-    same-origin on web and `https://sanctissimissa.surge.sh` on Tauri.
-  - It verifies sha256 and stores bytes in IndexedDB
-    `sanctissimissa.library.packages.v1` store `packages` (key = module id).
-  - Also `load(id)` and `remove(id)`.
-  - `#download-manager` shows installed module count, real byte sizes and
-    "Update available" when `modules.json` revision > installed revision.
-  - Remove, then reload the app.
-- **`CorpusDb.attachModule(bytes): {id, nodes}`:**
-  - Opens the module with sql.js as a second Database.
-  - INSERTs its rows into the main tables, resolving `medges` keys to
-    `nodes.id`, and clears the `vectors` cache.
-  - At startup it attaches every installed module whose entitlements
-    `EntitlementController.has()`. It also attaches immediately after purchase.
-  - Afterwards `commentaryFor`, `similarToText`, `concordance`,
-    `nucleatedSimilarToText`, MeaningPanel, JournalSidecar, HomilyPlanner and
-    Sacristan retrieval include Catena with no further change.
-  - Unentitled modules are never attached, so they are absent from all search and
-    reading.
-- **Chapters:** `chapterKey` = `<Book>/<ch>`, ordered Matt 1–28, Marc 1–16,
-  Luc 1–24, Joann 1–21 (89). A chapter's blocks are its nodes ordered by
-  `verseStart`.
+| Role | Model | Artifact | Output |
+|---|---|---|---|
+| Embedder | EmbeddingGemma-2, text encoder (Apache-2.0) | `ggml-org/embeddinggemma-2-GGUF` Q8_0 | 768-d, truncated to the first 256, L2-renormalized, int8 (×127) |
+| Reranker | Qwen3-Reranker-0.6B (Apache-2.0) | GGUF Q8_0 | rank pooling; P(yes) relevance score |
+
+- Embedder prefixes: query `task: search result | query: <text>`, document `title: none | text: <text>`.
+
+**Runtimes (D2), behind the existing contract.** `IInferenceEngine.embed?()`
+(`reusable-chatbot/core/engine-types.ts:98`) carries embeddings; `batchScore` carries
+reranking.
+
+| Engine | Where it runs | What it adds |
+|---|---|---|
+| `NativeEmbedEngine` | Linux and Android arm64 | Rust commands `embed_load`, `embed_texts`, `rerank_scores` in `src-tauri/src/embedding.rs`, using `llama-cpp-2` (`with_embeddings`, pooling Last/Rank) |
+| `WllamaEmbedEngine` | web/PWA, Windows, other Android ABIs | wllama, single-threaded; no COOP/COEP, so Firebase popups and RevenueCat checkout keep working |
+| `embedderFor(runtime)` | all | picks the engine and is the only selector |
+
+- LiteRT-LM is not used in this release.
+- Both models download in the background at app init, after Supertonic, on unmetered
+  networks. On metered networks they wait for consent, using the same rule as L.6.
+- Until they are ready (D7):
+  - free-text similarity uses FTS `concordance`;
+  - "more like this passage" uses precomputed `SIMILAR_TO` edges.
+
+**Embedding metadata (D5).** `missal.db` and every module carry table
+`embed_meta(key TEXT PRIMARY KEY, value TEXT)`. Keys: `model`, `artifact_sha256`, `dim`
+(256), `quant` (int8), `prefix_query`, `prefix_doc`, `norm` (l2).
+`EmbedMeta.compatible(a,b)` requires every key to be equal. An incompatible module is
+never attached, and the bookstore shows it as needing an update.
+
+**Ingest (D6).** `scripts/embed-corpus.mjs` is new and runs after `ingest-corpus.mjs`. It
+never edits `ingest-corpus.mjs`, because Stanza CD is still finishing that ingest.
+
+1. It runs llama.cpp with the pinned GGUF (`llama-embedding` CLI from the
+   `llama-cpp-2`-matching build) over every `text_blocks` row: English, plus Latin where
+   present, as one document string.
+2. It rewrites `embeddings` as dim 256.
+3. It writes `embed_meta`.
+4. It recomputes concept centroids and semantic `INSTANCE_OF` edges: cosine ≥ 0.45 to a
+   concept centroid, weight = cosine. These replace the trigram cluster edges.
+5. It writes `SIMILAR_TO` edges: the top 8 neighbours per node, cosine ≥ 0.35, weight =
+   cosine.
+
+Sidecar vectors (companion memory, accompaniments) are re-embedded on first launch
+after upgrade by `migrateSidecarVectors`.
+
+**Content modules (decision 19 realized).**
+
+`scripts/build-modules.mjs` runs after `embed-corpus.mjs`:
+- It emits `public/modules/<editionId>.db` in the **same graph schema keyed by node
+  key**: `module_meta`, `embed_meta`, `mnodes`, `mtext`, `medges(src_key,dst_key,rel,weight,meta)`,
+  `memb(node_key,dim,vec)`, `msearch`.
+- Module `SIMILAR_TO` edges also point to base-corpus keys.
+- It deletes the module's rows from `assets/missal.db`.
+- It writes `content/library/modules.json`.
+- It is idempotent.
+- Both `.db` files are regular binary blobs (not LFS).
+
+**Catena Aurea graph (D8).** Per-Father `quotation` nodes are created wherever the
+attribution is parseable, keyed `catena:<Book>/<ch>/<verseStart>/q<n>`.
+
+| Edge | From → to |
+|---|---|
+| `PART_OF` | quotation → pericope |
+| `ATTRIBUTED_TO` | quotation → `father:<slug>` |
+| `CITES` | quotation → `verse:` (explicit references) |
+| `COMMENTS_ON` | pericope → `verse:` |
+| `INSTANCE_OF` | → concept (semantic) |
+| `SIMILAR_TO` | → neighbour |
+
+- Father nodes are `kind:'father'`, with `title` and `meta.aliases` (the citation forms
+  found in the text, e.g. `Chrys.`, `Aug.`, `Pseudo-Chrys.`, `Gloss.`).
+- `parseCatenaQuotations` in `scripts/ingest-commentary.mjs` performs the split.
+  Unparseable chains keep the single pericope node.
+- `authorityKind` `patristics` is metadata and a facet, never a scoring input
+  (decision 21).
+- Catena joins the interpretive nucleus sources when attached. The source list becomes
+  `['haydock', …attached module ids]` instead of `['haydock']`.
+
+**Delivery and attach.**
+- `ModuleInstaller` (`src/core/library/modules.ts`): `install`, `load`, `remove`.
+  - It fetches `<base>/modules/<file>`: same-origin on web, `https://sanctissimissa.surge.sh`
+    on Tauri.
+  - It checks sha256 and stores the bytes in IndexedDB
+    `sanctissimissa.library.packages.v1` store `packages`.
+- `CorpusDb.attachModule(bytes)`:
+  - opens the module as a second sql.js Database;
+  - checks `EmbedMeta.compatible` against the base;
+  - inserts rows, resolving `medges` keys to `nodes.id`;
+  - clears the vector cache.
+- Attach happens at startup for every installed and entitled module, and immediately
+  after purchase. Unentitled modules are never attached and are absent from all search.
+- `#download-manager` shows real sizes, and shows "Update available" when the
+  `modules.json` revision is newer than the installed one.
+
+**Search stack.**
+- `CorpusDb.similarToText(text,k)`:
+  1. `embedder.embedQuery(text)`;
+  2. linear int8 cosine over base plus attached vectors;
+  3. take the top `max(k,20)`;
+  4. `reranker.rerank(text, hits)`;
+  5. return the top k.
+- `nucleatedSimilarToText`, MeaningPanel, JournalSidecar, HomilyPlanner and `clause.ts`
+  consume it unchanged.
+- `graphNeighbours(key,k)` returns `SIMILAR_TO` / `ATTRIBUTED_TO` / `CITES` /
+  `COMMENTS_ON` neighbours ordered by weight.
+- **Sacristan retrieval (D9).** `sacristanContext(query)` returns the top 5 reranked
+  vector hits plus the top 5 `graphNeighbours` of the first hit, drawn from the base
+  corpus and every attached module. Each item carries `{key, title, text, source}`.
+  `ChatView` adds it to the system context of every turn, alongside the existing
+  visible-context read (§K.8).
+- **Parity gate (D4).** `content/library/embed-probe.json` holds 40 fixed Latin and
+  English passages and queries with their ingest vectors. `verifyEmbedParity()` reports
+  the minimum cosine per platform. The release requires ≥ 0.99 (TEST_RUBRIC row L.7-10).
 
 ### L.5 Reading a purchased work
 
@@ -2897,12 +2967,19 @@ unit, smoke, mock or dev-build checks.
    unlocks the same flow, and Restore works after reinstall.
 8. Unentitled: Catena is absent from search and reading.
 9. The price shown equals the RevenueCat/Play price the operator configured.
+10. The embedding parity gate passes on web, Linux, Windows and Android (min cosine ≥ 0.99). Meaning search finds a Latin passage from an English paraphrase.
 
 ### L.8 Entity table (engaged-by = planned checklist task ids)
 
 | Entity | Target | Engaged by |
 |---|---|---|
+| `embed-corpus.mjs`, `embed_meta`, semantic `INSTANCE_OF`, `SIMILAR_TO` | `scripts/embed-corpus.mjs`, `assets/missal.db` | BA.10 |
+| `parseCatenaQuotations`, `father:` nodes, `PART_OF`/`ATTRIBUTED_TO`/`CITES` | `scripts/ingest-commentary.mjs` | BA.11 |
 | `build-modules.mjs`, `modules.json`, `public/modules/catena-aurea-en.db` | `scripts/`, `content/library/`, `public/modules/` | BA.1 |
+| `NativeEmbedEngine`, `embed_load`/`embed_texts`/`rerank_scores` | `reusable-chatbot/engines/native/embed.ts`, `src-tauri/src/embedding.rs` | BA.12 |
+| `WllamaEmbedEngine`, `embedderFor` | `reusable-chatbot/engines/wllama/embed.ts`, `src/core/vector/embedder.ts` | BA.13 |
+| `EmbedMeta`, `similarToText` (new stack), `graphNeighbours`, `migrateSidecarVectors`, `verifyEmbedParity`, `embed-probe.json` | `src/core/vector/{meta,parity}.ts`, `src/core/data/corpusDb.ts`, `src/core/accompaniment/store.ts`, `content/library/embed-probe.json` | BA.14 |
+| `sacristanContext` | `src/core/chat/retrieval.ts`, `src/ui/ChatView.tsx` | BA.15 |
 | `CorpusDb.attachModule` | `src/core/data/corpusDb.ts` | BA.2 |
 | `ModuleInstaller` | `src/core/library/modules.ts` | BA.2 |
 | `EntitlementController`, `useEntitlement`, `AccessState` | `src/core/entitlements/index.ts` | BA.3 |
