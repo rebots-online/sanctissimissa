@@ -43,3 +43,12 @@ never blocks, and what needs your clearance before architecting begins.
 
 Retrieved through the Stitch MCP on msi4090 (`/home/robin/Desktop/devProjects/sanctissimissa`).
 The hashes were checked against the live exports before freezing.
+
+## Operator clearances (2026-11-06)
+
+- **W1 cleared → one Bookstore entry.** A single rail item placed after Sacred Scripture. Tabs: Catalogue (Bookstore screen) and My Books (My Library screen). Chant and Mass Reference are excluded from this release.
+- **W6 overridden → bold line + approximate word glow.** The whole current line is bold. A glow sits on the *approximate* current word, timed by splitting the synthesized sentence's exact audio duration across its words in proportion to their length. No forced alignment is used ("approximate timing … good enough"; same approach as the operator's other project). This supersedes the §K.4 sentence-only glow for the audiobook.
+- **W8 cleared → Import Text deferred** to a later release. The button is not shown.
+- **W2–W5, W7, W9–W13:** not overridden, so the logged judgements stand.
+
+FREEZE 1 is cleared. Phase 2 (architecture) begins in a separate turn (I-2).
