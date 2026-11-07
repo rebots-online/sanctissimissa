@@ -75,6 +75,7 @@ export class AudiobookController {
   #owner: AudioOwner | null = null;
   #openSeq = 0;
   #saveTimer: ReturnType<typeof setTimeout> | null = null;
+  #snapshot: AudiobookState | null = null;
 
   constructor(deps: AudiobookDeps) {
     this.#deps = deps;
@@ -94,6 +95,7 @@ export class AudiobookController {
   }
 
   #emit(): void {
+    this.#snapshot = null;
     for (const l of this.#listeners) {
       try { l(); } catch (error) { debugEvent('audiobook', 'listener-failed', error, 'warn'); }
     }
@@ -139,7 +141,34 @@ export class AudiobookController {
     return this.#startOf(this.#sentenceIndex) + this.currentTime();
   }
 
+  /**
+   * Cached between emits: `useSyncExternalStore` needs the same object until
+   * the store changes, or React re-renders without end (BA.8 fix).
+   */
   getState(): AudiobookState {
+    this.#snapshot ??= this.#computeState();
+    return this.#snapshot;
+  }
+
+  // ── dock read accessors (BA.8 fix: the dock's line, word glow and scrub) ──
+
+  /** The current chapter's sentences (E8/E10/E17); same array until the chapter changes. */
+  sentences(): readonly AudioSentence[] {
+    return this.#sentences;
+  }
+
+  /** Stored duration of sentence `index` (F6 word glow), or null while it is not stored. */
+  sentenceDurationSec(index: number): number | null {
+    const key = this.#chapterKey;
+    return key && this.#queue ? this.#queue.storedDuration(key, index) ?? null : null;
+  }
+
+  /** The chapter end `seekFraction` scales by: `chapterDurationSec ?? estimate` (E15/E16). */
+  chapterEndSec(): number {
+    return this.#chapterEnd();
+  }
+
+  #computeState(): AudiobookState {
     const status = this.#deps.voiceRuntime.status();
     const key = this.#chapterKey;
     const storedCount = key && this.#queue

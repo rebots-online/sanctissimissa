@@ -10,10 +10,9 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import type { KeyboardEvent, PointerEvent, ReactNode } from 'react';
 import type { AudiobookController, AudiobookState } from '../../core/audiobook/controller.ts';
-import { AUDIOBOOK_EDITIONS, DEFAULT_SEC_PER_CHAR, RATE_OPTIONS, SKIP_SEC, type AudiobookRate } from '../../core/audiobook/constants.ts';
-import { chapterSentences, type AudioSentence } from '../../core/audiobook/text.ts';
+import { AUDIOBOOK_EDITIONS, RATE_OPTIONS, SKIP_SEC, type AudiobookRate } from '../../core/audiobook/constants.ts';
+import type { AudioSentence } from '../../core/audiobook/text.ts';
 import { approxWordTimes } from '../../core/audiobook/timing.ts';
-import type { CorpusDb } from '../../core/data/corpusDb.ts';
 import { debugEvent } from '../../core/diagnostics/store.ts';
 import { useEntitlement, type AccessState } from '../../core/entitlements/useEntitlement.ts';
 import { loadEditions } from '../../core/library/editions.ts';
@@ -26,14 +25,6 @@ const READABLE: ReadonlySet<string> = new Set(['free', 'owned', 'subscription'])
 
 type RateOption = { value: string; rate: AudiobookRate; label: string };
 type WordTime = { start: number; end: number; charStart: number; charEnd: number };
-
-/**
- * Contract gap (reported with BA.8): the frozen BA.7 controller surface carries
- * neither the corpus that `chapterSentences` needs nor the stored duration of
- * the current sentence that F6 needs. They are read structurally when BA.7
- * exposes them; absent, the line is empty and no word glows (never faked).
- */
-type DockSource = { corpus?: CorpusDb | null; sentenceDurationSec?: (index: number) => number | null };
 
 function clamp01(f: number): number {
   return Number.isFinite(f) ? Math.min(1, Math.max(0, f)) : 0;
@@ -77,26 +68,24 @@ export default function AudiobookDock({ controller }: { controller: AudiobookCon
   }, [controller, firstReadable]);
 
   const catalogue = useMemo(() => loadEditions(), []);
-  const source = controller as unknown as DockSource;
   const editionId: string | null = state.editionId;
   const chapterKey: string | null = state.chapterKey;
-  const sentences = useMemo<readonly AudioSentence[]>(() => {
-    const corpus = source.corpus ?? null;
-    if (!corpus || editionId === null || chapterKey === null) return [];
-    return chapterSentences(corpus, editionId, chapterKey) as AudioSentence[];
-  }, [source, editionId, chapterKey]);
+  // The controller's own chapter sentences and stored durations (BA.8 fix):
+  // the same array until the chapter changes, so the memos below stay stable.
+  const sentences: readonly AudioSentence[] = controller.sentences();
 
   const sentence: AudioSentence | null = sentences[state.sentenceIndex] ?? null;
   const text: string = sentence?.text ?? '';
-  const durationSec: number | null = sentence ? source.sentenceDurationSec?.(state.sentenceIndex) ?? null : null;
+  const durationSec: number | null = sentence ? controller.sentenceDurationSec(state.sentenceIndex) : null;
   const words = useMemo(() => approxWordTimes(text, durationSec ?? 0) as WordTime[], [text, durationSec]);
   const wordIndex = useWordGlow(controller, text, durationSec);
 
   const [drag, setDrag] = useState<number | null>(null);
   if (firstReadable === null) return null;
 
-  const estimate: number = sentences.reduce((sum: number, s: AudioSentence) => sum + s.text.length * DEFAULT_SEC_PER_CHAR, 0);
-  const total: number = state.chapterDurationSec ?? Math.max(estimate, state.positionSec);
+  // E16: chapterDurationSec ?? estimate — the same end `seekFraction` scales by,
+  // so the bar and the scrub target agree (measured `queue.secondsOf`).
+  const total: number = state.chapterDurationSec ?? controller.chapterEndSec();
   const progress: number = drag ?? (total > 0 ? clamp01(state.positionSec / total) : 0);
   const edition: { title: string } | null = editionId ? catalogue.get(editionId) : null;
   const nowTitle: string = edition ? `${edition.title} — ${state.chapterLabel}` : state.chapterLabel;
