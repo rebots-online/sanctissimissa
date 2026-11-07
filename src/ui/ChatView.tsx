@@ -32,6 +32,8 @@ import {
 } from '../core/orientation/guide.ts';
 import ChatBadge from './ChatBadge.tsx';
 import ChatMarkdown from './ChatMarkdown.tsx';
+import SpokenHighlight from './reader/SpokenHighlight.tsx';
+import { replyPlainText, useReplySpeech } from './reader/useReplySpeech.ts';
 import { COMPANION_PROMPTS } from '../content/companionPrompts.ts';
 import { CompanionMemory } from '../core/companion/memory.ts';
 import { ensureNoteHtml } from '../core/annotations/store.ts';
@@ -168,6 +170,7 @@ export default function ChatView({ sidecar = null, db = null }: { sidecar?: Side
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
   const [genSeconds, setGenSeconds] = useState<number | null>(null);
+  useReplySpeech(messages, streaming); // TT.4: a finished reply is spoken when the voice is ready
   const abortRef = useRef<AbortController | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
   const dragRef = useRef<DragState | null>(null);
@@ -631,6 +634,7 @@ export default function ChatView({ sidecar = null, db = null }: { sidecar?: Side
                     markdown renderer with the command suffix stripped; user
                     turns and authored strings stay plain text. */}
                 {m.role === 'assistant' ? <ChatMarkdown text={stripGuideCommands(m.text)} /> : m.text}
+                {m.role === 'assistant' && <SpokenHighlight text={replyPlainText(m.text)} container={null} />}
                 {/* CL.4 (§H.2): Save insight on each completed assistant
                     reply (never on the still-streaming tail). */}
                 {m.role === 'assistant' && m.text.length > 0 && !(streaming && i === messages.length - 1) && (

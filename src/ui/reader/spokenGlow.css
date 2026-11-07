@@ -1,0 +1,40 @@
+/*
+ * TT.4 — spoken-sentence glow (§K.4/§K.8; amended 2026-11-06, §L.9;
+ * L-audiobook-20261106.md S2, S10). Used by SpokenHighlight for Sacristan
+ * replies and reading content only. S10: the audiobook dock
+ * (#supertonic-tts-dock) never uses .spoken-glow — its highlight is BA.8's
+ * line-bold + approximate word glow.
+ */
+.spoken-glow-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.spoken-glow {
+  position: fixed;
+  display: block;
+  pointer-events: none;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--gold-bright) 16%, transparent);
+  /* Two blur layers, each ≤ 3px. */
+  box-shadow:
+    0 0 2px color-mix(in srgb, var(--gold-bright) 70%, transparent),
+    0 0 3px color-mix(in srgb, var(--gold-bright) 45%, transparent);
+  animation: spoken-glow-pulse 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes spoken-glow-pulse {
+  from { opacity: 0.8; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Colour shift only: no pulse, no halo motion. */
+  .spoken-glow {
+    animation: none;
+    box-shadow: none;
+    background: color-mix(in srgb, var(--gold-bright) 22%, transparent);
+  }
+}

@@ -67,6 +67,7 @@ import {
 } from '../core/ui/calloutPlacement.ts';
 import { debugEvent } from '../core/diagnostics/store.ts';
 import { registerCompanionSurfaceProps } from './MeaningPanel.tsx';
+import SpokenHighlight from './reader/SpokenHighlight.tsx';
 
 /**
  * §H.1/CL.5 — App (CL.2) re-dispatches the companion's `[[annotate:…]]`
@@ -926,6 +927,7 @@ export default function SectionReader({
             data-section={s.anchor}
             data-nodekey={s.nodeKey}
           >
+            {s.english && <SpokenHighlight text={s.english} container={null} />}
             <div
               className="head"
               onClick={collapsible ? () => toggleSection(s.anchor) : undefined}
