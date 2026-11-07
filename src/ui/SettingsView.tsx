@@ -11,6 +11,10 @@ import ModelPicker, { useCompanionModels } from './ModelPicker.tsx';
 import SearchModelsRow from './SearchModelsRow.tsx';
 import { SidecarDb } from '../core/accompaniment/store.ts';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
+import { getCommerce } from '../core/entitlements/service.ts';
+import { COMMERCE_MESSAGES } from '../core/entitlements/types.ts';
+import { COMMENTARY_SOURCE_EDITION } from '../core/entitlements/ids.ts';
+import { useAccount } from '../core/account/useAccount.ts';
 
 const PREVIEW_MATERIAL = [
   { role: 'rubric', la: '℟. Et cum spiritu tuo.', en: '℟. And with your spirit.' },
@@ -72,7 +76,15 @@ export default function SettingsView({
   const massForm = sidecar?.getSetting('mass.form') ?? 'lecta';
   const roleLens = sidecar?.getSetting('mass.roleLens') ?? 'off';
   const journalMode = sidecar?.getSetting('mode') ?? 'priest';
-  const billingConfigured = !!import.meta.env.VITE_REVENUECAT_API_KEY;
+  const billingConfigured: boolean = sidecar ? getCommerce(sidecar).entitlements.configured : false;
+  const signedIn = useAccount().user !== null;
+  const gate = !billingConfigured ? 'unconfigured' : signedIn ? 'billing-active' : 'signed-out';
+  const [billingMsg, setBillingMsg] = useState<string | null>(null);
+  const sourceTag = (source: string) => {
+    const ed: string | undefined = (COMMENTARY_SOURCE_EDITION as Record<string, string>)[source];
+    const st: string | undefined = ed && sidecar ? getCommerce(sidecar).entitlements.accessFor(ed).state : undefined;
+    return !ed || st === 'free' ? ' (included)' : st === 'owned' || st === 'subscription' ? ` (${st})` : '';
+  };
   const sources = useMemo(() => (corpus ? corpus.commentarySources() : []), [corpus]);
 
   const setSetting = (key: string, value: string) => {
@@ -201,23 +213,17 @@ export default function SettingsView({
         <section className="settings-section">
           <h3>Account / Billing</h3>
           <p className="settings-desc">
-            RevenueCat-backed entitlements (anonymous appUserId). No operator-hosted login; content never uploads to the billing plane.
+            Purchases belong to your signed-in SanctissiMissa account and are verified by RevenueCat. Your notes and journal never upload to the billing plane.
           </p>
-          <div className="settings-state" data-gate-state={billingConfigured ? 'billing-active' : 'ungated'}>
-            {billingConfigured
-              ? 'Billing active on this build — entitlements resolve through RevenueCat.'
-              : 'Billing not configured on this build — all features are ungated.'}
+          <div className="settings-state" data-gate-state={gate}>
+            {billingMsg ?? (gate === 'billing-active' ? 'Purchases verified through RevenueCat for this account.' : gate === 'signed-out' ? 'Sign in to buy or restore editions.' : 'Purchases are unavailable in this build; editions you already own stay readable on this device.')}
           </div>
           <div className="settings-actions">
             <button
               type="button"
               className="settings-button"
-              disabled={!billingConfigured}
-              title={
-                billingConfigured
-                  ? 'Restore purchases on this device'
-                  : 'Restore requires a billing-configured build (VITE_REVENUECAT_API_KEY)'
-              }
+              disabled={gate !== 'billing-active'}
+              onClick={() => sidecar && getCommerce(sidecar).purchases.restore().then(() => setBillingMsg(null), (e: { code?: keyof typeof COMMERCE_MESSAGES }) => setBillingMsg(COMMERCE_MESSAGES[e?.code ?? 'UNKNOWN'] ?? COMMERCE_MESSAGES.UNKNOWN))}
             >
               Restore purchases
             </button>
@@ -234,7 +240,7 @@ export default function SettingsView({
           <ul className="settings-list" data-source-count={sources.length}>
             {sources.map((s) => (
               <li key={s.source}>
-                <strong>{labelize(s.source)}</strong> — {s.blocks.toLocaleString()} verse-linked blocks (included)
+                <strong>{labelize(s.source)}</strong> — {s.blocks.toLocaleString()} verse-linked blocks{sourceTag(s.source)}
               </li>
             ))}
           </ul>

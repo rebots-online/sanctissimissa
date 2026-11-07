@@ -28,6 +28,7 @@ import DidacticOverlay from './ui/reader/DidacticOverlay.tsx';
 import AboutView from './ui/AboutView.tsx';
 import SignInView from './ui/account/SignInView.tsx';
 import AccountView from './ui/account/AccountView.tsx';
+import BookstoreRoute from './ui/library/BookstoreRoute.tsx';
 import { AccountProvider, useAccount, isSacristanVisible } from './core/account/useAccount.ts';
 import { creditReaderFromEnv } from './core/billing/client.ts';
 import ResizableInspectorLayout from './ui/ResizableInspectorLayout.tsx';
@@ -50,7 +51,7 @@ import { startModelPreload } from './core/vector/preload.ts';
 import { settled as voiceSettled } from './core/voice/runtime.ts';
 import { getCommerce, setCommerceEmail } from './core/entitlements/service.ts';
 
-type View = 'map' | 'reader' | 'annotations' | 'calendar' | 'office' | 'bible' | 'journal' | 'homily' | 'settings' | 'about' | 'account';
+type View = 'map' | 'reader' | 'annotations' | 'calendar' | 'office' | 'bible' | 'bookstore' | 'journal' | 'homily' | 'settings' | 'about' | 'account';
 
 const NAV: { id: View; ico: string; label: string }[] = [
   { id: 'map', ico: '✠', label: 'Holy Mass' },
@@ -58,6 +59,7 @@ const NAV: { id: View; ico: string; label: string }[] = [
   { id: 'calendar', ico: '📅', label: 'Perpetual Calendar' },
   { id: 'office', ico: '🕰', label: 'Divine Office' },
   { id: 'bible', ico: '📜', label: 'Sacred Scripture' },
+  { id: 'bookstore', ico: '📚', label: 'Bookstore' },
   { id: 'journal', ico: '✎', label: 'Journal' },
   { id: 'homily', ico: '✍', label: 'Homily Writer' },
   { id: 'annotations', ico: '🔖', label: 'Annotations' },
@@ -713,6 +715,7 @@ function AppShell() {
                   onOpenKey={onOpenKey}
                 />
               )}
+              {view === 'bookstore' && sidecar && <BookstoreRoute db={db} sidecar={sidecar} onOpenKey={onOpenKey} onSignIn={() => setView('account')} />}
               {view === 'journal' && sidecar && (
                 <JournalView
                   db={db}

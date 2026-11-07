@@ -1,0 +1,455 @@
+/*
+ * BA.5 — Bookstore drawer, access tiers, confirmation modal, inspect button and
+ * empty state, ported from the frozen export
+ * LIBS/UI/STITCH/sanctissimissa-library-20260913/bookstore.html (= B) for the
+ * mounted selectors only (card footer/price, inspect button, empty state, drawer,
+ * tiers, modal), every rule scoped under .library-surface (tokens in
+ * library.css). Not ported: .proposal-callout (not mounted, §4.2), .tier-period.
+ */
+.library-surface .card-footer {
+  border-top: 1px solid var(--parchment-deep);
+  padding-top: 12px;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.library-surface .price-block {
+  display: flex;
+  flex-direction: column;
+}
+.library-surface .price-label {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+}
+.library-surface .price-val {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.library-surface .btn-inspect {
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 5px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+.library-surface .btn-inspect:hover {
+  background: var(--vellum);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+/* Empty Search State */
+.library-surface .empty-state-container {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--vellum);
+  border: 1px dashed var(--card-border);
+  border-radius: 8px;
+  display: none;
+}
+.library-surface .empty-icon {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 14px;
+  color: var(--ink-faint);
+}
+.library-surface .empty-title {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.library-surface .empty-desc {
+  font-size: 13px;
+  color: var(--ink-faint);
+  max-width: 440px;
+  margin: 0 auto 16px;
+}
+/* Detail Drawer & Overlay */
+.library-surface .drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(34, 28, 20, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 90;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.library-surface .drawer-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.library-surface #book-detail {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 520px;
+  max-width: 90vw;
+  height: 100vh;
+  background: var(--surface-2);
+  border-left: 1px solid var(--parchment-deep);
+  box-shadow: -8px 0 28px rgba(34, 28, 20, 0.18);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+.library-surface #book-detail.open {
+  transform: translateX(0);
+}
+.library-surface .drawer-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--parchment-deep);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+}
+.library-surface .drawer-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.library-surface .drawer-kicker {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  font-weight: 600;
+}
+.library-surface .drawer-close-btn {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--ink-soft);
+  transition: all 0.15s ease;
+}
+.library-surface .drawer-close-btn:hover {
+  background: var(--parchment);
+  color: var(--ink);
+}
+.library-surface .drawer-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+.library-surface .drawer-book-hero {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+.library-surface .drawer-cover-preview {
+  width: 110px;
+  height: 155px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px 10px;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+  position: relative;
+}
+.library-surface .drawer-hero-meta {
+  display: flex;
+  flex-direction: column;
+}
+.library-surface .drawer-hero-title {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.library-surface .drawer-hero-author {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--burgundy);
+  margin-bottom: 12px;
+}
+.library-surface .drawer-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--card-border);
+  margin-bottom: 18px;
+}
+.library-surface .drawer-tab {
+  padding: 8px 14px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.library-surface .drawer-tab.active {
+  color: var(--burgundy);
+  border-bottom-color: var(--burgundy);
+  font-weight: 600;
+}
+.library-surface .tab-content {
+  display: none;
+}
+.library-surface .tab-content.active {
+  display: block;
+}
+/* Provenance Box */
+.library-surface #edition-provenance {
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 14px;
+  margin-bottom: 18px;
+  font-size: 12.5px;
+}
+.library-surface .provenance-grid {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  row-gap: 8px;
+  column-gap: 12px;
+}
+.library-surface .prov-label {
+  color: var(--ink-faint);
+  font-size: 11.5px;
+}
+.library-surface .prov-value {
+  color: var(--ink);
+  font-weight: 500;
+}
+/* Integration Benefits */
+.library-surface .benefits-box {
+  background: rgba(169, 126, 19, 0.05);
+  border: 1px solid rgba(169, 126, 19, 0.2);
+  border-radius: 6px;
+  padding: 14px;
+  margin-bottom: 20px;
+}
+.library-surface .benefits-title {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #634a0a;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.library-surface .benefits-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.library-surface .benefits-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.library-surface .benefits-list svg {
+  width: 14px;
+  height: 14px;
+  color: var(--gold);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+/* Preview Reader Box */
+.library-surface .preview-box {
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 16px;
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink);
+  margin-bottom: 18px;
+  max-height: 240px;
+  overflow-y: auto;
+  border-left: 3px solid var(--gold);
+}
+.library-surface .preview-citation {
+  font-family: var(--sans);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--burgundy);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+/* Purchase & Proposal Options */
+.library-surface #purchase-options {
+  background: var(--vellum);
+  border-top: 1px solid var(--parchment-deep);
+  padding: 18px 24px;
+}
+.library-surface .options-heading {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.library-surface .access-tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.library-surface .tier-card {
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.library-surface .tier-card:hover {
+  border-color: var(--gold);
+  background: #fffdf9;
+}
+.library-surface .tier-card.selected {
+  border-color: var(--burgundy);
+  background: rgba(156, 39, 51, 0.03);
+  box-shadow: 0 0 0 1px var(--burgundy);
+}
+.library-surface .tier-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.library-surface .tier-radio {
+  accent-color: var(--burgundy);
+}
+.library-surface .tier-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.library-surface .tier-desc {
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+.library-surface .tier-cost {
+  text-align: right;
+}
+.library-surface .tier-price-val {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--burgundy);
+}
+.library-surface .btn-action-primary {
+  width: 100%;
+  background: var(--burgundy);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 11px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.15s ease;
+}
+.library-surface .btn-action-primary:hover {
+  background: #841f2a;
+}
+/* Proposal Detail Modal */
+.library-surface .proposal-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(34, 28, 20, 0.6);
+  backdrop-filter: blur(3px);
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.library-surface .proposal-modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.library-surface .proposal-dialog {
+  background: var(--vellum);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  max-width: 480px;
+  width: 100%;
+  padding: 26px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.25);
+  position: relative;
+}
+.library-surface .proposal-dialog-title {
+  font-family: var(--serif);
+  font-size: 20px;
+  color: var(--burgundy);
+  margin-bottom: 10px;
+}
+.library-surface .proposal-dialog-text {
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.library-surface .proposal-feature-note {
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 12px;
+  color: var(--ink);
+  margin-bottom: 18px;
+}
+@media (max-width: 1100px) {
+  .library-surface #book-detail {
+    width: 460px;
+  }
+}
+@media (max-width: 640px) {
+  .library-surface #book-detail {
+    width: 100vw;
+    max-width: 100vw;
+  }
+}

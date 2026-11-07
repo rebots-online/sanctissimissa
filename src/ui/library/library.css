@@ -1,0 +1,497 @@
+/*
+ * BA.5 — Bookstore (Catalogue tab) styles, ported from the frozen export
+ * LIBS/UI/STITCH/sanctissimissa-library-20260913/bookstore.html (= B, CSS :1-1442)
+ * for the mounted selectors only. Every rule is scoped under .library-surface;
+ * the export's :root tokens are re-declared on .library-surface, never globally.
+ * Light mode carries the export palette; in dark mode the shared-name tokens
+ * (ink, parchment, surface, card …) are left to the app's theme, so the surface
+ * follows light/dark only through these scoped tokens. Drawer, tiers, modal,
+ * inspect button and empty state live in library-drawer.css (500-line rule).
+ */
+.library-surface {
+  --gold-faint: rgba(169, 126, 19, 0.14);
+  --burgundy: #9c2733;
+  --burgundy-soft: rgba(156, 39, 51, 0.08);
+  --burgundy-border: rgba(156, 39, 51, 0.22);
+  --badge-free: #2f6844;
+  --badge-free-bg: #eaf3ed;
+  --badge-owned: #435b71;
+  --badge-owned-bg: #e7eef4;
+  --badge-review: #85531b;
+  --badge-review-bg: #fdf3e5;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+html:not([data-mode='dark']) .library-surface {
+  --ink: #221c14;
+  --ink-soft: #4a4034;
+  --ink-faint: #8a7d6a;
+  --parchment: #f6f0e2;
+  --parchment-deep: #ece2cc;
+  --vellum: #fbf7ee;
+  --gold: #a97e13;
+  --gold-bright: #d4a017;
+  --surface: var(--parchment);
+  --surface-2: var(--vellum);
+  --card: #fbf7ee;
+  --card-border: #e3d7bf;
+  --card-shadow: 0 2px 8px rgba(34, 28, 20, 0.05), 0 1px 2px rgba(34, 28, 20, 0.04);
+}
+/* root doubles as the app's .content scroller; .content-container pads */
+.library-surface.content {
+  padding: 0;
+}
+.library-surface *, .library-surface *::before, .library-surface *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+/* Masthead segmented control (§4.2 .bookstore-tabs; new) */
+.library-surface .bookstore-tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  margin-bottom: 18px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+.library-surface .bookstore-tabs button {
+  min-height: 36px;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.library-surface .bookstore-tabs button[aria-selected='true'] {
+  background: var(--burgundy);
+  color: #ffffff;
+}
+/* Content View Container */
+.library-surface .content-container {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 32px 36px 64px;
+  width: 100%;
+}
+/* Editorial Masthead */
+.library-surface .editorial-masthead {
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--parchment-deep);
+  padding-bottom: 24px;
+}
+.library-surface .masthead-context {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.library-surface .kicker {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.library-surface .kicker svg {
+  width: 12px;
+  height: 12px;
+}
+.library-surface .section-rule {
+  height: 1px;
+  background: var(--parchment-deep);
+  flex: 1;
+  max-width: 120px;
+}
+.library-surface .library-scope-chip {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(169, 126, 19, 0.09);
+  color: #7a5806;
+  border: 1px solid rgba(169, 126, 19, 0.2);
+}
+.library-surface .masthead-title {
+  font-family: var(--serif);
+  font-size: 34px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+.library-surface .masthead-lead {
+  font-size: 15px;
+  color: var(--ink-soft);
+  max-width: 780px;
+  line-height: 1.6;
+}
+/* Filter Toolbar */
+.library-surface .filter-toolbar {
+  background: var(--vellum);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--card-shadow);
+}
+.library-surface .toolbar-upper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.library-surface .search-input-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+}
+.library-surface .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+.library-surface #catalogue-search {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 9px 12px 9px 36px;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.library-surface #catalogue-search:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(169, 126, 19, 0.15);
+}
+.library-surface .select-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.library-surface .filter-select {
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 8px 30px 8px 12px;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a7d6a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 14px;
+}
+.library-surface .filter-select:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+/* Quick Filter Chips */
+.library-surface .chip-row-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.library-surface .chip-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  margin-right: 4px;
+  font-weight: 600;
+}
+.library-surface .filter-chip {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.library-surface .filter-chip:hover {
+  background: rgba(169, 126, 19, 0.07);
+  border-color: var(--gold);
+  color: var(--ink);
+}
+.library-surface .filter-chip.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fbf7ee;
+  font-weight: 500;
+}
+.library-surface .filter-toggle-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 12px;
+  color: var(--ink-soft);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px dashed var(--card-border);
+  background: rgba(255, 255, 255, 0.4);
+}
+.library-surface .filter-toggle-pill input {
+  accent-color: var(--burgundy);
+  cursor: pointer;
+}
+.library-surface .catalogue-results-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 0 4px;
+  font-size: 12.5px;
+  color: var(--ink-faint);
+}
+.library-surface .reset-filters-btn {
+  background: none;
+  border: none;
+  color: var(--burgundy);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: underline;
+  display: none;
+}
+/* Catalogue Grid */
+.library-surface #catalogue-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 22px;
+  margin-bottom: 40px;
+}
+/* Editorial Book Card */
+.library-surface .book-card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  position: relative;
+}
+.library-surface .book-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(34, 28, 20, 0.08), 0 2px 4px rgba(34, 28, 20, 0.04);
+  border-color: #cbbe9f;
+}
+/* Typographic Book Cover Header */
+.library-surface .book-cover {
+  height: 155px;
+  padding: 16px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--card-border);
+  overflow: hidden;
+}
+/* Distinct Cover Palette Styles */
+.library-surface .cover-haydock {
+  background: linear-gradient(145deg, #1b2832, #263845);
+  color: #f7ede1;
+  border-top: 3px solid var(--gold-bright);
+}
+.library-surface .cover-aquinas {
+  background: linear-gradient(145deg, #371e22, #4e292f);
+  color: #faefe4;
+  border-top: 3px solid #b73e4a;
+}
+.library-surface .cover-sales {
+  background: linear-gradient(145deg, #2b2b36, #3d3b4d);
+  color: #f7f1ea;
+  border-top: 3px solid #7d709f;
+}
+.library-surface .cover-kempis {
+  background: linear-gradient(145deg, #24221d, #38342c);
+  color: #f4ecdc;
+  border-top: 3px solid var(--gold);
+}
+.library-surface .cover-raccolta {
+  background: linear-gradient(145deg, #42161b, #591b22);
+  color: #faede6;
+  border-top: 3px solid #d45d6a;
+}
+.library-surface .cover-alphonsus {
+  background: linear-gradient(145deg, #142838, #1e3a51);
+  color: #ebf3fb;
+  border-top: 3px solid #4a91c9;
+}
+.library-surface .cover-baltimore {
+  background: linear-gradient(145deg, #2a3127, #3b4537);
+  color: #eef3eb;
+  border-top: 3px solid #6c8a63;
+}
+.library-surface .cover-cochem {
+  background: linear-gradient(145deg, #38281f, #4d382b);
+  color: #f6efe8;
+  border-top: 3px solid #b8865a;
+}
+.library-surface .cover-ornament {
+  position: absolute;
+  right: 12px;
+  bottom: -6px;
+  opacity: 0.16;
+  pointer-events: none;
+  width: 100px;
+  height: 100px;
+}
+.library-surface .cover-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 2;
+}
+.library-surface .cover-category-tag {
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  opacity: 0.85;
+}
+.library-surface .state-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+  line-height: 1;
+}
+.library-surface .badge-free-included {
+  background: #e8f5ec;
+  color: #1a6438;
+  border: 1px solid #b7e0c4;
+}
+.library-surface .badge-owned {
+  background: #edf1f7;
+  color: #2b4966;
+  border: 1px solid #b9cee3;
+}
+.library-surface .badge-edition-review {
+  background: #fdf5e8;
+  color: #8c5a1a;
+  border: 1px solid #e7cd9d;
+}
+.library-surface .cover-title-block {
+  z-index: 2;
+}
+.library-surface .cover-book-title {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.25;
+  margin-bottom: 4px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.library-surface .cover-book-author {
+  font-size: 12px;
+  opacity: 0.9;
+  font-style: italic;
+  font-family: var(--serif);
+}
+/* Card Body */
+.library-surface .book-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.library-surface .book-metadata-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  margin-bottom: 10px;
+}
+.library-surface .meta-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.library-surface .book-synopsis {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  line-height: 1.5;
+  margin-bottom: 14px;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.library-surface .integration-bullet {
+  background: rgba(169, 126, 19, 0.08);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 11.5px;
+  color: #6d5210;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.library-surface .integration-bullet svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  color: var(--gold);
+}
+.library-surface .badge-available { /* §4.4 new badge (locked); seed authors outrun the export, so narrow selects shrink below */
+  color: var(--burgundy);
+  background: var(--badge-review-bg);
+}
+@media (max-width: 1100px) {
+  .library-surface .content-container {
+    padding: 24px 20px 48px;
+  }
+}
+@media (max-width: 640px) {
+  .library-surface .content-container {
+    padding: 16px 14px 40px;
+  }
+  .library-surface .select-filter-group, .library-surface .filter-select {
+    max-width: 100%;
+    min-width: 0;
+  }
+  .library-surface #catalogue-grid {
+    grid-template-columns: 1fr;
+  }
+}
