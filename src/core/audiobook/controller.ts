@@ -10,7 +10,7 @@ import { debugEvent } from '../diagnostics/store.ts';
 import { onNetworkCostChange } from '../net/metered.ts';
 import { voiceKey } from '../voice/assets.ts';
 import { calibrate } from '../voice/calibrate.ts';
-import type { AudioOwner, VoiceState, voiceRuntime as VoiceRuntimeInstance } from '../voice/runtime.ts';
+import type { VoiceState, voiceRuntime as VoiceRuntimeInstance } from '../voice/runtime.ts';
 import type { SynthesizedAudio } from '../voice/voice.ts';
 import { AUDIOBOOK_RATES, SKIP_SEC, type AudiobookRate } from './constants.ts';
 import { AudiobookPlayer } from './player.ts';
@@ -72,7 +72,6 @@ export class AudiobookController {
   #buffering = false;
   #rate: AudiobookRate | null = null;
   #readyThrough: string | null = null;
-  #owner: AudioOwner | null = null;
   #openSeq = 0;
   #saveTimer: ReturnType<typeof setTimeout> | null = null;
   #snapshot: AudiobookState | null = null;
@@ -84,7 +83,7 @@ export class AudiobookController {
     this.#player.on('buffering', () => { this.#buffering = true; this.#emit(); this.#queue?.pump(); });
     this.#player.on('chapter-end', () => { void this.#advanceChapter(); });
     deps.voiceRuntime.subscribe(() => this.#onVoice());
-    onNetworkCostChange(() => this.#queue?.pump());
+    onNetworkCostChange(() => { if (deps.voiceRuntime.audioOwner() !== 'sacristan') this.#queue?.pump(); });
   }
 
   // ── state ──────────────────────────────────────────────────────────
@@ -404,10 +403,9 @@ export class AudiobookController {
 
   #onVoice(): void {
     const owner = this.#deps.voiceRuntime.audioOwner();
-    const changed = owner !== this.#owner;
-    this.#owner = owner;
-    // The Sacristan claimed the pool: abort background jobs and do not re-pump (F3 step 9).
-    const sacristan = changed && owner === 'sacristan';
+    // Every claimAudio('sacristan') aborts background jobs and never re-pumps (F3 step 9);
+    // a notify cannot be told apart from a repeat claim, so abort while the Sacristan owns the pool.
+    const sacristan = owner === 'sacristan';
     if (sacristan) this.#queue?.abortAll();
     if (owner !== 'audiobook' && this.#playing) { this.#pause(!sacristan); return; }
     if (sacristan) { this.#emit(); return; }
