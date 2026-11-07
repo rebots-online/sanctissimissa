@@ -32,6 +32,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write src tests scripts vite.config.ts eslint.config.js",
     "ingest": "node --experimental-strip-types scripts/ingest-corpus.mjs",
+    "corpus:catena-graph": "node --experimental-strip-types scripts/ingest-commentary.mjs --catena-graph build/corpus/stage1-ingest.db build/corpus/stage2-graph.db",
     "tauri": "tauri"
   },
   "dependencies": {

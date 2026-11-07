@@ -94,7 +94,7 @@ export function parseHaydock(dir) {
 const CATENA_DIRS = { matthew: 'Matt', mark: 'Marc', luke: 'Luc', john: 'Joann' };
 
 /** Markdown link/bold/escape cruft → plain text (the Newman text itself is untouched). */
-function cleanMarkdown(text) {
+export function cleanMarkdown(text) {
   return text
     .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // [text](url) → text
     .replace(/\*\*([^*]+)\*\*/g, '$1')
@@ -108,17 +108,28 @@ function cleanMarkdown(text) {
 /**
  * Catena Aurea (ecatholic2000 scrape of the Newman/Parker 1841–45 tr.):
  * `markdown_chapters/<gospel>/<gospel>_chapter_NN.md`, pericopes under
- * `### <ch>:<vs>[–<ve>]` headings. Each block = the quoted lection + the
- * patristic chain, kept whole (that is the Catena as published). Site-nav
- * preamble and the trailing site-footer copyright line are stripped.
+ * `### <ch>:<vs>[–<ve>]` headings — or the one cross-chapter heading
+ * `### <ch>:<vs>–<ch2>:<ve>` (`15:39–16:4`, matthew_chapter_16.md:18;
+ * BA.11, L-content-modules-search-20261106.md §2.6). Each block = the quoted
+ * lection + the patristic chain, kept whole (that is the Catena as
+ * published). Site-nav preamble and the trailing site-footer copyright line
+ * are stripped.
+ *
+ * Records carry `chapterFile` (the file-name NN), `ord` (1-based global TOC
+ * order: Matt, Marc, Luc, Joann; files sorted; pericopes in file order),
+ * `chapterEnd` (cross-chapter headings only) and `raw` (the body after the
+ * nav/footer trim, BEFORE cleanMarkdown — the attribution grammar of
+ * scripts/catena-graph.mjs runs on it).
  */
 export function parseCatena(dir) {
   const records = [];
   let skipped = 0;
+  let ord = 0;
   for (const [sub, book] of Object.entries(CATENA_DIRS)) {
     const d = join(dir, sub);
     if (!existsSync(d)) continue;
     for (const file of readdirSync(d).filter((f) => f.endsWith('.md')).sort()) {
+      const chapterFile = Number(file.match(/_chapter_(\d+)\.md$/)?.[1]);
       let txt = readFileSync(join(d, file), 'utf8');
       const start = txt.indexOf('# Catena Aurea');
       if (start > 0) txt = txt.slice(start);
@@ -127,16 +138,22 @@ export function parseCatena(dir) {
       for (const part of parts) {
         const nl = part.indexOf('\n');
         const heading = part.slice(0, nl === -1 ? part.length : nl).trim();
-        const h = heading.match(/^(\d+):(\d+)(?:[–-](\d+))?$/);
+        const h = heading.match(/^(\d+):(\d+)(?:[–-](\d+)(?::(\d+))?)?$/);
         if (!h) { skipped++; continue; }
-        const text = cleanMarkdown(nl === -1 ? '' : part.slice(nl + 1));
+        const raw = nl === -1 ? '' : part.slice(nl + 1);
+        const text = cleanMarkdown(raw);
         if (!text) { skipped++; continue; }
+        const cross = h[4] !== undefined;
         records.push({
           book,
           chapter: Number(h[1]),
           verseStart: Number(h[2]),
-          verseEnd: Number(h[3] ?? h[2]),
+          verseEnd: Number(cross ? h[4] : (h[3] ?? h[2])),
+          ...(cross ? { chapterEnd: Number(h[3]) } : {}),
+          chapterFile,
+          ord: ++ord,
           text,
+          raw,
         });
       }
     }
@@ -205,21 +222,46 @@ export function ingestCommentary(db, log = console) {
         if (!bookEntry) { unresolved++; continue; }
         // COMMENTS_ON targets first: a record whose verses don't exist at all is skipped.
         const verseNodeIds = [];
-        for (let v = rec.verseStart; v <= rec.verseEnd; v++) {
-          const row = verseId.get(`verse:${rec.book}/${rec.chapter}/${v}`);
-          if (row) verseNodeIds.push(Number(row.id));
+        const cross = rec.chapterEnd !== undefined;
+        if (cross) {
+          // Cross-chapter pericope (BA.11, §2.6): <ch>/<verseStart>..last existing
+          // verse of <ch>, then <chapterEnd>/1..<verseEnd>.
+          for (let v = rec.verseStart, row; (row = verseId.get(`verse:${rec.book}/${rec.chapter}/${v}`)); v++) {
+            verseNodeIds.push(Number(row.id));
+          }
+          for (let v = 1; v <= rec.verseEnd; v++) {
+            const row = verseId.get(`verse:${rec.book}/${rec.chapterEnd}/${v}`);
+            if (row) verseNodeIds.push(Number(row.id));
+          }
+        } else {
+          for (let v = rec.verseStart; v <= rec.verseEnd; v++) {
+            const row = verseId.get(`verse:${rec.book}/${rec.chapter}/${v}`);
+            if (row) verseNodeIds.push(Number(row.id));
+          }
         }
         if (verseNodeIds.length === 0) { unresolved++; continue; }
 
         const key = `commentary:${source.id}/${rec.book}/${rec.chapter}/${rec.verseStart}`;
-        const range = rec.verseEnd > rec.verseStart ? `–${rec.verseEnd}` : '';
+        const range = cross
+          ? `–${rec.chapterEnd}:${rec.verseEnd}`
+          : rec.verseEnd > rec.verseStart ? `–${rec.verseEnd}` : '';
         const title = `${source.label} on ${bookEntry.dr} ${rec.chapter}:${rec.verseStart}${range}`;
+        const meta = source.id === 'catena-aurea'
+          ? {
+              source: source.id,
+              verseEnd: rec.verseEnd,
+              moduleId: 'catena-aurea-en',
+              chapterFile: rec.chapterFile,
+              ord: rec.ord,
+              ...(cross ? { chapterEnd: rec.chapterEnd } : {}),
+            }
+          : { source: source.id, verseEnd: rec.verseEnd };
         const r = insNode.run(
           'commentary', key, title, 'Commentarius', null, null, null,
-          JSON.stringify({ source: source.id, verseEnd: rec.verseEnd }),
+          JSON.stringify(meta),
         );
         const nid = Number(r.lastInsertRowid);
-        const section = `${rec.book} ${rec.chapter}:${rec.verseStart}${range ? `-${rec.verseEnd}` : ''}`;
+        const section = `${rec.book} ${rec.chapter}:${rec.verseStart}${range ? `-${range.slice(1)}` : ''}`;
         insText.run(nid, section, null, rec.text);
         for (const vid of verseNodeIds) {
           insEdge.run(nid, vid, 'COMMENTS_ON', 1.0, null);
@@ -243,4 +285,9 @@ export function ingestCommentary(db, log = console) {
   }
 
   return { commentaryNodes, commentsOnEdges, commentarySkippedRefs, commentarySources: perSource };
+}
+
+// BA.11 CLI delegation (L-content-modules-search-20261106.md §3.1 step 2): `--catena-graph <stage1.db> <stage2.db>`.
+if (process.argv[1]?.endsWith('ingest-commentary.mjs') && process.argv[2] === '--catena-graph') {
+  import('./catena-graph.mjs').then(({ runCatenaGraph }) => { process.exitCode = runCatenaGraph(process.argv[3], process.argv[4]); });
 }
