@@ -44,6 +44,8 @@ import {
 } from './core/orientation/guide.ts';
 import { debugEvent } from './core/diagnostics/store.ts';
 import { startMediaSession } from './core/audiobook/mediaSession.ts';
+import { bootSidecarVectors } from './core/accompaniment/sidecarVectors.ts';
+import { startParityProbe } from './core/vector/parity.ts';
 
 type View = 'map' | 'reader' | 'annotations' | 'calendar' | 'office' | 'bible' | 'journal' | 'homily' | 'settings' | 'about' | 'account';
 
@@ -332,6 +334,8 @@ function AppShell() {
   useAudiobookBoot(db, sidecar);
   useEffect(() => startMediaSession(), []);
   useEffect(() => (db && sidecar ? bootModules(db, sidecar) : undefined), [db, sidecar]);
+  useEffect(() => (sidecar ? bootSidecarVectors(sidecar) : undefined), [sidecar]);
+  useEffect(() => startParityProbe(), []);
 
   // Hash-route deep links (#/verse/…, #/day/…, #/section/…, #/s/… — §7.6 BB.3):
   // resolved once on load; shares/widgets/companion all target this layer.

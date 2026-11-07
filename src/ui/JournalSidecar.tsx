@@ -18,14 +18,14 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { ReactNode } from 'react';
 import type { Root } from 'react-dom/client';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 import type { SidecarDb } from '../core/accompaniment/store.ts';
-import type { DayInfo, SimilarHit } from '../core/data/types.ts';
+import type { DayInfo } from '../core/data/types.ts';
 import { debugEvent } from '../core/diagnostics/store.ts';
-import { embedText } from '../core/vector/embed.ts';
-import { bestClause } from '../core/vector/clause.ts';
+import { onEmbedState } from '../core/vector/active.ts';
+import { buildConnectionCards, type ConnectionCard } from './journal/connectionCards.tsx';
+import { useNucleatedSimilarity } from './hooks/useSimilarity.ts';
 import AccompanimentEditor from './AccompanimentEditor.tsx';
 import type { AccompanimentEditorApi } from './AccompanimentEditor.tsx';
 import {
@@ -108,24 +108,6 @@ if (typeof window !== 'undefined') {
 /* Helpers                                                             */
 /* ------------------------------------------------------------------ */
 
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-}
-
-/** Cited blockquote payload for "Add as source" → editor `insertContent`. */
-function blockquoteHtml(excerpt: string, citation: string): string {
-  return `<blockquote><p>${escapeHtml(excerpt)}</p><p>— ${escapeHtml(citation)}</p></blockquote>`;
-}
-
 /** Human form of an anchor node key for the SOURCE line. */
 function anchorHuman(db: CorpusDb, anchor: string | null): string {
   if (!anchor) return 'unanchored selection';
@@ -139,30 +121,9 @@ function anchorHuman(db: CorpusDb, anchor: string | null): string {
   return anchor;
 }
 
-/** Human source title for a corpus similar-hit (verse ref or section — title). */
-function corpusSourceTitle(hit: SimilarHit): string {
-  const v = hit.key.match(/^verse:([^/]+)\/(\d+)\/(\d+)$/);
-  if (v) return `${v[1]} ${v[2]}:${v[3]}`;
-  const s = hit.key.match(/^section:([^#]+)#(.+)$/);
-  if (s) return hit.title ? `${s[2]} — ${hit.title}` : `${s[2]} — ${s[1]}`;
-  return hit.title ?? hit.key;
-}
-
 /* ------------------------------------------------------------------ */
 /* ConnectionsPanel (exported per the P-T entity row)                  */
 /* ------------------------------------------------------------------ */
-
-interface ConnectionCard {
-  id: string; // dismissal key
-  heading: string;
-  body: ReactNode;
-  chips: string[];
-  bridge: string;
-  openKey: string | null;
-  addKey: string;
-  sourceHtml: string;
-  tier?: 'further';
-}
 
 export function ConnectionsPanel({
   db,
@@ -191,109 +152,19 @@ export function ConnectionsPanel({
   const [dismissed, setDismissed] = useState<ReadonlySet<string>>(new Set());
   const query = (override && override.trim() ? override : text).trim();
 
-  const cards = useMemo<ConnectionCard[]>(() => {
-    if (!query) return [];
-    const out: ConnectionCard[] = [];
-    const further: ConnectionCard[] = [];
-
-    // (a) Losslessly nucleated corpus vectors. High-context representatives
-    // lead; the complete remainder is retained for the expandable tail.
-    const set = db.nucleatedSimilarToText(query, {
-      candidateK: 64,
-      nucleusK: 5,
-      excludeKey: anchor ?? undefined,
-    });
-    const nuclei = new Map(
-      set.groups
-        .filter((group) => group.nucleus !== null)
-        .map((group) => [group.nucleus!.key, group.nucleus!] as const),
-    );
-    for (const group of set.groups) {
-      for (const item of group.representatives) {
-        const sourceTitle = corpusSourceTitle(item.hit);
-        out.push({
-          id: `c:${item.hit.key}`,
-          heading: sourceTitle,
-          body: <><b className="clause-hit">{item.clause}</b></>,
-          chips: [
-            group.nucleus ? `${group.nucleus.source} · ${group.nucleus.authorityKind}` : `concept · ${group.label}`,
-            'atomic corpus clause',
-          ],
-          bridge: `Bridge: corpus vector ${item.hit.score.toFixed(3)} → ${group.label} → context ${item.contextScore.toFixed(3)}`,
-          openKey: item.hit.key,
-          addKey: item.hit.key,
-          sourceHtml: blockquoteHtml(item.clause, sourceTitle),
-        });
-      }
-    }
-    for (const item of set.tail) {
-      const sourceTitle = corpusSourceTitle(item.hit);
-      const nucleus = item.nucleusKey ? nuclei.get(item.nucleusKey) ?? null : null;
-      further.push({
-        id: `c:${item.hit.key}`,
-        heading: sourceTitle,
-        body: <><b className="clause-hit">{item.clause}</b></>,
-        chips: [
-          nucleus ? `${nucleus.source} · ${nucleus.authorityKind}` : 'stable concept grouping',
-          'further association',
-        ],
-        bridge: `Bridge: corpus vector ${item.hit.score.toFixed(3)} → ${nucleus?.title ?? 'related passage'} → context ${item.contextScore.toFixed(3)}`,
-        openKey: item.hit.key,
-        addKey: item.hit.key,
-        sourceHtml: blockquoteHtml(item.clause, sourceTitle),
-        tier: 'further',
-      });
-    }
-
-    // (c) Vendored commentary on the captured verse (CorpusDb.commentaryFor,
-    // §7.7 interpretive layer — landed by the parallel BN wave, called directly).
-    const v = anchor?.match(/^verse:([^/]+)\/(\d+)\/(\d+)$/);
-    if (v) {
-      const verseRef = `${v[1]} ${v[2]}:${v[3]}`;
-      for (const cm of db.commentaryFor(v[1], Number(v[2]), Number(v[3])).slice(0, 2)) {
-        const source = cm.sourcePath.replace(/^Commentary\//, '') || 'commentary';
-        const full = cm.english ?? '';
-        const excerpt = bestClause(full, query)?.text ?? full;
-        if (!excerpt) continue;
-        out.push({
-          id: `m:${cm.nodeKey}`,
-          heading: `${source} on ${verseRef}`,
-          body: (
-            <><b className="clause-hit">{excerpt}</b></>
-          ),
-          chips: [`vendored · ${source}`, 'COMMENTS_ON'],
-          bridge: `Bridge: ${verseRef} → COMMENTS_ON edge → ${source} (vendored commentary)`,
-          openKey: null,
-          addKey: cm.nodeKey,
-          sourceHtml: blockquoteHtml(excerpt, `${source} on ${verseRef}`),
-        });
-      }
-    }
-
-    // (b) The user's own past accompaniments (sidecar_embeddings vector).
-    const own = new Map(sidecar.list().map((a) => [a.id, a]));
-    let personal = 0;
-    for (const hit of sidecar.similar(embedText(query), 4)) {
-      if (personal >= 2) break;
-      const a = own.get(hit.id);
-      if (!a || a.id === excludeId) continue;
-      const label = a.title || a.createdAt.slice(0, 10);
-      const excerpt = a.quote ?? stripHtml(a.bodyHtml).slice(0, 200);
-      if (!excerpt) continue;
-      personal++;
-      out.push({
-        id: `p:${a.id}`,
-        heading: `Your journal · ${label}`,
-        body: <>{excerpt}</>,
-        chips: ['personal', 'sidecar vector'],
-        bridge: `Bridge: selected passage → nearest of your own notes (vector similarity) → “${label}”`,
-        openKey: a.anchors[0] ?? null,
-        addKey: a.id,
-        sourceHtml: blockquoteHtml(excerpt, `Your journal, ${a.createdAt.slice(0, 10)}`),
-      });
-    }
-
-    return [...out, ...further];
+  const [cards, setCards] = useState<ConnectionCard[]>([]);
+  useEffect(() => {
+    let generation = 0;
+    const run = () => {
+      const mine = ++generation;
+      buildConnectionCards({ db, sidecar, query, anchor, excludeId }).then(
+        (next) => { if (mine === generation) setCards(next); },
+        (error: unknown) => console.warn('[connections]', error),
+      );
+    };
+    run();
+    const off = onEmbedState(run);
+    return () => { generation = -1; off(); };
   }, [db, sidecar, query, anchor, excludeId]);
 
   const visible = cards.filter((c) => !dismissed.has(c.id));
@@ -427,14 +298,14 @@ export default function JournalSidecar({
 
   const mode = sidecar.getSetting('mode') ?? 'priest';
   const seedLabel = mode === 'laity' ? 'Promote to reflection seed' : 'Promote to homily seed';
+  const { set: themeSet } = useNucleatedSimilarity(db, capture.quote, {
+    candidateK: 64,
+    nucleusK: 5,
+    excludeKey: capture.anchor ?? undefined,
+  });
   const themeSuggestions = useMemo(() => {
     const unique = new Map<string, { value: string; label: string; evidence: string }>();
-    const set = db.nucleatedSimilarToText(capture.quote, {
-      candidateK: 64,
-      nucleusK: 5,
-      excludeKey: capture.anchor ?? undefined,
-    });
-    for (const group of set.groups) {
+    for (const group of themeSet?.groups ?? []) {
       if (!group.nucleus) continue;
       for (const concept of group.nucleus.concepts) {
         if (!unique.has(concept.conceptId)) {
@@ -447,7 +318,7 @@ export default function JournalSidecar({
       }
     }
     return [...unique.values()];
-  }, [db, capture.quote, capture.anchor]);
+  }, [themeSet]);
 
   function showToast(msg: string) {
     setToast({ msg, key: Date.now() });

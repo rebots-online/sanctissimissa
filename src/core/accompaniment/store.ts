@@ -9,7 +9,7 @@
 import type { Database } from 'sql.js';
 import { isTauri } from '../data/loadCorpus.ts';
 import { storageRootName } from '../storage/root.ts';
-import { embedText, cosine, EMBED_DIM } from '../vector/embed.ts';
+import { enqueueSidecarEmbedding, ensureSidecarVectorSchema } from './sidecarVectors.ts';
 import { ensureNoteHtml } from '../annotations/store.ts';
 import type { Accompaniment, Exposure, OccurrenceSelector } from './types.ts';
 
@@ -168,6 +168,11 @@ function plainText(html: string): string {
     .trim();
 }
 
+/** The text a note is embedded from (§3.5): title, plain body, quote. */
+export function accompanimentEmbedText(acc: Pick<Accompaniment, 'title' | 'bodyHtml' | 'quote'>): string {
+  return `${acc.title} ${plainText(acc.bodyHtml)} ${acc.quote ?? ''}`;
+}
+
 function parseAnchors(raw: unknown): string[] {
   try {
     const parsed = raw ? JSON.parse(String(raw)) : [];
@@ -203,6 +208,7 @@ export class SidecarDb {
     const SQL = await initSql();
     const db = new SQL.Database(bytes ?? undefined);
     db.exec(SIDECAR_SCHEMA_SQL_V2);
+    ensureSidecarVectorSchema(db);
     const sdb = new SidecarDb(db);
     sdb.ensureColumn('accompaniments', 'quote_alt', 'TEXT'); // §7.7 upgrade of a pre-quote_alt byte store
     sdb.deviceId = sdb.ensureDeviceId();
@@ -341,7 +347,7 @@ export class SidecarDb {
     return out;
   }
 
-  /** Upsert; replaces occurrence rows from `acc.selectors`; refreshes the sidecar embedding. */
+  /** Upsert; replaces occurrence rows from `acc.selectors`; enqueues the sidecar embedding. */
   save(acc: Partial<Accompaniment> & { exposure: Exposure }): Accompaniment {
     const now = new Date().toISOString();
     const id = acc.id ?? crypto.randomUUID();
@@ -400,12 +406,7 @@ export class SidecarDb {
         s.value,
       ]);
     }
-    const vec = embedText(`${full.title} ${plainText(full.bodyHtml)} ${full.quote ?? ''}`);
-    this.run('INSERT OR REPLACE INTO sidecar_embeddings (ref_id, dim, vec) VALUES (?, ?, ?)', [
-      id,
-      EMBED_DIM,
-      new Uint8Array(vec.buffer, vec.byteOffset, vec.byteLength),
-    ]);
+    enqueueSidecarEmbedding(this.db, id, 'accompaniment', accompanimentEmbedText(full));
     return full;
   }
 
@@ -422,14 +423,6 @@ export class SidecarDb {
   /** Live accompaniments anchored to a node key. */
   forAnchor(nodeKey: string): Accompaniment[] {
     return this.list(undefined, { anchor: nodeKey });
-  }
-
-  /** Cosine top-k over sidecar_embeddings. */
-  similar(queryVec: Int8Array, k: number): { id: string; score: number }[] {
-    return this.all('SELECT ref_id, vec FROM sidecar_embeddings')
-      .map((r) => ({ id: String(r.ref_id), score: cosine(queryVec, r.vec as Uint8Array) }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, k);
   }
 
   getSetting(key: string): string | null {

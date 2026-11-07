@@ -6,8 +6,8 @@
 
 import initSqlJs, { type Database } from 'sql.js';
 import wasmUrl from 'sql.js/dist/sql-wasm.wasm?url';
-import { embedText, cosine, normalizeText } from '../vector/embed.ts';
-import { bestClause } from '../vector/clause.ts';
+import { normalizeText } from '../vector/embed.ts';
+import * as search from '../vector/search.ts';
 import { MASS_SECTION_ORDER } from '../model/massOrdo.ts';
 import type {
   GraphNode,
@@ -18,8 +18,6 @@ import type {
   ConceptHit,
   GroupedHit,
   InterpretiveNucleus,
-  NucleatedSimilarityGroup,
-  NucleatedSimilarityHit,
   NucleatedSimilaritySet,
 } from './types.ts';
 import type { DayFileMeta } from '../calendar/precedence.ts';
@@ -465,175 +463,14 @@ export class CorpusDb {
       .map((x) => x.hit);
   }
 
-  /**
-   * Short, query-matching clauses from authoritative interpretive sources.
-   * Haydock is the active v0.5 provider; the source filter keeps the method
-   * ready for independently delivered catechetical and magisterial modules.
-   */
-  interpretiveNucleiForText(
-    text: string,
-    opts: { k?: number; sources?: string[] } = {},
-  ): InterpretiveNucleus[] {
-    const k = Math.max(0, opts.k ?? 5);
-    const sources = new Set(opts.sources ?? ['haydock']);
-    if (!text.trim() || k === 0 || sources.size === 0) return [];
-
-    const queryVec = embedText(text);
-    const coarse = this.all(
-      `SELECT n.id, n.key, n.title, tb.english, e.vec
-       FROM nodes n
-       JOIN text_blocks tb ON tb.node_id = n.id
-       JOIN embeddings e ON e.node_id = n.id
-       WHERE n.kind = 'commentary' AND tb.english IS NOT NULL`,
-    )
-      .map((row) => {
-        const key = String(row.key);
-        const source = key.match(/^commentary:([^/]+)\//)?.[1] ?? '';
-        if (!sources.has(source)) return null;
-        const raw = row.vec as Uint8Array;
-        const vec = new Int8Array(raw.buffer, raw.byteOffset, raw.byteLength);
-        return {
-          id: Number(row.id),
-          key,
-          title: (row.title as string) ?? key,
-          english: String(row.english ?? ''),
-          source,
-          score: cosine(queryVec, vec),
-        };
-      })
-      .filter((row): row is NonNullable<typeof row> => row !== null)
-      .sort((a, b) => b.score - a.score || a.key.localeCompare(b.key))
-      .slice(0, Math.max(k * 4, k));
-
-    return coarse
-      .flatMap((row): InterpretiveNucleus[] => {
-        const clause = bestClause(row.english, text);
-        if (!clause || clause.text.length >= row.english.length) return [];
-        const anchors = this.all(
-          `SELECT DISTINCT v.key
-           FROM edges e JOIN nodes v ON v.id = e.dst
-           WHERE e.rel = 'COMMENTS_ON' AND e.src = ?
-           ORDER BY v.key`,
-          [row.id],
-        ).map((anchor) => String(anchor.key));
-        const concepts = this.all(
-          `SELECT DISTINCT c.key, c.title
-           FROM edges comments
-           JOIN edges instances ON instances.src = comments.dst AND instances.rel = 'INSTANCE_OF'
-           JOIN nodes c ON c.id = instances.dst
-           WHERE comments.rel = 'COMMENTS_ON' AND comments.src = ? AND c.kind = 'concept'
-           ORDER BY c.key`,
-          [row.id],
-        ).map((concept) => ({
-          conceptId: String(concept.key).replace(/^concept:/, ''),
-          label: (concept.title as string) ?? String(concept.key).replace(/^concept:/, ''),
-        }));
-        return [{
-          key: row.key,
-          title: row.title,
-          clause: clause.text,
-          queryScore: clause.score,
-          anchors,
-          concepts,
-          source: row.source,
-          authorityKind: 'scriptural-commentary',
-        }];
-      })
-      .sort((a, b) => b.queryScore - a.queryScore || a.key.localeCompare(b.key))
-      .slice(0, k);
+  /** Interpretive nuclei for text — delegates to search.ts (§3.4). */
+  async interpretiveNucleiForText(text: string, opts: { k?: number; sources?: string[] } = {}): Promise<InterpretiveNucleus[]> {
+    return search.interpretiveNucleiForText(this, text, opts);
   }
 
-  /**
-   * Losslessly organise the ordinary vector horizon around interpretive
-   * nuclei. Representatives are the high-signal front; every other candidate
-   * remains available in the ordered tail for association and inspiration.
-   */
-  nucleatedSimilarToText(
-    text: string,
-    opts: { candidateK?: number; nucleusK?: number; excludeKey?: string } = {},
-  ): NucleatedSimilaritySet {
-    const candidateK = Math.max(0, opts.candidateK ?? 64);
-    const nucleusK = Math.max(0, opts.nucleusK ?? 5);
-    const candidates = this.similarToText(text, candidateK, opts.excludeKey);
-    const nuclei = this.interpretiveNucleiForText(text, { k: nucleusK });
-
-    type DraftGroup = {
-      key: string;
-      nucleus: InterpretiveNucleus | null;
-      label: string;
-      hits: NucleatedSimilarityHit[];
-    };
-    const drafts = new Map<string, DraftGroup>();
-
-    for (const hit of candidates) {
-      const full = hit.english ?? hit.latin ?? '';
-      const clause = bestClause(full, text)?.text ?? full;
-      let nucleus: InterpretiveNucleus | null = null;
-      let nucleusKey: string | null = null;
-      let nucleusAffinity = 0;
-      let groupKey = 'related';
-      let label = 'Related passages';
-
-      if (nuclei.length > 0) {
-        const clauseVec = embedText(clause);
-        const ranked = nuclei
-          .map((candidate) => ({
-            nucleus: candidate,
-            affinity: cosine(clauseVec, embedText(candidate.clause)),
-          }))
-          .sort((a, b) => b.affinity - a.affinity || a.nucleus.key.localeCompare(b.nucleus.key));
-        nucleus = ranked[0].nucleus;
-        nucleusKey = nucleus.key;
-        nucleusAffinity = ranked[0].affinity;
-        groupKey = nucleus.key;
-        label = nucleus.title;
-      } else {
-        const primary = this.conceptsForSectionKey(hit.key)
-          .sort((a, b) => a.conceptId.localeCompare(b.conceptId))[0];
-        if (primary) {
-          nucleusKey = `concept:${primary.conceptId}`;
-          groupKey = nucleusKey;
-          label = primary.label;
-        }
-      }
-
-      const atomic: NucleatedSimilarityHit = {
-        hit,
-        clause,
-        nucleusKey,
-        nucleusAffinity,
-        contextScore: 0.7 * hit.score + 0.3 * nucleusAffinity,
-      };
-      const draft = drafts.get(groupKey) ?? { key: groupKey, nucleus, label, hits: [] };
-      draft.hits.push(atomic);
-      drafts.set(groupKey, draft);
-    }
-
-    const ordered = [...drafts.values()]
-      .map((group) => ({
-        ...group,
-        hits: group.hits.sort(
-          (a, b) => b.contextScore - a.contextScore || a.hit.key.localeCompare(b.hit.key),
-        ),
-      }))
-      .sort(
-        (a, b) =>
-          (b.hits[0]?.contextScore ?? -Infinity) - (a.hits[0]?.contextScore ?? -Infinity) ||
-          a.key.localeCompare(b.key),
-      );
-    const selected = ordered.slice(0, 5);
-    const representativeKeys = new Set<string>();
-    const groups: NucleatedSimilarityGroup[] = selected.map((group) => {
-      const representatives = group.hits.slice(0, 3);
-      representatives.forEach((hit) => representativeKeys.add(hit.hit.key));
-      return { nucleus: group.nucleus, label: group.label, representatives };
-    });
-    const tail = ordered
-      .flatMap((group) => group.hits)
-      .filter((hit) => !representativeKeys.has(hit.hit.key))
-      .sort((a, b) => b.contextScore - a.contextScore || a.hit.key.localeCompare(b.hit.key));
-
-    return { candidateCount: candidates.length, groups, tail };
+  /** Nucleated similarity for text — delegates to search.ts (§3.4). */
+  async nucleatedSimilarToText(text: string, opts: { candidateK?: number; nucleusK?: number; excludeKey?: string } = {}): Promise<NucleatedSimilaritySet> {
+    return search.nucleatedSimilarToText(this, text, opts);
   }
 
   /** Concepts counted by INSTANCE_OF edges landing on verse: nodes (imagery layer). */
@@ -750,44 +587,27 @@ export class CorpusDb {
     });
   }
 
-  private loadVectors(): { key: string; section: string; vec: Int8Array }[] {
+  /** Raw SQL rows over the corpus (BA.6 editionSections, search.ts). */
+  sqlRows(sql: string, params: unknown[] = []): Record<string, unknown>[] {
+    return this.all(sql, params);
+  }
+
+  /** Every `dim = 256` vector (base + attached modules); cached in `vectors`, reset on attach (BA.2). */
+  vectorRows(): { key: string; section: string; vec: Int8Array }[] {
     if (this.vectors) return this.vectors;
     const rows = this.all(
-      `SELECT n.key, n.title section, e.vec FROM embeddings e JOIN nodes n ON n.id = e.node_id`,
+      `SELECT n.key, n.title section, e.vec FROM embeddings e JOIN nodes n ON n.id = e.node_id WHERE e.dim = 256`,
     );
     this.vectors = rows.map((r) => {
       const raw = r.vec as Uint8Array;
-      return {
-        key: String(r.key),
-        section: String(r.section ?? ''),
-        vec: new Int8Array(raw.buffer, raw.byteOffset, raw.byteLength),
-      };
+      return { key: String(r.key), section: String(r.section ?? ''), vec: new Int8Array(raw.buffer, raw.byteOffset, raw.byteLength) };
     });
     return this.vectors;
   }
 
-  /** Vector-similar passages for free text (e.g. the user's selection). */
-  similarToText(text: string, k = 8, excludeKey?: string): SimilarHit[] {
-    const q = embedText(text);
-    const scored = this.loadVectors()
-      .filter((v) => v.key !== excludeKey)
-      .map((v) => ({ key: v.key, section: v.section, score: cosine(q, v.vec) }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, k);
-    return scored.map((s) => {
-      const tb = this.all(
-        `SELECT tb.latin, tb.english, n.title FROM text_blocks tb JOIN nodes n ON n.id = tb.node_id WHERE n.key = ?`,
-        [s.key],
-      )[0];
-      return {
-        key: s.key,
-        section: s.section,
-        title: (tb?.title as string) ?? null,
-        score: s.score,
-        latin: (tb?.latin as string) ?? null,
-        english: (tb?.english as string) ?? null,
-      };
-    });
+  /** Vector-similar passages for free text — delegates to search.ts (§3.4). */
+  async similarToText(text: string, k = 8, excludeKey?: string): Promise<SimilarHit[]> {
+    return search.similarToText(this, text, k, excludeKey);
   }
 
   /** FTS5 concordance. Malformed input returns [] (guard kept from HelloWord). */
@@ -827,40 +647,9 @@ export class CorpusDb {
 
   // ── Concept-graph query API ────────────────────────────────────────
 
-  /** Find concepts whose centroid is closest to the query text. */
-  conceptsForText(text: string, k = 5): ConceptHit[] {
-    const q = embedText(text);
-    const rows = this.all(
-      `SELECT n.id, n.key, n.title, n.meta FROM nodes n WHERE n.kind = 'concept'`,
-    );
-    const scored: ConceptHit[] = [];
-    for (const r of rows) {
-      const embRow = this.all('SELECT vec FROM embeddings WHERE node_id = ?', [Number(r.id)]);
-      if (embRow.length === 0) continue;
-      const raw = embRow[0].vec as Uint8Array;
-      const vec = new Int8Array(raw.buffer, raw.byteOffset, raw.byteLength);
-      const score = cosine(q, vec);
-      let description = '';
-      try {
-        const meta = r.meta ? JSON.parse(String(r.meta)) : {};
-        description = (meta.description as string) ?? '';
-      } catch {
-        description = '';
-      }
-      const conceptId = String(r.key).replace(/^concept:/, '');
-      const sectionCount = this.all(
-        `SELECT COUNT(*) c FROM edges WHERE rel = 'INSTANCE_OF' AND dst = ?`,
-        [Number(r.id)],
-      )[0];
-      scored.push({
-        conceptId,
-        label: (r.title as string) ?? conceptId,
-        description,
-        score,
-        sectionCount: Number(sectionCount?.c ?? 0),
-      });
-    }
-    return scored.sort((a, b) => b.score - a.score).slice(0, k);
+  /** Concepts whose vector is closest to the text — delegates to search.ts (§3.4). */
+  async conceptsForText(text: string, k = 5): Promise<ConceptHit[]> {
+    return search.conceptsForText(this, text, k);
   }
 
   /** All sections tagged as instances of a concept. */
@@ -930,41 +719,6 @@ export class CorpusDb {
         const gKey = '__other__';
         if (!groups.has(gKey)) {
           groups.set(gKey, { conceptId: null, label: 'Other occurrences', description: null, hits: [] });
-        }
-        groups.get(gKey)!.hits.push(hit);
-      } else {
-        for (const c of concepts) {
-          const gKey = c.conceptId;
-          if (!groups.has(gKey)) {
-            groups.set(gKey, { conceptId: c.conceptId, label: c.label, description: c.description, hits: [] });
-          }
-          groups.get(gKey)!.hits.push(hit);
-        }
-      }
-    }
-    return [...groups.values()]
-      .map((g) => ({
-        conceptId: g.conceptId,
-        label: g.label,
-        description: g.description,
-        count: g.hits.length,
-        representative: g.hits[0],
-        hits: g.hits,
-      }))
-      .sort((a, b) => b.count - a.count);
-  }
-
-  /** Vector-similar hits grouped by concept. */
-  groupedSimilarToText(text: string, k = 20, excludeKey?: string): GroupedHit<SimilarHit>[] {
-    const hits = this.similarToText(text, k, excludeKey);
-    if (hits.length === 0) return [];
-    const groups = new Map<string, { conceptId: string | null; label: string; description: string | null; hits: SimilarHit[] }>();
-    for (const hit of hits) {
-      const concepts = this.conceptsForSectionKey(hit.key);
-      if (concepts.length === 0) {
-        const gKey = '__other__';
-        if (!groups.has(gKey)) {
-          groups.set(gKey, { conceptId: null, label: 'Other passages', description: null, hits: [] });
         }
         groups.get(gKey)!.hits.push(hit);
       } else {

@@ -43,6 +43,8 @@ export interface SimilarHit {
   score: number;
   latin: string | null;
   english: string | null;
+  /** Reranker score when the top-20 were reranked (§2.11); `score` stays the cosine. */
+  rerank?: number;
 }
 
 export interface ConcordanceHit {

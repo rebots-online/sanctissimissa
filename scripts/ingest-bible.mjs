@@ -26,7 +26,7 @@
 
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { embedText, EMBED_DIM, normalizeText } from '../src/core/vector/embed.ts';
+import { embedText, EMBED_DIM, normalizeText } from './lib/trigram-embed.mjs';
 import { parseCitation } from './scripture.mjs';
 
 const VUL_TSV = 'VENDORED/vulgate-clementina/vul.tsv';

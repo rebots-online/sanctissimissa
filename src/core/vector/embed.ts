@@ -1,49 +1,14 @@
 /**
- * Deterministic offline text embeddings — hashed character trigrams.
- *
- * 128-dim, L2-normalized, int8-quantized (×127). Byte-stable across platforms
- * and runtimes so vectors computed at ingest time (Node) match query vectors
- * computed in the browser/WebView. The `embeddings` table is model-agnostic:
- * a real sentence-transformer can replace this without schema change.
+ * Vector primitives shared by the semantic search stack (§L.4 D5).
+ * Vectors are 256 int8, L2-normalized (`embed_meta` §2.2). The trigram
+ * `embedText` hasher is retired from `src/` (kept on branch
+ * `archive/trigram-embed-20261106`; ingest uses `scripts/lib/trigram-embed.mjs`).
  */
 
 import { normalizeText } from '../text/normalize.ts';
 export { normalizeText };
 
-export const EMBED_DIM = 128;
-
-/** FNV-1a 32-bit hash. */
-function fnv1a(s: string): number {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  return h >>> 0;
-}
-
-/** Embed text into a signed-int8, L2-normalized 128-d vector. */
-export function embedText(text: string): Int8Array {
-  const norm = normalizeText(text);
-  const acc = new Float64Array(EMBED_DIM);
-  const padded = `  ${norm}  `;
-  for (let i = 0; i + 3 <= padded.length; i++) {
-    const tri = padded.slice(i, i + 3);
-    if (tri.trim().length === 0) continue;
-    const h = fnv1a(tri);
-    const bucket = h % EMBED_DIM;
-    const sign = (h >>> 8) & 1 ? 1 : -1;
-    acc[bucket] += sign;
-  }
-  let mag = 0;
-  for (let i = 0; i < EMBED_DIM; i++) mag += acc[i] * acc[i];
-  mag = Math.sqrt(mag) || 1;
-  const out = new Int8Array(EMBED_DIM);
-  for (let i = 0; i < EMBED_DIM; i++) {
-    out[i] = Math.max(-127, Math.min(127, Math.round((acc[i] / mag) * 127)));
-  }
-  return out;
-}
+export const EMBED_DIM = 256;
 
 /** Cosine similarity between two int8 embeddings. */
 export function cosine(a: Int8Array | Uint8Array, b: Int8Array | Uint8Array): number {

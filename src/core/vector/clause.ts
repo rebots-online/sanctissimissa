@@ -11,7 +11,10 @@
  * on long corpus text.
  */
 
-import { embedText, cosine } from './embed.ts';
+import { cosine, normalizeText } from './embed.ts';
+
+/** Lazy so `splitClauses` stays importable from Node ingest scripts (BA.10). */
+const loadActive = () => import('./active.ts');
 
 export interface Clause {
   text: string;
@@ -76,26 +79,113 @@ export function splitClauses(text: string): Clause[] {
   return clauses;
 }
 
+/** Max clause vectors kept (L-content-modules-search §3.4). */
+const CLAUSE_CACHE_SIZE = 8192;
+
 /**
- * The clause of `text` most similar in meaning to `query` — embeds the query
- * once, embeds each clause, and returns the cosine argmax (first clause wins
- * ties, so results are deterministic). Null when the text yields no clauses.
+ * LRU of clause vectors keyed by `normalizeText(clause)`. Missing clauses are
+ * filled by ONE `embedDocs` call per query (`fill`). Qwen3 documents carry no
+ * instruction prefix — see DOCS/sdk/qwen3-embedding/model-card.md §Usage.
  */
-export function bestClause(text: string, query: string): (Clause & { score: number }) | null {
-  const clauses = splitClauses(text);
-  if (clauses.length === 0) return null;
-  const queryVec = embedText(query);
-  if (clauses.length === 1) {
-    return { ...clauses[0], score: cosine(queryVec, embedText(clauses[0].text)) };
+export class ClauseVectorCache {
+  private map = new Map<string, Int8Array>();
+  private readonly max: number;
+
+  constructor(max = CLAUSE_CACHE_SIZE) {
+    this.max = max;
   }
-  let best = clauses[0];
-  let bestScore = cosine(queryVec, embedText(clauses[0].text));
-  for (let i = 1; i < clauses.length; i++) {
-    const score = cosine(queryVec, embedText(clauses[i].text));
-    if (score > bestScore) {
-      best = clauses[i];
-      bestScore = score;
+
+  get(clause: string): Int8Array | null {
+    const key = normalizeText(clause);
+    const v = this.map.get(key);
+    if (!v) return null;
+    this.map.delete(key);
+    this.map.set(key, v);
+    return v;
+  }
+
+  private put(key: string, v: Int8Array): void {
+    this.map.delete(key);
+    this.map.set(key, v);
+    while (this.map.size > this.max) {
+      const oldest = this.map.keys().next().value;
+      if (oldest === undefined) break;
+      this.map.delete(oldest);
     }
   }
-  return { ...best, score: bestScore };
+
+  /** Embed every not-yet-cached clause in one `embedDocs` call. */
+  async fill(clauses: readonly string[]): Promise<void> {
+    const embedder = (await loadActive()).activeEmbedder();
+    if (!embedder) return;
+    const missing = new Map<string, string>();
+    for (const c of clauses) {
+      const key = normalizeText(c);
+      if (!this.map.has(key) && !missing.has(key)) missing.set(key, c);
+    }
+    if (missing.size === 0) return;
+    const keys = [...missing.keys()];
+    const vecs = await embedder.embedDocs([...missing.values()]);
+    keys.forEach((k, i) => {
+      if (vecs[i]) this.put(k, vecs[i]);
+    });
+  }
+}
+
+/** The app-lifetime clause cache shared by every search surface. */
+export const clauseVectors = new ClauseVectorCache();
+
+type Scored = Clause & { score: number };
+
+/** Lexical pick: most shared normalized words with the query (ties: first), score 0. */
+function lexicalBest(clauses: Clause[], query: string): Scored | null {
+  if (clauses.length === 0) return null;
+  const q = new Set(normalizeText(query).split(' ').filter(Boolean));
+  let best = clauses[0];
+  let bestShared = -1;
+  for (const c of clauses) {
+    const words = new Set(normalizeText(c.text).split(' ').filter(Boolean));
+    let shared = 0;
+    for (const w of words) if (q.has(w)) shared++;
+    if (shared > bestShared) {
+      best = c;
+      bestShared = shared;
+    }
+  }
+  return { ...best, score: 0 };
+}
+
+/**
+ * Best clause of each text for one query. Semantic: the query vector from
+ * `embedQuery`, clause vectors from `clauseVectors` (one `embedDocs` batch for
+ * every missing clause of every text), cosine argmax with the first clause
+ * winning ties. No active embedder (or not ready) → the lexical pick.
+ */
+export async function bestClauses(texts: string[], query: string): Promise<(Scored | null)[]> {
+  const split = texts.map((t) => splitClauses(t));
+  const { activeEmbedder, isEmbedNotReady } = await loadActive();
+  const embedder = activeEmbedder();
+  if (embedder) {
+    try {
+      const all = split.flat().map((c) => c.text);
+      const [queryVec] = await Promise.all([embedder.embedQuery(query), clauseVectors.fill(all)]);
+      return split.map((clauses) => {
+        let best: Scored | null = null;
+        for (const c of clauses) {
+          const v = clauseVectors.get(c.text);
+          const score = v ? cosine(queryVec, v) : 0;
+          if (!best || score > best.score) best = { ...c, score };
+        }
+        return best;
+      });
+    } catch (e) {
+      if (!isEmbedNotReady(e)) throw e;
+    }
+  }
+  return split.map((clauses) => lexicalBest(clauses, query));
+}
+
+/** The clause of `text` most similar in meaning to `query` (see `bestClauses`). */
+export async function bestClause(text: string, query: string): Promise<Scored | null> {
+  return (await bestClauses([text], query))[0];
 }

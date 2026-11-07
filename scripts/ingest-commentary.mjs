@@ -21,7 +21,7 @@
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { embedText, EMBED_DIM, normalizeText } from '../src/core/vector/embed.ts';
+import { embedText, EMBED_DIM, normalizeText } from './lib/trigram-embed.mjs';
 import { BOOK_MAP } from './ingest-bible.mjs';
 
 const byKey = new Map(BOOK_MAP.map((b) => [b.key, b]));

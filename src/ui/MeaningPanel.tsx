@@ -26,7 +26,7 @@ import type {
   NucleatedSimilarityHit,
   SimilarHit,
 } from '../core/data/types.ts';
-import { bestClause } from '../core/vector/clause.ts';
+import { PENDING_TEXT, useBestClause, useConceptsForText, useNucleatedSimilarity } from './hooks/useSimilarity.ts';
 import { buildBilingualResult } from '../core/text/bilingualResult.ts';
 import { organizeResultsByCanon, type ResultGroupingMode } from '../core/text/resultHierarchy.ts';
 import { ResultSnippet } from './ResultSnippet.tsx';
@@ -216,7 +216,7 @@ function SimilarHitRow({
   const [expanded, setExpanded] = useState(false);
   const result = buildBilingualResult({ latin: hit.latin, english: hit.english }, query);
   const full = hit.latin ?? hit.english ?? '';
-  const clause = useMemo(() => bestClause(full, query), [full, query]);
+  const { clause } = useBestClause(full, query);
   const hasContext = clause && (clause.start > 0 || clause.end < full.length);
   return (
     <div className="hit clickable" onClick={() => onOpenKey(hit.key)} title="Open in the reader, in context">
@@ -310,7 +310,8 @@ function NucleatedResults({
   excludeKey?: string;
   onOpenKey: (k: string) => void;
 }) {
-  const set = db.nucleatedSimilarToText(term, { candidateK: 64, nucleusK: 5, excludeKey });
+  const { status, set } = useNucleatedSimilarity(db, term, { candidateK: 64, nucleusK: 5, excludeKey });
+  if (!set) return <div className="hit">{status === 'pending' ? PENDING_TEXT : 'No similar passages found.'}</div>;
   if (set.candidateCount === 0) return <div className="hit">No similar passages found.</div>;
   const nuclei = new Map(
     set.groups
@@ -368,6 +369,44 @@ function NucleatedResults({
             ))}
           </div>
         </details>
+      )}
+    </>
+  );
+}
+
+function ConceptSummary({ db, term, onOpenKey }: { db: CorpusDb; term: string; onOpenKey: (k: string) => void }) {
+  const { concepts } = useConceptsForText(db, term, 4);
+  if (concepts.length === 0) return null;
+  return (
+    <div className="concept-summary">
+      <div className="group-title">This text relates to</div>
+      {concepts.map((c) => (
+        <ConceptTag key={c.conceptId} db={db} conceptId={c.conceptId} label={c.label} description={c.description} sectionCount={c.sectionCount} query={term} onOpenKey={onOpenKey} />
+      ))}
+    </div>
+  );
+}
+
+function NucleatedList({
+  db, term, excludeKey, mode, onMode, onOpenKey,
+}: {
+  db: CorpusDb; term: string; excludeKey?: string; mode: ResultGroupingMode; onMode: (m: ResultGroupingMode) => void; onOpenKey: (k: string) => void;
+}) {
+  const { status, set } = useNucleatedSimilarity(db, term, { candidateK: 64, nucleusK: 5, excludeKey });
+  if (!set) return <div className="hit">{status === 'pending' ? PENDING_TEXT : 'No similar passages found.'}</div>;
+  if (set.candidateCount === 0) return <div className="hit">No similar passages found.</div>;
+  // Flatten representatives + tail for canonical organization
+  const allItems: NucleatedSimilarityHit[] = [...set.groups.flatMap((group) => group.representatives), ...set.tail];
+  return (
+    <>
+      <ResultGroupingToolbar mode={mode} onChange={onMode} />
+      {mode === 'themes' ? (
+        <NucleatedResults db={db} term={term} excludeKey={excludeKey} onOpenKey={onOpenKey} />
+      ) : (
+        <>
+          <div className="result-total-count">Total: {set.candidateCount} hits</div>
+          <CanonicalResultTree db={db} tree={organizeResultsByCanon(allItems, db.getBooks())} query={term} onOpenKey={onOpenKey} />
+        </>
       )}
     </>
   );
@@ -626,18 +665,7 @@ export default function MeaningPanel({ db, action, onClose, onOpenKey }: Props) 
           <h2>Catholic meaning</h2>
           <div className="term">“{term}”</div>
 
-          {(() => {
-            const concepts = db.conceptsForText(term, 4);
-            if (concepts.length === 0) return null;
-            return (
-              <div className="concept-summary">
-                <div className="group-title">This text relates to</div>
-                {concepts.map((c) => (
-                  <ConceptTag key={c.conceptId} db={db} conceptId={c.conceptId} label={c.label} description={c.description} sectionCount={c.sectionCount} query={term} onOpenKey={onOpenKey} />
-                ))}
-              </div>
-            );
-          })()}
+          <ConceptSummary db={db} term={term} onOpenKey={onOpenKey} />
 
           <div className="group-title">Concordance — where the corpus prays these words</div>
           {(() => {
@@ -678,37 +706,7 @@ export default function MeaningPanel({ db, action, onClose, onOpenKey }: Props) 
           })()}
 
           <div className="group-title">Nearest by meaning (vector)</div>
-          {(() => {
-            const set = db.nucleatedSimilarToText(term, { candidateK: 64, nucleusK: 5, excludeKey: nodeKey ?? undefined });
-            if (set.candidateCount === 0) return <div className="hit">No similar passages found.</div>;
-
-            // Flatten representatives + tail for canonical organization
-            const allItems: NucleatedSimilarityHit[] = [];
-            for (const group of set.groups) {
-              allItems.push(...group.representatives);
-            }
-            allItems.push(...set.tail);
-
-            return (
-              <>
-                <ResultGroupingToolbar mode={groupingMode} onChange={setGroupingMode} />
-
-                {groupingMode === 'themes' ? (
-                  <NucleatedResults db={db} term={term} excludeKey={nodeKey ?? undefined} onOpenKey={onOpenKey} />
-                ) : (
-                  <>
-                    <div className="result-total-count">Total: {set.candidateCount} hits</div>
-                    <CanonicalResultTree
-                      db={db}
-                      tree={organizeResultsByCanon(allItems, db.getBooks())}
-                      query={term}
-                      onOpenKey={onOpenKey}
-                    />
-                  </>
-                )}
-              </>
-            );
-          })()}
+          <NucleatedList db={db} term={term} excludeKey={nodeKey ?? undefined} mode={groupingMode} onMode={setGroupingMode} onOpenKey={onOpenKey} />
 
           <div className="llm-slot">
             ✠ <b>Next major:</b> a fine-tuned model on ecclesiastical Latin and Catholic
@@ -722,37 +720,7 @@ export default function MeaningPanel({ db, action, onClose, onOpenKey }: Props) 
         <>
           <h2>Similar passages</h2>
           <div className="term">“{term.slice(0, 120)}”</div>
-          {(() => {
-            const set = db.nucleatedSimilarToText(term, { candidateK: 64, nucleusK: 5, excludeKey: nodeKey ?? undefined });
-            if (set.candidateCount === 0) return <div className="hit">No similar passages found.</div>;
-
-            // Flatten representatives + tail for canonical organization
-            const allItems: NucleatedSimilarityHit[] = [];
-            for (const group of set.groups) {
-              allItems.push(...group.representatives);
-            }
-            allItems.push(...set.tail);
-
-            return (
-              <>
-                <ResultGroupingToolbar mode={groupingMode} onChange={setGroupingMode} />
-
-                {groupingMode === 'themes' ? (
-                  <NucleatedResults db={db} term={term} excludeKey={nodeKey ?? undefined} onOpenKey={onOpenKey} />
-                ) : (
-                  <>
-                    <div className="result-total-count">Total: {set.candidateCount} hits</div>
-                    <CanonicalResultTree
-                      db={db}
-                      tree={organizeResultsByCanon(allItems, db.getBooks())}
-                      query={term}
-                      onOpenKey={onOpenKey}
-                    />
-                  </>
-                )}
-              </>
-            );
-          })()}
+          <NucleatedList db={db} term={term} excludeKey={nodeKey ?? undefined} mode={groupingMode} onMode={setGroupingMode} onOpenKey={onOpenKey} />
         </>
       )}
 

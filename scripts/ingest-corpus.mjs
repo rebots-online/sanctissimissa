@@ -27,7 +27,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { dirname, resolve, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { embedText, cosine, EMBED_DIM, normalizeText } from '../src/core/vector/embed.ts';
+import { embedText, cosine, EMBED_DIM, normalizeText } from './lib/trigram-embed.mjs';
 import { applyConditionals, vero, RUBRICS_1960 } from '../src/core/liturgy/conditionals.ts';
 import { parseDOFile, parseRank, ruleVide, CorpusTree, loadPrayers, resolveContent, FillLog, firstCitation } from './do-parse.mjs';
 import { ingestOfficePlane } from './ingest-office.mjs';

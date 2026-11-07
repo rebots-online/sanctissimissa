@@ -12,17 +12,18 @@
  * (live view / date / focus) is accepted so call sites pass their context
  * unchanged.
  *
- * Layer 2 `sidecar_embeddings`: model-agnostic `embedText` vectors.
- * `recall` embeds the query and ranks every embedding row by cosine, top-k.
+ * Layer 2 `sidecar_embeddings`: semantic `dim = 256` vectors (§L.4; the
+ * sidecar vector queue, L-content-modules-search-20261106.md §3.5).
+ * `recall` maps `sidecarSimilar` (no embedder ready → no hits).
  *
  * `distill` records one completed turn as a `lore` row of kind 'journey'
- * (body `Q: …\nA: …`, answer capped at 600 chars) plus its embedding row,
+ * (body `Q: …\nA: …`, answer capped at 600 chars) and enqueues its embedding,
  * keeping at most 64 distilled rows — the oldest (and their embeddings) are
  * pruned. No scheduling lives here; callers decide when a turn is distilled.
  */
 
 import type { Database } from 'sql.js';
-import { embedText, cosine, EMBED_DIM } from '../vector/embed.ts';
+import { enqueueSidecarEmbedding, sidecarSimilar } from '../accompaniment/sidecarVectors.ts';
 
 export interface MemoryHit {
   refId: string;
@@ -73,27 +74,17 @@ export class CompanionMemory {
     return kept.length ? `${LORE_HEADING}\n${kept.join('\n')}` : '';
   }
 
-  /**
-   * Embed `query` via `embedText` and rank every `sidecar_embeddings` row by
-   * cosine similarity, returning the top-k hits (ties broken by refId so the
-   * order is deterministic).
-   */
-  recall(query: string, k = 5): MemoryHit[] {
+  /** Top-k `dim = 256` memories by meaning (`sidecarSimilar`; ties by refId). */
+  async recall(query: string, k = 5): Promise<MemoryHit[]> {
     if (k <= 0) return [];
-    const queryVec = embedText(query);
-    return this.all('SELECT ref_id, vec FROM sidecar_embeddings')
-      .map((r) => ({ refId: String(r.ref_id), score: cosine(queryVec, r.vec as Uint8Array) }))
-      .sort(
-        (a, b) => b.score - a.score || (a.refId < b.refId ? -1 : a.refId > b.refId ? 1 : 0),
-      )
-      .slice(0, k);
+    return (await sidecarSimilar(this.db, query, k)).map((hit) => ({ refId: hit.id, score: hit.score }));
   }
 
   /**
    * Record one completed Companion turn as memory: a `lore` row of kind
    * 'journey' whose body is `Q: <question>\nA: <answer>` (answer capped at
-   * 600 chars) plus its `sidecar_embeddings` row. At most 64 distilled rows
-   * are kept — the oldest, and their embeddings with them, are pruned.
+   * 600 chars) and enqueues its embedding. At most 64 distilled rows are
+   * kept — the oldest, with their embeddings and pending rows, are pruned.
    * No scheduling: callers decide when a turn is distilled.
    */
   async distill(turn: { question: string; answer: string }): Promise<void> {
@@ -104,12 +95,7 @@ export class CompanionMemory {
       'INSERT INTO lore (id, device_id, updated_at, kind, body_md) VALUES (?, ?, ?, ?, ?)',
       [id, this.ensureDeviceId(), now, 'journey', body],
     );
-    const vec = embedText(body);
-    this.run('INSERT OR REPLACE INTO sidecar_embeddings (ref_id, dim, vec) VALUES (?, ?, ?)', [
-      id,
-      EMBED_DIM,
-      new Uint8Array(vec.buffer, vec.byteOffset, vec.byteLength),
-    ]);
+    enqueueSidecarEmbedding(this.db, id, 'lore', body);
     const distilled = this.all(
       "SELECT id FROM lore WHERE kind = 'journey' ORDER BY updated_at ASC, rowid ASC",
     );
@@ -117,6 +103,7 @@ export class CompanionMemory {
     for (let i = 0; i < excess; i++) {
       this.run('DELETE FROM lore WHERE id = ?', [distilled[i].id]);
       this.run('DELETE FROM sidecar_embeddings WHERE ref_id = ?', [distilled[i].id]);
+      this.run('DELETE FROM sidecar_embeddings_pending WHERE ref_id = ?', [distilled[i].id]);
     }
   }
 
