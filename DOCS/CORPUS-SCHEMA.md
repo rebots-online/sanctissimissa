@@ -93,9 +93,26 @@ content, its citation, and the supplying source. Filled sections carry
   - `BROADER_THAN`: parent concept → child concept (taxonomy hierarchy)
 - `text_blocks(node_id, section, latin, english)` — resolved bilingual text.
   Original text preserved for rendering; never normalized.
-- `embeddings(node_id, dim, vec)` — 128-d hashed-trigram int8, Latin normative.
-  Includes centroid embeddings for concept nodes (average of member section
-  embeddings, L2-normalized).
+- `embeddings(node_id, dim, vec)` — 256-d Qwen3-Embedding-0.6B, first 256 of 1024 (Matryoshka), L2-renormalized, int8 ×127; identity in `embed_meta`. Pre-q3e256 files carry 128-d trigram.
+- `embed_meta(key, value)` — exactly seven rows (`model`, `artifact_sha256`,
+  `dim`, `quant`, `prefix_query`, `prefix_doc`, `norm`), equal to
+  `RUNTIME_EMBED_META` (`src/core/vector/meta.ts`); written by
+  `scripts/embed-corpus.mjs` finalize. A file lacking it runs lexical-only.
+- `edges_trigram_archive(src_key, dst_key, rel, weight, meta)` — the trigram
+  INSTANCE_OF edges into `category='auto'` concepts, archived (by key) when
+  the semantic re-embed replaced them; `embeddings_trigram` keeps the old
+  128-d vectors.
+- `embed_progress(phase, completed_at)` — embed-corpus phases (`copy`,
+  `vectors`, `centroids`, `instance_of`, `similar_to`, `probe`, `finalize`);
+  a file without the `finalize` row is incomplete.
+- Additional rels (Phase L): `SIMILAR_TO` (node → its top-8 semantic
+  neighbours, cosine ≥ 0.35, weight = cosine, `meta.method='semantic'`;
+  semantic `INSTANCE_OF` carries the same meta, cosine ≥ 0.45), `PART_OF`
+  (quotation → pericope), `ATTRIBUTED_TO` (quotation → father), `CITES`
+  (quotation → verse).
+- Additional kinds (Phase L): `quotation` (`catena:<Book>/<ch>/<verseStart>/q<n>`)
+  and `father` (`father:<slug>`) — module-only (Catena Aurea module
+  `catena-aurea-en`; never in the base corpus).
 - `search` — FTS5 over `(key, section, content)`, meta sections excluded.
   Content is **normalized** via `normalizeText()` (lowercase, strip diacritics,
   map ligatures æ→ae / œ→oe, collapse non-letters to spaces) so that user

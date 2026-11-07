@@ -32,6 +32,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write src tests scripts vite.config.ts eslint.config.js",
     "ingest": "node --experimental-strip-types scripts/ingest-corpus.mjs",
+    "corpus:ingest": "node -e \"require('node:fs').mkdirSync('build/corpus',{recursive:true})\" && node --experimental-strip-types scripts/ingest-corpus.mjs build/corpus/stage1-ingest.db",
+    "corpus:embed": "node --experimental-strip-types scripts/embed-corpus.mjs",
     "corpus:catena-graph": "node --experimental-strip-types scripts/ingest-commentary.mjs --catena-graph build/corpus/stage1-ingest.db build/corpus/stage2-graph.db",
     "corpus:modules": "node --experimental-strip-types scripts/build-modules.mjs",
     "modules:stage": "node scripts/modules-stage.mjs",
