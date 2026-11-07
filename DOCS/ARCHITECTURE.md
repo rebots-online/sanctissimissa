@@ -3022,6 +3022,7 @@ more specific than or differs from §L.0–§L.8, the partial governs.
 | `DOCS/ARCHITECTURE/L-native-embed-engine-20261106.md` | `SemanticEmbedder` / `Reranker`, `NativeEmbedEngine` (Atomic fork, Windows included, clang ≥ 19 cross toolchain), `WllamaEmbedEngine`, runtime asset manifest |
 | `DOCS/ARCHITECTURE/L-audiobook-20261106.md` | Audiobook (S1–S10), §K.4 `Voice.synthesize` amendment, TT.1–TT.3 contract amendments |
 | `DOCS/ARCHITECTURE/L-release-20261106.md` | STAGE_ORDER, v1.70.x stamp, D12 dual-environment naming, rpm, PWA returning visitor, runtime host `https://sanctissimissa.robin.mba/runtime/`, rubric re-formation plan |
+| `DOCS/ARCHITECTURE/L-corpus-split-20261106.md` | three-part shipped corpus (text install-time, graph + vectors fast-follow), `split-corpus.mjs`, `CorpusPackPlugin`, `load_corpus_part`, `attachPart`; retires `include_bytes!` corpus and `assets/missal.db` input (operator 2026-11-06) |
 
 Local SDK snapshots for every external API: `DOCS/sdk/INDEX.md` (TC7).
 
