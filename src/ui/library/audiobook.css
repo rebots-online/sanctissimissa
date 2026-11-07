@@ -1,0 +1,203 @@
+/*
+ * BA.8 — AudiobookDock styles (L-audiobook-20261106.md §4 Styles; FREEZE 1
+ * export library-tts-karaoke-studio.html:895-962 inline tokens, PNG for
+ * layout order). Every rule is scoped under #supertonic-tts-dock.
+ * S10: the audiobook highlight is line-bold + approximate word glow; the
+ * reading-view `.spoken-glow` is never applied inside this dock.
+ */
+#supertonic-tts-dock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  margin: 0 0 16px;
+  background: #2b231b;
+  border: 1px solid #4a3e30;
+  border-radius: 10px;
+  color: #fff;
+}
+
+#supertonic-tts-dock .tts-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+#supertonic-tts-dock .tts-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* E2 — decorative wave; animates only while playing. */
+#supertonic-tts-dock .tts-wave-anim {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 22px;
+  flex: none;
+}
+#supertonic-tts-dock .tts-wave-bar {
+  width: 3px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--gold-bright);
+  transform-origin: bottom;
+}
+#supertonic-tts-dock.is-playing .tts-wave-bar { animation: tts-wave 1s ease-in-out infinite; }
+#supertonic-tts-dock.is-playing .tts-wave-bar:nth-child(2) { animation-delay: 0.15s; }
+#supertonic-tts-dock.is-playing .tts-wave-bar:nth-child(3) { animation-delay: 0.3s; }
+#supertonic-tts-dock.is-playing .tts-wave-bar:nth-child(4) { animation-delay: 0.45s; }
+#supertonic-tts-dock.is-playing .tts-wave-bar:nth-child(5) { animation-delay: 0.6s; }
+@keyframes tts-wave {
+  0%, 100% { transform: scaleY(0.5); }
+  50% { transform: scaleY(2.4); }
+}
+
+/* E3/E4 label row. */
+#supertonic-tts-dock .tts-label-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  color: var(--gold-bright);
+}
+#supertonic-tts-dock .tts-label-sep { color: #6d6252; }
+#supertonic-tts-dock #tts-render-status {
+  color: #9cb8a5;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* E5 title. */
+#supertonic-tts-dock #tts-now-title {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* E7/E8/E10 karaoke teleprompter. */
+#supertonic-tts-dock .karaoke-display {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid #4a3e30;
+  border-radius: 8px;
+}
+#supertonic-tts-dock .karaoke-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+#supertonic-tts-dock .karaoke-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--gold);
+  font-weight: 600;
+}
+#supertonic-tts-dock #tts-karaoke-locator { font-size: 10px; color: #9c9182; }
+#supertonic-tts-dock .karaoke-vernacular {
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 700;
+  color: #fff;
+  min-height: 1.5em;
+}
+#supertonic-tts-dock .karaoke-word-active {
+  color: var(--gold-bright);
+  text-shadow: 0 0 6px var(--gold-bright), 0 0 12px var(--gold-bright);
+  animation: tts-glow-pulse 1.2s ease-in-out infinite;
+}
+@keyframes tts-glow-pulse {
+  0%, 100% { text-shadow: 0 0 4px var(--gold-bright); }
+  50% { text-shadow: 0 0 6px var(--gold-bright), 0 0 14px var(--gold-bright); }
+}
+
+/* E11–E18 controls row. */
+#supertonic-tts-dock .tts-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+#supertonic-tts-dock .tts-btn-cluster { display: flex; align-items: center; gap: 6px; }
+#supertonic-tts-dock .tts-icon-btn {
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #fff;
+  background: transparent;
+  border: 1px solid #4a3e30;
+  border-radius: 6px;
+  cursor: pointer;
+}
+#supertonic-tts-dock .tts-icon-btn:hover,
+#supertonic-tts-dock .tts-icon-btn:focus-visible { border-color: var(--gold-bright); }
+#supertonic-tts-dock .tts-play-main {
+  min-width: 96px;
+  font-weight: 600;
+  color: #2b231b;
+  background: var(--gold-bright);
+  border-color: var(--gold-bright);
+}
+#supertonic-tts-dock .tts-timeline-wrap {
+  flex: 1 1 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 180px;
+}
+#supertonic-tts-dock .tts-track-scrub {
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: #4a3e30;
+  cursor: pointer;
+  touch-action: none;
+}
+#supertonic-tts-dock .tts-track-scrub:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+#supertonic-tts-dock .tts-track-progress {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--gold-bright);
+}
+#supertonic-tts-dock .tts-ticks {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 10px;
+  color: #9c9182;
+}
+#supertonic-tts-dock #tts-tick-anchor { color: var(--gold-bright); }
+#supertonic-tts-dock .tts-speed { display: flex; align-items: center; gap: 8px; }
+#supertonic-tts-dock .tts-speed label { font-size: 11px; color: #a69b8b; }
+#supertonic-tts-dock .tts-param-tag {
+  padding: 4px 8px;
+  font-size: 11px;
+  border: 1px solid #4a3e30;
+  border-radius: 6px;
+}
+#supertonic-tts-dock select.tts-param-tag {
+  background: #2b231b;
+  color: #fff;
+  border-color: #4a3e30;
+  cursor: pointer;
+}
+
+/* Reduced motion: the wave is static and the glow keeps its colour only. */
+@media (prefers-reduced-motion: reduce) {
+  #supertonic-tts-dock.is-playing .tts-wave-bar,
+  #supertonic-tts-dock .tts-wave-bar { animation: none; }
+  #supertonic-tts-dock .karaoke-word-active { animation: none; text-shadow: none; }
+}

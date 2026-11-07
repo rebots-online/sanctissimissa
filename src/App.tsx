@@ -41,6 +41,7 @@ import {
   type CompanionAct,
 } from './core/orientation/guide.ts';
 import { debugEvent } from './core/diagnostics/store.ts';
+import { startMediaSession } from './core/audiobook/mediaSession.ts';
 
 type View = 'map' | 'reader' | 'annotations' | 'calendar' | 'office' | 'bible' | 'journal' | 'homily' | 'settings' | 'about' | 'account';
 
@@ -326,6 +327,7 @@ function AppShell() {
     SidecarDb.open().then((s) => { if (alive) setSidecar(s); }).catch(() => { if (alive) setSidecar(null); });
     return () => { alive = false; };
   }, []);
+  useEffect(() => startMediaSession(), []);
 
   // Hash-route deep links (#/verse/…, #/day/…, #/section/…, #/s/… — §7.6 BB.3):
   // resolved once on load; shares/widgets/companion all target this layer.
