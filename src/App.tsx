@@ -46,6 +46,8 @@ import { debugEvent } from './core/diagnostics/store.ts';
 import { startMediaSession } from './core/audiobook/mediaSession.ts';
 import { bootSidecarVectors } from './core/accompaniment/sidecarVectors.ts';
 import { startParityProbe } from './core/vector/parity.ts';
+import { startModelPreload } from './core/vector/preload.ts';
+import { settled as voiceSettled } from './core/voice/runtime.ts';
 
 type View = 'map' | 'reader' | 'annotations' | 'calendar' | 'office' | 'bible' | 'journal' | 'homily' | 'settings' | 'about' | 'account';
 
@@ -325,6 +327,7 @@ function AppShell() {
       .then(setDb)
       .catch((e) => { console.error('[Missal:open]', e); setError('unavailable'); });
   }, []);
+  useEffect(() => { void startModelPreload(voiceSettled()); }, []); // L.4 order: after the voice runtime settles
 
   useEffect(() => {
     let alive = true;

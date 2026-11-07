@@ -1,0 +1,76 @@
+{
+  "schema": "sam.runtime-assets.v1",
+  "host": "https://sanctissimissa.robin.mba/runtime",
+  "assets": [
+    {
+      "id": "qwen3-embedding-0.6b-q8_0",
+      "kind": "embedder-gguf",
+      "fileName": "Qwen3-Embedding-0.6B-Q8_0.gguf",
+      "mirror_url": "https://sanctissimissa.robin.mba/runtime/models/sha256/06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439/Qwen3-Embedding-0.6B-Q8_0.gguf",
+      "sha256": "06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439",
+      "size_bytes": 639150592,
+      "upstream_url_of_record": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B-GGUF/resolve/370f27d7550e0def9b39c1f16d3fbaa13aa67728/Qwen3-Embedding-0.6B-Q8_0.gguf",
+      "upstream_revision": "370f27d7550e0def9b39c1f16d3fbaa13aa67728",
+      "license": "Apache-2.0",
+      "mirrored_at": null,
+      "android_pack": "embed_model_pack",
+      "runtime_path": null
+    },
+    {
+      "id": "qwen3-reranker-0.6b-q8_0",
+      "kind": "reranker-gguf",
+      "fileName": "qwen3-reranker-0.6b-q8_0.gguf",
+      "mirror_url": "https://sanctissimissa.robin.mba/runtime/models/sha256/22c9979ce4fbcdc5acdc310c6641c32797eff1aa980b8f7a2db8a8ea23429a48/qwen3-reranker-0.6b-q8_0.gguf",
+      "sha256": "22c9979ce4fbcdc5acdc310c6641c32797eff1aa980b8f7a2db8a8ea23429a48",
+      "size_bytes": 639153184,
+      "upstream_url_of_record": "https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/resolve/a02f48bb4f057028298c21fa033da2b30d7742d5/qwen3-reranker-0.6b-q8_0.gguf",
+      "upstream_revision": "a02f48bb4f057028298c21fa033da2b30d7742d5",
+      "license": "Apache-2.0",
+      "mirrored_at": null,
+      "android_pack": "rerank_model_pack",
+      "runtime_path": null
+    },
+    {
+      "id": "wllama-3.8.1-wasm",
+      "kind": "wllama-wasm",
+      "fileName": "wllama.wasm",
+      "mirror_url": "https://sanctissimissa.robin.mba/runtime/models/sha256/551f13439366eff11e057b1b91fe46a7fdac29d56d67372d4c5f19a549dfe70c/wllama.wasm",
+      "sha256": "551f13439366eff11e057b1b91fe46a7fdac29d56d67372d4c5f19a549dfe70c",
+      "size_bytes": 8763949,
+      "upstream_url_of_record": "https://registry.npmjs.org/@wllama/wllama/-/wllama-3.8.1.tgz#package/esm/wasm/wllama.wasm",
+      "upstream_revision": "sha512-Pl7BEJhPU8OHnV/yhn3DFZYhLLOdSHh+4TND79WCftHnlUAdQPAsyc/CfIOY+4mVxvf5VW3Xw3Uf7BBfotS1gw==",
+      "license": "MIT",
+      "mirrored_at": null,
+      "android_pack": null,
+      "runtime_path": null
+    },
+    {
+      "id": "wllama-compat-3.8.1-wasm",
+      "kind": "wllama-compat-wasm",
+      "fileName": "wllama.wasm",
+      "mirror_url": "https://sanctissimissa.robin.mba/runtime/models/sha256/2db3f67d0bcc19cdf8f14f129e46cab691bff898954808f8a2dc4c586eb5bb68/wllama.wasm",
+      "sha256": "2db3f67d0bcc19cdf8f14f129e46cab691bff898954808f8a2dc4c586eb5bb68",
+      "size_bytes": 16005007,
+      "upstream_url_of_record": "https://registry.npmjs.org/@wllama/wllama-compat/-/wllama-compat-3.8.1.tgz#package/wasm/wllama.wasm",
+      "upstream_revision": "sha512-IvmjrJ+JzDbt3w1FQq1yAmnFEiLGCceowK2Q80zW+k9ChFkPBM1ByX/9xm2xVxyd8MHC50VpuDo6SDE83k9kIQ==",
+      "license": "MIT",
+      "mirrored_at": null,
+      "android_pack": null,
+      "runtime_path": null
+    },
+    {
+      "id": "wllama-compat-3.8.1-js",
+      "kind": "wllama-compat-js",
+      "fileName": "wllama.js",
+      "mirror_url": "https://sanctissimissa.robin.mba/runtime/models/sha256/2649eeb408988841c372e54805adfa25aed5d02f850c09add78c2f3ac0f3fce1/wllama.js",
+      "sha256": "2649eeb408988841c372e54805adfa25aed5d02f850c09add78c2f3ac0f3fce1",
+      "size_bytes": 171615,
+      "upstream_url_of_record": "https://registry.npmjs.org/@wllama/wllama-compat/-/wllama-compat-3.8.1.tgz#package/wasm/wllama.js",
+      "upstream_revision": "sha512-IvmjrJ+JzDbt3w1FQq1yAmnFEiLGCceowK2Q80zW+k9ChFkPBM1ByX/9xm2xVxyd8MHC50VpuDo6SDE83k9kIQ==",
+      "license": "MIT",
+      "mirrored_at": null,
+      "android_pack": null,
+      "runtime_path": null
+    }
+  ]
+}

@@ -8,6 +8,7 @@ import { useMemo, useState } from 'react';
 import ThemePicker from './ThemePicker.tsx';
 import { openDiagnostics } from './DiagnosticsWindow.tsx';
 import ModelPicker, { useCompanionModels } from './ModelPicker.tsx';
+import SearchModelsRow from './SearchModelsRow.tsx';
 import { SidecarDb } from '../core/accompaniment/store.ts';
 import type { CorpusDb } from '../core/data/corpusDb.ts';
 
@@ -247,6 +248,7 @@ export default function SettingsView({
             (SHA-256) and stored once in the shared mba.robin library.
           </p>
           <ModelPicker hook={companionModels} />
+          <h3>Search models</h3><SearchModelsRow />
         </section>
       )}
 
