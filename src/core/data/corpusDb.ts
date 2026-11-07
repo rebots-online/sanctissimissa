@@ -23,6 +23,7 @@ import type {
   NucleatedSimilaritySet,
 } from './types.ts';
 import type { DayFileMeta } from '../calendar/precedence.ts';
+import { attachModuleRows, type AttachResult } from './moduleAttach.ts';
 
 export type {
   InterpretiveNucleus,
@@ -67,6 +68,7 @@ export class CorpusDb {
     const SQL = await initSqlJs({ locateFile: () => wasmUrl });
     return new CorpusDb(new SQL.Database(bytes));
   }
+  async attachModule(id: string, bytes: Uint8Array): Promise<AttachResult> { const r = await attachModuleRows(this.db, id, bytes); this.vectors = null; return r; }
 
   /** Real attached commentary-source listing with block counts (Settings › Library, CP.0). */
   commentarySources(): { source: string; blocks: number }[] {

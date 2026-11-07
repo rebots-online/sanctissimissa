@@ -68,10 +68,12 @@ fn save_sidecar(
 
 mod inference;
 mod model_store;
+mod module_pack;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(module_pack::init())
         .invoke_handler(tauri::generate_handler![
             load_corpus,
             load_sidecar,
@@ -89,7 +91,8 @@ pub fn run() {
             inference::inference_generate,
             inference::inference_cancel,
             inference::inference_unload,
-            inference::inference_tokenize
+            inference::inference_tokenize,
+            module_pack::module_pack_fetch
         ])
         .run(tauri::generate_context!())
         .expect("error while running SanctissiMissa");

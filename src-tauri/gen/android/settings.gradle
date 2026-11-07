@@ -1,3 +1,4 @@
 include ':app'
+include ':module_catena_aurea_en'
 
 apply from: 'tauri.settings.gradle'

@@ -18,6 +18,7 @@ import AnnotationIndex from './ui/AnnotationIndex.tsx';
 import { parseHashRoute, type SharePayload } from './core/share/shareLink.ts';
 import ShareLanding from './ui/ShareLanding.tsx';
 import { SidecarDb } from './core/accompaniment/store.ts';
+import { bootModules } from './core/library/moduleBoot.ts';
 import JournalSidecar from './ui/JournalSidecar.tsx';
 import JournalView from './ui/JournalView.tsx';
 import HomilyPlanner from './ui/HomilyPlanner.tsx';
@@ -328,6 +329,7 @@ function AppShell() {
     return () => { alive = false; };
   }, []);
   useEffect(() => startMediaSession(), []);
+  useEffect(() => (db && sidecar ? bootModules(db, sidecar) : undefined), [db, sidecar]);
 
   // Hash-route deep links (#/verse/…, #/day/…, #/section/…, #/s/… — §7.6 BB.3):
   // resolved once on load; shares/widgets/companion all target this layer.
