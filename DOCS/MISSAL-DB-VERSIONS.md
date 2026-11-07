@@ -37,6 +37,7 @@ One entry per ingest, newest first:
 - Trigram auto-concept INSTANCE_OF edges archived in `edges_trigram_archive` (1309 rows); trigram vectors kept as `embeddings_trigram`.
 - Counts: nodes 109016; embeddings (dim 256) 104836; SIMILAR_TO 836664; semantic INSTANCE_OF 13361062.
 - Rollback: prior corpus file untouched; revert the pointer commit.
+- **Status: NOT SHIPPABLE — do not vendor or release (BA.10 `[/]`, 2026-11-06).** The §3.1 step 5 rule (cosine ≥ 0.45 to a concept centroid) is applied as written, but on 256-d Qwen3 vectors it admits nearly every pair. Measured on the base asset `assets/corpus/missal.corpus-2026.11.07-0210-q3e256.db` (1,617,481,728 bytes, versus 220,246,016 for the input `stage2-graph.db`): 12,235,970 semantic INSTANCE_OF edges from 89,683 sources into 253 concepts (≈ 136 concepts per node), mean weight 0.563. Edges and sources at or above each weight: 0.50 → 8,837,839 / 86,298; 0.60 → 3,536,544 / 70,548; 0.70 → 1,016,676 / 40,202; 0.80 → 117,062 / 12,266. No single threshold both bounds the size and keeps coverage. The INSTANCE_OF rule needs an architect revision, for example a per-node top-k, before this pipeline is rerun under a new `<V>`.
 
 ### corpus-2026.08.16-1459 — `#` sub-heading markers stripped from section text
 
