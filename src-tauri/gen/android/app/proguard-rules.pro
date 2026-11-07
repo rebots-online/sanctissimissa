@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Commerce (§L.3, BA.4): Tauri resolves the plugin and @InvokeArg classes reflectively.
+-keep class mba.robin.sanctissimissa.CommercePlugin { *; }
+-keep class mba.robin.sanctissimissa.Commerce*Args { *; }

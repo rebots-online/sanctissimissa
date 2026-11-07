@@ -66,6 +66,7 @@ fn save_sidecar(
     std::fs::write(dir.join("sidecar.db"), bytes).map_err(|e| e.to_string())
 }
 
+mod commerce;
 mod inference;
 mod model_store;
 mod module_pack;
@@ -74,10 +75,16 @@ mod module_pack;
 pub fn run() {
     tauri::Builder::default()
         .plugin(module_pack::init())
+        .plugin(commerce::init())
         .invoke_handler(tauri::generate_handler![
             load_corpus,
             load_sidecar,
             save_sidecar,
+            commerce::commerce_configure,
+            commerce::commerce_offers,
+            commerce::commerce_purchase,
+            commerce::commerce_restore,
+            commerce::commerce_customer_info,
             model_store::model_lookup,
             model_store::model_begin,
             model_store::model_chunk,
