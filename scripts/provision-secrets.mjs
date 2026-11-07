@@ -18,6 +18,11 @@
  *                        beginning sk-or-) and materialized to .env.local as
  *                        VITE_OPENROUTER_API_KEY for the hosted debug Companion.
  *                        The value itself is never logged or echoed.
+ *   SAM_REVENUECAT_WEB_API_KEY / SAM_REVENUECAT_ANDROID_API_KEY — RevenueCat
+ *                        PUBLIC SDK keys (value form only, mode 'public-key'),
+ *                        materialized to .env.local as VITE_REVENUECAT_API_KEY /
+ *                        VITE_REVENUECAT_ANDROID_API_KEY. Unset → warning
+ *                        "commerce unconfigured"; malformed → FATAL. Never logged.
  *
  * Idempotent; warns (not fails) when a pointer is absent so corpus-only
  * builds stay unblocked, but FAILS when a pointer names a missing file —
@@ -139,6 +144,24 @@ const MATERIALIZATIONS = [
     mode: 'identity',
     fallback: 'https://sanctissimissa.surge.sh',
   },
+  // Commerce (§L.3; L-bookstore-commerce-20261106.md §2.6): RevenueCat PUBLIC
+  // SDK keys, value form only (exported SAM_REVENUECAT_* from .bashrc / CI).
+  {
+    pointer: 'SAM_REVENUECAT_WEB_API_KEY',
+    target: join(ROOT, '.env.local'),
+    envKey: 'VITE_REVENUECAT_API_KEY',
+    mode: 'public-key',
+    pattern: /^(rcb_|test_)[A-Za-z0-9_]{8,}$/,
+    requiredFor: 'web/PWA/Linux/Windows commerce',
+  },
+  {
+    pointer: 'SAM_REVENUECAT_ANDROID_API_KEY',
+    target: join(ROOT, '.env.local'),
+    envKey: 'VITE_REVENUECAT_ANDROID_API_KEY',
+    mode: 'public-key',
+    pattern: /^(goog_|test_)[A-Za-z0-9_]{8,}$/,
+    requiredFor: 'Android Play commerce',
+  },
 ];
 
 /**
@@ -174,6 +197,11 @@ function main() {
     const { pointer, target, requiredFor } = m;
     const raw = env[pointer];
     if (!raw) {
+      if (m.mode === 'public-key') {
+        // Unset public key: the existing .env.local line (if any) is kept.
+        console.warn(`[provision-secrets] ${pointer} unset — commerce unconfigured for ${requiredFor} (existing ${m.envKey} line in ${target}, if any, kept)`);
+        continue;
+      }
       if (m.mode === 'identity') {
         // Identity always materializes (this checkout's canonical fallback)
         // so an unexpanded $REF from .env never reaches Vite. Fresh clones
@@ -188,6 +216,19 @@ function main() {
       } else {
         console.warn(`[provision-secrets] ${pointer} unset and ${target} absent — ${requiredFor} will not work until the pointer is set (see .env.example)`);
       }
+      continue;
+    }
+    // Public-key mode (value form only): validated, written, never printed.
+    if (m.mode === 'public-key') {
+      if (!m.pattern.test(raw)) {
+        console.error(`[provision-secrets] FATAL: ${pointer} does not look like a RevenueCat public SDK key for ${requiredFor} (value masked; never printed).`);
+        failures += 1;
+        continue;
+      }
+      const existing = existsSync(target) ? readFileSync(target, 'utf8') : '';
+      writeFileSync(target, renderEnvLocal(existing, m.envKey, raw));
+      execSync(`chmod 600 ${JSON.stringify(target)}`);
+      console.log(`[provision-secrets] ${pointer} -> ${target} (${m.envKey} materialized; value not logged)`);
       continue;
     }
     const source = expandHome(raw);

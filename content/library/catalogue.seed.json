@@ -30,7 +30,7 @@
       ],
       "evidence": "LEAD",
       "publication": "candidate",
-      "editionId": null,
+      "editionId": "haydock-1883-en",
       "price": null,
       "productId": null
     },
@@ -45,10 +45,10 @@
         "https://openlibrary.org/books/OL7029827M/Catena_aurea"
       ],
       "evidence": "LEAD",
-      "publication": "candidate",
-      "editionId": null,
+      "publication": "ready",
+      "editionId": "catena-aurea-en",
       "price": null,
-      "productId": null
+      "productId": "mba.robin.sanctissimissa.iap.book.catena-aurea-en"
     },
     {
       "id": "work-c004",

@@ -227,7 +227,7 @@ function rightsOk(r: unknown, territory: string): r is RightsEvidence {
   if (!goodText(r.assetId) || !goodText(r.sourceEdition) || !goodText(r.basis) || !goodText(r.attribution)) return false;
   if (typeof r.kind !== 'string' || !ASSET_KINDS.includes(r.kind as AssetKind)) return false;
   if (!goodUrl(r.sourceUrl) || !goodSha256(r.sha256)) return false;
-  if (!Array.isArray(r.territories) || !r.territories.includes(territory)) return false;
+  if (!Array.isArray(r.territories) || !(r.territories.includes(territory) || r.territories.includes('*'))) return false;
   if (r.commercial !== true || r.redistribution !== true) return false;
   if (!goodText(r.reviewedBy) || !goodIsoDate(r.reviewedAt)) return false;
   return true;
@@ -248,7 +248,7 @@ export function canPublishEdition(edition: EditionRecord, territory: string): bo
   if (!goodText(e.workId) || !goodText(e.title) || !goodText(e.author) || !goodText(e.category)) return false;
   if (!Number.isInteger(e.revision) || (e.revision as number) <= 0) return false;
   if ((e.publication as Publication) !== 'ready') return false;
-  if (!Array.isArray(e.territories) || e.territories.length === 0 || !e.territories.includes(territory)) return false;
+  if (!Array.isArray(e.territories) || e.territories.length === 0 || !(e.territories.includes(territory) || e.territories.includes('*'))) return false;
   if (typeof e.free !== 'boolean') return false;
   if (isReservedFreeEdition(e.id) && e.free !== true) return false;
   if (!goodText(e.packagePath) || !goodSha256(e.packageSha256)) return false;

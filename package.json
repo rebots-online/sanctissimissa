@@ -41,6 +41,7 @@
   "dependencies": {
     "@ckeditor/ckeditor5-react": "^11.2.0",
     "@mlc-ai/web-llm": "^0.2.85",
+    "@revenuecat/purchases-js": "1.74.0",
     "@tauri-apps/api": "^2.4.0",
     "@wllama/wllama": "3.8.1",
     "@wllama/wllama-compat": "3.8.1",

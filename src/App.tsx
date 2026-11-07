@@ -48,6 +48,7 @@ import { bootSidecarVectors } from './core/accompaniment/sidecarVectors.ts';
 import { startParityProbe } from './core/vector/parity.ts';
 import { startModelPreload } from './core/vector/preload.ts';
 import { settled as voiceSettled } from './core/voice/runtime.ts';
+import { getCommerce, setCommerceEmail } from './core/entitlements/service.ts';
 
 type View = 'map' | 'reader' | 'annotations' | 'calendar' | 'office' | 'bible' | 'journal' | 'homily' | 'settings' | 'about' | 'account';
 
@@ -320,6 +321,7 @@ function AppShell() {
     systemPreference?.addEventListener('change', restoreTheme);
     return () => systemPreference?.removeEventListener('change', restoreTheme);
   }, [sidecar]);
+  useEffect(() => { if (!sidecar) return; setCommerceEmail(account.user?.email ?? null); void getCommerce(sidecar).entitlements.setUser(account.user?.uid ?? null); }, [sidecar, account.user?.uid]);
 
   useEffect(() => {
     loadCorpusBytes()
