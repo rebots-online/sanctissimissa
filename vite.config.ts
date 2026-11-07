@@ -44,6 +44,9 @@ export default defineConfig(({ mode }) => {
         // Montage images precache with the app (offline-first); videos stay out
         // of the precache and ride the media runtime route below (Stanza AM.05).
         globPatterns: ['**/*.{html,js,css,png,jpg,jpeg,gif,webp,avif,wasm}'],
+        // §L #20 (L-content-modules-search §2.5): nothing paid or heavy is
+        // precached — module DBs, corpus DBs, GGUFs and wllama runtime bytes.
+        globIgnores: ['**/modules/**', '**/*.db', '**/*.gguf', '**/vendor/wllama/**'],
         cleanupOutdatedCaches: true,
         runtimeCaching: [{
           urlPattern: /\.(mp4|webm|mov|m4v)$/,

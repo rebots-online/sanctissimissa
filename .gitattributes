@@ -8,3 +8,4 @@ dist/**/*.msix filter=lfs diff=lfs merge=lfs -text
 dist/**/*.AppImage filter=lfs diff=lfs merge=lfs -text
 dist/**/*.deb filter=lfs diff=lfs merge=lfs -text
 dist/**/*.zip filter=lfs diff=lfs merge=lfs -text
+dist/**/*.db filter=lfs diff=lfs merge=lfs -text

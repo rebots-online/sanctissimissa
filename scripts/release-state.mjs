@@ -532,6 +532,7 @@ async function runCommand(name, deps, root) {
     'android-release': () => {
       console.log('🔧 Stage: android-release');
       execFileSync(process.execPath, ['scripts/provision-secrets.mjs'], inherited);
+      execFileSync(process.execPath, ['scripts/modules-stage.mjs', '--android-pack'], inherited);
       execSync('npm exec -- tauri android build --apk --aab --ci', {
         ...inherited,
         env: { ...inherited.env, CARGO_PROFILE_RELEASE_DEBUG: '2', CARGO_PROFILE_RELEASE_STRIP: 'false' },

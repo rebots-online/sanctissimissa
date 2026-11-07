@@ -20,7 +20,7 @@
     "build:web": "npm run build:vite && node scripts/deploy-web.mjs",
     "deploy:web": "node scripts/deploy-web.mjs",
     "build:desktop": "node scripts/pre-build-gate.mjs && tauri build",
-    "build:android": "node scripts/pre-build-gate.mjs && tauri android build --apk --aab",
+    "build:android": "node scripts/pre-build-gate.mjs && node scripts/modules-stage.mjs --android-pack && tauri android build --apk --aab",
     "build:windows:unstamped": "node scripts/pre-build-gate.mjs && bash scripts/build-windows.sh",
     "build:windows:msi": "powershell -NoProfile -NonInteractive -File scripts/sanctissimissa-v1.40.21223-windows-native-20260913.ps1 -Kind MSI",
     "build:windows:msix": "powershell -NoProfile -NonInteractive -File scripts/sanctissimissa-v1.40.21223-windows-native-20260913.ps1 -Kind MSIX",
@@ -33,6 +33,8 @@
     "format": "prettier --write src tests scripts vite.config.ts eslint.config.js",
     "ingest": "node --experimental-strip-types scripts/ingest-corpus.mjs",
     "corpus:catena-graph": "node --experimental-strip-types scripts/ingest-commentary.mjs --catena-graph build/corpus/stage1-ingest.db build/corpus/stage2-graph.db",
+    "corpus:modules": "node --experimental-strip-types scripts/build-modules.mjs",
+    "modules:stage": "node scripts/modules-stage.mjs",
     "tauri": "tauri"
   },
   "dependencies": {

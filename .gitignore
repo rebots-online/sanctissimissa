@@ -102,3 +102,9 @@ LOGS/
 /dist/sanctissimissa-v1.58.28951-linux-amd64.AppImage
 /dist/sanctissimissa-v1.58.28951-linux-amd64.deb
 /dist/sanctissimissa-v1.58.28951-windows-x64-standalone.exe
+
+# §L content modules (BA.1): corpus pipeline work files, the new base corpus
+# and staged Play asset-pack bytes are build outputs, never source.
+/build/
+/assets/corpus/
+src-tauri/gen/android/module_*/src/main/assets/
