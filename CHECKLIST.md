@@ -3691,7 +3691,7 @@ Standing rules for this stanza (operator, 2026-11-05/06): architect never codes 
     - Every turn is grounded in the Mass, the Office, Scripture, Haydock and the owned modules (D9).
     - Wires (L-content-modules-search-20261106.md §4): `sacristanContext`, `buildCompanionSystemContext`; `SacristanContextItem`/`SacristanSource` closed set; ChatView `db` prop.
     - Commit + push this task alone (`git push --no-verify origin master`; never contact Forgejo).
-- [ ] **TT.1 — Voice contract + sentence segmentation (§K.4; amended 2026-11-06, §L.9; L-audiobook-20261106.md §2, S1, S9).** Self-contained. Files: `src/core/voice/voice.ts` (new), `src/core/voice/sentences.ts` (new). No `tests/*.test.ts` file is created (W13). The superseded `tests/voiceSentences.test.ts` is never written.
+- [X] **TT.1 — Voice contract + sentence segmentation (§K.4; amended 2026-11-06, §L.9; L-audiobook-20261106.md §2, S1, S9).** Self-contained. Files: `src/core/voice/voice.ts` (new), `src/core/voice/sentences.ts` (new). No `tests/*.test.ts` file is created (W13). The superseded `tests/voiceSentences.test.ts` is never written.
   - **Do:**
     - `voice.ts` exports the amended §K.4 contract verbatim from the partial §2, plus the option types the engine and runtime code against:
       ```ts
