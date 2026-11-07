@@ -165,8 +165,11 @@ export class SynthesisPool {
       if (!slot.discarding) this.#finish(slot.job, error);
       slot.job = null;
     }
-    if (!this.#slots.some((s) => s.alive)) this.#rejectQueued(error);
-    else this.#pump();
+    if (!this.#slots.some((s) => s.alive)) {
+      // No lane left: record the failure so later run() calls reject instead of queueing forever.
+      this.#failure ??= error;
+      this.#rejectQueued(error);
+    } else this.#pump();
   }
 
   #rejectQueued(error: unknown): void {
