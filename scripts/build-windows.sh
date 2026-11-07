@@ -8,6 +8,9 @@ if [ "$(uname -s)" != Linux ] || grep -qi microsoft /proc/sys/kernel/osrelease; 
   echo 'Windows cross-build requires native Linux; use the native release driver on Windows.' >&2
   exit 1
 fi
+export PATH="/usr/lib/llvm-19/bin:$PATH"   # D11: clang-cl/lld-link/llvm-lib ≥ 19 for llama.cpp
+CLANG_MAJOR="$(clang-cl --version | sed -n 's/.*clang version \([0-9]*\).*/\1/p' | head -1)"
+[ "${CLANG_MAJOR:-0}" -ge 19 ] || { echo "clang-cl ≥ 19 required (apt install clang-19 lld-19 llvm-19)" >&2; exit 1; }
 VERSION="$(node -e "try { console.log(JSON.parse(require('fs').readFileSync('version.json','utf8')).version) } catch { process.exit(1) }")"
 test "$(tr -d '\r\n' < version.txt)" = "$VERSION"
 

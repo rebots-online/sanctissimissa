@@ -70,12 +70,15 @@ mod commerce;
 mod inference;
 mod model_store;
 mod module_pack;
+mod embedding;
+mod model_pack;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(module_pack::init())
         .plugin(commerce::init())
+        .plugin(model_pack::init())
         .invoke_handler(tauri::generate_handler![
             load_corpus,
             load_sidecar,
@@ -99,7 +102,16 @@ pub fn run() {
             inference::inference_cancel,
             inference::inference_unload,
             inference::inference_tokenize,
-            module_pack::module_pack_fetch
+            module_pack::module_pack_fetch,
+            embedding::embed_probe,
+            embedding::embed_load,
+            embedding::embed_texts,
+            embedding::rerank_scores,
+            embedding::embed_unload,
+            model_pack::model_pack_location,
+            model_pack::model_pack_fetch,
+            model_pack::model_pack_state,
+            model_pack::model_pack_confirm_cellular
         ])
         .run(tauri::generate_context!())
         .expect("error while running SanctissiMissa");

@@ -78,8 +78,9 @@ android {
     buildFeatures {
         buildConfig = true
     }
-    // Paid Catena module, Play on-demand (L-content-modules-search §2.5; DOCS/sdk/play-asset-delivery/integrate-java.md)
-    assetPacks += listOf(":module_catena_aurea_en")
+    // Play on-demand packs: paid Catena module (L-content-modules-search §2.5) and the GGUF
+    // model packs (L-native-embed-engine F3) — see DOCS/sdk/play-asset-delivery/integrate-java.md §Build for Kotlin and Java
+    assetPacks += listOf(":module_catena_aurea_en", ":embed_model_pack", ":rerank_model_pack")
 }
 
 rust {

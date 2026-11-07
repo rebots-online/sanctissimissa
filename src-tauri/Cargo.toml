@@ -19,14 +19,16 @@ serde_json = "1"
 sha2 = "0.10"
 [features]
 default = ["native-inference"]
-native-inference = ["dep:llama-cpp-2"]
+native-inference = ["dep:llama-cpp-2", "dep:llama-cpp-sys-2"]
 
-# CP.7 native inference — target-gated: Windows cross-build (cargo-xwin,
-# clang < 19) cannot compile llama.cpp, and 32-bit (armv7) Android is outside
-# llama.cpp's reliable 32-bit support. Those targets ship honestly without
-# the native engine; 64-bit desktop + arm64 Android get the real engine.
-[target.'cfg(all(not(target_os = "windows"), target_pointer_width = "64"))'.dependencies]
-llama-cpp-2 = { version = "0.1.156", optional = true }
+# CP.7 + §L native engine (D10/D11): every 64-bit target incl. Windows (cargo-xwin, clang ≥ 19).
+# 32-bit Android (armv7, x86) stays outside llama.cpp's reliable support and uses wllama.
+[target.'cfg(target_pointer_width = "64")'.dependencies]
+llama-cpp-2 = { version = "=0.1.154", optional = true, default-features = false, features = ["android-shared-stdcxx"] }
+llama-cpp-sys-2 = { version = "=0.1.154", optional = true }
+
+[patch.crates-io]
+llama-cpp-sys-2 = { path = "../VENDORED/llama-cpp-sys-2-0.1.154-atomic" }
 
 [profile.release]
 codegen-units = 1

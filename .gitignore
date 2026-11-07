@@ -108,3 +108,5 @@ LOGS/
 /build/
 /assets/corpus/
 src-tauri/gen/android/module_*/src/main/assets/
+# L-native-embed-engine F3: staged GGUFs for the Play asset packs (scripts/stage-model-packs.mjs)
+src-tauri/gen/android/*_model_pack/src/main/assets/
