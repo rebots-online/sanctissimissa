@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "generatedAt": "2026-11-07T03:53:14.712Z",
+  "modules": [
+    {
+      "moduleId": "catena-aurea-en",
+      "editionId": "catena-aurea-en",
+      "title": "Catena Aurea",
+      "file": "catena-aurea-en-r1.db",
+      "revision": 1,
+      "appVersion": "1.69.99005",
+      "corpusVersion": "corpus-2026.11.07-0210-q3e256",
+      "sizeBytes": 245198848,
+      "sha256": "94a1a95a1b0f8a81dc9670057e2a9face0b8a9736f739f32275ed7b20b8a89b2",
+      "contentDigest": "e43212d9c82c980d493f1da39d4bf6e63cb9d01cb16375f357a68157d22c95cb",
+      "entitlementId": "reference_catena-aurea-en",
+      "nucleusSource": "catena-aurea",
+      "authorityKind": "patristics",
+      "androidPack": "module_catena_aurea_en",
+      "embedMeta": {
+        "model": "qwen3-embedding:0.6b",
+        "artifact_sha256": "06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439",
+        "dim": "256",
+        "quant": "int8",
+        "prefix_query": "Instruct: Given a passage of Catholic liturgy, Scripture or commentary, retrieve passages relevant to this query\nQuery:{text}",
+        "prefix_doc": "",
+        "norm": "l2"
+      }
+    }
+  ]
+}

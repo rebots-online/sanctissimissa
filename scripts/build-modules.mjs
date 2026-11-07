@@ -267,6 +267,9 @@ function buildBase(src, basePath) {
   base.exec(`CREATE TEMP TABLE mod_set AS SELECT id, key FROM nodes WHERE ${MODULE_GLOB}`);
   base.exec('DELETE FROM search WHERE key IN (SELECT key FROM temp.mod_set)');
   base.exec('DELETE FROM embeddings WHERE node_id IN (SELECT id FROM temp.mod_set)');
+  if (tableExists(base, 'embeddings_trigram')) {
+    base.exec('DELETE FROM embeddings_trigram WHERE node_id IN (SELECT id FROM temp.mod_set)');
+  }
   base.exec('DELETE FROM text_blocks WHERE node_id IN (SELECT id FROM temp.mod_set)');
   base.exec(`DELETE FROM edges WHERE src IN (SELECT id FROM temp.mod_set)
                                 OR dst IN (SELECT id FROM temp.mod_set)`);

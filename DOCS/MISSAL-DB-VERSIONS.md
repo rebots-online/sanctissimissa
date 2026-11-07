@@ -29,6 +29,15 @@ One entry per ingest, newest first:
 
 ## Entries
 
+### corpus-2026.11.07-0210-q3e256 — semantic re-embed (Qwen3-Embedding-0.6B, 256-d) and Catena module split
+
+- Derived from `corpus-2026.11.07-0210` by `scripts/embed-corpus.mjs` (model `qwen3-embedding:0.6b`, blob `sha256-06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439`, Ollama 0.34.2).
+- Vendored Divinum Officium commit: `e9a9055cc235`.
+- Catena moved to module `catena-aurea-en` r1 (R2), so the base no longer contains `commentary:catena-aurea/*`.
+- Trigram auto-concept INSTANCE_OF edges archived in `edges_trigram_archive` (1309 rows); trigram vectors kept as `embeddings_trigram`.
+- Counts: nodes 109016; embeddings (dim 256) 104836; SIMILAR_TO 836664; semantic INSTANCE_OF 13361062.
+- Rollback: prior corpus file untouched; revert the pointer commit.
+
 ### corpus-2026.08.16-1459 — `#` sub-heading markers stripped from section text
 
 - **Fixed:** DO's `#` sub-heading lines inside `[Section]` bodies

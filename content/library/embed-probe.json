@@ -1,0 +1,296 @@
+{
+  "schema": 1,
+  "corpusVersion": "corpus-2026.11.07-0210-q3e256",
+  "embedMeta": {
+    "model": "qwen3-embedding:0.6b",
+    "artifact_sha256": "06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439",
+    "dim": "256",
+    "quant": "int8",
+    "prefix_query": "Instruct: Given a passage of Catholic liturgy, Scripture or commentary, retrieve passages relevant to this query\nQuery:{text}",
+    "prefix_doc": "",
+    "norm": "l2"
+  },
+  "ollamaVersion": "0.34.2",
+  "items": [
+    {
+      "id": "d01",
+      "role": "doc",
+      "key": "section:Tempora/Quad4-5t#Super populum",
+      "text": "!Oratio super populum\nv. Orémus.\nv. Humiliáte cápita vestra Deo.\nv. Da nobis, quǽsumus, omnípotens Deus: ut, qui infirmitátis nostræ cónscii, de tua virtúte confídimus, sub tua semper pietáte gaudeámus.\nr. Per Dóminum nostrum Jesum Christum, Fílium tuum: qui tecum vivit et regnat in unitáte Spíritus Sancti Deus, per ómnia sǽcula sæculórum.\nR. Amen.\n\n!Prayer over the people\nv. Let us pray.\nv. Bow your heads to God.\nv. Grant us, we beseech You, almighty God, that, conscious of our weakness, we may place our trust in Your strength, and rejoice forever in Your fatherly love.\nr. Through Jesus Christ, thy Son our Lord, Who liveth and reigneth with thee, in the unity of the Holy Ghost, God, world without end.\nR. Amen.",
+      "vec": "CQD//AX8Dfj7/fQAE//7Eu0OGOYD9AwaFQoHCP8N9fkDAQf+/PoC+wX5CAT9+Pbv//33/fkC+vr+/AP/BQHv8wASAf3/+fgI8wEG+gIHAPn98gz4Ag/7Af/9EgUCBPcEBP/8AAQACAn5DPoMAfwF+ggBB/vw+wL49vIE//YD+PsJ9QL3/QUGA/oCAvwLBgABAAf6AQgE/AH+APr1APsDAAT8+vr+/Pr89AcBB/0DA/Tz6vwHA/7/BAML/wEF/vn7+wr5+gD5BP72AQH6CQ8GBgP7CfgDBgH39QD3BAT47PgF/f8CAv8B+hT/Bf39+AIMBv4OAfcD/v8H//r2DfH//w=="
+    },
+    {
+      "id": "d02",
+      "role": "doc",
+      "key": "section:Tempora/Adv3-6#OratioL5",
+      "text": "Deus, qui tribus púeris mitigásti flammas ígnium: concéde propítius; ut nos fámulos tuos non exúrat flamma vitiórum.\nr. Per Dóminum nostrum Jesum Christum, Fílium tuum: qui tecum vivit et regnat in unitáte Spíritus Sancti Deus, per ómnia sǽcula sæculórum.\nR. Amen.\n\nO God, You Who tempered the flames of fire for the three young men, mercifully grant that the flames of sin may not burn us, Your servants.\nr. Through Jesus Christ, thy Son our Lord, Who liveth and reigneth with thee, in the unity of the Holy Ghost, God, world without end.\nR. Amen.",
+      "vec": "DwP//Ar4CwDsBvf4D//+Hf8SEPb+/w0cFAMLAQsS6PgFAPr//v7/Awr4Af8DAgD6BAH9AQIJ+QYB+wEBBP/67/wN/QT5+AH89AP+//4A/P/69RX8/RHv/P3/Ewj9DPUJBP4CBfsJ//n+D/MI/v0EAAgEBP3y+AEA/fEC+P0H9/4D9P37AwoI/voCA/0GBAD6+wT+BAX//QMD+PT8AP39AQf//P4BCfT89A77DgL3Bvz88/8IAAMAAv4B/P/88fkC+Qv8+wcAA/77+AP9CQgGCf78AwgFEAL2+gT8DAb98/38BP0CBvr7AAv//gcE9gYI/f0RBvEEAgMD/vruCvL//A=="
+    },
+    {
+      "id": "d03",
+      "role": "doc",
+      "key": "section:Tempora/Quad2-2#Communio",
+      "text": "!Ps 9:2-3\nNarrábo ómnia mirabília tua: lætábor, et exsultábo in te: psallam nómini tuo, Altíssime.\n\n!Ps 9:2-3\nI will declare all Your wondrous deeds; I will be glad and exult in You; I will sing praise to Your name, Most High.",
+      "vec": "BP3+9vX7DhT8+fcCCf78EPMVGeP6/PESGP8AAA37APYDAgT98/wJAAwBBgL9/fz8BP3z/Pn5+/wIBAEC/QD99/v++f8A9gMQ6/4C/AP8+/769Ab7CxDv9wT2Ew/6Cuv9/QsDBP76Bvz9CfsC+AEEDAoBEP3y+f/9+fL/+fn/+vwA/AH3/wIFDQAF//sFAAX5Af4A//0A/P///AD8+fwGAQYC+PkBDQD//Q8C//sLBfz67foCAP7+AwUJA/oK8PX+8wUC/gX/A/n+AvwEAwUDAf//+PwB/QHz+wP9AggD7vkGBwIEBP33AA77BPoE9QYKCwMQ//kAAwb8Afv2B/D9BQ=="
+    },
+    {
+      "id": "d04",
+      "role": "doc",
+      "key": "section:Commune/C6#Capitulum Laudes",
+      "text": "!2 Cor 10:17-18\nv. Fratres: Qui gloriátur, in Dómino gloriétur. Non enim qui seípsum comméndat, ille probátus est; sed quem Deus comméndat.\nR. Deo grátias.\n\n!2 Cor 10:17-18\nv. Brothers: But he that glorieth, let him glory in the Lord. For not he who commendeth himself, is approved, but he, whom God commendeth.\nR. Thanks be to God.",
+      "vec": "BPH+BA34Dvf9BQDwEv79FPcOCvP6+gIXFvcHBA7+6/0DB/399+0JB/4AAQr2//4CCQX3Bv8F+gAKA///AQcFAPsRDAz79wD8AwMAAwIDAwMC8xT78w37AwgIAw0BCP0E+gb++/8FCwgBC/wJAPsXARX6Bwfw/Pv+8Pn+/fkB+gMH9/35/wwJB/38AP0C+////QEAB/8E+gT8/fYEAf4GAAgC+wP6/P39BgL6CAEC/wL67fYACQL7A/cO/gn7//r+/Q38AgL4/gUHBP7+AgcF/vf6+goJDgH9+fj3AgUE7PgI////EP3//BMBAQcC7gAPAPkTBfz7BwL+/fb7Bvj5+g=="
+    },
+    {
+      "id": "d05",
+      "role": "doc",
+      "key": "section:Tempora/Quad6-4t#Postcommunio",
+      "text": "Refécti vitálibus aliméntis, quǽsumus, Dómine, Deus noster: ut, quod témpore nostræ mortalitátis exséquimur, immortalitátis tuæ múnere consequámur.\nr. Per Dóminum nostrum Jesum Christum, Fílium tuum: qui tecum vivit et regnat in unitáte Spíritus Sancti Deus, per ómnia sǽcula sæculórum.\nR. Amen.\n\n Strengthened with life-giving Food, we beseech Thee, O Lord, our God, that what we do in our mortal life may bring us to the reward of life immortal with Thee. \nr. Through Jesus Christ, thy Son our Lord, Who liveth and reigneth with thee, in the unity of the Holy Ghost, God, world without end.\nR. Amen.",
+      "vec": "/wT//wf4B/zwBfP9Dv/8C/ITDOgA+gcnEAQCBQsN9AD/Bwn+9fcFAwr4CQH7+/vtCgH5AQcB/P8EAQD4AQL46wEOAQb6+P369QL/+/oE9QAB9Ab9/xLwAv36EQH+B/IHCQT5Bf0IAAD4EfUABP8CAQ8FCgDu/P4B+fYB/PMG+wEG9AP2/gAPAwYBBvYEAfz9AQL9/gcH/AIJ//0D+wEFAQkF+gIAAQj99AoBCP36Bff99QMCAAT+AP37BQP+/f3/9gv6+f/8/wH++AL9BQUMDAH3CAYEEAT6/AP6DQz+8Pr//wAEBQMC+Af7Bv789wcJAv8N//MFAvYACvrxCOv9AQ=="
+    },
+    {
+      "id": "d06",
+      "role": "doc",
+      "key": "section:Horas/Tempora/094-2#Responsory1",
+      "text": "R. Nos álium Deum nescímus præter Dóminum, in quo sperámus: \n* Qui non déspicit nos, nec ámovet salútem suam a génere nostro.\nV. Indulgéntiam ipsíus fusis lácrimis postulémus, et humiliémus illi ánimas nostras.\nR. Qui non déspicit nos, nec ámovet salútem suam a génere nostro.",
+      "vec": "Aff/Bv/+B/75/vDvBf75F/gCE+QD//8eGgQA/QoL7vsDAP3++/j9Agf7BwMBAwH2CAj8/QcI+/0B+gH3CAD58P0RCf/++v//+Ab3//8F/AQD7xP5/gv+AgIAEA3+B/T8A/j4//4JDwP0DfsMAPIB+hICCv37+f4D7v4F/f0I8f4E+P72/RACBgD9/fwJ//r//AT9////+fsG/fgC/PwJ/AYF9/8A/wf69Q3/DwICBPH49fcCCAD4AgACAv7++/4B+Qn+/vv4CfoC/v8BAAID/P8F+g4CCf787gH8AP/97foG/gIE9AL99Az4AgQD+f8ICfsR/vUGAgYJ+wXzC/4AAQ=="
+    },
+    {
+      "id": "d07",
+      "role": "doc",
+      "key": "section:Horas/Sancti/10-24#Tractus",
+      "text": "!Ps 148:2\nLaudáte Dóminum, omnes Angeli ejus: laudáte eum, omnes virtútes ejus.\n!Ps 102:21\nBenedícite Dóminum, omnes virtútes ejus: minístri ejus, qui fácitis voluntátem ejus.\n\n!Ps 148:2\nPraise the Lord, all you His Angels, praise Him, all you His hosts.  \n!Ps 102:21\nV. Bless the Lord, all you His hosts, His ministers, who do His will.",
+      "vec": "Bfr/+wT4DgcD9/X7C//+EPUZDfQHAf0UGQD/AwkO7wEEDAH++PQC/Ar+A/77/Pv5+P/3Av4G+gn/AQr3//zw+PsN/gr1+vwH8gX68fz+//v/8Rb2/RX4/wwCEQsDB+8DBv39BAEFBQcBCvoHAPsDAg4DDf/u/P768OwC+/UE////9P/5BAYBCfj9/f/8APz7+QX+AQAA+P///foF/P0CAQwB/v4AAfsBAAsCBQH/Bfn29PIJAAD7Af0R/gED+fz88AX9/gH6BQX3A/r7Bgr/APf5/gUDDAXy+P/+BgQB8vgBAQAEBwT59w8AAAMD7gECA/4aAvoAAv8GAPr7C/b/9w=="
+    },
+    {
+      "id": "d08",
+      "role": "doc",
+      "key": "section:Horas/Sancti/06-12#Introitus",
+      "text": "!Ps 36:30-31\nv. The mouth of the just man tells of wisdom, and his tongue utters what is right. The law of his God is in his heart.\n!Ps 36:1\nBe not vexed over evildoers, nor jealous of those who do wrong.\nV. Glory be to the Father, and to the Son, and to the Holy Ghost.\nR. As it was in the beginning, is now, and ever shall be, world without end. Amen.\nv. The mouth of the just man tells of wisdom, and his tongue utters what is right. The law of his God is in his heart.",
+      "vec": "+vQAAPvzBwz3+Pz3Ef8AE/kFFeP+CAcJBvsADRYB7AII/Pr//QME/AHwBAgCAPz4BgkAAfsI9An8AwL+Awb45v4PAgP3+QAP9Pn7C/79/AP9+hQE+g7oCgH+GAoFCf0F+QIEBv0B/wD1BwkP8gYFDwgFBvn3AP/99/UEAfkG+fwF/fz//Q0GAfMI+vga/v3+BAgD/wb0+QYD+/r6//z//wb7/P/9C/kDAwv9Af7/CQj89P8AA/0DCv/++/789/YB+QcD/P0CBfv3B/r/BQoIBf/++gMEBwj3/P38Dgf88fsDCAMD/v74BAv9A/j78fwD/P77APz9/gAFCvT9Bfj8+A=="
+    },
+    {
+      "id": "d09",
+      "role": "doc",
+      "key": "section:Horas/Sancti/01-25r#Graduale",
+      "text": "!Gal 2:8; 2:9\nQui operátus est Petro in apostolátum, operátus est ei mihi inter gentes: et cognovérunt grátiam Dei, quæ data est mihi.\nV. Grátia Dei in me vácua non fuit: sed grátia ejus semper in me manet. \nAllelúja, allelúja.\nV. Magnus sanctus Paulus, vas electiónis, vere digne est glorificándus, qui et méruit thronum duodécimum possídere. Allelúja.",
+      "vec": "Bvj+AgX5DQ/5BP/6Df73Eu4ZFe8JAgUOGvoFAAcKAvr7Dv78+fYF+wX5Bwj0//f7DPv9/QMG9/wBCAf9/g379fURCg0A9fQD+gwCAP75A//8AR0FAQb9Bgf+FgYADPkKAQYCBfgDAv0AEfUJ/P4ABA0HCvvr+wD48/sGAfgG/fwM8gH+/gsFA/v+BPcJ/QH4AwAA/wcM//34/QT/APsCAwIG+f//Cgf8/wkGBAQEAgL36f8GB/z9+ggF/f0M+fsE+QcBAf/6//sABwUBAgQJBf73+g0DCwv98QL3CQUB9/sA+f4EBQT/8gf9AgcG+gcUCAAG//gFBAD1BQL5AgP/AA=="
+    },
+    {
+      "id": "d10",
+      "role": "doc",
+      "key": "section:Horas/Tempora/Pent01-3#Responsory1",
+      "text": "R. Peccávi super númerum arénæ maris, et multiplicáta sunt peccáta mea: et non sum dignus vidére altitúdinem cæli præ multitúdine iniquitátis meæ: quóniam irritávi iram tuam, \n* Et malum coram te feci.\nV. Quóniam iniquitátem meam ego cognósco: et delíctum meum contra me est semper, quia tibi soli peccávi.\nR. Et malum coram te feci.\n\nR. My sins are many, yea, they are more in number than the sands of the sea; I am not worthy to look up toward heaven because of the multitude of my iniquities; for I have provoked thee to anger;\n* And done evil in thy sight.\nV. For I acknowledge my transgression, and my sin is ever before me, for against thee only have I sinned.\nR. And done evil in thy sight.",
+      "vec": "Bv7+AQn8Bvz2/f/wEP77FQAEHvcIBAITGvsFDwfv8PsD//r9APgIA/XzCAPw+QT8BQL8/AIF/f0G/wcCBgf69/gIAwT4+vcA9vv6Av37BAP79wX8AhD7/QUCEwn3Cfz9/fX5BP8H/vb0EvwO/AYN/Q0IBfb3Af388vwC9gD/8/sK/v3//QcFAfkG/vgR/Pr8/wYA/P3y//8D//3+//wF/gf9/vn/Df4B+AwDCP0DBPT+7f8DAwEABgEK+v349vz9+gf//gP9Cf37AAYAAAT7Bvj+9wQQAv/28wf9BwsG4Pv//QL5BAP/ABn8BPz/AQMPAf4JBvgDAAwACAL3AfIB/Q=="
+    },
+    {
+      "id": "d11",
+      "role": "doc",
+      "key": "verse:2Mach/5/20",
+      "text": "Ideoque et ipse locus particeps factus est populi malorum : postea autem fiet socius bonorum, et qui derelictus in ira Dei omnipotentis est, iterum in magni Domini reconciliatione cum summa gloria exaltabitur.\n\nAnd considering in what manner he was come to it, patiently bearing, he determined not to do any unlawful things for the love of life.",
+      "vec": "Afv+DQvwCgD7FfH4B/34GvgDFOQCBQ4KEf78/gsB8/j4Afr8BPgFBAHsDQD89wLxFQP7+QIB+vn+9Qj7Bwn06f0FBwP8/P/9/QwA/AT1AAIA+gcEAQ77B/0BFRT2CfwH/foACPcIA/P4FfQG/v4CAQoDBfb4/fj19wMCAPcC8fkL9v/7ABIC//gD+/gKAwD7/gQAAwb7/AL9/vz+//0JAQYC/f4BBAX/7gL5AAL8Bv757AUHB/7/Af4D/gT7+gICBgMB//77A/73CgP7/AYEAfv17wgRCAP78wP7BAX8+AT39QX9Af78/wcAAv0D+g0EAP8DAfgB+/3+CPzy/f0BAA=="
+    },
+    {
+      "id": "d12",
+      "role": "doc",
+      "key": "verse:4Reg/9/30",
+      "text": "venitque Jehu in Jezrahel. Porro Jezabel, introitu ejus audito, depinxit oculos suos stibio, et ornavit caput suum, et respexit per fenestram\n\nAnd Jehu came into Jezrahel. But Jezabel, hearing of his coming in, painted her face with stibic stone, and adorned her head, and looked out of a window",
+      "vec": "Evf+B/0BBxHw/PP8A/78FQEDHPHy6vb4AgT4Bxn9AA0FDQX99vcBBgb7EQX88/b0C/cAAAQB9vwLAQ38Ef4GCPb7CAH8+gb89wAABgUL+wf2EwAC+g7+8gD5Ewn3/vUBBf769gEE+/X1C/QG/AEGDQQPAgH58f39+vr7/f/9/wgHBPr7Bf8HAvsFBf8L/gUD/AEA/v7vCP/8AAMD+/QBAwcGA/4CAPb2/AwAE/oBD/j5Bvv/BvX6/gP3Cgf9APkD+w0D9v72Bf0BA/wD+QYGB/kDBAMDAv32+gj9AQAD8Pr++QUE+gYFBvsADfn//gQNCgYL+PwBAfcCAgcIAQD6Cw=="
+    },
+    {
+      "id": "d13",
+      "role": "doc",
+      "key": "verse:Jer/18/22",
+      "text": "audiatur clamor de domibus eorum : adduces enim super eos latronem repente, quia foderunt foveam ut caperent me, et laqueos absconderunt pedibus meis.\n\nLet a cry be heard out of their houses: for thou shalt bring the robber upon them suddenly: because they have digged a pit to take me, and have hid snares for my feet.",
+      "vec": "DP79BwXxD/75B/r3Df32HwH0JPnuC/wOFP8BBQD3+gT+Av/8BPUACQb7BvcD+wTxBgzyAQMA/PwD9QX6Bv3z/QH7BfX///oI/AUB+QIFBgT6CAryARQG+QIMAQn5+/38Avr7+f8ECvr3FvsL/AYLAgIBBPgG/PgH/Q7+7v357voE9/v8CAcFBAEHBvwH/AD2/gYBAgL0+QkB/QIH/PwOAwQD/vj/C/z+8AP7BQP5BPr48QUCCvn9Bfvz/ff59Pb5+AUC+Pr+BPr6/QQBAP4I/Pf88REF+/v+9QL6BAH/+f/6/QX3/wD4ARH9CvwE+P4CA/sI/fcC+fkCAQX2EAkCAw=="
+    },
+    {
+      "id": "d14",
+      "role": "doc",
+      "key": "verse:Jer/36/21",
+      "text": "Misitque rex Judi ut sumeret volumen : qui tollens illud de gazophylacio Elisamae scribae, legit, audiente rege et universis principibus qui stabant circa regem.\n\nAnd the king sent Judi that he should take the volume: who, bringing it out of the chamber of Elisama, the scribe, read it in the hearing of the king, and of all the princes that stood about the king.",
+      "vec": "BfL9/Pf0Ef3y+Ov1CP37HvYMDP/99fz/DwT2AhT8AAcNCPb8BP71BAsJCwQB8fkHDP38BAED/fII+gX6EgEA9AIGA/v58/n18Q4CBff8+vv3DAX++RX2+//9BA/yEPgFCQkDCfj6BfrxDvcB9/0MDf4JB/zq/f8DAvYA/A0H+QL/9PzzAPoEAPkQBP4L+gL5AwUI+QD5AgP8/fgB+/v8/wT+A/D8/vP+Awf7Bf39BQH5/PoEAQf1Afz/Agn++fn99gb7AQj7Av/5Bv3+CQgLBAYDAAb8DQILAQX6Df8G/f78AwEA+QUG/QIHDgX+AggDCwn/BAD8//n8AP7vCwH/BA=="
+    },
+    {
+      "id": "d15",
+      "role": "doc",
+      "key": "verse:Sap/14/31",
+      "text": "Non enim juratorum virtus, sed peccantium pœna, perambulat semper injustorum prævaricationem.]\n\nFor it is not the power of them, by whom they swear, but the just vengeance of sinners always punisheth the transgression of the unjust.",
+      "vec": "EvD+CAn7BAb6//z2Ef76Hf/yD+oK/w4LEwUCCQj/6/sAAgP9DPv/A//7/P/18gQAFQP1+AAG+f0M/gT3Df33+f0VBw72/AL0AAb2B//2/wL/AQ0CBAkCCQD/Eg0BCgD/APf/+gMJA/0AEPYI9wIJ/wkKAPXz/fz/+vz9+gkF9P0K/vYEAhkDBfcD//kT/P76/wEA/AL7/Pz//AIC+gMG/QUA/Pr+DAQBAgr6CAf9Av396wYDA/78Bwf/+f759PD7/gf8+//7Cf/6BgL+AAj+Avz6+AgCCgT78wP7CQj/9gLv/QQBAQYE+RD9AvsDAAIAAgEI//YHAPsCDAnx/gT8+g=="
+    },
+    {
+      "id": "d16",
+      "role": "doc",
+      "key": "commentary:haydock/Ps/55/9",
+      "text": "I have. Protestants, \"thou tellest my wanderings: put thou my tears into thy bottle. Are they not in thy book?\" St. Jerome, \"thou hast numbered my most secret things: place my tears in thy sight,\" etc. (Haydock) --- Septuagint render the sense clearer. (Berthier) --- God has promised to relieve the distressed, who confided in him.",
+      "vec": "EAT+/v3yCQXrB/39Cv/8H/f7HOb//QYPEAUJ+wAH7e8ICwT+APMK/Av+CAX1+wD4CAn2/vr/+gMHDQIKDgP9/Pf4B/7++f8C+QUFCf4EBfzz/xIF/xT3/QAIEhT9BPcDAP0D/gQGBAT1C/kM//sF+wsFBwb89wHyAAMGAwAD+QcK+gb7/gEGBAsGAAEN/gn6/gEA/gP7A//++/L/Af0H+wT0+wMHCvcB+PoDBfwEAQL8/PYDBPv//f39A/gD9fcEBAP++PvyBPgBAQMB+wr/Bv/5AwoCBgIK/gj4BgYA5PkC/vwCCf8B+wkDCQME9f8R+/wI+/b///oA/v3vAfcE+Q=="
+    },
+    {
+      "id": "d17",
+      "role": "doc",
+      "key": "commentary:haydock/Esth/11/4",
+      "text": "Juda. This has been noticed already, Esther 2:5. But we need not be surprized at such repetitions. We find the like in the books of Moses, and 1 Kings 16:10., and 17:12., etc. (Haydock) --- St. Jerome says, \"Librum Esther variis translatoribus constat esse vitiatum;\" or, various historical documents may have been improperly inserted in the Greek, though they be true; and therefore St. Jerome has rightly removed them to the end. (Houbigant)",
+      "vec": "CQn+9wEFDPr2+/DvFP77GvX/D/j9BAULEAP6+QwD/PgMDAX+//wI8Qj5DQv28Aj+CQrzBgYE/PIIBwIACvcMAvzuDfv/Af4BAQkD/wQE+fn/CREM/BD+/QQJ9xkBA/MD8vQKAggOCgX4B/3++v///QsC9gLy/fv08PkC+wwC9gcE+v///P0E/QIIB/8K/Ar7AgYN+v77AP/1/vv/APwH/Ab9A/cBBPf8DP//C/H6AQX7B/78Avr+A/4BA/YG/PwE9fr7/v37B/z9CQD/9wn8B/v9CAb+AQwDAgf6CQMG8PsCAwT6AAT78gn5BfoF8vwDBQQI9QL+BvX/EvbyA/cJAg=="
+    },
+    {
+      "id": "d18",
+      "role": "doc",
+      "key": "commentary:haydock/Ezech/39/28",
+      "text": "There, except such as refused to return. They have entire liberty. This and what follows was not fully accomplished till the propagation of the gospel. God wished all to embrace it; and though Israel has been partly blind, they will enter the Church after the Gentiles, Romans 12:26. (Calmet)",
+      "vec": "+ff/Agj0CQLyB/QB+f/4E+T8F+r18hAKEvj07BkL8wn8++7+//8GBgD0BgED+gL7CAABAfj/+f0I/vcDFQILAPkCDv8A9PoD9gABBf4A+Pz8/QoF+hQCBwT/BAn/Cen7BREC//4KC/8TEPcBAvcLBAUB/vzv+v/8+vwJ/PkH+AkI/wH8+gb/Cf8I//4L+fv4A/0CAAL/AwH6+QMA+QUJ/goCAAP/EfwCAP35BgPzBQn78gABBP8C+/3+Bv4B+wP7/wUC/wn8CvoEAP0D+QcFA/sF9gUOEAMM/gIBBAP78QUNBQMJBQMFAgAAAQgM/f0DAgAH9/sBAQH6/Pby/wACAg=="
+    },
+    {
+      "id": "d19",
+      "role": "doc",
+      "key": "commentary:haydock/Judic/9/21",
+      "text": "Bera. Hebrew, Bar or Beera, \"the well.\" There was a place of this name in the tribe of Ruben, where the Israelites encamped, Numbers 21:16. Bersabee, in the tribe of Juda, was another famous well, and it is probable that Joatham would retire to some distant place. (Haydock) --- St. Jerome mentions a Bera, eight miles north of Eleutheropolis; and Maundrell speaks of another, about 21 miles from Sichem, on the road to Jerusalem. The dominion of Abimelech did not extend far. (Calmet)",
+      "vec": "9PT9BgL7/g39/fkQEv3/GgoFEO/5BQQDCP/5BQ31CQMP/P/8+OoGDgr/DhH+/wL/Bf32APcB/vYTCAv5CP8EBfb3A/n2BgcG/v0J+Qj2+/8F/g0B/A0JBRDzAQMA7wL/CwYEAhH8BPv0DvoB7PoABwEGAgPz/wf6/vcFA/oG8xL+BAL8/vULBQEKDAcC+Aj0/gIDBP34AQL5+PkA/wECAwQF//0JCPgG+fsDA/L6AhAG9//9AQH7B///BAEEAQMI+QP++A78CPn6EPkD/A0FBPkA/QkL9QENAv/5AgH/7QIJBgT7//v08wED/wIB8gEFAwEN/fn5/fkG+xL9/voGBA=="
+    },
+    {
+      "id": "d20",
+      "role": "doc",
+      "key": "commentary:haydock/Ps/35/13",
+      "text": "There. The devil fell by pride, and man by his persuasion. Neither could escape punishment. (Worthington) --- There, in heaven, (St. Jerome) and in paradise, pride proved fatal; (Calmet) while it will be punished in hell. (St. Ambrose) --- Pride and injustice will entail destruction upon our persecutors. Babylon shall shortly fall a prey to Cyrus. (Calmet) --- Stand. Hebrew kum, \"rise again.\" The proud are seldom converted, (Berthier) and the rebel angels had no redress. (Menochius)",
+      "vec": "DQj+GAP3C/v8/gP+A/79Fvf+Iu4LDQwFEQIL/Qz55QMCC/39/fT+Bw//Cvz0ARn/FAT7AP8I/QgE9Qj9EAH97PYDAwkIAP37/fn+Cw/w/Pr7AQ78/xP8/Q3zAhL8CvP7A/z7/vkCCf/6EfsL/PkDBfwB/wAAAfn89wQD+wEG/Qj/+wMEBQwJAfkCAP4N9/z49f4ABAL3+//8+v8B+gEE/gUCAfz9Bwj8AgEBAPr7BQP87/f9BwL7Af/7/f/8+vv/BgX/9wL2BQD4C//7/QT/AwAB9QISBgYM/gH6AQT78AQC/gMEAP//AxAAAvsJ/QUB/vwLBfkFAAL+/gb5AvIEBw=="
+    },
+    {
+      "id": "q01",
+      "role": "query",
+      "key": "section:Tempora/Quad4-5t#Super populum",
+      "text": "!Prayer over the people\nv. Let us pray.\nv. Bow your heads to God.\nv.",
+      "vec": "/vb++f3zCfT0AvT9Ef//EfMMF+317xcXABASCP8P7wkDBAf+7u4MAgTy/AEB+/fw+Pz9APUC+QT59gT9CwP4+/8G/vz+APYL9/oEBP4MCfj3+APx/Q36BQD5Fwr3AwX9A/z+/QD8/AMC/v4E+PoB+goNCAr3/f789AwFAfX98gED9gD9AfIA/voBBP4HAQT+/wf7Agf/+v79Af/8APgEAAX8+Pb2AfkB/Qb8BwMI/PX66fkDAvcBAP8NAAID9voD/Ab+/QX9BQT1B/4BBgYABAQCAvsFBQUD8QT6A///8PQG/QP/BfkC+hL7AQT89AICBf0HBQEGAfwF/+/2Bfj++g=="
+    },
+    {
+      "id": "q02",
+      "role": "query",
+      "key": "section:Tempora/Adv3-6#OratioL5",
+      "text": "O God, You Who tempered the flames of fire for the three young men, mercifully grant that the flames of sin may not burn us, Your servants.\nr.",
+      "vec": "CAQABwb6CgTuCfzuDwAAHgYNC/fyAgwYE/0S/gcQ5fYF/fYABvsACALxAf8J/vz7BwH6A/4H9Af9/P8ACPr99vkM/wDx/wcA+v73BP4B/gT29RX3Aw7vAAMGERD9CfsGBQMFBf4LAfv7CPsJB/z8BAUEBAD6+wL9+v8I/fsE9P0B9/0BAA4EAPQFAP0E/gD7+gX9BwT7/gEE//T+AP/+AwgA+//+DPQE+RP6Cwb4BAP++AUHAAQGAgP//AD/9fsKBgoC/Af/Avz6AP//BgoFBv79+AQGEgEC+wb6CAD+8AD6A/4DBfn9/g34+AUJ9wkJ/f0MCPAFAAYC+gDxDvkA7g=="
+    },
+    {
+      "id": "q03",
+      "role": "query",
+      "key": "section:Tempora/Quad2-2#Communio",
+      "text": "!Ps 9:2-3\nI will declare all Your wondrous deeds;",
+      "vec": "DPj+9v4IEQr9//T/C/78Ge8QFugC/QEODQALDQQCA/UAAwP9/PP//QD++wEF+P71DgP3+Pb/+wUKAv7/C/oB8/kD9vr8+wcW7wAC/f4CAPr+9RD3BA/qAgHtDRT5CfT+/AsFAAL3+/oCAf0D9PwJDQcCBe/s/AT59fgD9wL3+/sA/v/1+ggGC/YFBfwP/f75/QID/gIJ/gL3+AT++/7+AgIG/vn/Dv38AAj8AfsLBwD59fwHA/v7BP4CA/sL/AEA/QYAA//9BvkACPwEAQUBAf769wL6BAT1AAz4/gUD7f/5A/8GBf77AxX9AwUC9QMFAQEP+vcEBQsABQP5A/L6/w=="
+    },
+    {
+      "id": "q04",
+      "role": "query",
+      "key": "section:Commune/C6#Capitulum Laudes",
+      "text": "!2 Cor 10:17-18\nv. Brothers:",
+      "vec": "BPX9CgcFDfn5+v/3D/38EPAGDv3zAwUgEQICAQ8F6vIL+Aj8/O4PEAH4Ag368/j0BwT5BP4F/QEJ+f8IA/oJ/AAJCwcD+P8IAwX9/QYMAvwG8A7+9xL6BQAO/RX/DAf9AQn/+wEHAQUCEPcG/fwGBP79//v2/f/88fz/9/L6+AIF9Ab1+f7//Qf8Bfv9/wf1+QAAAQgC+wMGAAALAP0JBAIG+AP6Bv0CBv/5B/sNAQX2+/79BwX/Af0LAQz//fv+/Qf7/QT7BvwIDfoFAQQA/vjz+wYGE/wA+wn8AwkC6fYCAf0GDv8A/An8CAn/8gAVBPwLAgP9AAD89vz4A/j3BA=="
+    },
+    {
+      "id": "q05",
+      "role": "query",
+      "key": "section:Tempora/Quad6-4t#Postcommunio",
+      "text": "Strengthened with life-giving Food, we beseech Thee, O Lord, our God, that what we do in our mortal life may bring us to the reward of life immortal with Thee. \nr.",
+      "vec": "+AgAAQT9AgH6DfX9EwD7DvMQA+X0/BMaBwEM+AkO7vr+CQj/APgGAgTzBwX89/3sEgL4/fz9+wQADv35CPz77fsLBgX2+f38/Pz8/PoD+wAC9Qr3/wztAwH3ERD+A/YICAj+Av8AA//5Dfj+BPcJBAoIDgHq/P78+gAGAfAC+P8D+Qfw/vkMAggFAfoMAP35//z++ggM/fwIAfv/9QIJ/QgJ+gX7AgEB+AoDA/76A/4B8gMBAQYEAwDyBQIBBAEK9gkA/v39//z8BQP5AwUNBQD8/QT/DAUB/gL4Cgj+6v79Av8DAwMF+AX6Bf0B+wMOBgELAfoGAPP9CgLxB/L++Q=="
+    },
+    {
+      "id": "q06",
+      "role": "query",
+      "key": "section:Horas/Tempora/094-2#Responsory1",
+      "text": "R. Nos álium Deum nescímus præter Dóminum, in quo sperámus:",
+      "vec": "+fj/APwECvr19PrxEf/5FfMSDe0EAwIWFgz88wMF7/oLAv/+++/6AgH8AgD9APj3Awz4+v0F9fv+APz4AAH47wEOAu///fv++Qr9Av0D/QADAA7r/gb4Bvf/CQj/BfX7A/73AwAGDQXxBf4O+vIL/hABBAXp8/sA7gID//kE+v0E9QL0+QIBBAT8/f0KBfkF/gP6+f8F/P0D/fMJ+/oH/AYD/f0B/P75+xL+B/4FBvX6A/wMBfz4Cvv2CAAF+gn9+gMA//r5AvwMAP7+/f0B+/8JBAr7/Pj67gj9/P/56fsQAP0A+gX78gP4BQj++/4CBv4N+vQF/QIH/AD+DgD+Bw=="
+    },
+    {
+      "id": "q07",
+      "role": "query",
+      "key": "section:Horas/Sancti/10-24#Tractus",
+      "text": "!Ps 148:2\nPraise the Lord, all you His Angels, praise Him, all you His hosts.  \n!Ps 102:21\nV.",
+      "vec": "DAD/+AX+AQj+9Pz8Cf79EPYZDPUDDAEaEfYJAwQV9v0CDQz+8/YJAQP5+AL9+wHzAfv7+PUK+Aj7BAb7Bf74+fsI+wX9+AAI9P7+7wL+Bvb58Rn0+RPz+QcBCwwBCO0LCAP/Af4E/QUGCv0KBfX/Ag8GC//y+gL08fL/+/sC/vsD+P/8/wIDBPn7A/wB/P77+gMEAQH6//0B/vz//QAABAcE9wH/BwEAAQ4EBgQGB//57/IIA//6/QAHBQAG+gD+8gMBAAL1BP//B/r8AgX5A/38AAgJDgb29gf+AAAD9PoFA/7/DgP5+Rb9BAcE7gIBAgAVAPz9/wMDAP/wCvEB9g=="
+    },
+    {
+      "id": "q08",
+      "role": "query",
+      "key": "section:Horas/Sancti/06-12#Introitus",
+      "text": "!Ps 36:30-31\nv. The mouth of the just man tells of wisdom, and his tongue utters what is right.",
+      "vec": "//b/A/r7DRH19/3zE/78FO0ID+kBCQQHCwkCBRIA6vwH+fv++gIG/QTz/wMF+/j6CQkA/vcE9QP9Df4CBf786P4GBvnx+/wO9Pv6DAMB+wP9+g8H/RTuB/4EFw4EBgEF/AYIAP3+Af75BgUP9AQHCxEHCvnz/wL98/gG+/MG9/0M9v39/AcFAvcNA/oaAfj5BQcCBAb3+AcC//L5Afr+/gH+/gD/B/cBAgj5AfsGCQn++/wGA/oCB/3//Pz++PoA+AUG/AECBff3BvgDBgkGB/8BAQAD/wj4/wQBCwf97vsFBQMFAwL3Bwz8Avn+7/8A/AH3APoBAAIBDvv+B/n9/A=="
+    },
+    {
+      "id": "q09",
+      "role": "query",
+      "key": "section:Horas/Sancti/01-25r#Graduale",
+      "text": "!Gal 2:8; 2:9\nQui operátus est Petro in apostolátum, operátus est ei mihi inter gentes:",
+      "vec": "C/P+BQX6DwkCAwfwD/72DuoNDer/CQ0RGgAAAwIBBfoH/f78/uwDBQ/uDAz7/Pf7CAT/+PcF8vkJDf4CBgj/+vMJCgP/+vgI/A/4CP78B//6ARMC/Ab9BgT9EgcCCAwJ/QoEBPwKA/f+E/EG+/v9CAMJ//f0/AP39v8CAP0D+vsM9/7/+g79+wABB/QK/gP0AwT+/wsA/P70/gsD/PkFAP8I/AT/DQH3CAkIBv4F/gr69v0D/fsA/AUA/QEJ+vj/BQX/BAb/AfcABAMC+gIFAvn4AhEGEAwI+gz1CAf99P//9/oABwcA9vz7AAIG9QgMBwH6AfgA+wP2CAT49QkFAA=="
+    },
+    {
+      "id": "q10",
+      "role": "query",
+      "key": "section:Horas/Tempora/Pent01-3#Responsory1",
+      "text": "R. My sins are many, yea, they are more in number than the sands of the sea;",
+      "vec": "+QP+BwUABfT1+wP8DP77HPcCDvgNAwgVHwEQDwv88PAD/vr+CPsNBu/z+QH5+AD3BwXzAwMA+/z9/Qn9DPj0+fr/BfwA+v0C+P34+//7AgL+8BAEBwr3/wAOCA73B/wBAPb7BQUG9/jwDvwPAP8PBwEEAfz5/A379AMG+wj/9fkJ+vsB/gAGBfkG/vwQ//8B/wD9+/oA+/oB/vkD/gAD/Qf9+vn9DwMG+wr9B/j9CQL+9QEBAgED/gMCAPkC/QICAAUA9wn3BPb5BgQE/AIBBf789v4MDPwC+wb8BQcF3vgA/fv7CwEA/Br2Av8F/AETAPkDB/j/Av8DAQj8//j/+A=="
+    },
+    {
+      "id": "q11",
+      "role": "query",
+      "key": "verse:2Mach/5/20",
+      "text": "And considering in what manner he was come to it, patiently bearing, he determined not to do any unlawful things for the love of life.",
+      "vec": "9QMAD/f2B/cACf/7/v/9FfkCCejzCBMOFAT6/BMD7vT8BwH//v4IDPfsDfz4+PTvEwH9A///8QH79AX6BP757AMJBwf8AP0UBAP4Bf73//YBAwr8Ag/1Bfj+Dgv6CPkBBfwABPEH+Pj4DfAC/Ab+CgwBBv/w+vz69AoBAO/++vwN+QT5/AoJAQX+/P0LAf37/Aj8AgcA/v0E9gIC/P0B/f0M+wIACgj/9/z9BffyBQD7/Q0AAwT9BPz2Av79AgX+AQj9/vz/B/3+B/gD/AMHA/r38gMFFwYB/Av9AQP37gEAAgIABv0I/AX5/AACAgIHAvoE/vMD+/YGDQEAAPYB9Q=="
+    },
+    {
+      "id": "q12",
+      "role": "query",
+      "key": "verse:4Reg/9/30",
+      "text": "And Jehu came into Jezrahel.",
+      "vec": "FfX+CgL7BRDt9fUQCv79Gvz9Efbw6QP3CgP1/A38AQ0FBwH9/fYDDQv7DwX/8/j1C/r7BQgI9gQGAg7/FPoA+/P9Cfr//AYG+gT/Bv8K+v7zDQ7/+w34+v/1Dw34//sBAP7++wIJ/vL6CfkB/AAJC/4MAfnx9wP59/35/vz6+QsDAvb7/fgFBQAGAf4G+A4A+wP//wD2/vr6/AYF/PkABQgIAQIAA/H5/gj9Dvn/D/72DgH6Avj+AQP4Bwj8AQL9AAsE9QL4Afz6BPcI+gsHC/r9AxADB/8A/Qn2BwAC7fv+AgcJAAECAv78CQH97/4KCAMN/PoCAvcCAwIHAfv4BQ=="
+    },
+    {
+      "id": "q13",
+      "role": "query",
+      "key": "verse:Jer/18/22",
+      "text": "Let a cry be heard out of their houses:",
+      "vec": "Bwn+/QLyCvr09vj9Cf78GfoCHfLqBfYNDwYPAQ8Q/voDBAT+BPAPCwr0AfwA+gD4AwT4CfkIAgUC/Qn9Cvj8+fsAA/oAAvYV/AcBA/0HAAX18RH2+xT1BAINCxX5/Pv7A/r//PkNCAH6CwEHAgMHBQsJBvQEAfr69wwD+QH59P8K+QMABv0GAgcC//wR/vv3/AMABAP9/Aj/AQP/BP4KCgYA9foBBvsG+wL8AwUBBPv//AD+BwD8+PoB/vwF9fv78QoB+//7BP4A/voFDAEACv8B8ggEDP4C/gf3/gD97/oBAvz3+/37+g79AvQD9gAFAfoJ+/n3+O4J+PP3D/z9+w=="
+    },
+    {
+      "id": "q14",
+      "role": "query",
+      "key": "verse:Jer/36/21",
+      "text": "And the king sent Judi that he should take the volume:",
+      "vec": "Dfb/+/buFPj4+/f7Av79G/EKEAQC9QgBFgL2ART+9wcPCf79BPv3CAb9CP7+9O7/EQAEAwIC/fICAQb9EwAF8wECBgr29fj98Q8ECvMM/+33BQX/+RXy9wIBAw/2F/kKBwgDCPj/Avn3Cf8BAv0NCwUEB//m/QX/AvwB+AMC/wb98f30APoG/v4KAf4O/AH+AAMH+QP8A/74+PT9/P/6+wEBAfP/A/QFAQf8BAECAwf4DP3/Awn5Afb/BgkD/f4C9wL7AQb8AgD7A/j+AgQFBgb+/wP9CAMJBQP+D/oC9fz/Bv/9AwMMAQEDCwQABgQFBQUAAQL+/vUA/fX1Dfr5AQ=="
+    },
+    {
+      "id": "q15",
+      "role": "query",
+      "key": "verse:Sap/14/31",
+      "text": "For it is not the power of them, by whom they swear, but the just vengeance of sinners always punisheth the transgression of the unjust.",
+      "vec": "Dfn/Cgj9BAP0+//4D//8GwLvEe3/+BAUEwQFBQcP5/wGBwL/A/f+B//49wD79wL6Ggr3+f8G+QUGBAH4DwH58/oNCQn3/Qb2CQbwBAH+Av0B/A4DAA/5CvcCEA/9D/wFBff+/AcNB/cJCfoI//wFAgsLB/T0BAH9/AQE+gQE9QIK/fUC/xQCB/kC+/sT/P72+wMDAgUB//oF+wH9+wgF/gwD+f0ACQIFBAj4Bgb8APz+7AAKBgD7AAQE+/r+8Pj+/wP/+vv8Cf39B/7+/wECBP4A/AgACgL2+gv4Bwv98//0AQQICwEC/Q36/vkI/wUAAPwCAP4F//j+CgD2AwD/+w=="
+    },
+    {
+      "id": "q16",
+      "role": "query",
+      "key": "commentary:haydock/Ps/55/9",
+      "text": "I have. Protestants, \"thou tellest my wanderings:",
+      "vec": "BQX+BAfzCf/yAwkDAf/5F/IIH+L9AgsPEAAF/Qb98PgFAw3+8u8LCP37+/37+/v/AAz5A/YD8wYHBAINBQIHBPkBA/YB9/oE7vwI+f78/Pv5Axb7Axf19PwDCQsCA/AFCf8H/PwJDQP/DAIK+QEHCQ0E+vr0+QTx+BED+/MA/PwC9/gAAvQGAgcJAfoD+gj9AQQDBwb8Cfz8+P8G//sEAQL8/wD9E/sG/fwAAQX7/gj/APwBB/8C+QLwAfgF9f/+/Ar8/QH4BfkDCQcFAAQBAf38CAkEAvsG/BT+/QP56PoCAvj+DAMACAn7BP0B9QAG+PoF//n7AAH/BP3x/fUD/w=="
+    },
+    {
+      "id": "q17",
+      "role": "query",
+      "key": "commentary:haydock/Esth/11/4",
+      "text": "Juda. This has been noticed already, Esther 2:5.",
+      "vec": "DwP+/P/7Awf2//b/HP74DPgEE+72+f8QFQf8BRUN+wUODf3+BPkL9QPzDv8A8gD9CQv+/P0G+foFCAj/DP8LAP76Evv9Af4J+AcB+P0K+/b/BwgF+xUEAP4CChj/BAEB/AEEAgYSBf31Bvv1+v4EAwsM/AD1/v705/8H+PsC9wcF+AD0+gEC+P0LBP8J+gn3AggH/gADB//7+vsE/fkLAwgBA/X/DfIDBfwADfn9BQb5Efr6BvMDBfn8BP4I/AIF9/4G+QTyCwEAEPoG/wL/BwD9CPn3Cgz/Awj6CQEA9P/8AwL7A/8F9QL9Cf4D8wgCDQAF9wEABvj/Bvz4/vsGAg=="
+    },
+    {
+      "id": "q18",
+      "role": "query",
+      "key": "commentary:haydock/Ezech/39/28",
+      "text": "There, except such as refused to return.",
+      "vec": "AQD/+wTzCeb1Aff6Bf/6Ffn0Ffv79RIHEgf4/Q8Q8gX/BPv++/4GAfn6APkF9wD2DAj1CvcE9Pn9+P7+HfoO8AIJEQP49/kE9QP9+v/7+fn5AgcL/hP7//wHBw71B/UBB/wG/fsNAvcHEfYHB/cGAxQQBvv59wH69gIJ/wYG+QMJ+vr9AAcFBP8GAQAG/v/0/wICAgIBAvf2BfYE/gMKAwEF/P4GCgoI/fX7AgLz/QH4+wL/BgMAAP0F/P0B6Qb9+wAAA/z7Cf4E/gb+/wMJA/wA+AIWFP4D+wj/BgL47AABAQIABAX9/gv8CAYI/AEFAPoDAPQAAvv8/QbyBgIF+Q=="
+    },
+    {
+      "id": "q19",
+      "role": "query",
+      "key": "commentary:haydock/Judic/9/21",
+      "text": "Bera. Hebrew, Bar or Beera, \"the well.",
+      "vec": "+Ov+BQr6/Q75/PQCHv0AEwkHDOsBAgMPDfb7AxH6/wcG+v/8/fAECQb+FQr5+/v7Dvr7/vgE//gOEQb9Afz9BPr6AvbzDAYK/vb+AAL0AQIC/wn+/BH9AAf8DgcAAggCAwQIChH+BAH3Df0A7Pf8BwYBAgz4AQv5+gMHBf8D8Bb+Awn6/PQJAwwKDwIG+wD2/wQCCf8BBgD4/vj9/v0FCAYD+/4DBf0H+/v/BPj//w8I/PkCBAABB/0DAgAE+wAH/AT4+Qj7DQHzB/QF/AUCBPv6BAcX+gMLAP/1AQgE6wMOCQb8AP348wH9AP8A+gIEAAAJ/vb8AfMDAAr7APsCAQ=="
+    },
+    {
+      "id": "q20",
+      "role": "query",
+      "key": "commentary:haydock/Ps/35/13",
+      "text": "There. The devil fell by pride, and man by his persuasion.",
+      "vec": "CQL+FgD1CPT5+v3wBP/+EPUAGPn/CQUIGv8EAA393QMACfv++Pv8CQD0AvTx/Ar8DwX+/QP//Pv8+Qj+Cg338AEHBwEKAfwJ+wADCwP3/vr7BxL4/xL6+Q75CQb/EPz9CfwCBPoHAwL8DP4J9vICBAH/AgP+Bfz+7woK9/f/+QcD+P38Bw8C//oB/QIZ/vj6+wP+BwT5+vn4AvkG/PYJ/QUHAvr9CwQABAT9Bf//AAD+8vX5BwEB+//4AAj8+gP9DgcB/QP2BQDzEwIA+gUGBfv/9QEJAwYF/QD6BgL19wkH+/8GAQAEBhICBPkEAgIF+gMLB/kI//wA9Qb1APUCBg=="
+    }
+  ]
+}
