@@ -32,6 +32,7 @@ import { AccountProvider, useAccount, isSacristanVisible } from './core/account/
 import { creditReaderFromEnv } from './core/billing/client.ts';
 import ResizableInspectorLayout from './ui/ResizableInspectorLayout.tsx';
 import TrayPanel from './ui/TrayPanel.tsx';
+import { useAudiobookBoot } from './core/audiobook/boot.ts';
 import { useNarrow } from './ui/BilingualText.tsx';
 import { applyTheme, readThemePreference, systemMode } from './core/theme/themes.ts';
 import {
@@ -328,6 +329,7 @@ function AppShell() {
     SidecarDb.open().then((s) => { if (alive) setSidecar(s); }).catch(() => { if (alive) setSidecar(null); });
     return () => { alive = false; };
   }, []);
+  useAudiobookBoot(db, sidecar);
   useEffect(() => startMediaSession(), []);
   useEffect(() => (db && sidecar ? bootModules(db, sidecar) : undefined), [db, sidecar]);
 

@@ -335,6 +335,14 @@ export class WebModelLibrary implements ModelLibrary {
     };
   }
 
+  /** BA.7/BA.13 (native-embed F4): the published File of models/sha256/<d>/<fileName>. */
+  async readFile(asset: ModelAsset): Promise<File> {
+    validateAsset(asset);
+    const root = await this.#ensureRoot();
+    const dir = await mkdirChain(root, ['models', 'sha256', asset.sha256]);
+    return (await dir.getFileHandle(asset.fileName)).getFile();
+  }
+
   async remove(sha256: string): Promise<void> {
     const root = await this.#ensureRoot();
     const parent = await mkdirChain(root, ['models', 'sha256']);

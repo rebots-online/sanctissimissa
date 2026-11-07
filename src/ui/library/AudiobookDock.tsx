@@ -10,7 +10,7 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import type { KeyboardEvent, PointerEvent, ReactNode } from 'react';
 import type { AudiobookController, AudiobookState } from '../../core/audiobook/controller.ts';
-import { AUDIOBOOK_EDITIONS, DEFAULT_SEC_PER_CHAR, RATE_OPTIONS, SKIP_SEC } from '../../core/audiobook/constants.ts';
+import { AUDIOBOOK_EDITIONS, DEFAULT_SEC_PER_CHAR, RATE_OPTIONS, SKIP_SEC, type AudiobookRate } from '../../core/audiobook/constants.ts';
 import { chapterSentences, type AudioSentence } from '../../core/audiobook/text.ts';
 import { approxWordTimes } from '../../core/audiobook/timing.ts';
 import type { CorpusDb } from '../../core/data/corpusDb.ts';
@@ -24,7 +24,7 @@ import './audiobook.css';
 
 const READABLE: ReadonlySet<string> = new Set(['free', 'owned', 'subscription']);
 
-type RateOption = { value: string; rate: number; label: string };
+type RateOption = { value: string; rate: AudiobookRate; label: string };
 type WordTime = { start: number; end: number; charStart: number; charEnd: number };
 
 /**
