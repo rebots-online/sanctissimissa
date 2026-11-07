@@ -747,7 +747,7 @@ function AppShell() {
           funding is discoverable through the always-present Account & Sync rail
           entry. (OG supersession, operator 2026-11-05: the orientation card was
           removed; §K.8's didactic overlay is the successor surface.) */}
-      {sacristanGate && <ChatView sidecar={sidecar} />}
+      {sacristanGate && <ChatView sidecar={sidecar} db={db} />}
       {/* HD.2 (§K.8): the didactic overlay — circles, arrows, highlight halo,
           focus-swap recede, and the show-path walkthrough (successor to the
           removed OG card's surfaces). Mounts with the same §K.3 gate. */}

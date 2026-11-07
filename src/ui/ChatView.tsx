@@ -26,7 +26,6 @@ import {
   SACRISTAN_ACT,
   SACRISTAN_LAYOUT,
   applyGuideCommand,
-  guideContext,
   parseCompanionCommand,
   stripGuideCommands,
   type PathStep,
@@ -41,6 +40,8 @@ import { ChatController } from '../../reusable-chatbot/core/chat-controller.ts';
 import { companionInvoke } from '../core/chat/runtime.ts';
 import { debugEvent, debugTrace } from '../core/diagnostics/store.ts';
 import { companionFeedback, logCompanionFailure } from '../core/chat/feedback.ts';
+import { buildCompanionSystemContext, liveFacts } from '../core/chat/systemContext.ts';
+import type { CorpusDb } from '../core/data/corpusDb.ts';
 import { resolveHostedEngine, resolveNativeEngine, resolveWebEngine, selectedModelId, type Resolution } from '../core/chat/resolve.ts';
 
 type DockMode = 'dock-left' | 'dock-right' | 'floating' | 'inline' | 'fullscreen' | 'sheet';
@@ -124,32 +125,6 @@ function sidecarHandle(store: SettingsStore | null): Database | null {
   return handle && typeof (handle as Database).prepare === 'function' ? (handle as Database) : null;
 }
 
-/** CL.4 (§H.2/§H.7): the live facts App registered in guideContext()'s
- *  documented context JSON (the CL.2 contract: currentView, currentDate,
- *  focusSection, openDraftKey, visible). Read back out of the documented
- *  block — this is the day anchor + focus section for Save insight and the
- *  date suffix of the §H.7 feast chip, without any new coupling surface. */
-function liveFacts(): { view: string; date: string; focus: string | null } {
-  const today = new Date().toISOString().slice(0, 10);
-  // HD.1: the context JSON's lead-in changed when `visible` became a live
-  // DOM read — parse the new documented phrasing.
-  const match = /actual visible DOM controls and the live page view: ([\s\S]*?)\. Current orientation target/.exec(guideContext());
-  if (!match) return { view: '', date: today, focus: null };
-  try {
-    const parsed = JSON.parse(match[1]) as { currentView?: unknown; currentDate?: unknown; focusSection?: unknown };
-    return {
-      view: typeof parsed.currentView === 'string' ? parsed.currentView : '',
-      date:
-        typeof parsed.currentDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(parsed.currentDate)
-          ? parsed.currentDate
-          : today,
-      focus: typeof parsed.focusSection === 'string' && parsed.focusSection ? parsed.focusSection : null,
-    };
-  } catch {
-    return { view: '', date: today, focus: null };
-  }
-}
-
 /** CL.4 (§H.4): the reply's narration paragraphs — one blank-line-separated
  *  paragraph per `>`-step, taken from the end of the reply body so prose
  *  before the walkthrough never leaks into a step. */
@@ -173,7 +148,7 @@ function withoutShowPathToken(text: string): string {
   return close >= 0 ? `${text.slice(0, at)}${text.slice(close + 2)}`.trimEnd() : text;
 }
 
-export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | null }) {
+export default function ChatView({ sidecar = null, db = null }: { sidecar?: SidecarStore | null; db?: CorpusDb | null }) {
   const models = useCompanionModels();
   const [open, setOpen] = useState(false);
   const [dock, setDock] = useState<DockMode>(
@@ -351,26 +326,6 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
   const [savedInsights, setSavedInsights] = useState<ReadonlySet<number>>(() => new Set());
   const saveAvailable = typeof sidecar?.save === 'function';
 
-  /** CL.4 (§H.2): per sent turn the system context = persona + guideContext()
-   *  (live view/date/focus/draft + the `visible` snapshot + the full command
-   *  grammar) + the lore block + the top-5 recall hits as `## Recalled
-   *  memories`. */
-  const companionSystemContext = (question: string): string => {
-    const facts = liveFacts();
-    const parts = [guideContext()];
-    if (memory) {
-      const lore = memory.assemble({ view: facts.view, date: facts.date, focus: facts.focus });
-      if (lore) parts.push(lore);
-      const hits = memory.recall(question, 5);
-      if (hits.length) {
-        parts.push(
-          `## Recalled memories\n${hits.map((hit) => `- ${hit.refId} (cosine ${hit.score.toFixed(2)})`).join('\n')}`,
-        );
-      }
-    }
-    return parts.join('\n\n');
-  };
-
   /** CL.4 (§H.1/§H.4): the reply's trailing [[…]] suffix parses, executes and
    *  strips per the grammar. show-path is dispatched HERE — not left to
    *  applyGuideCommand — so the COMPANION_ACT detail carries the reply's
@@ -488,7 +443,8 @@ export default function ChatView({ sidecar = null }: { sidecar?: SidecarStore | 
     let received = false;
     let response = '';
     try {
-      for await (const ev of controller.generate(text, abort.signal, companionSystemContext(text))) {
+      const system = await buildCompanionSystemContext({ question: text, memory, db });
+      for await (const ev of controller.generate(text, abort.signal, system)) {
         if (abort.signal.aborted) break;
         received ||= Boolean(ev.text);
         response += ev.text;
