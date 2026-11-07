@@ -50,7 +50,9 @@ class ModulePackPlugin(private val activity: Activity) : Plugin(activity) {
             return
         }
         if (ready != null) {
-            resolvePath(invoke, ready.assetsPath())
+            // assetsPath() is null for STORAGE_METHOD_APK packs; module packs are asset-storage, so null is a failure.
+            val readyPath = ready.assetsPath()
+            if (readyPath != null) resolvePath(invoke, readyPath) else invoke.reject("failed")
             return
         }
 
@@ -69,7 +71,7 @@ class ModulePackPlugin(private val activity: Activity) : Plugin(activity) {
             when (state.status()) {
                 AssetPackStatus.COMPLETED -> settle {
                     val loc = m.getPackLocation(pack)
-                    if (loc != null) resolvePath(invoke, loc.assetsPath()) else invoke.reject("failed")
+                    loc?.assetsPath()?.let { resolvePath(invoke, it) } ?: invoke.reject("failed")
                 }
                 AssetPackStatus.REQUIRES_USER_CONFIRMATION, AssetPackStatus.WAITING_FOR_WIFI -> {
                     // see DOCS/sdk/play-asset-delivery/integrate-java.md §Monitor download states (Large downloads)
