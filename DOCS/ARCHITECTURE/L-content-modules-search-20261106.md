@@ -298,8 +298,14 @@ from the pointer (sync-db), so the mirror is transient. Step 1 is the only invoc
    edges into `auto` concepts, and those edges are removed from `edges` **in the work file only**; centroid vectors written to
    `embeddings_q3e256`. Swap: `embeddings` → `embeddings_trigram` (renamed, kept), `embeddings_q3e256` → `embeddings`.
 5. `instance_of` (one transaction): delete edges with `json_extract(meta,'$.method')='semantic'`, then insert INSTANCE_OF
-   section/verse/commentary/quotation → concept where cosine ≥ 0.45, weight = cosine, meta `{"method":"semantic"}`, skipping
-   pairs that already have a curated edge.
+   section/verse/commentary/quotation → concept for the node's **top 3 concepts by cosine with cosine ≥ 0.50** (per-node top-k with
+   a floor; ties broken by concept `id` ascending), weight = cosine, meta `{"method":"semantic"}`, skipping pairs that already have
+   a curated edge (a skipped pair still counts toward the 3). Constants (Closed, Phase L): `INSTANCE_OF_TOP_K = 3`,
+   `INSTANCE_OF_MIN = 0.50`. Bound: ≤ 3 semantic edges per node (≈ 270k for the 2026-11 corpus).
+   *Revision 2026-11-06 (architect, BA.10 finding):* the original "every concept with cosine ≥ 0.45" rule admitted ≈ 136 of 253
+   concepts per node on 256-d Qwen3 vectors (12.2M edges, 1.6 GB base), so INSTANCE_OF carried no signal. Rerun: the existing
+   work file (same `input_sha256`) is reused — delete `embed_progress` rows `instance_of` and `finalize`, set `embed_work.corpus_version`
+   to a new `<V>`, rerun; `vectors`, `centroids`, `similar_to`, `probe` are not recomputed.
 6. `similar_to`: per batch of 1000 source nodes (table `similar_done(node_id PRIMARY KEY)`, one transaction per batch): top 8
    neighbours with cosine ≥ 0.35, weight = cosine, meta `{"method":"semantic"}`; concept nodes excluded as source and target.
    Universe: for a module node (§2.3 set) all nodes; for a base node only base nodes (so the base never points into a module).

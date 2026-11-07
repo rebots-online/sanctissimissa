@@ -3309,7 +3309,7 @@ Standing rules for this stanza (operator, 2026-11-05/06): architect never codes 
          - Rename `embeddings` → `embeddings_trigram`, then `embeddings_q3e256` → `embeddings`.
       5. **`instance_of`** (one transaction):
          - `DELETE FROM edges WHERE rel='INSTANCE_OF' AND json_extract(meta,'$.method')='semantic'`.
-         - For every node of kind `section|verse|commentary|quotation` with a vector, insert INSTANCE_OF → concept where cosine to the centroid ≥ 0.45, with weight = cosine and meta `{"method":"semantic"}`. Skip pairs that already have a non-semantic (curated) INSTANCE_OF edge.
+         - For every node of kind `section|verse|commentary|quotation` with a vector, insert INSTANCE_OF → concept for the node's top 3 concepts by cosine to the centroid with cosine ≥ 0.50 (`INSTANCE_OF_TOP_K = 3`, `INSTANCE_OF_MIN = 0.50`; ties by concept id ascending), with weight = cosine and meta `{"method":"semantic"}`. Skip pairs that already have a non-semantic (curated) INSTANCE_OF edge (a skipped pair still counts toward the 3). **Revised 2026-11-06 by the architect** (see L-content-modules-search §3.1 step 5): the former ≥ 0.45-only rule is superseded. Rerun reuses the existing work file: delete `embed_progress` rows `instance_of` and `finalize`, set a new `corpus_version`, rerun. Accept addition: semantic INSTANCE_OF edges ≤ 3 × source nodes; base asset size within 1.5× the input size.
       6. **`similar_to`:**
          - Track progress in `similar_done(node_id INTEGER PRIMARY KEY)`, one transaction per batch of 1000 source nodes, ordered by `node_id`.
          - Each source gets its top 8 neighbours with cosine ≥ 0.35. Order is cosine desc, then key asc. Weight = cosine and meta `{"method":"semantic"}`.
