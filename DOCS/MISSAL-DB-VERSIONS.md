@@ -39,6 +39,11 @@ One entry per ingest, newest first:
 - Semantic INSTANCE_OF per revised §3.1 step 5 (per node top 3 concepts with cosine ≥ 0.50): 257,668 edges from 98,028 sources in the full corpus (max 3 per source); base asset 219,899 edges from 85,123 sources, mean weight 0.674. Base asset `assets/corpus/missal.corpus-2026.11.07-0400-q3e256.db` is 314,572,800 bytes (1.43× the 220,246,016-byte input `stage2-graph.db`); module `catena-aurea-en-r2.db` is 71,880,704 bytes.
 - Rerun from the `corpus-2026.11.07-0210-q3e256` work file (phases `instance_of`, `probe`, `finalize` redone; vectors, centroids and SIMILAR_TO reused).
 - Rollback: prior corpus file untouched; revert the pointer commit.
+- **Parts** (CS.1, L-corpus-split §2–§4; `npm run corpus:split -- --in assets/corpus/missal.corpus-2026.11.07-0400-q3e256.db --out-dir assets/corpus/`, 2026-11-06). Input sha256 `0556ce770cd9c6051075cffb0a192a2b0972bc43f8d2a8f8ba54212a811cd983` (314,572,800 B), unchanged after the run. Outputs in `assets/corpus/` (gitignored, main checkout):
+  - `missal.corpus-2026.11.07-0400-q3e256.text.db` — 156,753,920 B, sha256 `1c0f729aab9459dade91b28905a782fced4667dba4fcc1883bf3763609c685fd`; `edges` 0, `embeddings` 0; `embed_meta` 7 rows; `corpus_parts` rows for graph and vectors equal the sha256/bytes below.
+  - `missal.corpus-2026.11.07-0400-q3e256.graph.db` — 120,320,000 B, sha256 `c68d028ae4aaf3af0a59bdfa6fa72a452d87be01563e62179db9dd426f465f2d`; `edges` 1,176,097 (= input).
+  - `missal.corpus-2026.11.07-0400-q3e256.vectors.db` — 25,022,464 B, sha256 `b17ac974674dfc7793650e0d3b1fb4879a96286a0e3197eafb5089dfa1c1778c`; `embeddings` 91,312 (= input); `embed_meta` equals the text part's row for row.
+  - Sum 302,096,384 B < input 314,572,800 B. `PRAGMA integrity_check` ok on all three; a rerun exits 3 (outputs exist).
 
 ### corpus-2026.11.07-0210-q3e256 — semantic re-embed (Qwen3-Embedding-0.6B, 256-d) and Catena module split
 

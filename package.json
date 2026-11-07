@@ -36,6 +36,7 @@
     "corpus:embed": "node --experimental-strip-types scripts/embed-corpus.mjs",
     "corpus:catena-graph": "node --experimental-strip-types scripts/ingest-commentary.mjs --catena-graph build/corpus/stage1-ingest.db build/corpus/stage2-graph.db",
     "corpus:modules": "node --experimental-strip-types scripts/build-modules.mjs",
+    "corpus:split": "node scripts/split-corpus.mjs",
     "modules:stage": "node scripts/modules-stage.mjs",
     "tauri": "tauri",
     "vendor:wllama": "node scripts/vendor-wllama.mjs",

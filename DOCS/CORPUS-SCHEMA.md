@@ -118,6 +118,42 @@ content, its citation, and the supplying source. Filled sections carry
   map ligatures æ→ae / œ→oe, collapse non-letters to spaces) so that user
   queries without diacritics match corpus text that has them.
 
+## Shipped parts (`missal.<V>.{text,graph,vectors}.db`)
+
+Normative source: `DOCS/ARCHITECTURE/L-corpus-split-20261106.md` §2, §3. Built by
+`npm run corpus:split -- --in <base asset> --out-dir assets/corpus/`
+(`scripts/split-corpus.mjs`; exit 0 ok · 3 an output exists · 4 invalid input; outputs are immutable).
+
+From §2 (Decision):
+
+> The shipped base corpus is **three SQLite files of one `corpus_version`**, split from the BA.10 base asset by a build step:
+>
+> | Part (Closed set, Phase L) | Tables carrying rows | Android delivery | Needed for |
+> |---|---|---|---|
+> | `text` | every table of the base asset **except** the ones listed for graph/vectors and the dropped set; `edges` and `embeddings` exist **empty** with their original schema and indexes | install-time asset pack `corpus_text` | Mass, Office, calendar, reader, FTS search: app is fully usable on this part alone |
+> | `graph` | `edges` (all rows) | fast-follow asset pack `corpus_graph` | concept surfacing, CITES/COMMENTS_ON navigation, SIMILAR_TO, Sacristan graph hits |
+> | `vectors` | `embeddings` (all rows), `embed_meta` (copy) | fast-follow asset pack `corpus_vectors` | semantic similarity, Sacristan vector hits |
+>
+> Dropped from all parts (kept in the full/work files only): `embeddings_trigram`, `edges_trigram_archive`, `embed_work`,
+> `embed_progress`, `similar_done`. Not changed in this release (non-goal, to avoid a wide query-layer change): the FTS5 `search`
+> table keeps its own content copy.
+>
+> Node ids are identical across the three parts (one source file), so the merge copies rows verbatim — **no key remapping**.
+
+From §3 (Formats, Closed set, Phase L):
+
+> - Every part has `corpus_meta(key,value)` with `corpus_version=<V>` and `corpus_part=text|graph|vectors`.
+> - The `text` part also has `corpus_parts(part TEXT PRIMARY KEY, file TEXT NOT NULL, sha256 TEXT NOT NULL, bytes INTEGER NOT NULL)`
+>   with one row each for `graph` and `vectors`. `file` = `missal.<V>.<part>.db`.
+> - The `text` part keeps `embed_meta` (module attach refuses a base without it, `moduleAttach.ts:49`); the `vectors` part's
+>   `embed_meta` must equal it row for row.
+> - File names: `missal.<V>.text.db`, `missal.<V>.graph.db`, `missal.<V>.vectors.db`.
+
+Build detail (§4): in `graph` and `vectors` the `edges` / `embeddings` tables have the input's columns
+without `REFERENCES` clauses, and `idx_edges_src` / `idx_edges_dst` as in the input. Each part's
+`corpus_meta` carries the input's rows plus `corpus_part`. Delivery per platform: L-corpus-split §5
+(`DOCS/sdk/play-asset-delivery/integrate-java.md`, `DOCS/sdk/play-asset-delivery/size-limits.md`).
+
 ## Text normalization (`src/core/text/normalize.ts`)
 
 Every text string entering any search path (FTS5, vector, concept graph,
