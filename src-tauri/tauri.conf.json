@@ -29,6 +29,7 @@
     "targets": [
       "deb",
       "appimage",
+      "rpm",
       "nsis"
     ],
     "icon": [
@@ -47,6 +48,11 @@
         "depends": [],
         "section": "Education",
         "priority": "optional"
+      },
+      "rpm": {
+        "release": "1",
+        "epoch": 0,
+        "depends": []
       }
     },
     "windows": {

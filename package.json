@@ -38,7 +38,13 @@
     "corpus:modules": "node --experimental-strip-types scripts/build-modules.mjs",
     "modules:stage": "node scripts/modules-stage.mjs",
     "tauri": "tauri",
-    "vendor:wllama": "node scripts/vendor-wllama.mjs"
+    "vendor:wllama": "node scripts/vendor-wllama.mjs",
+    "ingest:commentary": "node scripts/ingest-commentary.mjs",
+    "embed:corpus": "node scripts/embed-corpus.mjs",
+    "build:modules": "node scripts/build-modules.mjs",
+    "corpus:pipeline": "node scripts/release-inputs.mjs --pipeline",
+    "release:inputs": "node scripts/release-inputs.mjs --verify",
+    "deploy:modules": "node scripts/modules-deploy.mjs"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-react": "^11.2.0",

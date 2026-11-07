@@ -51,6 +51,20 @@ One entry per ingest, newest first:
 - **Status: NOT SHIPPABLE — do not vendor or release (BA.10 `[/]`, 2026-11-06).** The §3.1 step 5 rule (cosine ≥ 0.45 to a concept centroid) is applied as written, but on 256-d Qwen3 vectors it admits nearly every pair. Measured on the base asset `assets/corpus/missal.corpus-2026.11.07-0210-q3e256.db` (1,617,481,728 bytes, versus 220,246,016 for the input `stage2-graph.db`): 12,235,970 semantic INSTANCE_OF edges from 89,683 sources into 253 concepts (≈ 136 concepts per node), mean weight 0.563. Edges and sources at or above each weight: 0.50 → 8,837,839 / 86,298; 0.60 → 3,536,544 / 70,548; 0.70 → 1,016,676 / 40,202; 0.80 → 117,062 / 12,266. No single threshold both bounds the size and keeps coverage. The INSTANCE_OF rule needs an architect revision, for example a per-node top-k, before this pipeline is rerun under a new `<V>`.
 - **Superseded by `corpus-2026.11.07-0400-q3e256`** (per-node top-3 INSTANCE_OF, 2026-11-06). Remains NOT SHIPPABLE.
 
+### corpus-2026.09.09-2054 — shipped corpus, retroactive entry (vendored by BA.9)
+
+- **Retroactive** (L-release-20261106.md §1, §3 F1 step 5; R5): this corpus shipped from
+  2026-09-09 onward as `assets/missal.db` but never received a ledger entry or a tracked copy.
+  Its identity is read from its own `corpus_meta` row; no ingest was rerun to write this entry.
+- `corpus_meta`: `built_at` 2026-09-09T20:54:59.301Z; `vendored_commit` `ab5673212182`;
+  `ingest_script_sha` `077b8986fdb9`; description unset at ingest.
+- Scale: 2,709 files / 34,673 sections. Trigram-era embeddings (pre-§L).
+- Bytes: sha256 `7286cd357d43b75132d83aabbf8c64cb0dc7b3c44f6fd1e016729a592a14d2fa`,
+  195,137,536 bytes.
+- Vendored as `VENDORED/corpus/sanctissimissa-corpus-2026.09.09-2054.db` (LFS) by
+  `node scripts/release-inputs.mjs --vendor`; `VENDORED/corpus/CURRENT.json` points at it with
+  `previous: null`. It is the rollback target of the next corpus pointer.
+
 ### corpus-2026.08.16-1459 — `#` sub-heading markers stripped from section text
 
 - **Fixed:** DO's `#` sub-heading lines inside `[Section]` bodies

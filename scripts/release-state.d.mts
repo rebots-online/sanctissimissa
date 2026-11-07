@@ -97,7 +97,9 @@ export interface ReleaseDeps {
 export function expandHomePath(value: string, home?: string): string;
 
 /**
- * Canonical stage order
+ * Canonical stage order — re-exported from scripts/release-matrix.mjs (L-release-20261106.md §2.2):
+ * inputs, web, modules-deploy, web-deploy, linux, windows, windows-msi, windows-msix,
+ * android-release, symbols, collect. Lock v2 records completion per `<stage>@<env>` pair.
  */
 export const STAGE_ORDER: readonly string[];
 

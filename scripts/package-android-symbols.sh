@@ -39,10 +39,15 @@ if state.get('sourceHead') != head:
     refuse('current HEAD does not match the frozen release source commit')
 if state.get('stampPending', False) is not False:
     refuse('release stamping is pending or its state is invalid')
+# Lock v2 pairs (DOCS/ARCHITECTURE/L-release-20261106.md §2.3): the driver exports SAM_RELEASE_ENV.
+import os
+release_env = os.environ.get('SAM_RELEASE_ENV', '')
+if release_env not in ('ubuntu', 'windows'):
+    refuse('SAM_RELEASE_ENV must be ubuntu or windows (exported by the release driver)')
 completed = state.get('completedStages')
 if (not isinstance(completed, list) or not all(isinstance(stage, str) for stage in completed)
-        or 'android-release' not in completed):
-    refuse('the frozen release has no completed android-release stage')
+        or f'android-release@{release_env}' not in completed):
+    refuse(f'the frozen release has no completed android-release@{release_env} pair')
 print(version)
 RELEASE_GUARD
 )"
@@ -97,6 +102,12 @@ for line in readelf('--debug-dump=info', '--dwarf-depth=1').splitlines():
 def is_application_unit(unit):
     name = unit.get('name', '')
     if re.search(r'(?<![A-Za-z0-9_])sanctissimissa_lib(?![A-Za-z0-9_])', name):
+        return True
+    # DWARF from a Windows-built .so records Windows paths the container cannot
+    # equal (L-release §2.11): accept a unit whose comp_dir/name, backslashes
+    # normalized to '/', ends with /src-tauri/src/lib.rs.
+    joined = (unit.get('comp_dir', '') + '/' + name.split('/@/', 1)[0]).replace('\\', '/')
+    if joined.endswith('/src-tauri/src/lib.rs'):
         return True
     # Also accept the exact app source under its compilation directory, so
     # a generic dependency src/lib.rs cannot satisfy application coverage.

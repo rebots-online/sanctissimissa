@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 
 /**
- * Release state management for autonomous stamped resume.
+ * Release state management for autonomous stamped resume (lock v2, per-env pairs).
  *
  * The first invocation of `npm run build:release` stamps once, writes
- * `sanctissimissa-release-state.json`, and runs named stages. A later invocation with a matching
- * lock resumes automatically at the first incomplete stage without stamping.
- * Mismatched/corrupt locks fail closed with exact remediation.
+ * `sanctissimissa-release-state.json`, and runs the stages of this build environment.
+ * A later invocation with a matching lock resumes at the first incomplete `<stage>@<env>`
+ * pair without stamping. Mismatched/corrupt locks fail closed with exact remediation.
+ *
+ * Normative: DOCS/ARCHITECTURE/L-release-20261106.md §2.1–§2.3 (envs, stages, lock v2).
+ * The matrix lives in release-matrix.mjs, lock I/O in release-lock.mjs, stage commands in
+ * release-stage-commands.mjs and stage-as-produced copies in release-stage-outputs.mjs.
  */
 
 import fs from 'node:fs';
@@ -22,35 +26,29 @@ process.env.CARGO_BUILD_JOBS ||= '6';
 import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { createHash, randomUUID } from 'node:crypto';
-import { execFileSync, execSync, spawnSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
+import { REQUIRED_PAIRS, STAGE_ENVS, STAGE_ORDER, envOf, stageKey, stagePrereqs } from './release-matrix.mjs';
+import {
+  getInputHashes, getSourceHead, lockMatchesCurrent, markStageComplete, preserveState, readLock,
+  readVersion, unionPairs, writeEnvLockCopy, writeLock,
+} from './release-lock.mjs';
+import { stageCommand } from './release-stage-commands.mjs';
+import { stageOutputs } from './release-stage-outputs.mjs';
+
+export { STAGE_ORDER } from './release-matrix.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/**
- * Get root directory from deps, env, or default
- */
+/** Root directory from deps, env, or the checkout containing this script. */
 function getRoot(deps) {
-  if (deps?.fixtureDir) {
-    return deps.fixtureDir;
-  }
+  if (deps?.fixtureDir) return deps.fixtureDir;
   const env = deps?.env || process.env;
   return env.RELEASE_STATE_FIXTURE || env.RELEASE_ROOT || path.resolve(__dirname, '..');
 }
 
-/**
- * Get lock path for current root
- */
 function getLockPath(root) {
   return path.join(root, 'sanctissimissa-release-state.json');
-}
-
-/**
- * Get dist rubric runs path
- */
-function getDistRubricRuns(root) {
-  return path.join(root, 'dist', 'rubric-runs');
 }
 
 /**
@@ -61,184 +59,10 @@ function getDistRubricRuns(root) {
  * @throws {Error} If the path starts with ~user (user-specific expansion is not supported)
  */
 export function expandHomePath(value, home = os.homedir()) {
-  if (value === '~') {
-    return home;
-  }
-  if (value.startsWith('~/')) {
-    return path.join(home, value.slice(2));
-  }
-  if (value.startsWith('~')) {
-    throw new Error('User-specific path expansion (~user) is not supported');
-  }
+  if (value === '~') return home;
+  if (value.startsWith('~/')) return path.join(home, value.slice(2));
+  if (value.startsWith('~')) throw new Error('User-specific path expansion (~user) is not supported');
   return value;
-}
-
-/**
- * Version source: version.txt (MAJOR.MINOR.BUILD)
- * @param {string} root - The root directory
- * @returns {string} The current version string
- */
-function readVersion(root) {
-  return fs.readFileSync(path.join(root, 'version.txt'), 'utf-8').trim();
-}
-
-/**
- * Get current git HEAD commit hash
- * @param {string} root - The root directory
- * @returns {string} The current git HEAD commit hash
- */
-function getSourceHead(root, fixture = false) {
-  try {
-    const topLevel = execFileSync('git', ['rev-parse', '--show-toplevel'], {
-      cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
-    }).trim();
-    if (fs.realpathSync(topLevel) !== fs.realpathSync(root)) throw new Error('Release root is not the Git checkout root');
-    return execFileSync('git', ['rev-parse', '--verify', 'HEAD'], {
-      cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
-    }).trim();
-  } catch (error) {
-    if (!fixture) throw error;
-  }
-  // Small hermetic fixtures intentionally have no real object database.
-  const gitDir = path.join(root, '.git');
-  const headPath = path.join(gitDir, 'HEAD');
-  let headRef = fs.readFileSync(headPath, 'utf-8').trim();
-
-  if (headRef.startsWith('ref: ')) {
-    const refPath = path.join(gitDir, headRef.slice(5));
-    return fs.readFileSync(refPath, 'utf-8').trim();
-  }
-  return headRef;
-}
-
-/**
- * Release state lock file structure
- * @typedef {Object} ReleaseState
- * @property {string} version - The version string (MAJOR.MINOR.BUILD)
- * @property {string} sourceHead - The git HEAD commit hash
- * @property {string} startedAt - ISO 8601 timestamp when release started
- * @property {string[]} completedStages - Array of completed stage names
- * @property {Record<string, string>} [inputHashes] - Frozen corpus/env hashes
- * @property {boolean} [stampPending] - Stamp/commit has not completed
- */
-
-/**
- * Read and validate the release lock file, or return null only when absent.
- * @param {string} lockPath - The lock file path
- * @returns {ReleaseState|null} The parsed release state or null
- * @throws {Error} If the lock file contains corrupt JSON or invalid structure
- */
-function readLock(lockPath) {
-  if (!fs.existsSync(lockPath)) {
-    return null;
-  }
-
-  try {
-    const content = fs.readFileSync(lockPath, 'utf-8');
-    const parsed = JSON.parse(content);
-
-    // Validate structure
-    if (
-      parsed === null || typeof parsed !== 'object' || Array.isArray(parsed) ||
-      typeof parsed.version !== 'string' || !/^\d+\.\d+\.\d+$/.test(parsed.version) ||
-      typeof parsed.sourceHead !== 'string' || !parsed.sourceHead ||
-      typeof parsed.startedAt !== 'string' ||
-      !Number.isFinite(Date.parse(parsed.startedAt)) ||
-      !Array.isArray(parsed.completedStages) ||
-      !parsed.completedStages.every(s => STAGE_ORDER.includes(s)) ||
-      new Set(parsed.completedStages).size !== parsed.completedStages.length ||
-      (parsed.stampPending !== undefined && typeof parsed.stampPending !== 'boolean') ||
-      (parsed.stampPending === true && parsed.completedStages.length !== 0) ||
-      (parsed.completedStages.includes('collect') && parsed.completedStages.length !== STAGE_ORDER.length) ||
-      (parsed.inputHashes !== undefined && (
-        parsed.inputHashes === null || typeof parsed.inputHashes !== 'object' || Array.isArray(parsed.inputHashes) ||
-        !Object.values(parsed.inputHashes).every(value => typeof value === 'string' && /^(?:[a-f0-9]{64}|absent)$/.test(value))
-      ))
-    ) {
-      throw new Error('Lock file has invalid structure');
-    }
-
-    return parsed;
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      // JSON parse error - corrupt lock
-      throw new Error('Lock file contains invalid JSON');
-    }
-    throw error;
-  }
-}
-
-/**
- * Atomically write the release lock file
- * @param {ReleaseState} state - The release state to write
- * @param {string} lockPath - The lock file path
- */
-function preserveState(lockPath, version, reason, outboxDir) {
-  fs.mkdirSync(outboxDir, { recursive: true });
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const archivedPath = path.join(outboxDir,
-    `sanctissimissa-v${version}-${reason}-${timestamp}-${randomUUID()}.json`);
-  fs.copyFileSync(lockPath, archivedPath, fs.constants.COPYFILE_EXCL);
-  return archivedPath;
-}
-
-function writeLock(state, lockPath, outboxDir) {
-  if (fs.existsSync(lockPath)) preserveState(lockPath, state.version, 'release-state-before-update', outboxDir);
-  const tempPath = `${lockPath}.${randomUUID()}.tmp`;
-  fs.writeFileSync(tempPath, JSON.stringify(state, null, 2), 'utf-8');
-  fs.renameSync(tempPath, lockPath);
-}
-
-/**
- * Atomically append a completed stage to the lock
- * @param {string} stage - The stage name to mark complete
- * @param {string} lockPath - The lock file path
- */
-function markStageComplete(stage, lockPath, outboxDir) {
-  const lock = readLock(lockPath);
-  if (!lock) {
-    throw new Error('Cannot mark stage complete: no valid lock file');
-  }
-
-  if (lock.completedStages.includes(stage)) {
-    throw new Error(`Stage ${stage} already marked complete`);
-  }
-
-  const updated = {
-    ...lock,
-    completedStages: [...lock.completedStages, stage],
-  };
-
-  writeLock(updated, lockPath, outboxDir);
-}
-
-/**
- * Check if lock matches current state
- * @param {ReleaseState} lock - The lock to check
- * @param {string} root - The root directory
- * @returns {boolean} True if the lock matches current version and sourceHead
- */
-function lockMatchesCurrent(lock, root, fixture) {
-  const currentVersion = readVersion(root);
-  const currentHead = getSourceHead(root, fixture);
-
-  if (lock.version !== currentVersion || lock.sourceHead !== currentHead) return false;
-  if (!fixture || lock.inputHashes) {
-    const current = getInputHashes(root);
-    return Object.entries(current).every(([name, hash]) => lock.inputHashes?.[name] === hash);
-  }
-  return true;
-}
-
-function getInputHashes(root) {
-  return Object.fromEntries(['assets/missal.db', '.env'].map(name => {
-    const filename = path.join(root, name);
-    if (!fs.existsSync(filename)) {
-      if (name === '.env') return [name, 'absent'];
-      throw new Error('Release input assets/missal.db is missing');
-    }
-    return [name, createHash('sha256').update(fs.readFileSync(filename)).digest('hex')];
-  }));
 }
 
 function isFixture(deps) {
@@ -251,41 +75,26 @@ function getOutboxDir(deps) {
   return expandHomePath('~/outbox/sanctissimissa', home);
 }
 
-/**
- * Canonical stage order.
- * android-debug is REMOVED (operator rule 2026-09-16: no android-debug stage
- * ever — debug APKs are never shipped; android-release is the only Android
- * build stage).
- */
-export const STAGE_ORDER = [
-  'test', 'web', 'web-deploy', 'linux',
-  'windows', 'windows-msi', 'windows-msix',
-  'android-release', 'symbols', 'collect',
-];
-
 export const PENDING_RELEASE_EXIT_CODE = 2;
 
+/** §2.2: a stage runs on a host when the host's env is in STAGE_ENVS[stage]. */
 export function stageRunsOnHost(stage, platform) {
-  if (!STAGE_ORDER.includes(stage)) return false;
-  if (stage === 'collect') return platform === 'linux';
-  if (['test', 'web', 'web-deploy'].includes(stage)) return ['linux', 'win32'].includes(platform);
-  if (['windows-msi', 'windows-msix'].includes(stage)) return platform === 'win32';
-  return platform === 'linux';
+  let env;
+  try {
+    env = envOf(platform);
+  } catch {
+    return false;
+  }
+  return STAGE_ENVS[stage]?.includes(env) ?? false;
 }
 
-/**
- * Interrupt receipt filename
- */
+/** Interrupt receipt filename */
 export const INTERRUPT_RECEIPT_FILENAME = 'sanctissimissa-release-interrupt-receipt.json';
 
-/**
- * Exit code when controlled interrupt occurs
- */
+/** Exit code when controlled interrupt occurs */
 export const INTERRUPT_EXIT_CODE = 70;
 
-/**
- * Exit code when receipt validation fails
- */
+/** Exit code when receipt validation fails */
 export const RECEIPT_MISMATCH_EXIT_CODE = 71;
 
 /**
@@ -313,29 +122,16 @@ export function getReceiptPath(fixtureDir) {
  */
 export function readInterruptReceipt(fixtureDir) {
   const receiptPath = getReceiptPath(fixtureDir);
-
-  if (!fs.existsSync(receiptPath)) {
-    return null;
-  }
-
+  if (!fs.existsSync(receiptPath)) return null;
   try {
-    const content = fs.readFileSync(receiptPath, 'utf-8');
-    const parsed = JSON.parse(content);
-
+    const parsed = JSON.parse(fs.readFileSync(receiptPath, 'utf-8'));
     // Validate structure: { target: string, consumed: true, writtenAt: string }
-    if (
-      typeof parsed.target !== 'string' ||
-      parsed.consumed !== true ||
-      typeof parsed.writtenAt !== 'string'
-    ) {
+    if (typeof parsed.target !== 'string' || parsed.consumed !== true || typeof parsed.writtenAt !== 'string') {
       throw new Error('Invalid interrupt receipt structure');
     }
-
     return parsed;
   } catch (error) {
-    if (error instanceof SyntaxError) {
-      throw new Error('Interrupt receipt contains invalid JSON');
-    }
+    if (error instanceof SyntaxError) throw new Error('Interrupt receipt contains invalid JSON');
     throw error;
   }
 }
@@ -348,15 +144,14 @@ export function readInterruptReceipt(fixtureDir) {
 export function writeInterruptReceipt(target, fixtureDir) {
   const receiptPath = getReceiptPath(fixtureDir);
   const tempPath = `${receiptPath}.tmp`;
-
-  const receipt = {
-    target,
-    consumed: true,
-    writtenAt: new Date().toISOString(),
-  };
-
+  const receipt = { target, consumed: true, writtenAt: new Date().toISOString() };
   fs.writeFileSync(tempPath, JSON.stringify(receipt, null, 2), 'utf-8');
   fs.renameSync(tempPath, receiptPath);
+}
+
+/** Append one stub event line (hermetic stub mode). */
+function logStub(fixtureDir, name) {
+  fs.appendFileSync(path.join(fixtureDir, 'sanctissimissa-release-stage-events.log'), `${name}\n`, 'utf-8');
 }
 
 /**
@@ -365,9 +160,10 @@ export function writeInterruptReceipt(target, fixtureDir) {
  * @param {string} name - Command name ('stamp' or stage name)
  * @param {Object} deps - Dependency injection object
  * @param {string} root - Root directory
+ * @param {string} releaseEnv - Build environment ('ubuntu' | 'windows'), exported as SAM_RELEASE_ENV
  * @returns {Promise<number>} Exit code (0 for success)
  */
-async function runCommand(name, deps, root) {
+async function runCommand(name, deps, root, releaseEnv) {
   // Injected stub runner
   if (deps?.runCommand) {
     const result = await deps.runCommand(name);
@@ -376,39 +172,30 @@ async function runCommand(name, deps, root) {
 
   // Environment-selected hermetic stub mode
   const env = deps?.env || process.env;
-  const isStub = env.RELEASE_STATE_RUNNER === 'stub';
   const fixtureDir = deps?.fixtureDir || env.RELEASE_STATE_FIXTURE;
-
-  if (isStub && fixtureDir) {
+  if (env.RELEASE_STATE_RUNNER === 'stub' && fixtureDir) {
     // Controlled interrupt protocol (stub mode only)
     const interruptTarget = env.RELEASE_STATE_INTERRUPT_AT;
     if (interruptTarget !== undefined) {
-      // Validate interrupt target is a known stage
       if (!STAGE_ORDER.includes(interruptTarget)) {
         console.error(`❌ RELEASE_STATE_INTERRUPT_AT must be a canonical stage: ${STAGE_ORDER.join(', ')}`);
         return RECEIPT_MISMATCH_EXIT_CODE;
       }
-
-      // Handle interrupt at target stage
       if (name === interruptTarget) {
         try {
           const receipt = readInterruptReceipt(fixtureDir);
-
           // First reach: write receipt and interrupt
           if (receipt === null) {
-            const logPath = path.join(fixtureDir, 'sanctissimissa-release-stage-events.log');
-            fs.appendFileSync(logPath, name + '\n', 'utf-8');
+            logStub(fixtureDir, name);
             writeInterruptReceipt(name, fixtureDir);
             console.log(`⏸️  Controlled interrupt at ${name} (receipt written)`);
             return INTERRUPT_EXIT_CODE;
           }
-
           // Receipt mismatch: fail closed
           if (receipt.target !== interruptTarget) {
             console.error(`❌ Interrupt receipt mismatch: receipt.target=${receipt.target}, RELEASE_STATE_INTERRUPT_AT=${interruptTarget}`);
             return RECEIPT_MISMATCH_EXIT_CODE;
           }
-
           // Resume: receipt matches, continue without re-stamping
           console.log(`▶️  Resuming from ${name} (receipt matched)`);
           return 0;
@@ -417,19 +204,8 @@ async function runCommand(name, deps, root) {
           return RECEIPT_MISMATCH_EXIT_CODE;
         }
       }
-
-      // Non-target stages: log normally
-      const logPath = path.join(fixtureDir, 'sanctissimissa-release-stage-events.log');
-      const logLine = `${name}\n`;
-      fs.appendFileSync(logPath, logLine, 'utf-8');
-      console.log(`🔧 [STUB] ${name}`);
-      return 0;
     }
-
-    // Normal stub logging (no interrupt requested)
-    const logPath = path.join(fixtureDir, 'sanctissimissa-release-stage-events.log');
-    const logLine = `${name}\n`;
-    fs.appendFileSync(logPath, logLine, 'utf-8');
+    logStub(fixtureDir, name);
     console.log(`🔧 [STUB] ${name}`);
     return 0;
   }
@@ -438,7 +214,7 @@ async function runCommand(name, deps, root) {
   // terminal: never background a build and never redirect its only evidence
   // to a disposable log file.
   if (isFixture(deps)) throw new Error('Fixture execution requires an injected runner or RELEASE_STATE_RUNNER=stub');
-  const childEnv = { ...process.env, ...env, FORCE_COLOR: env.FORCE_COLOR || '1' };
+  const childEnv = { ...process.env, ...env, FORCE_COLOR: env.FORCE_COLOR || '1', SAM_RELEASE_ENV: releaseEnv };
   childEnv.ANDROID_HOME ||= path.join(os.homedir(), 'Android', 'Sdk');
   childEnv.ANDROID_SDK_ROOT = childEnv.ANDROID_HOME;
   childEnv.NDK_HOME ||= path.join(childEnv.ANDROID_HOME, 'ndk', '27.0.12077973');
@@ -446,11 +222,7 @@ async function runCommand(name, deps, root) {
     const javaPath = execSync('command -v java', { encoding: 'utf8', env: childEnv }).trim();
     childEnv.JAVA_HOME = path.dirname(path.dirname(fs.realpathSync(javaPath)));
   }
-  const inherited = {
-    cwd: root,
-    stdio: 'inherit',
-    env: childEnv,
-  };
+  const inherited = { cwd: root, stdio: 'inherit', env: childEnv };
 
   // npm's Windows shim is absent in node_modules copied from Linux. Each host
   // must install its own CLI before running a production stage or the stamp.
@@ -475,123 +247,48 @@ async function runCommand(name, deps, root) {
     return 0;
   }
 
-  // Stage commands
-  const stageCommands = {
-    test: () => {
-      console.log('🔧 Stage: test');
-      // npm test runs at --test-concurrency=4 (195MB corpus DB children).
-      // A corpus-loading child still dies file-level without diagnostics in
-      // ~1 run in 10 under load (observed 2026-09-17, no kernel OOM/segv —
-      // environmental). One deterministic retry with both outputs kept in
-      // the train log; two consecutive failures fail the stage for real.
-      const attempt = (args) => spawnSync('npm', args, { stdio: 'inherit', shell: false });
-      const first = attempt(['test']);
-      if (first.status === 0) return;
-      console.warn('⚠ test stage failed once (corpus-load flake class) — deterministic retry with TAP evidence:');
-      const second = attempt(['test', '--', '--test-reporter=tap']);
-      if (second.status !== 0) {
-        throw new Error(`test stage failed twice (first exit ${first.status}, retry exit ${second.status}) — see TAP output above`);
-      }
-      console.warn('⚠ test stage passed on retry; first-failure evidence retained above');
-    },
-    web: () => {
-      console.log('🔧 Stage: web');
-      execSync('npm run build:vite', inherited);
-    },
-    // Publishes the completed web output (REL.1 / operator 2026-09-18). Runs
-    // before native packaging so a pending Windows installer never blocks web
-    // publication; deploy-web.mjs never rebuilds or stamps, and its failure
-    // leaves this stage incomplete and retryable under the same version.
-    'web-deploy': () => {
-      console.log('🔧 Stage: web-deploy');
-      execFileSync(process.execPath, ['scripts/deploy-web.mjs'], inherited);
-    },
-    linux: () => {
-      console.log('🔧 Stage: linux');
-      execSync('npm exec -- tauri build --bundles deb,appimage --ci', inherited);
-    },
-    windows: () => {
-      console.log('🔧 Stage: windows');
-      execSync('npm run build:windows:unstamped', inherited);
-    },
-    'windows-msi': () => {
-      console.log('🔧 Stage: windows-msi');
-      execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-File',
-        'scripts/sanctissimissa-v1.40.21223-windows-native-20260913.ps1', '-Kind', 'MSI'], inherited);
-    },
-    'windows-msix': () => {
-      console.log('🔧 Stage: windows-msix');
-      execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-File',
-        'scripts/sanctissimissa-v1.40.21223-windows-native-20260913.ps1', '-Kind', 'MSIX'], inherited);
-    },
-    'android-debug': () => {
-      console.log('🔧 Stage: android-debug');
-      execFileSync(process.execPath, ['scripts/provision-secrets.mjs'], inherited);
-      execSync('npm exec -- tauri android build --debug --apk --ci', inherited);
-    },
-    'android-release': () => {
-      console.log('🔧 Stage: android-release');
-      execFileSync(process.execPath, ['scripts/provision-secrets.mjs'], inherited);
-      execSync('node scripts/stage-model-packs.mjs --require', inherited);
-      execFileSync(process.execPath, ['scripts/modules-stage.mjs', '--android-pack'], inherited);
-      execSync('npm exec -- tauri android build --apk --aab --ci', {
-        ...inherited,
-        env: { ...inherited.env, CARGO_PROFILE_RELEASE_DEBUG: '2', CARGO_PROFILE_RELEASE_STRIP: 'false' },
-      });
-    },
-    symbols: () => {
-      console.log('🔧 Stage: symbols');
-      execSync('npm run package:android-symbols', inherited);
-    },
-    collect: () => {
-      console.log('🔧 Stage: collect');
-      execSync('npm run collect-artifacts', inherited);
-    },
-  };
-
-  const command = stageCommands[name];
-  if (!command) {
-    throw new Error(`Unknown command: ${name}`);
-  }
-
-  await command();
-  return 0;
+  // Stage commands: the L-release §2.2 STAGE_ENVS table (release-stage-commands.mjs).
+  if (!STAGE_ORDER.includes(name)) throw new Error(`Unknown command: ${name}`);
+  return stageCommand(name, releaseEnv, inherited);
 }
 
 /**
- * Run a single stage and mark it complete
+ * Run one stage for this host's env and mark its `<stage>@<env>` pair complete.
+ * Outputs are staged into dist/ (stageOutputs) before the pair is marked (CC14 stage-as-produced).
  * @param {string} stage - The stage name to run
  * @param {Object} [deps] - Optional dependency overrides
  * @param {string} [root] - Root directory
  * @param {string} [lockPath] - Lock file path
- * @returns {Promise<number>} Exit code
+ * @returns {Promise<number>} Exit code (0 complete, PENDING_RELEASE_EXIT_CODE pending)
  */
 export async function runReleaseStage(stage, deps, root, lockPath) {
-  if (!STAGE_ORDER.includes(stage)) {
-    throw new Error(`Unknown stage: ${stage}`);
-  }
-
+  if (!STAGE_ORDER.includes(stage)) throw new Error(`Unknown stage: ${stage}`);
   root ||= getRoot(deps);
   lockPath ||= getLockPath(root);
-  const platform = deps?.platform ?? (isFixture(deps) ? undefined : process.platform);
-  if (platform && !stageRunsOnHost(stage, platform)) return PENDING_RELEASE_EXIT_CODE;
+  const platform = deps?.platform ?? process.platform;
+  if (!stageRunsOnHost(stage, platform)) return PENDING_RELEASE_EXIT_CODE;
+  const env = envOf(platform);
+  const pair = stageKey(stage, env);
   const lock = readLock(lockPath);
   if (lock?.stampPending) throw new Error('Cannot run a release stage while stamp/commit is pending');
-  if (stage === 'collect' && STAGE_ORDER.some(s => s !== 'collect' && !lock?.completedStages.includes(s))) {
+  const missingPrereqs = stagePrereqs(stage, env).filter((p) => !lock?.completedStages.includes(p));
+  if (missingPrereqs.length) {
+    console.log(`⏳ ${pair} pending: needs ${missingPrereqs.join(', ')}`);
     return PENDING_RELEASE_EXIT_CODE;
   }
-  const exitCode = await runCommand(stage, deps, root);
-  if (exitCode !== 0) {
-    throw new Error(`Stage ${stage} failed with exit code ${exitCode}`);
+  const exitCode = await runCommand(stage, deps, root, env);
+  if (exitCode === PENDING_RELEASE_EXIT_CODE) {
+    console.log(`⏳ ${pair} pending`);
+    return PENDING_RELEASE_EXIT_CODE;
   }
-
-  markStageComplete(stage, lockPath, getOutboxDir(deps));
+  if (exitCode !== 0) throw new Error(`Stage ${pair} failed with exit code ${exitCode}`);
+  if (deps?.stageOutputs) deps.stageOutputs(stage, env);
+  else if (!isFixture(deps)) stageOutputs(stage, env, root);
+  markStageComplete(pair, lockPath, getOutboxDir(deps));
   return 0;
 }
 
-/**
- * Print usage information
- */
+/** Print usage information (L-release §2.2 stages; no `test`, no android-debug). */
 export function printUsage() {
   console.log(`Usage: node release-state.mjs [options]
 
@@ -601,23 +298,24 @@ Options:
   --resume-only      Continue matching existing state; never stamp
   --clean-only       Copy matching state to outbox; retain the active state
 
-Release stages (run automatically):
-  test               Run the test suite
-  web                Build web/PWA
-  web-deploy         Publish the completed web output to sanctissimissa.surge.sh
-  linux              Build Linux deb and AppImage
-  windows            Build Windows x64 standalone PE and NSIS installer
-  windows-msi        Build the MSI installer (Windows host only)
-  windows-msix       Build the MSIX package (Windows host only)
-  android-debug      Build Android debug APK
-  android-release    Build Android release APK and AAB
-  symbols            Package Android native debug symbols
-  collect            Collect and validate all release artifacts
+Release stages (run automatically; each completes as <stage>@<env>, env ubuntu|windows):
+  inputs             Verify vendored release inputs, stage corpus/modules into dist/ (both)
+  web                Build web/PWA and stage its zip (both)
+  modules-deploy     Upload modules and runtime assets to sanctissimissa.robin.mba/runtime (ubuntu)
+  web-deploy         Publish the completed web output to sanctissimissa.surge.sh (ubuntu)
+  linux              Build Linux deb, AppImage and rpm (both; container on windows)
+  windows            Build Windows x64 standalone PE and NSIS installer (both)
+  windows-msi        Build the MSI installer (windows)
+  windows-msix       Build the MSIX package (windows)
+  android-release    Build Android release APK and AAB (both)
+  symbols            Package Android native debug symbols (both; container on windows)
+  collect            Collect the union of both envs and write the release manifest (ubuntu)
 
 The state file (sanctissimissa-release-state.json) enables resume after interruption:
 - First run: stamps version and writes lock with empty completedStages
 - Subsequent runs: resume at first incomplete stage (no stamp)
-- Mismatched/corrupt locks: fail closed with remediation instructions`);
+- Mismatched/corrupt locks: fail closed with remediation instructions
+- Every run copies the lock to dist/rubric-runs/sanctissimissa-v<ver>-release-state-buildenv-<env>.json`);
 }
 
 /**
@@ -654,6 +352,7 @@ export async function main(argv, deps = {}) {
     console.error('❌ This release driver requires native Linux or Windows; no stamp was run.');
     return 1;
   }
+  const releaseEnv = envOf(deps.platform ?? process.platform);
 
   let lock;
   try {
@@ -710,8 +409,8 @@ export async function main(argv, deps = {}) {
       console.log(`📦 Copied lock to ${archivedPath}; active state retained. Use --restart for a fresh release.`);
       return 0;
     }
-    console.log(`🔄 Resuming release v${lock.version}`);
-    console.log(`Completed stages: ${lock.completedStages.join(', ') || 'none'}`);
+    console.log(`🔄 Resuming release v${lock.version} on ${releaseEnv}`);
+    console.log(`Completed pairs: ${lock.completedStages.join(', ') || 'none'}`);
   } else {
     // Validate non-Git inputs before burning a version or altering old state.
     if (!fixture) {
@@ -731,7 +430,7 @@ export async function main(argv, deps = {}) {
       ...(!fixture ? { inputHashes: getInputHashes(root) } : {}),
     };
     writeLock(predecessor, lockPath, outboxDir);
-    const exitCode = await runCommand('stamp', deps, root);
+    const exitCode = await runCommand('stamp', deps, root, releaseEnv);
     if (exitCode !== 0) throw new Error(`Stamp failed with exit code ${exitCode}`);
     lock = {
       version: readVersion(root),
@@ -744,33 +443,32 @@ export async function main(argv, deps = {}) {
     console.log(`🔒 Wrote sanctissimissa-release-state.json v${lock.version}`);
   }
 
-  for (const stage of STAGE_ORDER) {
-    if (lock.completedStages.includes(stage)) continue;
-    const result = await runReleaseStage(stage, deps, root, lockPath);
-    if (result === PENDING_RELEASE_EXIT_CODE) {
-      console.log(`⏳ Pending ${stage}: requires another host or earlier required stages.`);
+  try {
+    for (const stage of STAGE_ORDER) {
+      if (!STAGE_ENVS[stage].includes(releaseEnv)) {
+        console.log(`⏭ ${stage}: runs in ${STAGE_ENVS[stage].join(', ')} only`);
+        continue;
+      }
+      if (lock.completedStages.includes(stageKey(stage, releaseEnv))) continue;
+      await runReleaseStage(stage, deps, root, lockPath);
+      lock = readLock(lockPath);
     }
-    lock = readLock(lockPath);
+  } finally {
+    // §2.3 environment copy at the end of every invocation, complete or pending.
+    if (fs.existsSync(lockPath)) {
+      const copy = writeEnvLockCopy(root, lockPath, readLock(lockPath).version, releaseEnv, outboxDir);
+      console.log(`📦 Copied release state to ${copy}`);
+    }
   }
 
-  const pendingStages = STAGE_ORDER.filter(stage => !lock.completedStages.includes(stage));
-  if (pendingStages.length) {
-    console.log(`⏳ Release v${lock.version} incomplete: ${pendingStages.join(', ')}`);
-    console.log('Continue the same source, version, inputs and state on the required host: npm run build:release -- --resume-only');
+  const union = unionPairs(lock, root);
+  const missing = REQUIRED_PAIRS.filter((pair) => !union.includes(pair));
+  if (missing.length) {
+    console.log(`⏳ Release v${lock.version} incomplete: ${missing.join(', ')}`);
+    console.log('Continue the same source, version, inputs and state in the required env: npm run build:release -- --resume-only');
     return PENDING_RELEASE_EXIT_CODE;
   }
-
-  // Keep the terminal state so another invocation cannot accidentally stamp again.
-  const distRubricRuns = getDistRubricRuns(root);
-  fs.mkdirSync(distRubricRuns, { recursive: true });
-  const archivePath = path.join(distRubricRuns, `sanctissimissa-v${lock.version}-release-state.json`);
-  const lockBytes = fs.readFileSync(lockPath);
-  if (!fs.existsSync(archivePath) || !fs.readFileSync(archivePath).equals(lockBytes)) {
-    if (fs.existsSync(archivePath)) preserveState(archivePath, lock.version, 'release-state-before-archive', outboxDir);
-    fs.copyFileSync(lockPath, archivePath);
-  }
-  console.log(`📦 Archived release state to ${archivePath}; terminal state retained.`);
-  console.log('✅ All artifact build stages complete; release acceptance remains subject to the recorded platform/Store verification gates.');
+  console.log(`✅ All ${REQUIRED_PAIRS.length} release pairs complete; release acceptance remains subject to the recorded platform/Store verification gates.`);
   console.log('Use --restart to start a new stamped release.');
   return 0;
 }
