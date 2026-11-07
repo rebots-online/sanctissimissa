@@ -1,0 +1,288 @@
+/* Library reader (BA.6) — export `LIBS/UI/STITCH/sanctissimissa-library-20260913/reader.html`
+   (Stitch 0918fcd8) <style> ported and re-scoped under .library-reader. The text inside
+   #book-reader-host is the app's SectionReader, styled by src/styles.css; only the host,
+   sheet, TOC, tools and notebook chrome come from the export. Rules for unmounted parts
+   (nav rail, specimen notice, verse specimen rows, recording panel, popover) are not carried. */
+
+.library-reader {
+  --lr-ink: var(--ink, #221c14);
+  --lr-ink-soft: var(--ink-soft, #4a4034);
+  --lr-ink-faint: var(--ink-faint, #7a6e5d);
+  --lr-parchment: var(--surface, #f6f0e2);
+  --lr-parchment-deep: var(--card-border, #ece2cc);
+  --lr-parchment-deepest: #ded2b5;
+  --lr-vellum: var(--card, #fbf7ee);
+  --lr-gold: var(--gold, #a97e13);
+  --lr-gold-soft: rgba(169, 126, 19, 0.12);
+  --lr-burgundy: #9c2733;
+  --lr-burgundy-soft: rgba(156, 39, 51, 0.08);
+  --lr-serif: var(--serif, Georgia, serif);
+  --lr-sans: var(--sans, system-ui, sans-serif);
+  --lr-display: 'Cinzel', var(--lr-serif);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--lr-parchment);
+  color: var(--lr-ink);
+  font-family: var(--lr-sans);
+}
+
+/* Top bar */
+.library-reader .reader-header {
+  background: var(--lr-vellum);
+  border-bottom: 1px solid var(--lr-parchment-deep);
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 54px;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+}
+.library-reader .reader-header-left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.library-reader .back-library-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--lr-ink-soft);
+  text-decoration: none;
+  padding: 4px 8px;
+  min-height: 44px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: 1px solid var(--lr-parchment-deep);
+  background: var(--lr-vellum);
+  cursor: pointer;
+}
+.library-reader .back-library-btn:hover { background: var(--lr-parchment); }
+.library-reader .work-breadcrumbs { font-size: 13px; color: var(--lr-ink); font-weight: 500; }
+.library-reader .work-breadcrumbs span { color: var(--lr-ink-faint); }
+
+/* Tools */
+.library-reader #reader-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--lr-parchment);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--lr-parchment-deepest);
+}
+.library-reader .tool-btn {
+  background: none;
+  border: 1px solid transparent;
+  padding: 5px 8px;
+  min-height: 44px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--lr-ink-soft);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.library-reader .tool-btn:hover { background: var(--lr-vellum); border-color: var(--lr-parchment-deep); color: var(--lr-ink); }
+.library-reader .tool-btn:disabled { opacity: 0.5; cursor: default; }
+.library-reader .tool-btn.active {
+  background: var(--lr-burgundy-soft);
+  border-color: var(--lr-burgundy);
+  color: var(--lr-burgundy);
+  font-weight: 600;
+}
+
+/* Three-column stage */
+.library-reader .reader-stage {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr) 340px;
+  height: calc(100vh - 140px);
+  min-height: 420px;
+  overflow: hidden;
+}
+.library-reader .reader-center { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+
+/* Left: TOC */
+.library-reader #book-toc {
+  background: var(--lr-vellum);
+  border-right: 1px solid var(--lr-parchment-deep);
+  overflow-y: auto;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.library-reader .toc-title {
+  font-family: var(--lr-display);
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--lr-ink-faint);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--lr-parchment-deep);
+}
+.library-reader .toc-tree { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.library-reader .toc-item {
+  width: 100%;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  color: var(--lr-ink-soft);
+  background: none;
+  border: none;
+  border-left: 3px solid transparent;
+  padding: 6px 10px;
+  min-height: 36px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.library-reader .toc-item:hover { background: var(--lr-parchment); color: var(--lr-ink); }
+.library-reader .toc-item.active {
+  background: var(--lr-gold-soft);
+  color: var(--lr-ink);
+  font-weight: 600;
+  border-left-color: var(--lr-gold);
+}
+.library-reader .toc-book-heading {
+  font-family: var(--lr-serif);
+  font-weight: 600;
+  font-size: 13px;
+  margin-top: 10px;
+  color: var(--lr-burgundy);
+  padding: 4px 6px;
+}
+
+/* Center: long-form text host */
+.library-reader #book-reader-host {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 36px 48px 80px;
+  background: var(--lr-parchment);
+  position: relative;
+}
+.library-reader .reader-page-sheet {
+  max-width: 720px;
+  margin: 0 auto;
+  background: var(--lr-vellum);
+  border: 1px solid var(--lr-parchment-deep);
+  border-radius: 8px;
+  padding: 44px 50px;
+  box-shadow: 0 4px 18px rgba(34, 28, 20, 0.04);
+}
+.library-reader .reader-absent {
+  max-width: 520px;
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--lr-ink-soft);
+}
+
+/* Right: notebook */
+.library-reader #notebook-panel {
+  background: var(--lr-vellum);
+  border-left: 1px solid var(--lr-parchment-deep);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.library-reader .panel-tabs { display: flex; border-bottom: 1px solid var(--lr-parchment-deep); background: var(--lr-parchment); }
+.library-reader .panel-tab {
+  flex: 1;
+  padding: 10px 8px;
+  min-height: 44px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  background: none;
+  color: var(--lr-ink-faint);
+  cursor: pointer;
+}
+.library-reader .panel-tab.active {
+  color: var(--lr-burgundy);
+  background: var(--lr-vellum);
+  border-bottom: 2px solid var(--lr-burgundy);
+}
+.library-reader .panel-body { padding: 18px; display: flex; flex-direction: column; gap: 18px; }
+.library-reader .citation-card {
+  background: var(--lr-parchment);
+  border: 1px solid var(--lr-parchment-deepest);
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 12px;
+}
+.library-reader .citation-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--lr-gold);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.library-reader .mass-cross-ref {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--lr-parchment-deepest);
+}
+.library-reader .cross-ref-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--lr-burgundy);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  background: none;
+  border: none;
+  padding: 4px 0;
+  min-height: 32px;
+  text-align: left;
+  cursor: pointer;
+}
+.library-reader .cross-ref-item:hover { text-decoration: underline; }
+.library-reader .comment-card {
+  background: var(--lr-vellum);
+  border: 1px solid var(--lr-parchment-deep);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+.library-reader .comment-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--lr-ink-faint);
+  font-size: 10px;
+  margin-bottom: 4px;
+}
+.library-reader .comment-quote { color: var(--lr-ink-soft); font-style: italic; line-height: 1.4; margin: 0 0 4px; }
+.library-reader .comment-note { color: var(--lr-ink); line-height: 1.4; }
+
+/* Narrow (export breakpoint): one column; the export hides the TOC and notebook here */
+@media (max-width: 1100px) {
+  .library-reader .reader-stage { grid-template-columns: 1fr; }
+  .library-reader #book-toc,
+  .library-reader #notebook-panel { display: none; }
+  .library-reader #book-reader-host { padding: 20px; }
+}
+
+@media (max-width: 480px) {
+  .library-reader .reader-header { padding: 8px 12px; }
+  .library-reader #book-reader-host { padding: 10px; }
+  .library-reader .reader-page-sheet { padding: 16px 14px; }
+}
