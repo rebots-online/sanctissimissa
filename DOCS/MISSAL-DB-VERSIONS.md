@@ -29,6 +29,17 @@ One entry per ingest, newest first:
 
 ## Entries
 
+### corpus-2026.11.07-0400-q3e256 — semantic re-embed (Qwen3-Embedding-0.6B, 256-d) and Catena module split
+
+- Derived from `corpus-2026.11.07-0210` by `scripts/embed-corpus.mjs` (model `qwen3-embedding:0.6b`, blob `sha256-06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439`, Ollama 0.34.2).
+- Vendored Divinum Officium commit: `e9a9055cc235`.
+- Catena moved to module `catena-aurea-en` r2 (R2), so the base no longer contains `commentary:catena-aurea/*`.
+- Trigram auto-concept INSTANCE_OF edges archived in `edges_trigram_archive` (1309 rows); trigram vectors kept as `embeddings_trigram`.
+- Counts: nodes 109016; embeddings (dim 256) 104836; SIMILAR_TO 836664; semantic INSTANCE_OF 257668.
+- Semantic INSTANCE_OF per revised §3.1 step 5 (per node top 3 concepts with cosine ≥ 0.50): 257,668 edges from 98,028 sources in the full corpus (max 3 per source); base asset 219,899 edges from 85,123 sources, mean weight 0.674. Base asset `assets/corpus/missal.corpus-2026.11.07-0400-q3e256.db` is 314,572,800 bytes (1.43× the 220,246,016-byte input `stage2-graph.db`); module `catena-aurea-en-r2.db` is 71,880,704 bytes.
+- Rerun from the `corpus-2026.11.07-0210-q3e256` work file (phases `instance_of`, `probe`, `finalize` redone; vectors, centroids and SIMILAR_TO reused).
+- Rollback: prior corpus file untouched; revert the pointer commit.
+
 ### corpus-2026.11.07-0210-q3e256 — semantic re-embed (Qwen3-Embedding-0.6B, 256-d) and Catena module split
 
 - Derived from `corpus-2026.11.07-0210` by `scripts/embed-corpus.mjs` (model `qwen3-embedding:0.6b`, blob `sha256-06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439`, Ollama 0.34.2).
@@ -38,6 +49,7 @@ One entry per ingest, newest first:
 - Counts: nodes 109016; embeddings (dim 256) 104836; SIMILAR_TO 836664; semantic INSTANCE_OF 13361062.
 - Rollback: prior corpus file untouched; revert the pointer commit.
 - **Status: NOT SHIPPABLE — do not vendor or release (BA.10 `[/]`, 2026-11-06).** The §3.1 step 5 rule (cosine ≥ 0.45 to a concept centroid) is applied as written, but on 256-d Qwen3 vectors it admits nearly every pair. Measured on the base asset `assets/corpus/missal.corpus-2026.11.07-0210-q3e256.db` (1,617,481,728 bytes, versus 220,246,016 for the input `stage2-graph.db`): 12,235,970 semantic INSTANCE_OF edges from 89,683 sources into 253 concepts (≈ 136 concepts per node), mean weight 0.563. Edges and sources at or above each weight: 0.50 → 8,837,839 / 86,298; 0.60 → 3,536,544 / 70,548; 0.70 → 1,016,676 / 40,202; 0.80 → 117,062 / 12,266. No single threshold both bounds the size and keeps coverage. The INSTANCE_OF rule needs an architect revision, for example a per-node top-k, before this pipeline is rerun under a new `<V>`.
+- **Superseded by `corpus-2026.11.07-0400-q3e256`** (per-node top-3 INSTANCE_OF, 2026-11-06). Remains NOT SHIPPABLE.
 
 ### corpus-2026.08.16-1459 — `#` sub-heading markers stripped from section text
 

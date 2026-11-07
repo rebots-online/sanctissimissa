@@ -16,7 +16,8 @@ import { availableParallelism } from 'node:os';
 
 export const DIM = 256;
 export const MODULE_KEY_RE = /^(commentary:catena-aurea\/|catena:|father:)/;
-export const INSTANCE_OF_MIN = 0.45;
+export const INSTANCE_OF_TOP_K = 3;
+export const INSTANCE_OF_MIN = 0.50;
 export const SIMILAR_MIN = 0.35;
 export const SIMILAR_TOP = 8;
 export const SIMILAR_BATCH = 1000;
@@ -113,9 +114,13 @@ export function loadMatrix(db) {
 }
 
 /**
- * Phase `instance_of` body (caller wraps one transaction): delete previous
- * semantic INSTANCE_OF edges, then link section/verse/commentary/quotation →
- * concept where cosine ≥ 0.45, skipping pairs with a curated edge.
+ * Phase `instance_of` body (caller wraps one transaction), §3.1 step 5 as
+ * revised 2026-11-06: delete previous semantic INSTANCE_OF edges, then for
+ * each section/verse/commentary/quotation node take its top
+ * INSTANCE_OF_TOP_K (3) concepts by cosine to the centroid with cosine ≥
+ * INSTANCE_OF_MIN (0.50), ties by concept id ascending; weight = cosine,
+ * meta {"method":"semantic"}. A pair that already has a curated
+ * (non-semantic) INSTANCE_OF edge is skipped but still counts toward the 3.
  */
 export function semanticInstanceOf(db, m) {
   db.exec(`DELETE FROM edges WHERE rel = 'INSTANCE_OF' AND json_extract(meta, '$.method') = 'semantic'`);
@@ -123,13 +128,23 @@ export function semanticInstanceOf(db, m) {
     .map((r) => `${r.src}:${r.dst}`));
   const concepts = [];
   for (let i = 0; i < m.n; i++) if (m.kinds[i] === 'concept') concepts.push(i);
+  concepts.sort((a, b) => m.ids[a] - m.ids[b]);
   const ins = db.prepare('INSERT INTO edges (src, dst, rel, weight, meta) VALUES (?,?,?,?,?)');
   let count = 0;
   for (let i = 0; i < m.n; i++) {
     if (!INSTANCE_KINDS.has(m.kinds[i])) continue;
+    const best = []; // [cos, conceptRow], cos desc then concept id asc, length ≤ TOP_K
     for (const c of concepts) {
       const cos = dot(m.mat, i, c);
       if (cos < INSTANCE_OF_MIN) continue;
+      // concepts iterate by id ascending, so an equal cosine never displaces an earlier one
+      if (best.length === INSTANCE_OF_TOP_K && cos <= best[INSTANCE_OF_TOP_K - 1][0]) continue;
+      let j = best.length;
+      while (j > 0 && best[j - 1][0] < cos) j--;
+      best.splice(j, 0, [cos, c]);
+      if (best.length > INSTANCE_OF_TOP_K) best.pop();
+    }
+    for (const [cos, c] of best) {
       if (existing.has(`${m.ids[i]}:${m.ids[c]}`)) continue;
       ins.run(m.ids[i], m.ids[c], 'INSTANCE_OF', cos, SEMANTIC_META);
       count++;

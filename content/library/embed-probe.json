@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "corpusVersion": "corpus-2026.11.07-0210-q3e256",
+  "corpusVersion": "corpus-2026.11.07-0400-q3e256",
   "embedMeta": {
     "model": "qwen3-embedding:0.6b",
     "artifact_sha256": "06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439",
@@ -17,7 +17,7 @@
       "role": "doc",
       "key": "section:Tempora/Quad4-5t#Super populum",
       "text": "!Oratio super populum\nv. Orémus.\nv. Humiliáte cápita vestra Deo.\nv. Da nobis, quǽsumus, omnípotens Deus: ut, qui infirmitátis nostræ cónscii, de tua virtúte confídimus, sub tua semper pietáte gaudeámus.\nr. Per Dóminum nostrum Jesum Christum, Fílium tuum: qui tecum vivit et regnat in unitáte Spíritus Sancti Deus, per ómnia sǽcula sæculórum.\nR. Amen.\n\n!Prayer over the people\nv. Let us pray.\nv. Bow your heads to God.\nv. Grant us, we beseech You, almighty God, that, conscious of our weakness, we may place our trust in Your strength, and rejoice forever in Your fatherly love.\nr. Through Jesus Christ, thy Son our Lord, Who liveth and reigneth with thee, in the unity of the Holy Ghost, God, world without end.\nR. Amen.",
-      "vec": "CQD//AX8Dfj7/fQAE//7Eu0OGOYD9AwaFQoHCP8N9fkDAQf+/PoC+wX5CAT9+Pbv//33/fkC+vr+/AP/BQHv8wASAf3/+fgI8wEG+gIHAPn98gz4Ag/7Af/9EgUCBPcEBP/8AAQACAn5DPoMAfwF+ggBB/vw+wL49vIE//YD+PsJ9QL3/QUGA/oCAvwLBgABAAf6AQgE/AH+APr1APsDAAT8+vr+/Pr89AcBB/0DA/Tz6vwHA/7/BAML/wEF/vn7+wr5+gD5BP72AQH6CQ8GBgP7CfgDBgH39QD3BAT47PgF/f8CAv8B+hT/Bf39+AIMBv4OAfcD/v8H//r2DfH//w=="
+      "vec": "Cf///AX8Dfj7/fQAE//7E+0OGOYE9AwaFQkGCP8N9fkEAQf++/oC+wX5CAT9+Pfv//73/fkC+vr+/AMABQHw8/8SAf7/+PgI8gEG+gIHAPn98gz4Ag/7Af/9EwUCBPcEBP/8AAQACAj5DPoMAf0F+ggBB/vv+wL49vIE//YD+PsJ9QL3/AUGBPoCAvwLBgABAQf6AQgE/AH+APr1APsDAAT8+vr+/Pv89AcBCP0DA/Tz6/sHA/3/BAML/wEF/vn7+wr5+gD5BP72AQH6CQ8GBgP7CfgDBgH39QD3AwT47PgF/f8CAv8B+hT/Bf39+AIMBv4OAfgD/v4H//r2DfH//w=="
     },
     {
       "id": "d02",
@@ -31,14 +31,14 @@
       "role": "doc",
       "key": "section:Tempora/Quad2-2#Communio",
       "text": "!Ps 9:2-3\nNarrábo ómnia mirabília tua: lætábor, et exsultábo in te: psallam nómini tuo, Altíssime.\n\n!Ps 9:2-3\nI will declare all Your wondrous deeds; I will be glad and exult in You; I will sing praise to Your name, Most High.",
-      "vec": "BP3+9vX7DhT8+fcCCf78EPMVGeP6/PESGP8AAA37APYDAgT98/wJAAwBBgL9/fz8BP3z/Pn5+/wIBAEC/QD99/v++f8A9gMQ6/4C/AP8+/769Ab7CxDv9wT2Ew/6Cuv9/QsDBP76Bvz9CfsC+AEEDAoBEP3y+f/9+fL/+fn/+vwA/AH3/wIFDQAF//sFAAX5Af4A//0A/P///AD8+fwGAQYC+PkBDQD//Q8C//sLBfz67foCAP7+AwUJA/oK8PX+8wUC/gX/A/n+AvwEAwUDAf//+PwB/QHz+wP9AggD7vkGBwIEBP33AA77BPoE9QYKCwMQ//kAAwb8Afv2B/D9BQ=="
+      "vec": "BP3+9vb7DhT8+fcCCf78EPMVGeP6/PESGP8BAQ37APYDAgT99PwJAAwBBgL9/fz8BP30/Pn5+/wHBAEC/QH99/r++f8A9gMQ6/4C/AP8+/769Af7CxDv+AT2Ew/6Cuv9/AsDBP/6Bvz9CfsC+AEECwoBEP3y+f/9+fL/+fn/+vsA/AL3/wMFDf8F//sGAAT5Af4A//0A/P///AD8+fwGAQYC+PkBDQD//Q8C//sLBfz67foCAP7+AwUJA/oL8PT+8wUC/gX/Avn+AvwEAwYDAQD/+P0B/QHz+wP+AggD7vkGBwIEBP33AA/7BPoE9QUKCwMR//kAAwb8Afv2B/D9Bg=="
     },
     {
       "id": "d04",
       "role": "doc",
       "key": "section:Commune/C6#Capitulum Laudes",
       "text": "!2 Cor 10:17-18\nv. Fratres: Qui gloriátur, in Dómino gloriétur. Non enim qui seípsum comméndat, ille probátus est; sed quem Deus comméndat.\nR. Deo grátias.\n\n!2 Cor 10:17-18\nv. Brothers: But he that glorieth, let him glory in the Lord. For not he who commendeth himself, is approved, but he, whom God commendeth.\nR. Thanks be to God.",
-      "vec": "BPH+BA34Dvf9BQDwEv79FPcOCvP6+gIXFvcHBA7+6/0DB/399+0JB/4AAQr2//4CCQX3Bv8F+gAKA///AQcFAPsRDAz79wD8AwMAAwIDAwMC8xT78w37AwgIAw0BCP0E+gb++/8FCwgBC/wJAPsXARX6Bwfw/Pv+8Pn+/fkB+gMH9/35/wwJB/38AP0C+////QEAB/8E+gT8/fYEAf4GAAgC+wP6/P39BgL6CAEC/wL67fYACQL7A/cO/gn7//r+/Q38AgL4/gUHBP7+AgcF/vf6+goJDgH9+fj3AgUE7PgI////EP3//BMBAQcC7gAPAPkTBfz7BwL+/fb7Bvj5+g=="
+      "vec": "BPH+Aw34DvX9BADwEv7+FPcNCvT5+gIWFvcHBA7/6/0ECP399+0JCP4AAQr2//4CCQT3Bv8F+gAKA/8AAQcFAPsRDAz79wD8AwMAAwIDAwMC8xT78w37AwgIAg0BCP0F+gb+/AAFCwgBCvwKAPsXARX6Bwfw/Pv+8Pr+/fkB+gMH9/35/wwJBv38//0C/P///QEAB/8E+QP8/fYEAf4GAAgC+wP6/P39BgL5CAEC/wL67PYACQL7A/YP/gj7/vr+/Qz8AgL4/gUHBP7+AgcF/vf6+goJDgH9+fj3AgYE7fgI///+EP3//BMBAQcC7gAOAPkUBfz7BwL+/ff8Bvj5+g=="
     },
     {
       "id": "d05",
@@ -241,14 +241,14 @@
       "role": "query",
       "key": "verse:Jer/18/22",
       "text": "Let a cry be heard out of their houses:",
-      "vec": "Bwn+/QLyCvr09vj9Cf78GfoCHfLqBfYNDwYPAQ8Q/voDBAT+BPAPCwr0AfwA+gD4AwT4CfkIAgUC/Qn9Cvj8+fsAA/oAAvYV/AcBA/0HAAX18RH2+xT1BAINCxX5/Pv7A/r//PkNCAH6CwEHAgMHBQsJBvQEAfr69wwD+QH59P8K+QMABv0GAgcC//wR/vv3/AMABAP9/Aj/AQP/BP4KCgYA9foBBvsG+wL8AwUBBPv//AD+BwD8+PoB/vwF9fv78QoB+//7BP4A/voFDAEACv8B8ggEDP4C/gf3/gD97/oBAvz3+/37+g79AvQD9gAFAfoJ+/n3+O4J+PP3D/z9+w=="
+      "vec": "Bgn+/QLxC/r09vj9Cf78GfoCHvLqBfYNEAYPAQ8Q/voDBAP+BPAPCgrzAvwA+v/4AwT4CfgIAgQC/Qr8Cvj8+fv/A/oAAvcV/AcBA/0HAAT18hH2+xX0AwINCxX5/Pr7A/r//PkNCAH6CwEHAgMHBQsJBvUDAfr69wwD+QH59P8K+QMAB/0GAgcC//wR/vv3/AMABAP9/Aj/AQL/BP4KCgYA9foBBvsG+wL8AwUCBPv//AD+BwD8+PoB/vwF9fv78QoB+//7BP8A/voFDAEACv8B8ggEDP8C/gb3/gH97/oBAv32+/37+g79AvQE9gAFAfkJ+/n3+O4J+fP3D/z9+w=="
     },
     {
       "id": "q14",
       "role": "query",
       "key": "verse:Jer/36/21",
       "text": "And the king sent Judi that he should take the volume:",
-      "vec": "Dfb/+/buFPj4+/f7Av79G/EKEAQC9QgBFgL2ART+9wcPCf79BPv3CAb9CP7+9O7/EQAEAwIC/fICAQb9EwAF8wECBgr29fj98Q8ECvMM/+33BQX/+RXy9wIBAw/2F/kKBwgDCPj/Avn3Cf8BAv0NCwUEB//m/QX/AvwB+AMC/wb98f30APoG/v4KAf4O/AH+AAMH+QP8A/74+PT9/P/6+wEBAfP/A/QFAQf8BAECAwf4DP3/Awn5Afb/BgkD/f4C9wL7AQb8AgD7A/j+AgQFBgb+/wP9CAMJBQP+D/oC9fz/Bv/9AwMMAQEDCwQABgQFBQUAAQL+/vUA/fX1Dfr5AQ=="
+      "vec": "Dff/+/buFPn4+vf7Av79G/IKDwQD9QgAFgL1ART++AcPCf79BPv4CAb+CP3+9O//EQAEAwIC/fICAQf9EwEF8gECBgv29fj98Q8ECvMN/u33BgT/+BXy9wEBAw/2F/kKBwgDCPj/Avj2Cf8BAv0NCgQEB//m/QX/A/wB+AMC/wb98f30AfoG/v4KAf4O/AH+AAMG+QP8A/74+PT9/P/6+wIBAfP/A/QFAQf8BQECAwf5DP3/Awn5Afb/BgkE/f4C9wL7AQb8AgH7A/j9AgQFBgb+/wP9CQMJBQP+D/oC9fz/Bv/9BAMMAQEDCwQBBQQFBgUAAQL+/vUA/fX1Dfr5AQ=="
     },
     {
       "id": "q15",
@@ -269,14 +269,14 @@
       "role": "query",
       "key": "commentary:haydock/Esth/11/4",
       "text": "Juda. This has been noticed already, Esther 2:5.",
-      "vec": "DwP+/P/7Awf2//b/HP74DPgEE+72+f8QFQf8BRUN+wUODf3+BPkL9QPzDv8A8gD9CQv+/P0G+foFCAj/DP8LAP76Evv9Af4J+AcB+P0K+/b/BwgF+xUEAP4CChj/BAEB/AEEAgYSBf31Bvv1+v4EAwsM/AD1/v705/8H+PsC9wcF+AD0+gEC+P0LBP8J+gn3AggH/gADB//7+vsE/fkLAwgBA/X/DfIDBfwADfn9BQb5Efr6BvMDBfn8BP4I/AIF9/4G+QTyCwEAEPoG/wL/BwD9CPn3Cgz/Awj6CQEA9P/8AwL7A/8F9QL9Cf4D8wgCDQAF9wEABvj/Bvz4/vsGAg=="
+      "vec": "DwX+/P/7BAf2//f/G/73DPgEE+71+QARFQf8BRUN+wUODf3+BPkL9QTzDv//8wD9CQv+/P0H+foFCAgADP8LAP76Evv9Af4J+AcB+f0K+/X/BwgF+xUEAP4CChf/BAEB/AEEAgYTBf31Bfv1+v4EAwsM/AD1/v705/8H+PsC9wcF+AD0+gED+P0LBP8J+gn3AwgH/gADB//7+vsD/fkKAwgAA/X/DfIDBfwADfn9BQX5Efr6BvMDBfn8BP4I/QIF9/4G+QTyCwEAEPoG/wL/BwD9CPn2CQz/Awj6CQEA9AD8AwL7A/8F9QL9Cf4C8wgCDQAF9wEABvj/Bvz4/vsGAg=="
     },
     {
       "id": "q18",
       "role": "query",
       "key": "commentary:haydock/Ezech/39/28",
       "text": "There, except such as refused to return.",
-      "vec": "AQD/+wTzCeb1Aff6Bf/6Ffn0Ffv79RIHEgf4/Q8Q8gX/BPv++/4GAfn6APkF9wD2DAj1CvcE9Pn9+P7+HfoO8AIJEQP49/kE9QP9+v/7+fn5AgcL/hP7//wHBw71B/UBB/wG/fsNAvcHEfYHB/cGAxQQBvv59wH69gIJ/wYG+QMJ+vr9AAcFBP8GAQAG/v/0/wICAgIBAvf2BfYE/gMKAwEF/P4GCgoI/fX7AgLz/QH4+wL/BgMAAP0F/P0B6Qb9+wAAA/z7Cf4E/gb+/wMJA/wA+AIWFP4D+wj/BgL47AABAQIABAX9/gv8CAYI/AEFAPoDAPQAAvv8/QbyBgIF+Q=="
+      "vec": "AQD/+gPzCOj1Aff6Bf/6Ffn1Ffv69RIIEgf4/g8Q8gX/BPr++/4GAfj6APkF9wD2DAj1CvcE9Pn9+P/+HfkO8AIJEQP49/kE9gP9+f/6+fn5AQcL/RP7//wHBw71B/UBB/sG/fsNAfcHEPYHB/cGAxQRBvv59wH79gIJ/wYG+gMJ+vr9AAcFBAAGAQAF/gD0AAICAgIAAvf2BfYE/gMKAwEF/P4GCgoI/fb7AgLz/QH4+wL+BgMAAP0F/P0B6Qb++wD/A/z7Cf4E/Qb+/gMJA/wA+AIWE/4C+wf/BgL57AABAQIABAX9/Qv8CAYI/AEFAPoD//UAA/v8/QbyBgIF+Q=="
     },
     {
       "id": "q19",
@@ -290,7 +290,7 @@
       "role": "query",
       "key": "commentary:haydock/Ps/35/13",
       "text": "There. The devil fell by pride, and man by his persuasion.",
-      "vec": "CQL+FgD1CPT5+v3wBP/+EPUAGPn/CQUIGv8EAA393QMACfv++Pv8CQD0AvTx/Ar8DwX+/QP//Pv8+Qj+Cg338AEHBwEKAfwJ+wADCwP3/vr7BxL4/xL6+Q75CQb/EPz9CfwCBPoHAwL8DP4J9vICBAH/AgP+Bfz+7woK9/f/+QcD+P38Bw8C//oB/QIZ/vj6+wP+BwT5+vn4AvkG/PYJ/QUHAvr9CwQABAT9Bf//AAD+8vX5BwEB+//4AAj8+gP9DgcB/QP2BQDzEwIA+gUGBfv/9QEJAwYF/QD6BgL19wkH+/8GAQAEBhICBPkEAgIF+gMLB/kI//wA9Qb1APUCBg=="
+      "vec": "CQL+FgD1CPP5+v3xBP/9EPYAGPn/CAUIGv8E/g393QMACfz++Pv8CQD0AvTx+wr8DwX+/QP//Pv8+Qj+Cg337wEHBwIKAfwJ+gEDCwP3/vr7BxL4/xL6+Q36CQb/EPz9CfwCBPoIBAL8DP4J9vECBAD+AgP+Bfz+7woK9/f/+QcD+P39Bw8C//oB/AIZ/fj6+wP+BwT4+vn4AvkG/PYJ/QUHAvr8CwQABAT9BQAAAAD+8vX5BwEA/P/4AAj8+gT8DgcB/QP2BP/yEwIA+gUGBfv/9AEJAwYG/QD6BgL09wkH+/8GAQAEBhICA/kEAgIF+gQLBvkI//wA9Qb1APUBBg=="
     }
   ]
 }
