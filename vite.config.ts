@@ -46,9 +46,19 @@ export default defineConfig(({ mode }) => {
         globPatterns: ['**/*.{html,js,css,png,jpg,jpeg,gif,webp,avif,wasm}'],
         // §L #20 (L-content-modules-search §2.5): nothing paid or heavy is
         // precached — module DBs, corpus DBs, GGUFs and wllama runtime bytes.
-        globIgnores: ['**/modules/**', '**/*.db', '**/*.gguf', '**/vendor/wllama/**'],
+        // TT.2: the ORT runtime (15–29 MB per .wasm) is only needed once the voice is used, so it
+        // stays out of the install-time precache and rides the CacheFirst route below (offline
+        // after warm-up, L.7-6a). Hashed names make CacheFirst safe.
+        globIgnores: ['**/modules/**', '**/*.db', '**/*.gguf', '**/vendor/wllama/**', '**/ort-wasm-simd-threaded*'],
         cleanupOutdatedCaches: true,
         runtimeCaching: [{
+          urlPattern: /\/ort-wasm-simd-threaded[^/]*\.(wasm|mjs)$/,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'sanctissimissa-ort',
+            expiration: { maxEntries: 8 },
+          },
+        },{
           urlPattern: /\.(mp4|webm|mov|m4v)$/,
           // Hashed media assets are immutable, so CacheFirst is safe and keeps
           // large backstory videos out of the install-time precache: offline
